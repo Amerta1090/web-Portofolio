@@ -1,0 +1,521 @@
+{
+  "skills": [
+    {
+      "name": "Django",
+      "associated_with": [
+        "IJO PLIS — IHSG & USD/IDR Forecasting Platform"
+      ]
+    },
+    {
+      "name": "Time Series Forecasting",
+      "associated_with": [
+        "IJO PLIS — IHSG & USD/IDR Forecasting Platform"
+      ]
+    },
+    {
+      "name": "Responsive Web Design",
+      "associated_with": [
+        "NyatetDuwit — Offline-First Personal Finance PWA"
+      ]
+    },
+    {
+      "name": "Progressive Web Applications (PWAs)",
+      "associated_with": [
+        "NyatetDuwit — Offline-First Personal Finance PWA"
+      ]
+    },
+    {
+      "name": "Front-End Development",
+      "associated_with": []
+    },
+    {
+      "name": "Dexie.js",
+      "associated_with": []
+    },
+    {
+      "name": "IndexedDB",
+      "associated_with": [
+        "NyatetDuwit — Offline-First Personal Finance PWA"
+      ]
+    },
+    {
+      "name": "Back-End Web Development",
+      "associated_with": []
+    },
+    {
+      "name": "React.js",
+      "associated_with": []
+    },
+    {
+      "name": "Full-Stack Development",
+      "associated_with": [
+        "Full-Stack Systems Engineer (AI & Automation) at Ferswit Indonesia"
+      ]
+    },
+    {
+      "name": "Enterprise Resource Planning (ERP)",
+      "associated_with": [
+        "Full-Stack Systems Engineer (AI & Automation) at Ferswit Indonesia"
+      ]
+    },
+    {
+      "name": "Systems Engineering",
+      "associated_with": [
+        "Full-Stack Systems Engineer (AI & Automation) at Ferswit Indonesia"
+      ]
+    },
+    {
+      "name": "Linux Desktop",
+      "associated_with": [
+        "Premium Sudoku: Overengineered Puzzle Experience"
+      ]
+    },
+    {
+      "name": "Cascading Style Sheets (CSS)",
+      "associated_with": []
+    },
+    {
+      "name": "HTML",
+      "associated_with": []
+    },
+    {
+      "name": "Artificial Intelligence (AI)",
+      "associated_with": [
+        "Ferswit Indonesia (and 3 other companies)",
+        "Resepku – Multi-Modal Recipe Discovery with Image and Text-Based Queries",
+        "IJO PLIS — IHSG & USD/IDR Forecasting Platform"
+      ]
+    },
+    {
+      "name": "Internet of Things (IoT)",
+      "associated_with": [
+        "Samsung Innovation Campus Participant at Samsung Innovation Campus",
+        "Automated Chicken Coop Environment Controller",
+        "Smart Laundry Bin: IoT-Based Load & Cost Monitoring System"
+      ]
+    },
+    {
+      "name": "Data Science",
+      "associated_with": [
+        "IDCamp 2023 Participant at IDCamp Indosat Ooredoo Hutchison",
+        "Universitas AMIKOM Yogyakarta",
+        "Student Retention Analysis & Prediction System: Reducing Dropout Rates"
+      ]
+    },
+    {
+      "name": "Data Engineering",
+      "associated_with": [
+        "Predictive Analytics for Real Estate: Housing Price Estimation in South Tangerang",
+        "Personalized Book Recommendation System: Multi-Model Discovery Engine"
+      ]
+    },
+    {
+      "name": "Information Retrieval",
+      "associated_with": [
+        "Resepku – Multi-Modal Recipe Discovery with Image and Text-Based Queries"
+      ]
+    },
+    {
+      "name": "Large Language Models (LLM)",
+      "associated_with": [
+        "TemuSehat ADK – Herbal AI Agent for Early Symptom Triage"
+      ]
+    },
+    {
+      "name": "Retrieval-Augmented Generation (RAG)",
+      "associated_with": [
+        "AI Quranic Tafsir Assistant: Hybrid Sparse-Dense Retrieval & RAG"
+      ]
+    },
+    {
+      "name": "Recommender Systems",
+      "associated_with": [
+        "SweetLife Mobile App – AI-Powered Wellness & Diabetes-Friendly Lifestyle Companion",
+        "Pathwise Career AI: Personalized Guidance Through Data-Driven Insights"
+      ]
+    },
+    {
+      "name": "Deep Learning",
+      "associated_with": [
+        "Resepku – Multi-Modal Recipe Discovery with Image and Text-Based Queries",
+        "SweetLife Mobile App – AI-Powered Wellness & Diabetes-Friendly Lifestyle Companion"
+      ]
+    },
+    {
+      "name": "Natural Language Processing (NLP)",
+      "associated_with": [
+        "AI Quranic Tafsir Assistant: Hybrid Sparse-Dense Retrieval & RAG",
+        "Personalized Book Recommendation System: Multi-Model Discovery Engine"
+      ]
+    },
+    {
+      "name": "Machine Learning",
+      "associated_with": [
+        "Program Studi Informatika AMIKOM (and 3 other companies)",
+        "SweetLife Mobile App – AI-Powered Wellness & Diabetes-Friendly Lifestyle Companion",
+        "Student Retention Analysis & Prediction System: Reducing Dropout Rates"
+      ]
+    },
+    {
+      "name": "Google Sheets",
+      "associated_with": [
+        "Journal CLI: Automated Micro-Journaling via Google Sheets API"
+      ]
+    },
+    {
+      "name": "Image Processing",
+      "associated_with": [
+        "Algorithmic Image Compressor: Precision Size Optimization"
+      ]
+    },
+    {
+      "name": "Object-Oriented Programming (OOP)",
+      "associated_with": [
+        "CLI Productivity Engine: A JSON-Driven Task Management System"
+      ]
+    },
+    {
+      "name": "Automation",
+      "associated_with": [
+        "Full-Stack Systems Engineer (AI & Automation) at Ferswit Indonesia",
+        "Google Workspace Automation: Recurring Event & Task Scheduler",
+        "TreeMake: CLI Project Scaffolding Tool"
+      ]
+    },
+    {
+      "name": "Google Apps Script",
+      "associated_with": [
+        "Google Workspace Automation: Recurring Event & Task Scheduler"
+      ]
+    },
+    {
+      "name": "Google Workspace",
+      "associated_with": [
+        "Google Workspace Automation: Recurring Event & Task Scheduler",
+        "Journal CLI: Automated Micro-Journaling via Google Sheets API"
+      ]
+    },
+    {
+      "name": "FastAPI",
+      "associated_with": [
+        "Red Devil Dynamics — AI Goal Timing Predictor for Manchester United"
+      ]
+    },
+    {
+      "name": "Supervised Learning",
+      "associated_with": [
+        "SweetLife Mobile App – AI-Powered Wellness & Diabetes-Friendly Lifestyle Companion"
+      ]
+    },
+    {
+      "name": "Machine Learning Algorithms",
+      "associated_with": [
+        "SweetLife Mobile App – AI-Powered Wellness & Diabetes-Friendly Lifestyle Companion"
+      ]
+    },
+    {
+      "name": "AI Agents",
+      "associated_with": [
+        "TemuSehat ADK – Herbal AI Agent for Early Symptom Triage"
+      ]
+    },
+    {
+      "name": "Web Development",
+      "associated_with": [
+        "Red Devil Dynamics — AI Goal Timing Predictor for Manchester United",
+        "Premium Sudoku: Overengineered Puzzle Experience",
+        "NyatetDuwit — Offline-First Personal Finance PWA"
+      ]
+    },
+    {
+      "name": "Google Agent Development Kit (ADK)",
+      "associated_with": [
+        "TemuSehat ADK – Herbal AI Agent for Early Symptom Triage"
+      ]
+    },
+    {
+      "name": "Meta AI (LLAMA)",
+      "associated_with": [
+        "AI Quranic Tafsir Assistant: Hybrid Sparse-Dense Retrieval & RAG"
+      ]
+    },
+    {
+      "name": "ESP8266",
+      "associated_with": [
+        "Smart Laundry Bin: IoT-Based Load & Cost Monitoring System"
+      ]
+    },
+    {
+      "name": "Survival Analysis",
+      "associated_with": [
+        "Red Devil Dynamics — AI Goal Timing Predictor for Manchester United"
+      ]
+    },
+    {
+      "name": "API Development",
+      "associated_with": [
+        "Red Devil Dynamics — AI Goal Timing Predictor for Manchester United"
+      ]
+    },
+    {
+      "name": "C++",
+      "associated_with": [
+        "SMKN 3 BOYOLANGU",
+        "Automated Chicken Coop Environment Controller",
+        "Smart Laundry Bin: IoT-Based Load & Cost Monitoring System"
+      ]
+    },
+    {
+      "name": "Electronic Circuit Design",
+      "associated_with": [
+        "Automated Chicken Coop Environment Controller"
+      ]
+    },
+    {
+      "name": "Embedded Systems",
+      "associated_with": [
+        "Automated Chicken Coop Environment Controller",
+        "Smart Laundry Bin: IoT-Based Load & Cost Monitoring System"
+      ]
+    },
+    {
+      "name": "MLOps",
+      "associated_with": [
+        "MLOps Integration: Real-Time Incremental Learning with MLflow",
+        "Production-Ready MLOps Pipeline: House Pricing Model with Real-Time Monitoring",
+        "Membangun Sistem Machine Learning"
+      ]
+    },
+    {
+      "name": "MLflow",
+      "associated_with": [
+        "Membangun Sistem Machine Learning"
+      ]
+    },
+    {
+      "name": "AI Prompting",
+      "associated_with": [
+        "Prompt Design in Vertex AI",
+        "AI Praktis untuk Produktivitas",
+        "Belajar Penggunaan Generative AI"
+      ]
+    },
+    {
+      "name": "Prompt Engineering",
+      "associated_with": [
+        "Prompt AI Trainer at Aksoro",
+        "TemuSehat ADK – Herbal AI Agent for Early Symptom Triage",
+        "Prompt Design in Vertex AI"
+      ]
+    },
+    {
+      "name": "Chatbot Development",
+      "associated_with": [
+        "Prompt AI Trainer at Aksoro",
+        "AI Quranic Tafsir Assistant: Hybrid Sparse-Dense Retrieval & RAG",
+        "TemuSehat ADK – Herbal AI Agent for Early Symptom Triage"
+      ]
+    },
+    {
+      "name": "Docker",
+      "associated_with": [
+        "Membangun Sistem Machine Learning"
+      ]
+    },
+    {
+      "name": "Grafana",
+      "associated_with": [
+        "Production-Ready MLOps Pipeline: House Pricing Model with Real-Time Monitoring",
+        "Membangun Sistem Machine Learning"
+      ]
+    },
+    {
+      "name": "Prometheus",
+      "associated_with": [
+        "Production-Ready MLOps Pipeline: House Pricing Model with Real-Time Monitoring",
+        "Membangun Sistem Machine Learning"
+      ]
+    },
+    {
+      "name": "Tableau",
+      "associated_with": [
+        "Laboratory Assistant at Forum Asisten"
+      ]
+    },
+    {
+      "name": "SPSS Statistics",
+      "associated_with": [
+        "Laboratory Assistant at Forum Asisten"
+      ]
+    },
+    {
+      "name": "Arduino IDE",
+      "associated_with": [
+        "Laboratory Assistant at Forum Asisten",
+        "Automated Chicken Coop Environment Controller",
+        "Smart Laundry Bin: IoT-Based Load & Cost Monitoring System"
+      ]
+    },
+    {
+      "name": "Arduino",
+      "associated_with": [
+        "Laboratory Assistant at Forum Asisten"
+      ]
+    },
+    {
+      "name": "Looker studio",
+      "associated_with": [
+        "Laboratory Assistant at Forum Asisten"
+      ]
+    },
+    {
+      "name": "Hardware Development",
+      "associated_with": [
+        "Laboratory Assistant at Forum Asisten"
+      ]
+    },
+    {
+      "name": "Statistics",
+      "associated_with": [
+        "Laboratory Assistant at Forum Asisten"
+      ]
+    },
+    {
+      "name": "Google Cloud Platform (GCP)",
+      "associated_with": [
+        "Cloud Speech API: 3 Ways",
+        "Prepare Data for ML APIs on Google Cloud",
+        "Automate Data Capture at Scale with Document"
+      ]
+    },
+    {
+      "name": "Data Visualization",
+      "associated_with": [
+        "Laboratory Assistant at Forum Asisten"
+      ]
+    },
+    {
+      "name": "Big Data",
+      "associated_with": [
+        "Laboratory Assistant at Forum Asisten"
+      ]
+    },
+    {
+      "name": "Data Analysis",
+      "associated_with": [
+        "Belajar Analisis Data dengan Python"
+      ]
+    },
+    {
+      "name": "ESP32 Microcontrollers",
+      "associated_with": [
+        "IoT Development with ESP32 (Gold)"
+      ]
+    },
+    {
+      "name": "Raspberry Pi",
+      "associated_with": [
+        "Internet of Things (IoT) - Hardware (Gold)"
+      ]
+    },
+    {
+      "name": "Bash",
+      "associated_with": [
+        "Journal CLI: Automated Micro-Journaling via Google Sheets API",
+        "TreeMake: CLI Project Scaffolding Tool",
+        "Using Python to Interact with the Operating System"
+      ]
+    },
+    {
+      "name": "Regular Expressions",
+      "associated_with": [
+        "TreeMake: CLI Project Scaffolding Tool",
+        "Using Python to Interact with the Operating System"
+      ]
+    },
+    {
+      "name": "Data Structures",
+      "associated_with": [
+        "Algorithm & Data Structures with Python (Gold)"
+      ]
+    },
+    {
+      "name": "Cybersecurity",
+      "associated_with": [
+        "Introduction to Cybersecurity"
+      ]
+    },
+    {
+      "name": "Cisco Certified",
+      "associated_with": [
+        "CCNA: Introduction to Networks",
+        "Introduction to Cybersecurity",
+        "Networking Basics"
+      ]
+    },
+    {
+      "name": "Cisco Networking",
+      "associated_with": [
+        "CCNA: Introduction to Networks",
+        "Networking Basics",
+        "Networking Devices and Initial Configuration"
+      ]
+    },
+    {
+      "name": "Python (Programming Language)",
+      "associated_with": [
+        "Forum Asisten (and 2 other companies)",
+        "Universitas AMIKOM Yogyakarta",
+        "AI Quranic Tafsir Assistant: Hybrid Sparse-Dense Retrieval & RAG"
+      ]
+    },
+    {
+      "name": "JavaScript",
+      "associated_with": [
+        "Belajar Membuat Aplikasi Back-End untuk Pemula",
+        "Belajar Dasar Pemrograman JavaScript",
+        "Belajar Membuat Front-End Web untuk Pemula"
+      ]
+    },
+    {
+      "name": "DevOps",
+      "associated_with": [
+        "Laboratory Assistant at Forum Asisten",
+        "Universitas AMIKOM Yogyakarta"
+      ]
+    },
+    {
+      "name": "Printed Circuit Board (PCB) Design",
+      "associated_with": [
+        "SMKN 3 BOYOLANGU"
+      ]
+    },
+    {
+      "name": "SQL",
+      "associated_with": [
+        "Universitas AMIKOM Yogyakarta",
+        "Belajar Dasar Structured Query Language (SQL)"
+      ]
+    },
+    {
+      "name": "Eagle PCB",
+      "associated_with": [
+        "SMKN 3 BOYOLANGU"
+      ]
+    },
+    {
+      "name": "Soldering",
+      "associated_with": [
+        "SMKN 3 BOYOLANGU"
+      ]
+    },
+    {
+      "name": "Linux",
+      "associated_with": [
+        "TreeMake: CLI Project Scaffolding Tool",
+        "Premium Sudoku: Overengineered Puzzle Experience",
+        "CLI"
+      ]
+    }
+  ]
+}

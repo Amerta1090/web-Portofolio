@@ -1,0 +1,500 @@
+{
+  "licenses_and_certifications": [
+    {
+      "title": "EF SET English Certificate 72/100 (C2 Proficient)",
+      "issuer": "EF SET",
+      "issue_date": null,
+      "expiration_date": null,
+      "credential_id": null,
+      "skills": []
+    },
+    {
+      "title": "Belajar Fundamental Pemrosesan Data",
+      "issuer": "Dicoding Indonesia",
+      "issue_date": "Oct 2025",
+      "expiration_date": "Oct 2028",
+      "credential_id": "JMZVVV65RZN9",
+      "skills": []
+    },
+    {
+      "title": "Membangun Sistem Machine Learning",
+      "issuer": "Dicoding Indonesia",
+      "issue_date": "Jun 2025",
+      "expiration_date": "Jun 2028",
+      "credential_id": "EYX4K1096PDL",
+      "skills": ["Machine Learning", "MLflow"]
+    },
+    {
+      "title": "Prompt Engineering untuk Software Developer",
+      "issuer": "Dicoding Indonesia",
+      "issue_date": "Jun 2025",
+      "expiration_date": "Jun 2028",
+      "credential_id": "2VX3KGVR3XYQ",
+      "skills": ["Prompt Engineering", "AI Prompting"]
+    },
+    {
+      "title": "Belajar Dasar AI",
+      "issuer": "Dicoding Indonesia",
+      "issue_date": "May 2025",
+      "expiration_date": "May 2028",
+      "credential_id": "4EXGV018QXRL",
+      "skills": ["Artificial Intelligence (AI)"]
+    },
+    {
+      "title": "Belajar Penggunaan Generative AI",
+      "issuer": "Dicoding Indonesia",
+      "issue_date": "May 2025",
+      "expiration_date": "May 2028",
+      "credential_id": "QLZ93L39MZ5D",
+      "skills": ["AI Prompting", "Artificial Intelligence (AI)"]
+    },
+    {
+      "title": "AI Praktis untuk Produktivitas",
+      "issuer": "Dicoding Indonesia",
+      "issue_date": "May 2025",
+      "expiration_date": "May 2028",
+      "credential_id": "RVZKWNR9QZD5",
+      "skills": ["Artificial Intelligence (AI)", "AI Prompting"]
+    },
+    {
+      "title": "Machine Learning Terapan",
+      "issuer": "Dicoding Indonesia",
+      "issue_date": "Mar 2025",
+      "expiration_date": "Mar 2028",
+      "credential_id": "MRZMNWY7KPYQ",
+      "skills": ["Machine Learning"]
+    },
+    {
+      "title": "Use Machine Learning APIs on Google Cloud",
+      "issuer": "Google Cloud Skills Boost",
+      "issue_date": "Feb 2025",
+      "expiration_date": null,
+      "credential_id": null,
+      "skills": ["Machine Learning", "Artificial Intelligence (AI)"]
+    },
+    {
+      "title": "Automate Data Capture at Scale with Document",
+      "issuer": "Google Cloud Skills Boost",
+      "issue_date": "Feb 2025",
+      "expiration_date": null,
+      "credential_id": null,
+      "skills": ["Machine Learning", "Google Cloud Platform (GCP)"]
+    },
+    {
+      "title": "Prepare Data for ML APIs on Google Cloud",
+      "issuer": "Google Cloud Skills Boost",
+      "issue_date": "Feb 2025",
+      "expiration_date": null,
+      "credential_id": null,
+      "skills": ["Machine Learning", "Artificial Intelligence (AI)"]
+    },
+    {
+      "title": "Cloud Speech API: 3 Ways",
+      "issuer": "Google Cloud Skills Boost",
+      "issue_date": "Feb 2025",
+      "expiration_date": "Feb 2026",
+      "credential_id": null,
+      "skills": ["Machine Learning", "Artificial Intelligence (AI)"]
+    },
+    {
+      "title": "Build Real World AI Applications with Gemini and Imagen",
+      "issuer": "Google Cloud Skills Boost",
+      "issue_date": "Feb 2025",
+      "expiration_date": null,
+      "credential_id": null,
+      "skills": ["Machine Learning", "Artificial Intelligence (AI)"]
+    },
+    {
+      "title": "Prompt Design in Vertex AI",
+      "issuer": "Google Cloud Skills Boost",
+      "issue_date": "Feb 2025",
+      "expiration_date": null,
+      "credential_id": null,
+      "skills": ["Prompt Engineering", "AI Prompting"]
+    },
+    {
+      "title": "Build Basic Generative Adversarial Networks (GANs)",
+      "issuer": "DeepLearning.AI",
+      "issue_date": "Nov 2024",
+      "expiration_date": null,
+      "credential_id": "SI4U71PB7QS8",
+      "skills": []
+    },
+    {
+      "title": "Generative AI for Everyone",
+      "issuer": "DeepLearning.AI",
+      "issue_date": "Nov 2024",
+      "expiration_date": null,
+      "credential_id": "74GRIZJBV46P",
+      "skills": []
+    },
+    {
+      "title": "Advanced Computer Vision with TensorFlow",
+      "issuer": "DeepLearning.AI",
+      "issue_date": "Nov 2024",
+      "expiration_date": null,
+      "credential_id": "SO3G8Y5TLK7R",
+      "skills": []
+    },
+    {
+      "title": "Custom and Distributed Training with TensorFlow",
+      "issuer": "DeepLearning.AI",
+      "issue_date": "Nov 2024",
+      "expiration_date": null,
+      "credential_id": "QI1984U4BWRJ",
+      "skills": []
+    },
+    {
+      "title": "Custom Models, Layers, and Loss Functions with TensorFlow",
+      "issuer": "DeepLearning.AI",
+      "issue_date": "Nov 2024",
+      "expiration_date": null,
+      "credential_id": "SPL3FA06LGGF",
+      "skills": []
+    },
+    {
+      "title": "Data Pipelines with TensorFlow Data Services",
+      "issuer": "DeepLearning.AI",
+      "issue_date": "Nov 2024",
+      "expiration_date": null,
+      "credential_id": "HUF3VAYZ3D8I",
+      "skills": ["Machine Learning"]
+    },
+    {
+      "title": "Device-based Models with TensorFlow Lite",
+      "issuer": "DeepLearning.AI",
+      "issue_date": "Nov 2024",
+      "expiration_date": null,
+      "credential_id": "HV5V7Q95IH2J",
+      "skills": []
+    },
+    {
+      "title": "Browser-based Models with TensorFlow.js",
+      "issuer": "DeepLearning.AI",
+      "issue_date": "Nov 2024",
+      "expiration_date": null,
+      "credential_id": "4V44LYGDT2H5",
+      "skills": []
+    },
+    {
+      "title": "Structuring Machine Learning Projects",
+      "issuer": "DeepLearning.AI",
+      "issue_date": "Nov 2024",
+      "expiration_date": null,
+      "credential_id": "YXVHA4N40O1L",
+      "skills": ["Machine Learning"]
+    },
+    {
+      "title": "DeepLearning.AI TensorFlow Developer Specialization",
+      "issuer": "DeepLearning.AI",
+      "issue_date": "Nov 2024",
+      "credential_id": "9ZOQP7T9N5VJ",
+      "expiration_date": null,
+      "skills": []
+    },
+    {
+      "title": "Sequences, Time Series and Prediction",
+      "issuer": "DeepLearning.AI",
+      "issue_date": "Nov 2024",
+      "expiration_date": null,
+      "credential_id": "101UFY6VP8W8",
+      "skills": ["Machine Learning", "Artificial Intelligence (AI)"]
+    },
+    {
+      "title": "Natural Language Processing in TensorFlow",
+      "issuer": "DeepLearning.AI",
+      "issue_date": "Nov 2024",
+      "expiration_date": null,
+      "credential_id": "T2Z5HXSVD44Y",
+      "skills": ["Machine Learning", "Artificial Intelligence (AI)"]
+    },
+    {
+      "title": "Convolutional Neural Networks in TensorFlow",
+      "issuer": "DeepLearning.AI",
+      "issue_date": "Oct 2024",
+      "expiration_date": null,
+      "credential_id": "8G2F09C22NHY",
+      "skills": ["Machine Learning", "Artificial Intelligence (AI)"]
+    },
+    {
+      "title": "Introduction to TensorFlow for Artificial Intelligence, Machine Learning, and Deep Learning",
+      "issuer": "DeepLearning.AI",
+      "issue_date": "Oct 2024",
+      "expiration_date": null,
+      "credential_id": "8TY6VWVSDK80",
+      "skills": ["Machine Learning", "Artificial Intelligence (AI)"]
+    },
+    {
+      "title": "Machine Learning Specialization",
+      "issuer": "DeepLearning.AI, Coursera, Stanford CPD, UVM",
+      "issue_date": "Oct 2024",
+      "expiration_date": null,
+      "credential_id": "6J1DXGOAZ1EZ",
+      "skills": ["Machine Learning"]
+    },
+    {
+      "title": "Unsupervised Learning, Recommenders, Reinforcement Learning",
+      "issuer": "DeepLearning.AI, Coursera, Stanford CPD, UVM",
+      "issue_date": "Oct 2024",
+      "expiration_date": null,
+      "credential_id": "U8PT5G10L9B1",
+      "skills": ["Machine Learning"]
+    },
+    {
+      "title": "Advanced Learning Algorithms",
+      "issuer": "DeepLearning.AI, Coursera, Stanford CPD, UVM",
+      "issue_date": "Oct 2024",
+      "expiration_date": null,
+      "credential_id": "6NIGRVU17ELC",
+      "skills": ["Machine Learning"]
+    },
+    {
+      "title": "Supervised Machine Learning: Regression and Classification",
+      "issuer": "DeepLearning.AI, Coursera, Stanford CPD, UVM",
+      "issue_date": "Oct 2024",
+      "expiration_date": null,
+      "credential_id": "3Y4BNC1PV6VY",
+      "skills": ["Machine Learning"]
+    },
+    {
+      "title": "Linear Algebra for Machine Learning and Data Science",
+      "issuer": "DeepLearning.AI",
+      "issue_date": "Oct 2024",
+      "expiration_date": null,
+      "credential_id": "8VZAR6KT11D2",
+      "skills": ["Machine Learning", "Data Science"]
+    },
+    {
+      "title": "Using Python to Interact with the Operating System",
+      "issuer": "Google",
+      "issue_date": "Sep 2024",
+      "expiration_date": null,
+      "credential_id": "SQN7F4F2VYPX",
+      "skills": ["Python (Programming Language)", "Bash"]
+    },
+    {
+      "title": "Crash Course on Python",
+      "issuer": "Google",
+      "issue_date": "Sep 2024",
+      "expiration_date": null,
+      "credential_id": "YUF9TT7IKZTT",
+      "skills": ["Python (Programming Language)"]
+    },
+    {
+      "title": "Belajar Dasar Git dengan GitHub",
+      "issuer": "Dicoding Indonesia",
+      "issue_date": "Sep 2024",
+      "expiration_date": "Sep 2027",
+      "credential_id": "L4PQ1D2YVXO1",
+      "skills": []
+    },
+    {
+      "title": "Internet of Things (IoT) - Hardware (Gold)",
+      "issuer": "Skilvul",
+      "issue_date": "Jul 2024",
+      "expiration_date": "Jul 2026",
+      "credential_id": "nbpdDJSeSCiZ2w0xMP6fAg",
+      "skills": ["Internet of Things (IoT)", "Raspberry Pi"]
+    },
+    {
+      "title": "Belajar Penerapan Data Science",
+      "issuer": "Dicoding Indonesia",
+      "issue_date": "Jun 2024",
+      "expiration_date": "Jun 2027",
+      "credential_id": "53XEO1ORYZRN",
+      "skills": ["Data Science", "Machine Learning"]
+    },
+    {
+      "title": "Belajar Membuat Front-End Web untuk Pemula",
+      "issuer": "Dicoding Indonesia",
+      "issue_date": "Jun 2024",
+      "expiration_date": "Jun 2027",
+      "credential_id": "L4PQ19RLOXO1",
+      "skills": ["JavaScript"]
+    },
+    {
+      "title": "Internet of Things (IoT) - Software and Platforms (Gold)",
+      "issuer": "Skilvul",
+      "issue_date": "Jun 2024",
+      "expiration_date": "Jun 2026",
+      "credential_id": "m_TRSOQPT46p0-CJVE0mgw",
+      "skills": ["Internet of Things (IoT)"]
+    },
+    {
+      "title": "IoT Development with ESP32 (Gold)",
+      "issuer": "Skilvul",
+      "issue_date": "Jun 2024",
+      "expiration_date": "Jun 2026",
+      "credential_id": "duXt_9keQomerf5R_wdwoQ",
+      "skills": ["Internet of Things (IoT)", "ESP32 Microcontrollers"]
+    },
+    {
+      "title": "Internet of Things (IoT) - Fundamentals (Gold)",
+      "issuer": "Skilvul",
+      "issue_date": "Apr 2024",
+      "expiration_date": "Apr 2026",
+      "credential_id": "4bQuh9yOQ72Y08YJxF26MA",
+      "skills": ["Internet of Things (IoT)"]
+    },
+    {
+      "title": "Algorithm & Data Structures with Python (Gold)",
+      "issuer": "Skilvul",
+      "issue_date": "Mar 2024",
+      "expiration_date": "Feb 2026",
+      "credential_id": "DwfVW4LCRDacft3l0R3-Hw",
+      "skills": ["Data Structures", "Python (Programming Language)"]
+    },
+    {
+      "title": "Python Lanjutan (Gold)",
+      "issuer": "Skilvul",
+      "issue_date": "Mar 2024",
+      "expiration_date": "Mar 2026",
+      "credential_id": "67_uTSO_QjaVwUGAuhW8Zw",
+      "skills": ["Python (Programming Language)"]
+    },
+    {
+      "title": "Networking Devices and Initial Configuration",
+      "issuer": "Cisco",
+      "issue_date": "Mar 2024",
+      "expiration_date": null,
+      "credential_id": null,
+      "skills": ["Cisco Certified", "Cisco Networking"]
+    },
+    {
+      "title": "Python Dasar (Gold)",
+      "issuer": "Skilvul",
+      "issue_date": "Mar 2024",
+      "expiration_date": "Mar 2026",
+      "credential_id": "3_sm0P1xQLCvq3MCiuPhgQ",
+      "skills": ["Python (Programming Language)"]
+    },
+    {
+      "title": "Belajar Dasar Pemrograman Web",
+      "issuer": "Dicoding Indonesia",
+      "issue_date": "Mar 2024",
+      "expiration_date": "Mar 2027",
+      "credential_id": "98XW27R74PM3",
+      "skills": []
+    },
+    {
+      "title": "Networking Basics",
+      "issuer": "Cisco",
+      "issue_date": "Feb 2024",
+      "expiration_date": null,
+      "credential_id": null,
+      "skills": ["Cisco Networking", "Cisco Certified"]
+    },
+    {
+      "title": "Introduction to Cybersecurity",
+      "issuer": "Cisco",
+      "issue_date": "Feb 2024",
+      "expiration_date": "Feb 2026",
+      "credential_id": null,
+      "skills": ["Cybersecurity", "Cisco Certified"]
+    },
+    {
+      "title": "CCNA: Introduction to Networks",
+      "issuer": "Cisco",
+      "issue_date": "Jan 2024",
+      "expiration_date": null,
+      "credential_id": null,
+      "skills": ["Cisco Networking", "Cisco Certified"]
+    },
+    {
+      "title": "Belajar Pengembangan Machine Learning",
+      "issuer": "Dicoding Indonesia",
+      "issue_date": "Dec 2023",
+      "expiration_date": "Dec 2026",
+      "credential_id": "L4PQQ8N82PO1",
+      "skills": ["Machine Learning", "Python (Programming Language)"]
+    },
+    {
+      "title": "Belajar Machine Learning untuk Pemula",
+      "issuer": "Dicoding Indonesia",
+      "issue_date": "Nov 2023",
+      "expiration_date": "Nov 2026",
+      "credential_id": "KEXL8E86MZG2",
+      "skills": ["Machine Learning", "Python (Programming Language)"]
+    },
+    {
+      "title": "Belajar Analisis Data dengan Python",
+      "issuer": "Dicoding Indonesia",
+      "issue_date": "Nov 2023",
+      "expiration_date": "Nov 2026",
+      "credential_id": "JMZV1YVJRXN9",
+      "skills": ["Data Analysis", "Python (Programming Language)"]
+    },
+    {
+      "title": "Memulai Pemrograman dengan Python",
+      "issuer": "Dicoding Indonesia",
+      "issue_date": "Nov 2023",
+      "expiration_date": "Nov 2026",
+      "credential_id": "KEXLLKJK4XG2",
+      "skills": ["Python (Programming Language)", "Data Science"]
+    },
+    {
+      "title": "Belajar Dasar Data Science",
+      "issuer": "Dicoding Indonesia",
+      "issue_date": "Nov 2023",
+      "expiration_date": "Nov 2026",
+      "credential_id": "2VX363KOQXYQ",
+      "skills": ["Data Science"]
+    },
+    {
+      "title": "Memulai Dasar Pemrograman untuk Menjadi Pengembang Software",
+      "issuer": "Dicoding Indonesia",
+      "issue_date": "Aug 2023",
+      "expiration_date": "Aug 2026",
+      "credential_id": "2VX3JGEOQPYQ",
+      "skills": []
+    },
+    {
+      "title": "Belajar Dasar Structured Query Language (SQL)",
+      "issuer": "Dicoding Indonesia",
+      "issue_date": "Sep 2023",
+      "expiration_date": "Sep 2026",
+      "credential_id": "2VX36JDW3XYQ",
+      "skills": ["SQL"]
+    },
+    {
+      "title": "Belajar Dasar Manajemen Proyek",
+      "issuer": "Dicoding Indonesia",
+      "issue_date": "Aug 2023",
+      "expiration_date": "Aug 2026",
+      "credential_id": "MRZMQJE40PYQ",
+      "skills": []
+    },
+    {
+      "title": "Belajar Dasar Pemrograman JavaScript",
+      "issuer": "Dicoding Indonesia",
+      "issue_date": "Jul 2023",
+      "expiration_date": "Jul 2026",
+      "credential_id": "1OP80MOM8XQK",
+      "skills": ["JavaScript"]
+    },
+    {
+      "title": "Belajar Membuat Aplikasi Back-End untuk Pemula",
+      "issuer": "Dicoding Indonesia",
+      "issue_date": "Jul 2023",
+      "expiration_date": "Jul 2026",
+      "credential_id": "ERZRGJ9JWPYV",
+      "skills": ["JavaScript"]
+    },
+    {
+      "title": "Cloud Practitioner Essentials (Belajar Dasar AWS Cloud)",
+      "issuer": "Dicoding Indonesia",
+      "issue_date": "Feb 2023",
+      "expiration_date": "Feb 2026",
+      "credential_id": "1OP85EJJQPQK",
+      "skills": []
+    },
+    {
+      "title": "Belajar Dasar Visualisasi Data",
+      "issuer": "Dicoding Indonesia",
+      "issue_date": "Jan 2023",
+      "expiration_date": "Jan 2026",
+      "credential_id": "81P28L63OPOY",
+      "skills": ["Data Science"]
+    }
+  ]
+}

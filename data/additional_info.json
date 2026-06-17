@@ -1,0 +1,26 @@
+{
+  "languages": [
+    {
+      "language": "English",
+      "proficiency": "Professional working proficiency",
+      "additional_info": "Duolingo Score 130 (May 2026)"
+    },
+    {
+      "language": "Indonesian",
+      "proficiency": "Native or bilingual proficiency",
+      "additional_info": null
+    }
+  ],
+  "volunteering": [
+    {
+      "role": "Speaker",
+      "organization": "Universitas AMIKOM Yogyakarta",
+      "duration": "May 2025 · 1 mo",
+      "cause": "Education",
+      "description": "Served as a Speaker/Presenter for the \"Belajar Bareng UTS Genap 2025\" program, organized by the Directorate of Student Affairs at Universitas AMIKOM Yogyakarta. Delivered academic material and mentored participants in preparation for the Even Semester Midterm Examinations."
+    }
+  ],
+  "contact_links": {
+    "linkedin": "https://www.linkedin.com/in/abdulmajidr708/"
+  }
+}

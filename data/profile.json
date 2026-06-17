@@ -1,0 +1,105 @@
+{
+  "personal_information": {
+    "full_name": "Abdul Majid Ridwan Tyastonoatmaja",
+    "headline": "Aspiring IT Enthusiast | Passionate about Data Science, Machine Learning, and IoT | Eager to Explore and Contribute to the World of Technology.",
+    "location": {
+      "address": "Beji, Boyolangu, Tulungagung, Jawa Timur",
+      "country": "Indonesia"
+    },
+    "contact": {
+      "phone": "085927450991",
+      "email": "abdulmajidr708@gmail.com",
+      "linkedin": "www.linkedin.com/in/abdulmajidr708"
+    },
+    "summary": "I am a computer science graduate focused on applied machine learning, data science, and intelligent systems. With a background in electronics and data-driven problem solving, I work on building AI-powered solutions at the intersection of data, automation, and IoT. My approach emphasizes structured analysis, system-level thinking, and practical implementation rather than surface-level experimentation. I am open to technical roles, research-oriented projects, and collaborations that prioritize real-world impact."
+  },
+  "skills": {
+    "top_skills": [
+      "Django",
+      "Time Series Forecasting",
+      "Responsive Web Design"
+    ],
+    "languages": [
+      {
+        "language": "English",
+        "proficiency": "Professional Working"
+      },
+      {
+        "language": "Indonesian",
+        "proficiency": "Native or Bilingual"
+      }
+    ]
+  },
+  "certifications": [
+    "Custom Models, Layers, and Loss Functions with TensorFlow",
+    "IoT Development with ESP32 (Gold)"
+  ],
+  "honors_and_awards": [
+    "2nd Place Winner - IoT Category | Ignition Informatics 2024",
+    "Winner - AMICTA 2025 (Artificial Intelligence Category)",
+    "2nd Place Winner in Artificial Intelligence - ARCADIA Award 2026"
+  ],
+  "experience": [
+    {
+      "company": "Ferswit Indonesia",
+      "role": "Full-Stack Systems Engineer (AI & Automation)",
+      "period": "May 2026 - Present (2 months)",
+      "location": "Tulungagung",
+      "description": "Developed and continuously improved company systems, including ERP, internal tools, automation workflows, and web-based business applications. Gathered and translated business requirements into scalable technical solutions, contributing to sprint planning and feature prioritization. Designed, developed, and maintained full-stack web applications, covering both frontend and backend development. Leveraged AI-assisted development to accelerate software delivery, improve engineering efficiency, and streamline development workflows. Implemented automation and AI-driven solutions to optimize operational processes and reduce manual work. Managed deployment, VPS infrastructure, server configuration, monitoring, and production maintenance to ensure system reliability and performance. Performed debugging, testing, and continuous system enhancements to improve functionality, usability, and business impact."
+    },
+    {
+      "company": "Forum Asisten",
+      "role": "Laboratory Assistant",
+      "period": "September 2024 - January 2026 (1 year 5 months)",
+      "location": "Sleman, Yogyakarta, Indonesia",
+      "description": ""
+    },
+    {
+      "company": "Program Studi Informatika AMIKOM",
+      "role": "AI Engineer",
+      "period": "November 2024 - April 2025 (6 months)",
+      "location": "Sleman Regency, Yogyakarta, Indonesia",
+      "description": ""
+    },
+    {
+      "company": "Aksoro",
+      "role": "Prompt AI Trainer",
+      "period": "January 2025 - March 2025 (3 months)",
+      "location": "Gamping, Yogyakarta, Indonesia",
+      "description": ""
+    },
+    {
+      "company": "Bangkit Academy led by Google, Tokopedia, Gojek, & Traveloka",
+      "role": "Machine Learning Cohort",
+      "period": "September 2024 - January 2025 (5 months)",
+      "location": "Jakarta, Indonesia",
+      "description": ""
+    },
+    {
+      "company": "Samsung Innovation Campus",
+      "role": "Samsung Innovation Campus Participant",
+      "period": "February 2024 - August 2024 (7 months)",
+      "location": "",
+      "description": ""
+    },
+    {
+      "company": "Indosat Ooredoo Hutchison Digital Camp",
+      "role": "IDCamp 2023 Participant",
+      "period": "November 2023 - July 2024 (9 months)",
+      "location": "Jakarta, Indonesia",
+      "description": ""
+    }
+  ],
+  "education": [
+    {
+      "institution": "Universitas AMIKOM Yogyakarta",
+      "degree": "Bachelor's degree, Informatics",
+      "period": "September 2022 - March 2026"
+    },
+    {
+      "institution": "SMKN 3 BOYOLANGU",
+      "degree": "Industrial Electronics Technology/Technician",
+      "period": "June 2019 - June 2022"
+    }
+  ]
+}
