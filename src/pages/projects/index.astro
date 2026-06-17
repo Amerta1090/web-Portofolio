@@ -1,0 +1,44 @@
+---
+import Card from "../../components/ui/Card.astro";
+import Container from "../../components/ui/Container.astro";
+import Section from "../../components/ui/Section.astro";
+import Tag from "../../components/ui/Tag.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getProjects } from "../../lib/data";
+
+const projects = getProjects();
+
+function slugify(title: string): string {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+}
+---
+
+<BaseLayout title="Projects — Abdul Majid Ridwan Tyastonoatmaja" description="Portfolio projects in ML, IoT, web development, and more.">
+  <Section title="All Projects" subtitle={projects.length > 0 ? `${projects.length} projects across ML, IoT, web, CLI, and DevOps` : ""}>
+    <Container>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {
+          projects.map((project) => (
+            <Card href={`/projects/${slugify(project.title)}`} variant="elevated">
+              <h3 class="text-lg font-semibold text-text-primary mb-2 line-clamp-2">
+                {project.title}
+              </h3>
+              <p class="text-text-secondary text-sm line-clamp-3 mb-3">
+                {project.description}
+              </p>
+              {project.period && (
+                <p class="text-xs text-text-secondary mb-3">{project.period}</p>
+              )}
+              <div class="flex flex-wrap gap-1.5" slot="footer">
+                {project.skills.slice(0, 3).map((skill) => <Tag>{skill}</Tag>)}
+                {project.skills.length > 3 && (
+                  <Tag>+{project.skills.length - 3}</Tag>
+                )}
+              </div>
+            </Card>
+          ))
+        }
+      </div>
+    </Container>
+  </Section>
+</BaseLayout>

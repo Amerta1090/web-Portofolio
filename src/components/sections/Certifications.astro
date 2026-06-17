@@ -1,0 +1,95 @@
+---
+import type { Certification } from "../../types/certifications";
+import Badge from "../ui/Badge.astro";
+import Container from "../ui/Container.astro";
+
+export interface Props {
+  certifications: Certification[];
+}
+
+const { certifications } = Astro.props;
+
+function formatDate(date: string | null): string {
+  if (!date) return "";
+  const [year, month] = date.split("-");
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  return month ? `${months[Number.parseInt(month) - 1]} ${year}` : year;
+}
+
+const grouped = certifications.reduce((acc: Record<string, Certification[]>, cert) => {
+  const issuer = cert.issuer || "Other";
+  if (!acc[issuer]) acc[issuer] = [];
+  acc[issuer].push(cert);
+  return acc;
+}, {});
+---
+
+<Container>
+  <div class="mb-6">
+    <Badge variant="accent">{certifications.length} Certifications</Badge>
+  </div>
+  <div class="space-y-4">
+    {
+      Object.entries(grouped).map(([issuer, certs]) => (
+        <details class="group bg-bg-secondary border border-border rounded-xl overflow-hidden">
+          <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-bg-tertiary transition-colors duration-200 list-none">
+            <div class="flex items-center gap-3">
+              <h3 class="font-medium text-text-primary">{issuer}</h3>
+              <Badge>{certs.length}</Badge>
+            </div>
+            <svg
+              class="w-5 h-5 text-text-secondary group-open:rotate-180 transition-transform duration-200"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="border-t border-border">
+            {certs.map((cert) => (
+              <div class="p-4 border-b border-border last:border-b-0 hover:bg-bg-tertiary/50 transition-colors">
+                <div class="flex items-start justify-between gap-4">
+                  <div>
+                    <p class="text-text-primary text-sm font-medium">
+                      {cert.url
+                        ? <a href={cert.url} target="_blank" rel="noopener noreferrer" class="hover:text-accent transition-colors">{cert.title}</a>
+                        : cert.title
+                      }
+                    </p>
+                    {cert.date && (
+                      <p class="text-xs text-text-secondary mt-0.5">{formatDate(cert.date)}</p>
+                    )}
+                  </div>
+                  {cert.credential_id && (
+                    <span class="text-xs text-text-secondary flex-shrink-0">ID: {cert.credential_id}</span>
+                  )}
+                </div>
+                {cert.skills && cert.skills.length > 0 && (
+                  <div class="flex flex-wrap gap-1.5 mt-2">
+                    {cert.skills.map((skill) => (
+                      <span class="inline-flex items-center px-2 py-0.5 text-xs bg-bg-tertiary text-text-secondary rounded-full">{skill}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </details>
+      ))
+    }
+  </div>
+</Container>

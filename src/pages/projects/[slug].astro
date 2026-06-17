@@ -1,0 +1,113 @@
+---
+import Button from "../../components/ui/Button.astro";
+import Container from "../../components/ui/Container.astro";
+import Tag from "../../components/ui/Tag.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getProjects } from "../../lib/data";
+
+export async function getStaticPaths() {
+  const projects = getProjects();
+  return projects.map((project) => ({
+    params: { slug: project.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+
+if (!project) {
+  return Astro.redirect("/404");
+}
+
+const allProjects = getProjects();
+const currentIndex = allProjects.findIndex((p) => p.title === project.title);
+const prevProject = currentIndex > 0 ? allProjects[currentIndex - 1] : null;
+const nextProject = currentIndex < allProjects.length - 1 ? allProjects[currentIndex + 1] : null;
+
+function slugify(title: string): string {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+}
+---
+
+<BaseLayout title={`${project.title} — Abdul Majid Ridwan Tyastonoatmaja`} description={project.description.slice(0, 160)}>
+  <Container size="md">
+    <article class="py-12 md:py-24">
+      <div class="mb-8">
+        <a
+          href="/projects"
+          class="text-sm text-text-secondary hover:text-accent transition-colors"
+        >
+          ← Back to Projects
+        </a>
+      </div>
+
+      <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary leading-tight mb-4">
+        {project.title}
+      </h1>
+
+      {project.association && (
+        <p class="text-text-secondary mb-2">{project.association}</p>
+      )}
+
+      <p class="text-sm text-text-secondary mb-6">{project.period}</p>
+
+      <div class="flex flex-wrap gap-2 mb-8">
+        {project.skills.map((skill) => <Tag>{skill}</Tag>)}
+      </div>
+
+      <div class="prose prose-invert max-w-none">
+        <p class="text-text-primary leading-relaxed text-lg">
+          {project.description}
+        </p>
+      </div>
+
+      {project.links && project.links.length > 0 && (
+        <div class="mt-8 flex flex-wrap gap-4">
+          {project.links.map((link) => (
+            <Button href={link.url} variant={link.label === "GitHub Repository" ? "secondary" : "primary"}>
+              {link.label}
+            </Button>
+          ))}
+        </div>
+      )}
+
+      {project.media && project.media.length > 0 && (
+        <div class="mt-12">
+          <h2 class="text-xl font-semibold text-text-primary mb-4">Media</h2>
+          <div class="grid md:grid-cols-2 gap-4">
+            {project.media.map((m) => (
+              <div class="bg-bg-secondary border border-border rounded-xl p-6 text-center">
+                <p class="text-text-secondary">{m}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {(prevProject || nextProject) && (
+        <div class="mt-16 pt-8 border-t border-border flex flex-wrap justify-between gap-4">
+          <div>
+            {prevProject && (
+              <a
+                href={`/projects/${slugify(prevProject.title)}`}
+                class="text-sm text-text-secondary hover:text-accent transition-colors"
+              >
+                ← {prevProject.title}
+              </a>
+            )}
+          </div>
+          <div>
+            {nextProject && (
+              <a
+                href={`/projects/${slugify(nextProject.title)}`}
+                class="text-sm text-text-secondary hover:text-accent transition-colors"
+              >
+                {nextProject.title} →
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+    </article>
+  </Container>
+</BaseLayout>

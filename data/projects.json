@@ -2,6 +2,7 @@
   "projects": [
     {
       "title": "NyatetDuwit — Offline-First Personal Finance PWA",
+      "featured": true,
       "period": "May 2026 – Present",
       "description": "NyatetDuwit adalah aplikasi personal finance berbasis PWA untuk pengguna Indonesia yang fokus pada speed, privacy, dan offline-first experience. Dibuat untuk mempermudah pencatatan pemasukan dan pengeluaran harian dalam waktu kurang dari 3 detik tanpa ketergantungan cloud. Fitur utama mencakup pencatatan transaksi cepat, budget per kategori, recurring transaction, dashboard bulanan, daily reminder, search & filter, serta backup & restore data berbasis JSON. Seluruh data disimpan secara lokal menggunakan IndexedDB sehingga tetap private dan dapat digunakan sepenuhnya secara offline. Project ini juga menjadi media eksplorasi untuk PWA architecture, offline-first system design, state management, frontend performance, dan product thinking.",
       "links": [
@@ -18,6 +19,7 @@
     },
     {
       "title": "IJO PLIS — IHSG & USD/IDR Forecasting Platform",
+      "featured": true,
       "period": "May 2026 – Jun 2026",
       "description": "Developed IJO PLIS, a forecasting platform for IHSG (Indonesia Composite Index) and USD/IDR exchange rate prediction using Facebook Prophet and historical financial data (~10 years). Built an end-to-end ML-powered web platform with: Forecast visualization and confidence intervals, Multi-timeframe prediction (7/30/90 days), Trend decomposition (weekly, yearly seasonality), SMA indicators and volatility analysis, Automated retraining pipeline and model versioning, and Dark-mode interactive dashboard. Designed the system architecture using Django, PostgreSQL, Tailwind CSS, Chart.js, Docker, and Railway deployment, with optional background task scheduling via Celery + Redis. Implemented automated data ingestion, model retraining, evaluation (MAE/RMSE), and API endpoints for prediction and decomposition insights.",
       "links": [
@@ -47,6 +49,7 @@
     },
     {
       "title": "Red Devil Dynamics — AI Goal Timing Predictor for Manchester United",
+      "featured": true,
       "period": "Mar 2026 – Mar 2026",
       "description": "Red Devil Dynamics is a football analytics project that predicts the probability of Manchester United scoring within the next 10 minutes of a match. The model applies concepts from survival analysis to treat a goal as a time-to-event problem. Using match context variables such as current minute, cumulative shots, expected goals (xG), and home/away conditions, the system estimates scoring probability through a Poisson-based scoring intensity model and survival probability transformation. The project integrates machine learning modeling, API development with FastAPI, and a custom frontend interface. It demonstrates how statistical methods commonly used in reliability engineering and medical research—such as Survival Function S(t), Hazard Function h(t), and censoring—can be adapted for sports analytics. The system is deployed as a live web application and structured as a lightweight end-to-end AI product, from model development to cloud deployment.",
       "links": [
@@ -75,6 +78,7 @@
     },
     {
       "title": "AI Quranic Tafsir Assistant: Hybrid Sparse-Dense Retrieval & RAG",
+      "featured": true,
       "period": "Sep 2025 – Jan 2026",
       "association": "Universitas AMIKOM Yogyakarta",
       "description": "Developed an end-to-end Retrieval-Augmented Generation (RAG) system to democratize access to the monumental Tafsir Ibn Kathir (10 volumes, 6,500+ pages). The system features a Hybrid Retrieval Engine combining BM25 (Sparse Path) for precise keyword matching and E5 Large Multilingual (Dense Path) for cross-lingual semantic understanding. By integrating the LLaMA 3.2 3B model, the system generates grounded responses with a Context Relevance score of 0.972, effectively eliminating AI hallucinations. Optimized for efficiency, the project achieves an average end-to-end latency of 5.93 seconds on limited hardware (i3, 4GB RAM).",

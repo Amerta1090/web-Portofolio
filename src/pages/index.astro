@@ -1,61 +1,80 @@
 ---
-import Container from "../components/ui/Container.astro";
+import About from "../components/sections/About.astro";
+import Certifications from "../components/sections/Certifications.astro";
+import Contact from "../components/sections/Contact.astro";
+import Experience from "../components/sections/Experience.astro";
+import Hero from "../components/sections/Hero.astro";
+import Honors from "../components/sections/Honors.astro";
+import Projects from "../components/sections/Projects.astro";
+import Skills from "../components/sections/Skills.astro";
+import Volunteering from "../components/sections/Volunteering.astro";
 import Section from "../components/ui/Section.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { getProfile } from "../lib/data";
+import {
+  getCertifications,
+  getExperience,
+  getFeaturedProjects,
+  getHonors,
+  getProfile,
+  getSkills,
+  getVolunteering,
+} from "../lib/data";
 
 const profile = getProfile();
+const featuredProjects = getFeaturedProjects();
+const experiences = getExperience();
+const skills = getSkills();
+const certifications = getCertifications();
+const honors = getHonors();
+const volunteerings = getVolunteering();
 ---
 
 <BaseLayout>
-  <!-- Hero -->
   <Section id="hero">
-    <Container size="sm">
-      <div class="min-h-[calc(100vh-4rem)] flex flex-col justify-center">
-        <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold text-text-primary leading-tight">
-          {profile.name}
-        </h1>
-        <p class="mt-4 text-xl md:text-2xl text-accent font-medium">
-          {profile.headline}
-        </p>
-        <p class="mt-2 text-lg text-text-secondary max-w-xl">
-          {profile.tagline}
-        </p>
-        <div class="mt-8 flex flex-wrap gap-4">
-          <a
-            href="/#contact"
-            class="inline-flex items-center px-6 py-3 bg-accent text-bg-primary font-medium rounded-lg hover:brightness-110 transition-all duration-200"
-          >
-            Get in Touch
-          </a>
-          <a
-            href={profile.resume_url}
-            class="inline-flex items-center px-6 py-3 border border-border text-text-primary font-medium rounded-lg hover:bg-bg-tertiary transition-all duration-200"
-          >
-            Download Resume
-          </a>
-        </div>
-      </div>
-    </Container>
+    <Hero profile={profile} />
   </Section>
 
-  <!-- Experience -->
+  <Section id="about" title="About" variant="alt">
+    <About profile={profile} />
+  </Section>
+
   <Section id="experience" title="Experience" variant="alt">
-    <p class="text-text-secondary">Experience section coming in Sprint 2.</p>
+    <Experience experiences={experiences} />
   </Section>
 
-  <!-- Projects -->
-  <Section id="projects" title="Featured Projects">
-    <p class="text-text-secondary">Projects section coming in Sprint 2.</p>
+  <Section id="projects" title="Featured Projects" subtitle="Selected work that demonstrates my range">
+    <Projects projects={featuredProjects} />
   </Section>
 
-  <!-- Skills -->
   <Section id="skills" title="Skills" variant="alt">
-    <p class="text-text-secondary">Skills section coming in Sprint 2.</p>
+    <Skills skills={skills} />
   </Section>
 
-  <!-- Contact -->
-  <Section id="contact" title="Contact">
-    <p class="text-text-secondary">Contact section coming in Sprint 2.</p>
+  {
+    certifications.length > 0 && (
+      <Section id="certifications" title="Certifications">
+        <Certifications certifications={certifications} />
+      </Section>
+    )
+  }
+
+  {
+    honors.length > 0 && (
+      <Section id="honors" title="Honors & Awards" variant="alt">
+        <Honors honors={honors} />
+      </Section>
+    )
+  }
+
+  {
+    volunteerings.length > 0 && (
+      <Section id="volunteering" title="Volunteering">
+        <Volunteering volunteerings={volunteerings} />
+      </Section>
+    )
+  }
+
+  <Section id="contact" title="Contact" subtitle="Have a question or want to work together?">
+    <Contact profile={profile} />
   </Section>
 </BaseLayout>

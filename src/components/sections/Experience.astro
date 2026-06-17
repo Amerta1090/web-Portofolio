@@ -1,0 +1,79 @@
+---
+import type { Experience } from "../../types/experience";
+import Badge from "../ui/Badge.astro";
+import Container from "../ui/Container.astro";
+import Tag from "../ui/Tag.astro";
+
+export interface Props {
+  experiences: Experience[];
+}
+
+const { experiences } = Astro.props;
+
+function formatDate(date: string | null): string {
+  if (!date) return "Present";
+  const [year, month] = date.split("-");
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  return month ? `${months[Number.parseInt(month) - 1]} ${year}` : year;
+}
+---
+
+<Container>
+  <div class="relative">
+    <div class="absolute left-4 top-0 bottom-0 w-px bg-border" />
+    <div class="space-y-12">
+      {
+        experiences
+          .sort((a, b) => b.start_date.localeCompare(a.start_date))
+          .map((exp) => (
+            <div class="relative pl-12">
+              <div class="absolute left-2.5 top-1.5 w-3 h-3 rounded-full bg-accent border-2 border-bg-primary" />
+              <div class="bg-bg-secondary border border-border rounded-xl p-6">
+                <div class="flex flex-wrap items-start justify-between gap-2 mb-2">
+                  <div>
+                    <h3 class="text-lg font-semibold text-text-primary">
+                      {exp.role}
+                    </h3>
+                    <p class="text-text-secondary">{exp.company}</p>
+                  </div>
+                  {!exp.end_date && <Badge variant="accent">Present</Badge>}
+                </div>
+                <p class="text-sm text-text-secondary mb-3">
+                  {formatDate(exp.start_date)} – {formatDate(exp.end_date)}
+                  {exp.location ? ` · ${exp.location}` : ""}
+                </p>
+                <ul class="space-y-1.5 mb-3">
+                  {
+                    exp.highlights.length > 0
+                      ? exp.highlights.map((h) => (
+                          <li class="text-text-secondary text-sm flex gap-2">
+                            <span class="text-accent mt-1.5 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-accent" />
+                            <span>{h}</span>
+                          </li>
+                        ))
+                      : <li class="text-text-secondary text-sm italic">Details not available</li>
+                  }
+                </ul>
+                <div class="flex flex-wrap gap-2">
+                  {exp.technologies.map((tech) => <Tag>{tech}</Tag>)}
+                </div>
+              </div>
+            </div>
+          ))
+      }
+    </div>
+  </div>
+</Container>

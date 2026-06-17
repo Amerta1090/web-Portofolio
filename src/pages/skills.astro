@@ -1,0 +1,31 @@
+---
+import Container from "../components/ui/Container.astro";
+import Section from "../components/ui/Section.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getSkills } from "../lib/data";
+
+const skills = getSkills();
+---
+
+<BaseLayout title="Skills — Abdul Majid Ridwan Tyastonoatmaja" description="Technical skills across ML, data science, web development, IoT, DevOps, and more.">
+  <Section title="Skills" subtitle="Technologies and tools I work with">
+    <Container>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {skills.categories.map((category) => (
+          <div>
+            <h3 class="text-sm font-semibold text-accent uppercase tracking-wider mb-4">
+              {category.name}
+            </h3>
+            <div class="flex flex-wrap gap-2">
+              {category.skills.map((skill) => (
+                <span class="inline-flex items-center px-3 py-1.5 text-sm bg-bg-tertiary text-text-secondary rounded-full hover:bg-accent-muted/20 hover:text-accent transition-colors duration-200">
+                  {skill.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </Container>
+  </Section>
+</BaseLayout>

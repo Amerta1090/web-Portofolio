@@ -1,0 +1,29 @@
+---
+import type { Profile } from "../../types/profile";
+import Button from "../ui/Button.astro";
+import Container from "../ui/Container.astro";
+
+export interface Props {
+  profile: Profile;
+}
+
+const { profile } = Astro.props;
+---
+
+<Container size="sm">
+  <div class="min-h-[calc(100vh-4rem)] flex flex-col justify-center">
+    <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold text-text-primary leading-tight">
+      {profile.name}
+    </h1>
+    <p class="mt-4 text-xl md:text-2xl text-accent font-medium">
+      {profile.headline}
+    </p>
+    <p class="mt-2 text-lg text-text-secondary max-w-xl">
+      {profile.tagline}
+    </p>
+    <div class="mt-8 flex flex-wrap gap-4">
+      <Button href="/#contact" variant="primary" size="lg">Get in Touch</Button>
+      <Button href={profile.resume_url} variant="secondary" size="lg">Download Resume</Button>
+    </div>
+  </div>
+</Container>
