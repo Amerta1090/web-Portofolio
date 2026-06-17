@@ -1,0 +1,28 @@
+---
+import { NAV_ITEMS } from "../../lib/constants";
+import Container from "../ui/Container.astro";
+import ThemeToggle from "../ui/ThemeToggle.astro";
+---
+
+<header class="fixed top-0 left-0 right-0 z-50 bg-bg-primary/80 backdrop-blur-md border-b border-border">
+  <Container>
+    <nav class="flex items-center justify-between h-16" aria-label="Primary">
+      <a href="/" class="text-xl font-bold text-accent hover:text-accent/90 transition-colors" aria-label="Home">
+        AM
+      </a>
+      <div class="flex items-center gap-1">
+        {
+          NAV_ITEMS.map((item) => (
+            <a
+              href={item.href}
+              class="px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-tertiary rounded-lg transition-all duration-200"
+            >
+              {item.label}
+            </a>
+          ))
+        }
+        <ThemeToggle />
+      </div>
+    </nav>
+  </Container>
+</header>

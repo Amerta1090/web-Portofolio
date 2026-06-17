@@ -1,0 +1,111 @@
+[
+  {
+    "id": "ferswit",
+    "company": "Ferswit Indonesia",
+    "role": "Full-Stack Systems Engineer (AI & Automation)",
+    "type": "full-time",
+    "start_date": "2026-05",
+    "end_date": null,
+    "location": "Tulungagung (Remote)",
+    "highlights": [
+      "Developed ERP, internal tools, and automation workflows",
+      "Designed full-stack web applications across frontend and backend",
+      "AI-assisted development to accelerate software delivery",
+      "Managed VPS infrastructure, deployment, monitoring",
+      "Implemented automation and AI-driven solutions"
+    ],
+    "technologies": ["Python", "Django", "JavaScript", "PostgreSQL", "Docker"],
+    "url": null
+  },
+  {
+    "id": "forum-asisten",
+    "company": "Forum Asisten",
+    "role": "Laboratory Assistant",
+    "type": "part-time",
+    "start_date": "2024-09",
+    "end_date": "2026-01",
+    "location": "Sleman, Yogyakarta, Indonesia",
+    "highlights": [
+      "Assisted in laboratory instruction for informatics students",
+      "Supported curriculum delivery and practical exam administration"
+    ],
+    "technologies": ["Python", "Data Science", "Tableau", "SPSS"],
+    "url": null
+  },
+  {
+    "id": "amikom-ai",
+    "company": "Program Studi Informatika AMIKOM",
+    "role": "AI Engineer",
+    "type": "part-time",
+    "start_date": "2024-11",
+    "end_date": "2025-04",
+    "location": "Sleman, Yogyakarta, Indonesia",
+    "highlights": [
+      "Developed AI and machine learning solutions for academic projects",
+      "Contributed to research and development of intelligent systems"
+    ],
+    "technologies": ["Machine Learning", "Python", "Deep Learning"],
+    "url": null
+  },
+  {
+    "id": "aksoro",
+    "company": "Aksoro",
+    "role": "Prompt AI Trainer",
+    "type": "contract",
+    "start_date": "2025-01",
+    "end_date": "2025-03",
+    "location": "Gamping, Yogyakarta, Indonesia",
+    "highlights": [
+      "Trained AI models through prompt engineering",
+      "Developed prompt strategies for improved model outputs"
+    ],
+    "technologies": ["Prompt Engineering", "AI"],
+    "url": null
+  },
+  {
+    "id": "bangkit",
+    "company": "Bangkit Academy led by Google, Tokopedia, Gojek, & Traveloka",
+    "role": "Machine Learning Cohort",
+    "type": "internship",
+    "start_date": "2024-09",
+    "end_date": "2025-01",
+    "location": "Jakarta, Indonesia",
+    "highlights": [
+      "Completed intensive machine learning training program",
+      "Built AI-powered wellness application as capstone project",
+      "Developed skills in TensorFlow, NLP, and computer vision"
+    ],
+    "technologies": ["TensorFlow", "Machine Learning", "Python"],
+    "url": null
+  },
+  {
+    "id": "samsung-innovation",
+    "company": "Samsung Innovation Campus",
+    "role": "Samsung Innovation Campus Participant",
+    "type": "internship",
+    "start_date": "2024-02",
+    "end_date": "2024-08",
+    "location": "",
+    "highlights": [
+      "Participated in IoT and coding education program",
+      "Developed embedded systems and IoT projects"
+    ],
+    "technologies": ["IoT", "Embedded Systems", "C++"],
+    "url": null
+  },
+  {
+    "id": "idcamp",
+    "company": "Indosat Ooredoo Hutchison Digital Camp",
+    "role": "IDCamp 2023 Participant",
+    "type": "internship",
+    "start_date": "2023-11",
+    "end_date": "2024-07",
+    "location": "Jakarta, Indonesia",
+    "highlights": [
+      "Completed data science and web development coursework",
+      "Built student retention prediction system as final project"
+    ],
+    "technologies": ["Data Science", "Machine Learning", "Python"],
+    "url": null
+  }
+]

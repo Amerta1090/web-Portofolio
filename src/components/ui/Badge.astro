@@ -1,0 +1,20 @@
+---
+export interface Props {
+  variant?: "default" | "accent" | "success";
+  class?: string;
+}
+
+const { variant = "default", class: className } = Astro.props;
+
+const variants: Record<string, string> = {
+  default: "bg-bg-tertiary text-text-secondary",
+  accent: "bg-accent-muted/20 text-accent",
+  success: "bg-green-900/20 text-green-400",
+};
+
+const cls = `inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full ${variants[variant]} ${className ?? ""}`;
+---
+
+<span class={cls}>
+  <slot />
+</span>

@@ -1,0 +1,49 @@
+---
+import { FOOTER_LINKS, SITE } from "../../lib/constants";
+import Container from "../ui/Container.astro";
+---
+
+<footer class="border-t border-border bg-bg-secondary">
+  <Container>
+    <div class="py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div>
+        <h3 class="text-lg font-semibold text-text-primary mb-3">{SITE.author}</h3>
+        <p class="text-sm text-text-secondary leading-relaxed">
+          {SITE.description}
+        </p>
+      </div>
+      <div>
+        <h4 class="text-sm font-semibold text-text-primary uppercase tracking-wider mb-3">Links</h4>
+        <ul class="space-y-2">
+          {
+            FOOTER_LINKS.map((link) => (
+              <li>
+                <a href={link.href} class="text-sm text-text-secondary hover:text-accent transition-colors">
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-sm font-semibold text-text-primary uppercase tracking-wider mb-3">Connect</h4>
+        <ul class="space-y-2">
+          <li>
+            <a href={SITE.github} class="text-sm text-text-secondary hover:text-accent transition-colors" target="_blank" rel="noopener noreferrer">
+              GitHub
+            </a>
+          </li>
+          <li>
+            <a href={SITE.linkedin} class="text-sm text-text-secondary hover:text-accent transition-colors" target="_blank" rel="noopener noreferrer">
+              LinkedIn
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="py-6 border-t border-border text-center text-xs text-text-secondary">
+      &copy; {new Date().getFullYear()} {SITE.author}. All rights reserved.
+    </div>
+  </Container>
+</footer>
