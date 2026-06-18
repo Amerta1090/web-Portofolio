@@ -3,6 +3,7 @@
     {
       "title": "NyatetDuwit — Offline-First Personal Finance PWA",
       "featured": true,
+      "category": "web",
       "period": "May 2026 – Present",
       "description": "NyatetDuwit adalah aplikasi personal finance berbasis PWA untuk pengguna Indonesia yang fokus pada speed, privacy, dan offline-first experience. Dibuat untuk mempermudah pencatatan pemasukan dan pengeluaran harian dalam waktu kurang dari 3 detik tanpa ketergantungan cloud. Fitur utama mencakup pencatatan transaksi cepat, budget per kategori, recurring transaction, dashboard bulanan, daily reminder, search & filter, serta backup & restore data berbasis JSON. Seluruh data disimpan secara lokal menggunakan IndexedDB sehingga tetap private dan dapat digunakan sepenuhnya secara offline. Project ini juga menjadi media eksplorasi untuk PWA architecture, offline-first system design, state management, frontend performance, dan product thinking.",
       "links": [
@@ -20,6 +21,7 @@
     {
       "title": "IJO PLIS — IHSG & USD/IDR Forecasting Platform",
       "featured": true,
+      "category": "ml",
       "period": "May 2026 – Jun 2026",
       "description": "Developed IJO PLIS, a forecasting platform for IHSG (Indonesia Composite Index) and USD/IDR exchange rate prediction using Facebook Prophet and historical financial data (~10 years). Built an end-to-end ML-powered web platform with: Forecast visualization and confidence intervals, Multi-timeframe prediction (7/30/90 days), Trend decomposition (weekly, yearly seasonality), SMA indicators and volatility analysis, Automated retraining pipeline and model versioning, and Dark-mode interactive dashboard. Designed the system architecture using Django, PostgreSQL, Tailwind CSS, Chart.js, Docker, and Railway deployment, with optional background task scheduling via Celery + Redis. Implemented automated data ingestion, model retraining, evaluation (MAE/RMSE), and API endpoints for prediction and decomposition insights.",
       "links": [
@@ -37,6 +39,7 @@
     },
     {
       "title": "Premium Sudoku: Overengineered Puzzle Experience",
+      "category": "web",
       "period": "May 2026 – May 2026",
       "description": "Built a Sudoku game from scratch using Vanilla JavaScript, HTML, and CSS instead of adding another React project to the internet. Features procedural puzzle generation via backtracking algorithms, intelligent hint systems, undo history, dynamic board tracking, and a polished glassmorphism-inspired interface. Designed to run both as a browser game and as a native desktop application through Electron. Development workflow was accelerated using Google Antigravity for rapid iteration, UI exploration, and reducing the amount of time normally spent arguing with boilerplate.",
       "links": [
@@ -50,6 +53,7 @@
     {
       "title": "Red Devil Dynamics — AI Goal Timing Predictor for Manchester United",
       "featured": true,
+      "category": "ml",
       "period": "Mar 2026 – Mar 2026",
       "description": "Red Devil Dynamics is a football analytics project that predicts the probability of Manchester United scoring within the next 10 minutes of a match. The model applies concepts from survival analysis to treat a goal as a time-to-event problem. Using match context variables such as current minute, cumulative shots, expected goals (xG), and home/away conditions, the system estimates scoring probability through a Poisson-based scoring intensity model and survival probability transformation. The project integrates machine learning modeling, API development with FastAPI, and a custom frontend interface. It demonstrates how statistical methods commonly used in reliability engineering and medical research—such as Survival Function S(t), Hazard Function h(t), and censoring—can be adapted for sports analytics. The system is deployed as a live web application and structured as a lightweight end-to-end AI product, from model development to cloud deployment.",
       "links": [
@@ -66,6 +70,7 @@
     },
     {
       "title": "TreeMake: CLI Project Scaffolding Tool",
+      "category": "cli",
       "period": "Mar 2026 – Mar 2026",
       "description": "Developed a Python-based Command Line Interface (CLI) tool designed to automate the manual process of project directory creation. The tool specifically addresses the \"boilerplate friction\" encountered when working with Large Language Models (LLMs) by parsing ASCII-formatted tree structures and manifesting them into physical system directories and files. Logic & Parsing: Implemented advanced string manipulation and Regular Expressions (Regex) to accurately calculate indentation levels and parent-child relationships from non-standardized text inputs. System Integration: Engineered an automated installation workflow for Linux environments, enabling the script to function as a global system command via symlinking and executable permission management. Efficiency Gain: Eliminated repetitive manual tasks (mkdir, touch) by providing a seamless one-command solution for complex project initialization.",
       "links": [
@@ -79,6 +84,7 @@
     {
       "title": "AI Quranic Tafsir Assistant: Hybrid Sparse-Dense Retrieval & RAG",
       "featured": true,
+      "category": "ml",
       "period": "Sep 2025 – Jan 2026",
       "association": "Universitas AMIKOM Yogyakarta",
       "description": "Developed an end-to-end Retrieval-Augmented Generation (RAG) system to democratize access to the monumental Tafsir Ibn Kathir (10 volumes, 6,500+ pages). The system features a Hybrid Retrieval Engine combining BM25 (Sparse Path) for precise keyword matching and E5 Large Multilingual (Dense Path) for cross-lingual semantic understanding. By integrating the LLaMA 3.2 3B model, the system generates grounded responses with a Context Relevance score of 0.972, effectively eliminating AI hallucinations. Optimized for efficiency, the project achieves an average end-to-end latency of 5.93 seconds on limited hardware (i3, 4GB RAM).",
@@ -92,6 +98,7 @@
     },
     {
       "title": "TemuSehat ADK – Herbal AI Agent for Early Symptom Triage",
+      "category": "ml",
       "period": "Oct 2025 – Oct 2025",
       "description": "TemuSehat ADK is an LLM-based AI agent designed to provide herbal/jamu recommendations for mild health complaints while performing early symptom triage through semi-interactive consultation. Instead of responding immediately, the agent actively elicits additional context (e.g., duration, symptom characteristics, accompanying signs) to improve recommendation accuracy. This interaction model mimics a lightweight pre-consultation flow rather than a static Q&A chatbot. A built-in Red Flag Detection System identifies potentially dangerous symptoms (e.g., chest pain, shortness of breath, persistent high fever). When such indicators are detected, the agent suppresses herbal recommendations and returns a structured warning instructing the user to seek professional medical care. The system is implemented using Google ADK (Agent Development Kit) with a tool-based agent architecture, producing structured JSON responses (success, clarify, red_flag) that are frontend-friendly and easy to integrate. The project emphasizes AI safety, agentic reasoning, and UX-aware health interaction, rather than medical diagnosis.",
       "links": [
@@ -104,6 +111,7 @@
     },
     {
       "title": "Journal CLI: Automated Micro-Journaling via Google Sheets API",
+      "category": "cli",
       "period": "Aug 2025 – Aug 2025",
       "description": "I developed a specialized command-line tool designed for high-efficiency journaling, inspired by the \"Homework for Life\" concept from the book Storyworthy. The application enables users to log daily reflections directly from the terminal, which are then automatically synchronized to a cloud-based Google Sheets spreadsheet. To achieve this, I implemented a secure authentication flow using OAuth 2.0, integrating both the Google Sheets API and the Google Drive API to handle remote data manipulation. The system architecture is built around a Python backend that processes one-sentence summaries, timestamps them, and appends them to a persistent digital ledger. By combining shell scripting for quick command execution with a modular Python environment, I created a \"set-and-forget\" productivity tool that bridges the gap between local terminal workflows and cloud storage accessibility.",
       "links": [
@@ -116,6 +124,7 @@
     },
     {
       "title": "Pathwise Career AI: Personalized Guidance Through Data-Driven Insights",
+      "category": "ml",
       "period": "Jun 2025 – Jul 2025",
       "description": "I developed Pathwise Career AI, a sophisticated web application designed to empower students and job seekers by providing personalized career recommendations based on individual aptitude and characteristics. Built using Streamlit and Python, the application utilizes a machine learning backend centered around Cosine Similarity to measure the alignment between a user’s self-assessed traits and a diverse dataset of professional career profiles. The platform features an interactive \"Recommendation Wizard\" that guides users through a multi-step input process, offering real-time feedback and high-fidelity visualizations. Beyond simple predictions, the app integrates advanced data science techniques, including Principal Component Analysis (PCA) for 2D characteristic clustering and Plotly for comparative feature analysis, allowing users to understand how their profile compares to industry averages. To ensure a professional user experience, I implemented custom CSS for modern UI/UX design and included features for exporting personalized career reports to Excel, creating a comprehensive tool for strategic career planning.",
       "links": [
@@ -128,6 +137,7 @@
     },
     {
       "title": "Production-Ready MLOps Pipeline: House Pricing Model with Real-Time Monitoring",
+      "category": "devops",
       "period": "Jun 2025 – Jul 2025",
       "description": "I engineered a comprehensive MLOps ecosystem designed to transition a housing price prediction model from a static experiment into a robust, production-monitored service. The project began with a structured machine learning workflow, utilizing custom preprocessing scripts and a dedicated modeling pipeline to ensure data consistency and high predictive accuracy. To facilitate a professional deployment environment, I integrated a CI/CD workflow that automates testing and integration, ensuring that every update to the model or serving logic is verified before reaching production. The serving layer is powered by a custom inference engine and a Prometheus exporter, which bridges the gap between raw model predictions and operational observability. A core highlight of this project is the implementation of full-stack monitoring using Prometheus and Grafana to track the model's health in real time. By developing a dedicated exporter, I successfully visualized critical production metrics, including prediction latency, request counts, and live accuracy tracking. This setup allows for proactive detection of performance degradation and resource bottlenecks through intuitive Grafana dashboards. The project demonstrates a complete lifecycle approach—from initial data experimentation and CI/CD automation to live service monitoring—ensuring the machine learning model remains reliable, scalable, and transparent in a production setting.",
       "links": [],
@@ -136,6 +146,7 @@
     },
     {
       "title": "CLI Productivity Engine: A JSON-Driven Task Management System",
+      "category": "cli",
       "period": "Jun 2025 – Jun 2025",
       "description": "I developed a robust Command Line Interface (CLI) application designed to handle task management with a focus on core software engineering principles and efficient data persistence. Built using Python, the system utilizes a modular file structure that separates business logic, task blueprints, and user interface components to ensure maintainability and scalability. The application features a sophisticated task manager that supports adding, searching, and filtering tasks, alongside a custom \"Auto-Priority\" logic and ISO-standard deadline tracking. Data is persisted via a JSON-based storage system, allowing for lightweight and reliable data management without the overhead of a traditional database. To enhance the terminal experience, I integrated libraries such as Tabulate for organized data rendering and Colorama for improved visual feedback, demonstrating a balance between minimalist design and functional complexity.",
       "links": [
@@ -148,6 +159,7 @@
     },
     {
       "title": "MLOps Integration: Real-Time Incremental Learning with MLflow",
+      "category": "devops",
       "period": "Jun 2025 – Jun 2025",
       "description": "I developed a machine learning pipeline focused on Online Learning, a technique essential for handling high-velocity data streams where traditional batch training is impractical. Using Python and the Scikit-Learn library, I implemented an SGDClassifier that learns incrementally through partial_fit logic, allowing the model to continuously refine its accuracy as new data batches arrive without retraining from scratch. To bridge the gap between development and production, I integrated MLflow as the central MLOps backbone, enabling the system to autonomously retrieve the most recent model version from the registry and resume training. This project serves as a practical demonstration of maintaining adaptive models that evolve in real-time while ensuring full versioning and performance monitoring in a centralized dashboard.",
       "links": [
@@ -160,6 +172,7 @@
     },
     {
       "title": "Resepku – Multi-Modal Recipe Discovery with Image and Text-Based Queries",
+      "category": "web",
       "period": "Mar 2025 – Apr 2025",
       "association": "Universitas AMIKOM Yogyakarta",
       "description": "Resepku is a modern recipe discovery and management platform that supports multi-modal search, allowing users to find recipes using text queries, food images, or a combination of both. Beyond standard CRUD recipe features, the core contribution of this project lies in its end-to-end information retrieval (IR) pipeline. The system integrates classical text-based retrieval, semantic search, and computer vision-based image understanding to enable flexible and intuitive recipe discovery. On the text side, the platform processes recipe titles, ingredients, and descriptions using IR techniques to support keyword-based and semantic matching. On the image side, the system performs image classification and ingredient-level detection, extracting visual signals that are transformed into searchable representations. These signals are then aligned with the textual recipe corpus to enable cross-modal retrieval. The frontend is built with Next.js 13+ App Router, while the backend search pipeline is designed with scalability in mind, separating retrieval, ranking, and modality-fusion logic. This project demonstrates practical implementation of multi-modal search systems, bridging NLP, computer vision, and information retrieval in a production-oriented web application.",
@@ -173,6 +186,7 @@
     },
     {
       "title": "Google Workspace Automation: Recurring Event & Task Scheduler",
+      "category": "cli",
       "period": "Feb 2025 – Feb 2025",
       "description": "I developed a custom automation suite using Google Apps Script to eliminate the manual effort of managing recurring social events and team duty rosters. By bridging logic with Google Calendar, this project automates the entire coordination process—from identifying specific dates to sending invitations—ensuring logistics run seamlessly in the background. The system features an intelligent scheduling logic that automatically detects patterns, such as the \"first Friday of the month,\" to organize recurring gatherings. It also includes a dynamic task-rotation algorithm that assigns daily responsibilities to a group of participants for 30 days. Both features utilize the Google Workspace API to send automated email invites, ensuring everyone stays informed without manual follow-ups. Technically, the project focuses on JavaScript-based automation and complex date manipulation to handle high-frequency administrative tasks. This solution successfully minimizes human error and scheduling conflicts, transforming a tedious manual process into a \"set-and-forget\" automated workflow.",
       "links": [
@@ -185,6 +199,7 @@
     },
     {
       "title": "Personalized Book Recommendation System: Multi-Model Discovery Engine",
+      "category": "ml",
       "period": "Feb 2025 – Feb 2025",
       "description": "In this project, I developed a dual-approach book recommendation system to solve the modern \"choice overload\" problem for readers, utilizing both Content-Based and Collaborative Filtering techniques. By analyzing a large-scale dataset of over 1.1 million ratings and 270,000 users, I engineered a solution that identifies relevant books through two distinct lenses: semantic similarity of book attributes (Author and Publisher) via TF-IDF Vectorization and user-behavior patterns through a Neural Network-based embedding model. The system effectively mitigates the \"cold start\" problem by providing content-driven suggestions for new users while delivering hyper-personalized experiences for established readers. To ensure high-quality outputs, I implemented a rigorous data pipeline involving outlier removal via IQR, noise reduction through rating-count thresholds, and Min-Max normalization. Evaluated using industry-standard metrics, the Collaborative Filtering model achieved a high NDCG@5 score of 0.95 and a low RMSE of 0.1679, demonstrating its superior ability to rank relevant books at the top of the user’s list and provide a seamless discovery experience.",
       "links": [
@@ -197,6 +212,7 @@
     },
     {
       "title": "Predictive Analytics for Real Estate: Housing Price Estimation in South Tangerang",
+      "category": "ml",
       "period": "Feb 2025 – Feb 2025",
       "description": "In this project, I developed a machine learning solution to provide accurate housing price estimates in South Tangerang, Indonesia, by analyzing a dataset of over 29,000 property listings. The initiative successfully addresses the challenge of price estimation errors in the property market, offering a data-driven tool for buyers, sellers, and real estate agents to make more informed decisions. I managed an end-to-end data pipeline that involved intensive cleaning, including the removal of over 5,000 duplicate entries and handling missing values across critical features such as bedroom count and floor area. To enhance the model's accuracy, I implemented comprehensive feature engineering, utilizing One-Hot Encoding for categorical locations and standardizing numerical features like floor area and bath counts to ensure algorithmic stability. Throughout the modeling phase, I performed a comparative analysis of multiple architectures, including Linear Regression and Gradient Boosting, eventually identifying the Random Forest Regressor as the most effective approach for this non-linear dataset. By applying hyperparameter tuning through Grid Search, I achieved a high-performing final model with an R-Squared of 0.864, significantly reducing prediction errors compared to traditional baseline models. The final result is a robust predictive system that provides realistic price recommendations, helping stakeholders minimize financial risk and better understand historical market trends in the region.",
       "links": [
@@ -209,6 +225,7 @@
     },
     {
       "title": "Algorithmic Image Compressor: Precision Size Optimization",
+      "category": "cli",
       "period": "Jan 2025 – Jan 2025",
       "description": "I developed a high-performance Python utility designed to automate the compression of JPEG and PNG images while maintaining optimal visual fidelity. The core of the project features a binary search algorithm that dynamically adjusts JPEG quality settings to meet specific file size targets with surgical precision. By leveraging the Pillow library, the script provides format-specific handling—applying lossy optimization for JPEGs and maximizing lossless reduction for PNGs. This tool effectively streamlines digital asset management by transforming bulky, unoptimized images into lean, web-ready files through an automated, logic-driven approach.",
       "links": [
@@ -221,6 +238,7 @@
     },
     {
       "title": "SweetLife Mobile App – AI-Powered Wellness & Diabetes-Friendly Lifestyle Companion",
+      "category": "ml",
       "period": "Sep 2024 – Jan 2025",
       "association": "Bangkit Academy led by Google, Tokopedia, Gojek, & Traveloka",
       "description": "SweetLife is a mobile wellness application designed to support diabetes risk awareness and lifestyle management through AI-driven analysis and personalized recommendations. The core of the system combines predictive modeling, computer vision, and recommendation logic into a single end-to-end workflow. The application performs diabetes risk prediction based on user health and lifestyle inputs, enabling early awareness rather than clinical diagnosis. To support daily decision-making, the system includes food detection and classification using computer vision, allowing users to log meals via images instead of manual input. Detected food items are mapped to nutritional and health considerations relevant to diabetes management. Based on predicted risk levels and logged activity, the app generates context-aware food and exercise recommendations, balancing calorie control, glycemic considerations, and practical user behavior. All recommendations are framed as decision support, not medical advice, with explicit safeguards against clinical claims. This project demonstrates applied use of AI in health-adjacent systems, emphasizing practical deployment, risk-aware design, and multi-model integration rather than isolated ML experiments.",
@@ -234,6 +252,7 @@
     },
     {
       "title": "Smart Laundry Bin: IoT-Based Load & Cost Monitoring System",
+      "category": "iot",
       "period": "May 2024 – May 2024",
       "association": "Universitas AMIKOM Yogyakarta",
       "description": "Developed an IoT-based smart bucket designed to optimize laundry management and household budgeting. By integrating load and distance sensors with the Wemos D1 R1 (ESP8266) platform, this system provides real-time data to help users track their laundry habits efficiently via a mobile dashboard. Key Features: 1. Capacity & Weight Tracking: Real-time monitoring of bucket capacity (1-100%) and precise clothing weight using a Load Cell and Ultrasonic sensor. 2. Cost Estimation: Automatically calculates estimated laundry costs based on weight-to-price algorithms. 3. Resource Optimization: Provides smart recommendations for detergent/softener usage (sachet units) to prevent chemical waste. 4. Mobile Connectivity: Seamless remote monitoring and limitations through the Blynk IoT platform.",
@@ -243,6 +262,7 @@
     },
     {
       "title": "Student Retention Analysis & Prediction System: Reducing Dropout Rates",
+      "category": "ml",
       "period": "Mar 2024 – Mar 2024",
       "association": "Indosat Ooredoo Hutchison Digital Camp",
       "description": "Developed an end-to-end data solution for Jaya Jaya Institut to combat high student dropout rates. This project focused on identifying at-risk students through historical data analysis and deploying a machine learning-based predictive system to enhance institutional stability and student success. Key Contributions: 1. Business Intelligence: Conducted deep-dive analysis into historical student data to identify critical dropout drivers such as tuition payment status, scholarship enrollment, and early academic performance (GPA/Credits). 2. Machine Learning Development: Built and validated a predictive model using Scikit-learn to identify students with a high probability of dropping out. 3. Interactive Dashboard: Designed and deployed a real-time web application using Streamlit, allowing staff to input student metrics and receive instant risk assessments and probability scores. 4. Strategic Recommendations: Provided actionable business insights, including improving enrollment processes and implementing financial/academic support interventions for high-risk demographics.",
@@ -256,6 +276,7 @@
     },
     {
       "title": "Automated Chicken Coop Environment Controller",
+      "category": "iot",
       "period": "Dec 2023 – Jan 2024",
       "association": "Universitas AMIKOM Yogyakarta",
       "description": "Developed an IoT-based smart poultry management system designed to maintain an ideal microclimate for livestock. The system automates temperature regulation using a DHT sensor to ensure optimal growth conditions. When the temperature exceeds the ideal threshold, the system triggers a cooling fan, and when it drops, it activates heating lamps. Key Features: 1. Real-time Monitoring: Integrated with Blynk IoT platform for remote control and status monitoring of fans and lights via smartphone. 2. Automated Climate Control: Implemented logic to maintain a specific temperature range suitable for poultry health. 3. Power Management: Designed to support dual power input (AC/DC) with an AC-to-DC converter for reliability. Components Used: ESP8266, DHT Temperature Sensor, Relay Modules, PC Cooling Fans, Heating Lamps, and AC-DC Converters.",

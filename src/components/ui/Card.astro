@@ -13,9 +13,9 @@ const variants: Record<string, string> = {
   default:
     "bg-bg-secondary border border-border rounded-xl hover:border-accent/30 transition-all duration-200",
   elevated:
-    "bg-bg-secondary border border-border rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200",
+    "bg-bg-secondary border border-border rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 card-glow",
   glass:
-    "bg-bg-secondary/80 backdrop-blur-sm border border-border rounded-xl transition-all duration-200",
+    "bg-bg-secondary/80 backdrop-blur-sm border border-border rounded-xl transition-all duration-200 card-glow",
 };
 
 const cls = `block p-6 ${variants[variant]} ${className ?? ""}`;

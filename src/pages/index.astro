@@ -4,12 +4,13 @@ import Certifications from "../components/sections/Certifications.astro";
 import Contact from "../components/sections/Contact.astro";
 import Experience from "../components/sections/Experience.astro";
 import GitHubShowcase from "../components/sections/GitHubShowcase.astro";
-import Hero from "../components/sections/Hero.astro";
 import Honors from "../components/sections/Honors.astro";
 import Projects from "../components/sections/Projects.astro";
-import Skills from "../components/sections/Skills.astro";
 import Volunteering from "../components/sections/Volunteering.astro";
 import Section from "../components/ui/Section.astro";
+import AnimatedHero from "../islands/AnimatedHero";
+import ScrollAnimator from "../islands/ScrollAnimator.astro";
+import SkillsExplorer from "../islands/SkillsExplorer";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import {
   getCertifications,
@@ -33,29 +34,35 @@ const gitHubData = await fetchAllGitHubData();
 ---
 
 <BaseLayout>
-  <Section id="hero" ariaLabel="Hero">
-    <Hero profile={profile} />
-  </Section>
+  <section id="hero" aria-label="Hero">
+    <AnimatedHero
+      client:idle
+      name={profile.name}
+      headline={profile.headline}
+      tagline={profile.tagline}
+      resumeUrl={profile.resume_url}
+    />
+  </section>
 
-  <Section id="about" title="About" variant="alt" ariaLabel="About me">
+  <Section data-reveal id="about" title="About" variant="alt" ariaLabel="About me">
     <About profile={profile} />
   </Section>
 
-  <Section id="experience" title="Experience" variant="alt" ariaLabel="Work experience">
+  <Section data-reveal id="experience" title="Experience" variant="alt" ariaLabel="Work experience">
     <Experience experiences={experiences} />
   </Section>
 
-  <Section id="projects" title="Featured Projects" subtitle="Selected work that demonstrates my range" ariaLabel="Featured projects">
+  <Section data-reveal id="projects" title="Featured Projects" subtitle="Selected work that demonstrates my range" ariaLabel="Featured projects">
     <Projects projects={featuredProjects} />
   </Section>
 
-  <Section id="skills" title="Skills" variant="alt" ariaLabel="Skills and technologies">
-    <Skills skills={skills} />
+  <Section data-reveal id="skills" title="Skills" variant="alt" ariaLabel="Skills and technologies">
+    <SkillsExplorer client:load skills={skills} />
   </Section>
 
   {
     certifications.length > 0 && (
-      <Section id="certifications" title="Certifications" ariaLabel="Certifications">
+      <Section data-reveal id="certifications" title="Certifications" ariaLabel="Certifications">
         <Certifications certifications={certifications} />
       </Section>
     )
@@ -63,7 +70,7 @@ const gitHubData = await fetchAllGitHubData();
 
   {
     honors.length > 0 && (
-      <Section id="honors" title="Honors & Awards" variant="alt" ariaLabel="Honors and awards">
+      <Section data-reveal id="honors" title="Honors & Awards" variant="alt" ariaLabel="Honors and awards">
         <Honors honors={honors} />
       </Section>
     )
@@ -71,7 +78,7 @@ const gitHubData = await fetchAllGitHubData();
 
   {
     volunteerings.length > 0 && (
-      <Section id="volunteering" title="Volunteering" ariaLabel="Volunteering experience">
+      <Section data-reveal id="volunteering" title="Volunteering" ariaLabel="Volunteering experience">
         <Volunteering volunteerings={volunteerings} />
       </Section>
     )
@@ -79,13 +86,15 @@ const gitHubData = await fetchAllGitHubData();
 
   {
     gitHubData.pinned_repos.length > 0 && (
-      <Section id="github" title="GitHub" subtitle="Recent activity and repositories" variant="alt" ariaLabel="GitHub activity">
+      <Section data-reveal id="github" title="GitHub" subtitle="Recent activity and repositories" variant="alt" ariaLabel="GitHub activity">
         <GitHubShowcase data={gitHubData} />
       </Section>
     )
   }
 
-  <Section id="contact" title="Contact" subtitle="Have a question or want to work together?" ariaLabel="Contact">
+  <Section data-reveal id="contact" title="Contact" subtitle="Have a question or want to work together?" ariaLabel="Contact">
     <Contact profile={profile} />
   </Section>
+
+  <ScrollAnimator />
 </BaseLayout>

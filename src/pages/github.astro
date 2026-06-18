@@ -7,11 +7,6 @@ import { fetchAllGitHubData } from "../lib/github";
 import type { GitHubData } from "../types/github";
 
 const data: GitHubData | null = await fetchAllGitHubData();
-
-function formatDate(dateStr: string): string {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-}
 ---
 
 <BaseLayout title="GitHub — Abdul Majid Ridwan Tyastonoatmaja" description="GitHub repositories, contributions, and activity.">
@@ -104,7 +99,7 @@ function formatDate(dateStr: string): string {
             <div class="bg-bg-secondary border border-border rounded-xl p-6">
               <div class="space-y-3">
                 {data.languages.map((lang) => (
-                  <div key={lang.language}>
+                  <div>
                     <div class="flex justify-between text-sm mb-1">
                       <span class="text-text-primary font-medium">{lang.language}</span>
                       <span class="text-text-secondary">{lang.percentage}%</span>
@@ -133,7 +128,6 @@ function formatDate(dateStr: string): string {
                       const height = Math.max((week.total / maxCommits) * 100, 4);
                       return (
                         <div
-                          key={week.week}
                           class="flex-1 bg-accent/60 hover:bg-accent rounded-t transition-colors relative group"
                           style={`height: ${height}%`}
                         >
@@ -165,8 +159,8 @@ function formatDate(dateStr: string): string {
                   ))}
                 </div>
                 <div class="flex gap-0.5" style={`width: ${data.contributions.weeks.length * 14}px`}>
-                  {data.contributions.weeks.map((week, wi) => (
-                    <div key={wi} class="flex flex-col gap-0.5">
+                  {data.contributions.weeks.map((week) => (
+                    <div class="flex flex-col gap-0.5">
                       {week.days.map((day) => (
                         <div
                           class="h-3 w-3 rounded-[2px]"

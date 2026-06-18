@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import "../styles/theme.css";
+import ClientRouter from "astro/components/ClientRouter.astro";
 import Footer from "../components/layout/Footer.astro";
 import Header from "../components/layout/Header.astro";
 import { SITE } from "../lib/constants";
@@ -22,19 +23,8 @@ const {
   canonicalUrl,
 } = Astro.props;
 
-const jsonLd = Astro.props.jsonLd;
-
 const canonical = canonicalUrl ?? SITE.url;
 const ogImageUrl = ogImage.startsWith("http") ? ogImage : `${SITE.url}${ogImage}`;
-
-const defaultJsonLd: Record<string, unknown> = {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  name: SITE.author,
-  jobTitle: "AI/ML Engineer & Systems Builder",
-  url: SITE.url,
-  sameAs: [SITE.github, SITE.linkedin],
-};
 ---
 
 <!DOCTYPE html>
@@ -56,9 +46,17 @@ const defaultJsonLd: Record<string, unknown> = {
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href={canonical} />
+    <ClientRouter />
 
     <script is:inline type="application/ld+json">
-      {JSON.stringify(jsonLd ?? defaultJsonLd)}
+      {JSON.stringify(Astro.props.jsonLd ?? {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        name: SITE.author,
+        jobTitle: "AI/ML Engineer & Systems Builder",
+        url: SITE.url,
+        sameAs: [SITE.github, SITE.linkedin],
+      })}
     </script>
 
     <script is:inline>
@@ -74,7 +72,7 @@ const defaultJsonLd: Record<string, unknown> = {
       })();
     </script>
   </head>
-  <body class="min-h-screen bg-bg-primary text-text-primary">
+  <body class="min-h-screen bg-bg-primary text-text-primary noise-overlay">
     <a href="#main-content" class="skip-to-content">Skip to content</a>
     <Header />
     <main id="main-content" class="pt-16">
