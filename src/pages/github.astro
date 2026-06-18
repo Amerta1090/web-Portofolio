@@ -1,0 +1,197 @@
+---
+import Container from "../components/ui/Container.astro";
+import Section from "../components/ui/Section.astro";
+import Tag from "../components/ui/Tag.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { fetchAllGitHubData } from "../lib/github";
+import type { GitHubData } from "../types/github";
+
+const data: GitHubData | null = await fetchAllGitHubData();
+
+function formatDate(dateStr: string): string {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+---
+
+<BaseLayout title="GitHub — Abdul Majid Ridwan Tyastonoatmaja" description="GitHub repositories, contributions, and activity.">
+  {
+    !data || data.pinned_repos.length === 0 ? (
+      <Section title="GitHub" ariaLabel="GitHub showcase">
+        <Container>
+          <div class="text-center py-16">
+            <p class="text-text-secondary text-lg mb-4">GitHub data will appear here after the next build.</p>
+            <p class="text-text-secondary text-sm">Make sure <code class="font-mono px-2 py-0.5 bg-bg-tertiary rounded">GITHUB_TOKEN</code> is set and run the build again.</p>
+          </div>
+        </Container>
+      </Section>
+    ) : (
+      <>
+        <Section title="GitHub Overview" ariaLabel="GitHub overview">
+          <Container>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+              <div class="bg-bg-secondary border border-border rounded-xl p-6 text-center">
+                <p class="text-3xl font-bold text-text-primary">{data.total_repos}</p>
+                <p class="text-sm text-text-secondary mt-1">Repositories</p>
+              </div>
+              <div class="bg-bg-secondary border border-border rounded-xl p-6 text-center">
+                <p class="text-3xl font-bold text-accent">{data.total_stars}</p>
+                <p class="text-sm text-text-secondary mt-1">Total Stars</p>
+              </div>
+              <div class="bg-bg-secondary border border-border rounded-xl p-6 text-center">
+                <p class="text-3xl font-bold text-text-primary">{data.total_forks}</p>
+                <p class="text-sm text-text-secondary mt-1">Total Forks</p>
+              </div>
+              <div class="bg-bg-secondary border border-border rounded-xl p-6 text-center">
+                <p class="text-3xl font-bold text-accent">{data.contribution_count}</p>
+                <p class="text-sm text-text-secondary mt-1">Contributions</p>
+              </div>
+            </div>
+          </Container>
+        </Section>
+
+        <Section title="Pinned Repositories" variant="alt" ariaLabel="Pinned repositories">
+          <Container>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {
+                data.pinned_repos.map((repo) => (
+                  <a
+                    href={repo.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="block bg-bg-secondary border border-border rounded-xl p-5 hover:border-accent/30 hover:-translate-y-0.5 transition-all duration-200"
+                  >
+                    <div class="flex items-center gap-2 mb-3">
+                      <svg class="w-5 h-5 text-text-secondary shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                      </svg>
+                      <h3 class="font-semibold text-text-primary truncate">{repo.name}</h3>
+                    </div>
+                    <p class="text-sm text-text-secondary line-clamp-2 mb-4 min-h-[2.5rem]">
+                      {repo.description ?? "No description"}
+                    </p>
+                    <div class="flex items-center gap-4 text-xs text-text-secondary">
+                      {repo.language && (
+                        <span class="flex items-center gap-1.5">
+                          <span class="w-2.5 h-2.5 rounded-full bg-accent" />
+                          {repo.language}
+                        </span>
+                      )}
+                      <span class="flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        {repo.stars}
+                      </span>
+                      <span class="flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                        {repo.forks}
+                      </span>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5 mt-3">
+                      {repo.topics.slice(0, 3).map((topic) => (
+                        <Tag>{topic}</Tag>
+                      ))}
+                      {repo.topics.length > 3 && <Tag>+{repo.topics.length - 3}</Tag>}
+                    </div>
+                  </a>
+                ))
+              }
+            </div>
+          </Container>
+        </Section>
+
+        <Section title="Languages" ariaLabel="Languages breakdown">
+          <Container>
+            <div class="bg-bg-secondary border border-border rounded-xl p-6">
+              <div class="space-y-3">
+                {data.languages.map((lang) => (
+                  <div key={lang.language}>
+                    <div class="flex justify-between text-sm mb-1">
+                      <span class="text-text-primary font-medium">{lang.language}</span>
+                      <span class="text-text-secondary">{lang.percentage}%</span>
+                    </div>
+                    <div class="h-2 bg-bg-tertiary rounded-full overflow-hidden">
+                      <div
+                        class="h-full bg-accent rounded-full transition-all duration-500"
+                        style={`width: ${lang.percentage}%`}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Container>
+        </Section>
+
+        <Section title="Commit Activity" subtitle="Weekly commits across repositories (last 12 weeks)" variant="alt" ariaLabel="Commit activity">
+          <Container>
+            <div class="bg-bg-secondary border border-border rounded-xl p-6">
+              {
+                data.commit_activity.length > 0 ? (
+                  <div class="flex items-end gap-1 h-32">
+                    {data.commit_activity.map((week) => {
+                      const maxCommits = Math.max(...data.commit_activity.map((w) => w.total), 1);
+                      const height = Math.max((week.total / maxCommits) * 100, 4);
+                      return (
+                        <div
+                          key={week.week}
+                          class="flex-1 bg-accent/60 hover:bg-accent rounded-t transition-colors relative group"
+                          style={`height: ${height}%`}
+                        >
+                          <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-bg-tertiary text-text-primary text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                            {week.total} commits
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p class="text-center text-text-secondary py-8">No commit activity data available.</p>
+                )
+              }
+            </div>
+          </Container>
+        </Section>
+
+        <Section title="Contribution Graph" ariaLabel="Contribution graph">
+          <Container>
+            <div class="bg-bg-secondary border border-border rounded-xl p-6 overflow-x-auto">
+              <p class="text-sm text-text-secondary mb-4">
+                {data.contribution_count} contributions in the last year
+              </p>
+              <div class="flex gap-0.5">
+                <div class="flex flex-col gap-0.5 pr-1 pt-2">
+                  {["", "Mon", "", "Wed", "", "Fri", ""].map((day) => (
+                    <div class="h-3 text-[10px] text-text-secondary leading-3">{day}</div>
+                  ))}
+                </div>
+                <div class="flex gap-0.5" style={`width: ${data.contributions.weeks.length * 14}px`}>
+                  {data.contributions.weeks.map((week, wi) => (
+                    <div key={wi} class="flex flex-col gap-0.5">
+                      {week.days.map((day) => (
+                        <div
+                          class="h-3 w-3 rounded-[2px]"
+                                          title={`${day.count} contributions on ${day.date}`}
+                          style={`background-color: ${day.count === 0 ? 'var(--bg-tertiary)' : day.count <= 3 ? 'rgba(146,64,14,0.4)' : day.count <= 6 ? 'rgba(146,64,14,0.6)' : day.count <= 9 ? 'rgba(146,64,14,0.8)' : '#f59e0b'}`}
+                        />
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div class="flex items-center justify-end gap-1 mt-3">
+                <span class="text-[10px] text-text-secondary">Less</span>
+                {[0, 1, 2, 3, 4].map((level) => (
+                  <div
+                    class="w-3 h-3 rounded-[2px]"
+                    style={`background-color: ${level === 0 ? 'var(--bg-tertiary)' : level === 1 ? 'rgba(146,64,14,0.4)' : level === 2 ? 'rgba(146,64,14,0.6)' : level === 3 ? 'rgba(146,64,14,0.8)' : '#f59e0b'}`}
+                  />
+                ))}
+                <span class="text-[10px] text-text-secondary">More</span>
+              </div>
+            </div>
+          </Container>
+        </Section>
+      </>
+    )
+  }
+</BaseLayout>

@@ -6,3 +6,4 @@ dist/
 *.log
 public/github/
 .astro/
+.cache/

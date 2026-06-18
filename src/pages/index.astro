@@ -3,6 +3,7 @@ import About from "../components/sections/About.astro";
 import Certifications from "../components/sections/Certifications.astro";
 import Contact from "../components/sections/Contact.astro";
 import Experience from "../components/sections/Experience.astro";
+import GitHubShowcase from "../components/sections/GitHubShowcase.astro";
 import Hero from "../components/sections/Hero.astro";
 import Honors from "../components/sections/Honors.astro";
 import Projects from "../components/sections/Projects.astro";
@@ -19,6 +20,7 @@ import {
   getSkills,
   getVolunteering,
 } from "../lib/data";
+import { fetchAllGitHubData } from "../lib/github";
 
 const profile = getProfile();
 const featuredProjects = getFeaturedProjects();
@@ -27,6 +29,7 @@ const skills = getSkills();
 const certifications = getCertifications();
 const honors = getHonors();
 const volunteerings = getVolunteering();
+const gitHubData = await fetchAllGitHubData();
 ---
 
 <BaseLayout>
@@ -70,6 +73,14 @@ const volunteerings = getVolunteering();
     volunteerings.length > 0 && (
       <Section id="volunteering" title="Volunteering" ariaLabel="Volunteering experience">
         <Volunteering volunteerings={volunteerings} />
+      </Section>
+    )
+  }
+
+  {
+    gitHubData.pinned_repos.length > 0 && (
+      <Section id="github" title="GitHub" subtitle="Recent activity and repositories" variant="alt" ariaLabel="GitHub activity">
+        <GitHubShowcase data={gitHubData} />
       </Section>
     )
   }

@@ -23,6 +23,6 @@
     }
   },
   "files": {
-    "ignore": [".astro", "dist", "node_modules", "public/github"]
+    "ignore": [".astro", ".cache", "dist", "node_modules", "public/github"]
   }
 }
