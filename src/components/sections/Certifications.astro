@@ -92,4 +92,12 @@ const grouped = certifications.reduce((acc: Record<string, Certification[]>, cer
       ))
     }
   </div>
+  <div class="mt-8 text-center">
+    <a href="/certifications" class="inline-flex items-center gap-2 text-sm text-accent hover:text-accent-muted transition-colors font-medium">
+      View all {certifications.length} certifications
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </a>
+  </div>
 </Container>

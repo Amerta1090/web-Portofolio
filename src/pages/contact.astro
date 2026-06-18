@@ -9,7 +9,7 @@ const profile = getProfile();
 const { contact } = profile;
 ---
 
-<BaseLayout title="Contact — Abdul Majid Ridwan Tyastonoatmaja" description="Get in touch for collaboration, opportunities, or just to say hi.">
+<BaseLayout title="Contact — Abdul Majid Ridwan Tyastonoatmaja" description="Get in touch for collaboration, opportunities, or just to say hi." canonicalUrl="https://abdulmajidr708.dev/contact">
   <Section title="Contact" subtitle="Let's connect">
     <Container size="md">
       <div class="grid md:grid-cols-2 gap-8 md:gap-12">
@@ -67,18 +67,17 @@ const { contact } = profile;
         <div>
           <h3 class="text-lg font-semibold text-text-primary mb-4">Send a Message</h3>
           <form
-            action="https://api.web3forms.com/submit"
-            method="POST"
+            id="contact-form-page"
             class="space-y-4"
           >
             <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE" />
             <input type="hidden" name="subject" value="New contact from portfolio" />
             <input type="hidden" name="from_name" value={profile.name} />
             <div>
-              <label for="name" class="block text-sm font-medium text-text-primary mb-1">Name</label>
+              <label for="name-page" class="block text-sm font-medium text-text-primary mb-1">Name</label>
               <input
                 type="text"
-                id="name"
+                id="name-page"
                 name="name"
                 required
                 class="w-full px-4 py-2.5 bg-bg-secondary border border-border rounded-lg text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200"
@@ -86,10 +85,10 @@ const { contact } = profile;
               />
             </div>
             <div>
-              <label for="email" class="block text-sm font-medium text-text-primary mb-1">Email</label>
+              <label for="email-page" class="block text-sm font-medium text-text-primary mb-1">Email</label>
               <input
                 type="email"
-                id="email"
+                id="email-page"
                 name="email"
                 required
                 class="w-full px-4 py-2.5 bg-bg-secondary border border-border rounded-lg text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200"
@@ -97,9 +96,9 @@ const { contact } = profile;
               />
             </div>
             <div>
-              <label for="message" class="block text-sm font-medium text-text-primary mb-1">Message</label>
+              <label for="message-page" class="block text-sm font-medium text-text-primary mb-1">Message</label>
               <textarea
-                id="message"
+                id="message-page"
                 name="message"
                 required
                 rows={4}
@@ -107,10 +106,45 @@ const { contact } = profile;
                 placeholder="Your message..."
               />
             </div>
-            <Button variant="primary" size="md">Send Message</Button>
+            <Button type="submit" variant="primary" size="md">Send Message</Button>
+            <div id="form-status-page" class="text-sm hidden"></div>
           </form>
         </div>
       </div>
     </Container>
   </Section>
 </BaseLayout>
+
+<script is:inline>
+  (function() {
+    const form = document.getElementById("contact-form-page");
+    if (!form) return;
+    const status = document.getElementById("form-status-page");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = form.querySelector('button[type="submit"]');
+      const origText = btn.textContent;
+      btn.textContent = "Sending...";
+      btn.disabled = true;
+      status.className = "text-sm hidden";
+      try {
+        const data = new FormData(form);
+        const resp = await fetch("https://api.web3forms.com/submit", { method: "POST", body: data });
+        const json = await resp.json();
+        if (json.success) {
+          status.className = "text-sm text-green-500 mt-3";
+          status.textContent = "Message sent successfully! I'll get back to you soon.";
+          form.reset();
+        } else {
+          status.className = "text-sm text-red-400 mt-3";
+          status.textContent = json.message || "Failed to send. Please try again or email me directly.";
+        }
+      } catch {
+        status.className = "text-sm text-red-400 mt-3";
+        status.textContent = "Network error. Please email me directly at abdulmajidr708@gmail.com";
+      }
+      btn.textContent = origText;
+      btn.disabled = false;
+    });
+  })();
+</script>

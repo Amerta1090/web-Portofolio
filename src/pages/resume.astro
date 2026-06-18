@@ -1,0 +1,108 @@
+---
+import Container from "../components/ui/Container.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getExperience, getProfile, getSkills } from "../lib/data";
+
+const profile = getProfile();
+const experience = getExperience();
+const skills = getSkills();
+const { contact } = profile;
+---
+
+<BaseLayout title="Resume — Abdul Majid Ridwan Tyastonoatmaja" description="Professional resume and career summary." canonicalUrl="https://abdulmajidr708.dev/resume">
+  <div class="print:hidden pt-16">
+    <Container>
+      <div class="flex justify-end py-6">
+        <button id="print-resume" class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-accent text-white font-medium hover:brightness-110 transition-all duration-200 text-base">Print / Save PDF</button>
+    <script is:inline>
+      document.getElementById('print-resume')?.addEventListener('click', () => window.print());
+    </script>
+      </div>
+    </Container>
+  </div>
+
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+    <article class="bg-white text-gray-900 rounded-2xl shadow-xl overflow-hidden print:rounded-none print:shadow-none" id="resume-content">
+      <div class="p-8 sm:p-12 print:p-8">
+        <header class="border-b border-gray-200 pb-6 mb-8 print:break-inside-avoid">
+          <h1 class="text-3xl font-bold">{profile.name}</h1>
+          <p class="text-lg text-amber-600 font-medium mt-1">{profile.headline}</p>
+          <p class="text-gray-600 mt-1">{profile.tagline}</p>
+          <div class="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-sm text-gray-500">
+            <span>{contact.email}</span>
+            <span>{contact.phone}</span>
+            <span>{profile.location}</span>
+          </div>
+        </header>
+
+        <section class="mb-8 print:break-inside-avoid">
+          <h2 class="text-xl font-semibold border-b border-gray-200 pb-2 mb-4">Summary</h2>
+          <p class="text-gray-700 leading-relaxed">{profile.summary}</p>
+        </section>
+
+        <section class="mb-8 print:break-inside-avoid">
+          <h2 class="text-xl font-semibold border-b border-gray-200 pb-2 mb-4">Experience</h2>
+          <div class="space-y-6">
+            {experience.map((exp) => (
+              <div>
+                <div class="flex items-start justify-between gap-4">
+                  <div>
+                    <h3 class="font-semibold text-gray-900">{exp.role}</h3>
+                    <p class="text-amber-600 font-medium">{exp.company}</p>
+                  </div>
+                  <div class="text-sm text-gray-500 text-right flex-shrink-0">
+                    <p>{exp.start_date} — {exp.end_date || "Present"}</p>
+                    <p>{exp.location}</p>
+                  </div>
+                </div>
+                <ul class="mt-2 space-y-1">
+                  {exp.highlights.map((h) => (
+                    <li class="text-sm text-gray-600 flex items-start gap-2">
+                      <span class="text-amber-500 mt-1 flex-shrink-0">•</span>
+                      <span>{h}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section class="mb-8 print:break-inside-avoid">
+          <h2 class="text-xl font-semibold border-b border-gray-200 pb-2 mb-4">Skills</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {skills.categories.map((cat) => (
+              <div>
+                <h3 class="font-medium text-gray-900 text-sm uppercase tracking-wider mb-2">{cat.name}</h3>
+                <div class="flex flex-wrap gap-1.5">
+                  {cat.skills.map((s) => (
+                    <span class="inline-flex items-center px-2.5 py-0.5 text-xs bg-gray-100 text-gray-700 rounded-full">{s.name}</span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section class="print:break-inside-avoid">
+          <h2 class="text-xl font-semibold border-b border-gray-200 pb-2 mb-4">Contact</h2>
+          <div class="text-sm text-gray-600 space-y-1">
+            <p>Email: {contact.email}</p>
+            <p>Phone: {contact.phone}</p>
+            <p>LinkedIn: {contact.linkedin}</p>
+            <p>GitHub: {contact.github}</p>
+          </div>
+        </section>
+      </div>
+    </article>
+  </div>
+</BaseLayout>
+
+<style is:global>
+  @media print {
+    body { background: white !important; }
+    .skip-to-content { display: none !important; }
+    nav, footer, .print\\:hidden { display: none !important; }
+    #resume-content { box-shadow: none !important; border-radius: 0 !important; }
+  }
+</style>

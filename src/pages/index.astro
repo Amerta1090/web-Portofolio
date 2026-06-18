@@ -30,29 +30,29 @@ const volunteerings = getVolunteering();
 ---
 
 <BaseLayout>
-  <Section id="hero">
+  <Section id="hero" ariaLabel="Hero">
     <Hero profile={profile} />
   </Section>
 
-  <Section id="about" title="About" variant="alt">
+  <Section id="about" title="About" variant="alt" ariaLabel="About me">
     <About profile={profile} />
   </Section>
 
-  <Section id="experience" title="Experience" variant="alt">
+  <Section id="experience" title="Experience" variant="alt" ariaLabel="Work experience">
     <Experience experiences={experiences} />
   </Section>
 
-  <Section id="projects" title="Featured Projects" subtitle="Selected work that demonstrates my range">
+  <Section id="projects" title="Featured Projects" subtitle="Selected work that demonstrates my range" ariaLabel="Featured projects">
     <Projects projects={featuredProjects} />
   </Section>
 
-  <Section id="skills" title="Skills" variant="alt">
+  <Section id="skills" title="Skills" variant="alt" ariaLabel="Skills and technologies">
     <Skills skills={skills} />
   </Section>
 
   {
     certifications.length > 0 && (
-      <Section id="certifications" title="Certifications">
+      <Section id="certifications" title="Certifications" ariaLabel="Certifications">
         <Certifications certifications={certifications} />
       </Section>
     )
@@ -60,7 +60,7 @@ const volunteerings = getVolunteering();
 
   {
     honors.length > 0 && (
-      <Section id="honors" title="Honors & Awards" variant="alt">
+      <Section id="honors" title="Honors & Awards" variant="alt" ariaLabel="Honors and awards">
         <Honors honors={honors} />
       </Section>
     )
@@ -68,13 +68,13 @@ const volunteerings = getVolunteering();
 
   {
     volunteerings.length > 0 && (
-      <Section id="volunteering" title="Volunteering">
+      <Section id="volunteering" title="Volunteering" ariaLabel="Volunteering experience">
         <Volunteering volunteerings={volunteerings} />
       </Section>
     )
   }
 
-  <Section id="contact" title="Contact" subtitle="Have a question or want to work together?">
+  <Section id="contact" title="Contact" subtitle="Have a question or want to work together?" ariaLabel="Contact">
     <Contact profile={profile} />
   </Section>
 </BaseLayout>

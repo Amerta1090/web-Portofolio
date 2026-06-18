@@ -3,10 +3,11 @@ export interface Props {
   href?: string;
   variant?: "primary" | "secondary" | "ghost";
   size?: "sm" | "md" | "lg";
+  type?: "button" | "submit" | "reset";
   class?: string;
 }
 
-const { href, variant = "primary", size = "md", class: className } = Astro.props;
+const { href, variant = "primary", size = "md", type = "button", class: className } = Astro.props;
 
 const variants: Record<string, string> = {
   primary: "bg-accent text-bg-primary hover:brightness-110 active:scale-[0.98]",
@@ -29,7 +30,7 @@ const cls = `inline-flex items-center justify-center font-medium rounded-lg tran
       <slot />
     </a>
   ) : (
-    <button class={cls}>
+    <button type={type} class={cls}>
       <slot />
     </button>
   )

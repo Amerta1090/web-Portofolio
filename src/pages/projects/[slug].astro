@@ -29,7 +29,7 @@ function slugify(title: string): string {
 }
 ---
 
-<BaseLayout title={`${project.title} — Abdul Majid Ridwan Tyastonoatmaja`} description={project.description.slice(0, 160)}>
+<BaseLayout title={`${project.title} — Abdul Majid Ridwan Tyastonoatmaja`} description={project.description.slice(0, 160)} canonicalUrl={`https://abdulmajidr708.dev/projects/${slugify(project.title)}`}>
   <Container size="md">
     <article class="py-12 md:py-24">
       <div class="mb-8">

@@ -9,13 +9,32 @@ export interface Props {
   title?: string;
   description?: string;
   ogImage?: string;
+  ogType?: string;
+  canonicalUrl?: string;
+  jsonLd?: Record<string, unknown>;
 }
 
 const {
   title = SITE.title,
   description = SITE.description,
   ogImage = "/og-image.png",
+  ogType = "website",
+  canonicalUrl,
 } = Astro.props;
+
+const jsonLd = Astro.props.jsonLd;
+
+const canonical = canonicalUrl ?? SITE.url;
+const ogImageUrl = ogImage.startsWith("http") ? ogImage : `${SITE.url}${ogImage}`;
+
+const defaultJsonLd: Record<string, unknown> = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: SITE.author,
+  jobTitle: "AI/ML Engineer & Systems Builder",
+  url: SITE.url,
+  sameAs: [SITE.github, SITE.linkedin],
+};
 ---
 
 <!DOCTYPE html>
@@ -29,12 +48,18 @@ const {
 
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={ogImage} />
-    <meta property="og:type" content="website" />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={SITE.author} />
     <meta name="twitter:card" content="summary_large_image" />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="canonical" href={SITE.url} />
+    <link rel="canonical" href={canonical} />
+
+    <script is:inline type="application/ld+json">
+      {JSON.stringify(jsonLd ?? defaultJsonLd)}
+    </script>
 
     <script is:inline>
       // Prevent FOUC — apply theme before render

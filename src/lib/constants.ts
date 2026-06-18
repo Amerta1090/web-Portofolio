@@ -20,5 +20,5 @@ export const FOOTER_LINKS = [
   { label: "Certifications", href: "/certifications" },
   { label: "GitHub", href: "/github" },
   { label: "Timeline", href: "/timeline" },
-  { label: "Resume", href: "/resume.pdf" },
+  { label: "Resume", href: "/resume" },
 ] as const;
