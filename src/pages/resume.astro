@@ -12,14 +12,20 @@ const { contact } = profile;
 <BaseLayout title="Resume — Abdul Majid Ridwan Tyastonoatmaja" description="Professional resume and career summary." canonicalUrl="https://abdulmajidr708.dev/resume">
   <div class="print:hidden pt-16">
     <Container>
-      <div class="flex justify-end py-6">
-        <button id="print-resume" class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-accent text-white font-medium hover:brightness-110 transition-all duration-200 text-base">Print / Save PDF</button>
-    <script is:inline>
-      document.getElementById('print-resume')?.addEventListener('click', () => window.print());
-    </script>
+      <div class="flex items-center justify-between py-6">
+        <p class="text-sm text-text-secondary">Use the button below to download or print a PDF version of this resume.</p>
+        <div class="flex gap-3">
+          <button id="download-pdf" class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-accent text-white font-medium hover:brightness-110 transition-all duration-200 text-base">Download PDF</button>
+          <button id="print-resume" class="inline-flex items-center justify-center px-6 py-3 rounded-xl border border-border text-text-primary font-medium hover:bg-bg-tertiary transition-all duration-200 text-base">Print</button>
+        </div>
       </div>
     </Container>
   </div>
+
+  <script is:inline>
+    document.getElementById("download-pdf")?.addEventListener("click", () => window.print());
+    document.getElementById("print-resume")?.addEventListener("click", () => window.print());
+  </script>
 
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
     <article class="bg-white text-gray-900 rounded-2xl shadow-xl overflow-hidden print:rounded-none print:shadow-none" id="resume-content">
