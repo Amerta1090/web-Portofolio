@@ -13,7 +13,7 @@ const metricItems = [
   { label: "Years Experience", value: metrics.years_experience, suffix: "+" },
   { label: "Projects Shipped", value: metrics.projects_shipped },
   { label: "Certifications", value: metrics.certifications },
-  { label: "Languages", value: metrics.languages.join(" / ") },
+  { label: "Languages", value: metrics.languages.length, suffix: "" },
 ];
 ---
 
@@ -29,7 +29,7 @@ const metricItems = [
         metricItems.map((item) => (
           <div class="bg-bg-secondary border border-border rounded-xl p-4 text-center">
             <div class="text-2xl md:text-3xl font-bold text-accent">
-              {typeof item.value === "number" ? item.value : ""}{item.suffix ?? ""}
+              {item.value}{item.suffix ?? ""}
             </div>
             <div class="mt-1 text-sm text-text-secondary">{item.label}</div>
           </div>
