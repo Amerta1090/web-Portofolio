@@ -102,31 +102,54 @@ const { contact } = profile;
 
 <script is:inline>
   (function() {
-    const form = document.getElementById("contact-form-home");
+    function showToast(message, type) {
+      var existing = document.getElementById("toast-portal");
+      if (existing) existing.remove();
+      var portal = document.createElement("div");
+      portal.id = "toast-portal";
+      portal.style.cssText = "position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px";
+      document.body.appendChild(portal);
+      var toast = document.createElement("div");
+      toast.role = "alert";
+      toast.className = "flex items-center gap-3 px-5 py-3 rounded-xl shadow-xl text-sm font-medium " + (type === "success" ? "bg-green-600 text-white" : "bg-red-600 text-white");
+      toast.style.animation = "toast-in 0.3s ease-out";
+      var icon = document.createElement("span");
+      icon.innerHTML = type === "success"
+        ? '<svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>'
+        : '<svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>';
+      toast.appendChild(icon);
+      var msg = document.createElement("span");
+      msg.textContent = message;
+      toast.appendChild(msg);
+      portal.appendChild(toast);
+      setTimeout(function() { toast.style.opacity = "0"; toast.style.transform = "translateY(1rem)"; toast.style.transition = "all 0.3s ease"; setTimeout(function() { portal.remove(); }, 300); }, 4000);
+    }
+    var style = document.createElement("style");
+    style.textContent = "@keyframes toast-in { from { opacity: 0; transform: translateY(1rem); } to { opacity: 1; transform: translateY(0); } }";
+    document.head.appendChild(style);
+
+    var form = document.getElementById("contact-form-home");
     if (!form) return;
-    const status = document.getElementById("form-status-home");
-    form.addEventListener("submit", async (e) => {
+    var status = document.getElementById("form-status-home");
+    form.addEventListener("submit", async function(e) {
       e.preventDefault();
-      const btn = form.querySelector('button[type="submit"]');
-      const origText = btn.textContent;
+      var btn = form.querySelector('button[type="submit"]');
+      var origText = btn.textContent;
       btn.textContent = "Sending...";
       btn.disabled = true;
-      status.className = "text-sm hidden";
+      if (status) { status.className = "text-sm hidden"; }
       try {
-        const data = new FormData(form);
-        const resp = await fetch("https://api.web3forms.com/submit", { method: "POST", body: data });
-        const json = await resp.json();
+        var data = new FormData(form);
+        var resp = await fetch("https://api.web3forms.com/submit", { method: "POST", body: data });
+        var json = await resp.json();
         if (json.success) {
-          status.className = "text-sm text-green-500 mt-3";
-          status.textContent = "Message sent successfully! I'll get back to you soon.";
+          showToast("Message sent successfully! I'll get back to you soon.", "success");
           form.reset();
         } else {
-          status.className = "text-sm text-red-400 mt-3";
-          status.textContent = json.message || "Failed to send. Please try again or email me directly.";
+          showToast(json.message || "Failed to send. Please try again or email me directly.", "error");
         }
       } catch {
-        status.className = "text-sm text-red-400 mt-3";
-        status.textContent = "Network error. Please email me directly at abdulmajidr708@gmail.com";
+        showToast("Network error. Please email me directly at abdulmajidr708@gmail.com", "error");
       }
       btn.textContent = origText;
       btn.disabled = false;

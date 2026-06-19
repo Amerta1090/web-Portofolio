@@ -4,6 +4,7 @@ import "../styles/theme.css";
 import ClientRouter from "astro/components/ClientRouter.astro";
 import Footer from "../components/layout/Footer.astro";
 import Header from "../components/layout/Header.astro";
+import ScrollProgress from "../islands/ScrollProgress";
 import { SITE } from "../lib/constants";
 
 export interface Props {
@@ -44,7 +45,7 @@ const ogImageUrl = ogImage.startsWith("http") ? ogImage : `${SITE.url}${ogImage}
     <meta property="og:site_name" content={SITE.author} />
     <meta name="twitter:card" content="summary_large_image" />
 
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" id="favicon" />
     <link rel="canonical" href={canonical} />
     <ClientRouter />
 
@@ -71,9 +72,27 @@ const ogImageUrl = ogImage.startsWith("http") ? ogImage : `${SITE.url}${ogImage}
         }
       })();
     </script>
+
+    <script is:inline>
+      // Dynamic favicon — swaps between dark/light variant
+      (function () {
+        const updateFavicon = function () {
+          const isDark = document.documentElement.classList.contains("dark");
+          const link = document.getElementById("favicon");
+          if (link) {
+            link.setAttribute("href", isDark ? "/favicon.svg" : "/favicon-light.svg");
+          }
+        };
+        // Watch for theme changes via mutation
+        const observer = new MutationObserver(function () { updateFavicon(); });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+        updateFavicon();
+      })();
+    </script>
   </head>
   <body class="min-h-screen bg-bg-primary text-text-primary noise-overlay">
     <a href="#main-content" class="skip-to-content">Skip to content</a>
+    <ScrollProgress client:load />
     <Header />
     <main id="main-content" class="pt-16">
       <slot />

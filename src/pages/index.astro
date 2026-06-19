@@ -10,6 +10,7 @@ import Volunteering from "../components/sections/Volunteering.astro";
 import Section from "../components/ui/Section.astro";
 import AnimatedHero from "../islands/AnimatedHero";
 import ScrollAnimator from "../islands/ScrollAnimator.astro";
+import SectionCounter from "../islands/SectionCounter";
 import SkillsExplorer from "../islands/SkillsExplorer";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import {
@@ -97,4 +98,5 @@ const gitHubData = await fetchAllGitHubData();
   </Section>
 
   <ScrollAnimator />
+  <SectionCounter client:load />
 </BaseLayout>
