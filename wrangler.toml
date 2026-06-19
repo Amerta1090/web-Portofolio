@@ -1,10 +1,7 @@
-name = "portfolio"
+name = "web-portofolio"
 compatibility_date = "2024-01-01"
 
-assets = { directory = "dist" }
-
-[env.production]
-routes = ["*"]
+pages_build_output_dir = "dist"
 
 [[headers]]
 for = "/*"
