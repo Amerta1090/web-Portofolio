@@ -1,6 +1,24 @@
 {
   "projects": [
     {
+      "title": "Retro Game-Inspired Portfolio Website",
+      "featured": true,
+      "category": "web",
+      "period": "Jun 2026 – Present",
+      "description": "Built a personal portfolio website with a retro PS2-inspired main menu experience using Astro, React, and Tailwind CSS. This project explores how modern web development can deliver interfaces beyond conventional scrolling websites. Instead of traditional navigation, the portfolio uses keyboard-driven menu interaction inspired by classic game title screens. Key highlights: Built with Astro (SSG) for fast performance and zero runtime API calls; Interactive title screen and main menu with keyboard navigation; Retro visual design with PS2-era aesthetics, scanlines, gradients, and animated UI; 3D web experiments using Three.js / React Three Fiber; Fully data-driven architecture using local JSON files validated at build time; Includes projects, certifications, skills, GitHub activity, blog, and resume pages; Performance-focused with lazy loading, code splitting, and Lighthouse optimization; Accessible with keyboard navigation and screen reader support. The goal of this project was to combine performance, interactivity, and unconventional UI design to create a portfolio that feels more like a game experience than a standard website.",
+      "links": [
+        {
+          "label": "Live Demo",
+          "url": "https://portfolio.abdulmajidr708.workers.dev/"
+        },
+        {
+          "label": "GitHub Repository",
+          "url": "https://github.com/Amerta1090/web-Portofolio"
+        }
+      ],
+      "skills": ["Web Development"]
+    },
+    {
       "title": "NyatetDuwit — Offline-First Personal Finance PWA",
       "featured": true,
       "category": "web",
