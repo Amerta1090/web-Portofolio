@@ -3,22 +3,26 @@ import { FOOTER_LINKS, SITE } from "../../lib/constants";
 import Container from "../ui/Container.astro";
 ---
 
-<footer class="border-t border-border bg-bg-secondary">
+<footer class="border-t border-accent/10 bg-bg-secondary/80">
   <Container>
     <div class="py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
       <div>
-        <h3 class="text-lg font-semibold text-text-primary mb-3">{SITE.author}</h3>
-        <p class="text-sm text-text-secondary leading-relaxed">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="w-2 h-2 bg-accent pulse-ring" />
+          <h3 class="text-lg font-black uppercase tracking-wider text-text-primary">{SITE.author}</h3>
+        </div>
+        <p class="text-sm text-text-secondary leading-relaxed font-mono">
           {SITE.description}
         </p>
       </div>
       <div>
-        <h4 class="text-sm font-semibold text-text-primary uppercase tracking-wider mb-3" id="footer-links-heading">Links</h4>
+        <h4 class="text-sm font-black uppercase tracking-widest text-accent mb-3" id="footer-links-heading">// Links</h4>
         <ul class="space-y-2" aria-labelledby="footer-links-heading">
           {
             FOOTER_LINKS.map((link) => (
               <li>
-                <a href={link.href} class="text-sm text-text-secondary hover:text-accent transition-colors">
+                <a href={link.href} class="text-sm font-mono text-text-secondary hover:text-accent transition-colors group flex items-center gap-2">
+                  <span class="w-0 h-px bg-accent group-hover:w-3 transition-all duration-300" />
                   {link.label}
                 </a>
               </li>
@@ -27,16 +31,18 @@ import Container from "../ui/Container.astro";
         </ul>
       </div>
       <div>
-        <h4 class="text-sm font-semibold text-text-primary uppercase tracking-wider mb-3" id="footer-connect-heading">Connect</h4>
+        <h4 class="text-sm font-black uppercase tracking-widest text-accent mb-3" id="footer-connect-heading">// Connect</h4>
         <ul class="space-y-2" aria-labelledby="footer-connect-heading">
           <li>
-            <a href={SITE.github} class="text-sm text-text-secondary hover:text-accent transition-colors" target="_blank" rel="noopener noreferrer">
+            <a href={SITE.github} class="text-sm font-mono text-text-secondary hover:text-accent transition-colors group flex items-center gap-2" target="_blank" rel="noopener noreferrer">
+              <span class="w-0 h-px bg-accent group-hover:w-3 transition-all duration-300" />
               GitHub
               <span class="sr-only">(opens in new tab)</span>
             </a>
           </li>
           <li>
-            <a href={SITE.linkedin} class="text-sm text-text-secondary hover:text-accent transition-colors" target="_blank" rel="noopener noreferrer">
+            <a href={SITE.linkedin} class="text-sm font-mono text-text-secondary hover:text-accent transition-colors group flex items-center gap-2" target="_blank" rel="noopener noreferrer">
+              <span class="w-0 h-px bg-accent group-hover:w-3 transition-all duration-300" />
               LinkedIn
               <span class="sr-only">(opens in new tab)</span>
             </a>
@@ -44,8 +50,14 @@ import Container from "../ui/Container.astro";
         </ul>
       </div>
     </div>
-    <div class="py-6 border-t border-border text-center text-xs text-text-secondary">
-      &copy; {new Date().getFullYear()} {SITE.author}. All rights reserved.
+    <div class="py-6 border-t border-accent/10 text-center">
+      <div class="flex items-center justify-center gap-3 text-xs font-mono text-text-secondary/40">
+        <span>&copy; {new Date().getFullYear()} {SITE.author}</span>
+        <span class="text-accent/30">//</span>
+        <span>BUILT WITH ASTRO</span>
+        <span class="text-accent/30">//</span>
+        <span class="w-2 h-2 bg-accent pulse-ring inline-block" />
+      </div>
     </div>
   </Container>
 </footer>

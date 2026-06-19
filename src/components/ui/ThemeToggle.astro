@@ -1,11 +1,9 @@
 ---
-// CSS-only theme toggle — no JS required for MVP
-// Theme is toggled via a class on <html> element
 ---
 
 <button
   id="theme-toggle"
-  class="theme-rotate inline-flex items-center justify-center w-10 h-10 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
+  class="theme-rotate inline-flex items-center justify-center w-10 h-10 text-text-secondary hover:text-accent hover:border-accent/40 transition-all duration-200 border border-accent/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
   aria-label="Toggle theme"
   aria-live="polite"
   data-theme-toggle
@@ -43,7 +41,6 @@
 </button>
 
 <script is:inline>
-  // Theme toggle script — inline to prevent FOUC
   (function () {
     const stored = localStorage.getItem("theme");
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -52,7 +49,6 @@
     } else {
       document.documentElement.classList.add("dark");
     }
-
     document.addEventListener("DOMContentLoaded", function () {
       const btn = document.querySelector("[data-theme-toggle]");
       if (!btn) return;

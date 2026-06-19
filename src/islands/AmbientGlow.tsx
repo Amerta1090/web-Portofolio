@@ -13,7 +13,7 @@ export default function AmbientGlow() {
       const rect = parent.getBoundingClientRect();
       const x = ((e.clientX - rect.left) / rect.width) * 100;
       const y = ((e.clientY - rect.top) / rect.height) * 100;
-      el.style.background = `radial-gradient(600px circle at ${x}% ${y}%, rgba(245, 158, 11, 0.06), transparent 40%)`;
+      el.style.background = `radial-gradient(600px circle at ${x}% ${y}%, rgba(230, 0, 18, 0.06), transparent 40%)`;
     };
 
     const onLeave = () => {

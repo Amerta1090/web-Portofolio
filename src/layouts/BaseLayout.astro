@@ -6,6 +6,7 @@ import Footer from "../components/layout/Footer.astro";
 import Header from "../components/layout/Header.astro";
 import ScrollProgress from "../islands/ScrollProgress";
 import { SITE } from "../lib/constants";
+import { ThreeDCanvas } from "../components/ui/ThreeDCanvas";
 
 export interface Props {
   title?: string;
@@ -68,10 +69,9 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
     <link rel="preload" href="/fonts/inter-700.woff2" as="font" type="font/woff2" crossorigin />
 
     <script is:inline>
-      // Predictive prefetch — prefetch links on hover/touch
       (function () {
         const prefetched = new Set();
-        const prefetch = (url: string) => {
+        const prefetch = (url) => {
           if (prefetched.has(url)) return;
           prefetched.add(url);
           const link = document.createElement("link");
@@ -80,13 +80,13 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
           document.head.appendChild(link);
         };
         document.addEventListener("mouseover", (e) => {
-          const a = (e.target as HTMLElement).closest?.("a");
+          const a = e.target.closest?.("a");
           if (a && a.href && a.href.startsWith(location.origin) && !a.href.includes("#")) {
             prefetch(a.href);
           }
         }, { passive: true });
         document.addEventListener("touchstart", (e) => {
-          const a = (e.target as HTMLElement).closest?.("a");
+          const a = e.target.closest?.("a");
           if (a && a.href && a.href.startsWith(location.origin) && !a.href.includes("#")) {
             prefetch(a.href);
           }
@@ -95,7 +95,6 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
     </script>
 
     <script is:inline>
-      // Prevent FOUC — apply theme before render
       (function () {
         const stored = localStorage.getItem("theme");
         const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -108,7 +107,6 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
     </script>
 
     <script is:inline>
-      // Dynamic favicon — swaps between dark/light variant
       (function () {
         const updateFavicon = function () {
           const isDark = document.documentElement.classList.contains("dark");
@@ -117,7 +115,6 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
             link.setAttribute("href", isDark ? "/favicon.svg" : "/favicon-light.svg");
           }
         };
-        // Watch for theme changes via mutation
         const observer = new MutationObserver(function () { updateFavicon(); });
         observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
         updateFavicon();
@@ -129,12 +126,19 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
     )}
   </head>
   <body class="min-h-screen bg-bg-primary text-text-primary noise-overlay">
-    <a href="#main-content" class="skip-to-content">Skip to content</a>
-    <ScrollProgress client:load />
-    <Header currentPath={currentPath} />
-    <main id="main-content" class="pt-16">
-      <slot />
-    </main>
-    <Footer />
+    <!-- 3D Canvas Background -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+      <ThreeDCanvas client:load />
+    </div>
+
+    <div class="relative z-10">
+      <a href="#main-content" class="skip-to-content">Skip to content</a>
+      <ScrollProgress client:load />
+      <Header currentPath={currentPath} />
+      <main id="main-content" class="pt-16">
+        <slot />
+      </main>
+      <Footer />
+    </div>
   </body>
 </html>

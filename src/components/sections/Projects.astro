@@ -1,6 +1,5 @@
 ---
-import type { Project } from "../../types/projects";
-import Card from "../ui/Card.astro";
+import type { Project } from "../../types/project";
 import Tag from "../ui/Tag.astro";
 
 export interface Props {
@@ -12,33 +11,59 @@ const { projects } = Astro.props;
 function slugify(title: string): string {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 }
+
+const categoryEmojis: Record<string, string> = {
+  ml: "◆",
+  web: "■",
+  cli: "▲",
+  iot: "●",
+  devops: "★",
+};
 ---
 
-<div class="grid md:grid-cols-2 gap-6">
+<div class="grid md:grid-cols-2 gap-5">
   {
-    projects.map((project) => (
-      <Card href={`/projects/${slugify(project.title)}`} variant="elevated">
-        <div class="flex items-start justify-between gap-2 mb-2">
-          <h3 class="text-lg font-semibold text-text-primary line-clamp-2">
-            {project.title}
-          </h3>
-          {project.category && (
-            <span class="inline-flex items-center px-2 py-0.5 text-xs bg-accent-muted/20 text-accent rounded-full shrink-0 mt-1">{project.category.toUpperCase()}</span>
+    projects.map((project, idx) => (
+      <a
+        href={`/projects/${slugify(project.title)}`}
+        class="group block bg-bg-secondary border border-accent/10 hover:border-accent/40 transition-all duration-300 p-6 relative overflow-hidden"
+      >
+        {/* Corner decoration */}
+        <div class="absolute -top-6 -right-6 w-12 h-12 border-t-2 border-r-2 border-accent/20 group-hover:border-accent/60 transition-colors rotate-45" />
+        
+        <div class="flex items-start justify-between gap-3 mb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-accent text-sm">{categoryEmojis[project.category] || "◇"}</span>
+            <span class="text-[10px] font-mono text-accent/60 uppercase tracking-wider">{project.category}</span>
+          </div>
+          {project.featured && (
+            <span class="text-[9px] font-mono text-accent border border-accent/30 px-1.5 py-0.5 uppercase tracking-widest">FEATURED</span>
           )}
         </div>
-        <p class="text-text-secondary text-sm line-clamp-2 mb-3">
+        
+        <h3 class="text-lg font-black uppercase tracking-wider text-text-primary group-hover:text-accent transition-colors leading-tight mb-2">
+          {project.title}
+        </h3>
+        
+        <p class="text-text-secondary text-sm leading-relaxed line-clamp-2 mb-3">
           {project.description}
         </p>
+        
         {project.period && (
-          <p class="text-xs text-text-secondary mb-3">{project.period}</p>
+          <p class="text-xs font-mono text-text-secondary/60 mb-3">{project.period}</p>
         )}
-        <div class="flex flex-wrap gap-1.5" slot="footer">
-          {project.skills.slice(0, 4).map((skill) => <Tag>{skill}</Tag>)}
+        
+        <div class="flex flex-wrap gap-1.5">
+          {project.skills.slice(0, 4).map((skill: string) => (
+            <span class="text-[9px] font-mono px-1.5 py-0.5 border border-accent/15 text-accent/60 uppercase tracking-wider">
+              {skill.length > 15 ? skill.slice(0, 15) + "…" : skill}
+            </span>
+          ))}
           {project.skills.length > 4 && (
-            <Tag>+{project.skills.length - 4}</Tag>
+            <span class="text-[9px] font-mono px-1.5 py-0.5 border border-accent/15 text-accent/60">+{project.skills.length - 4}</span>
           )}
         </div>
-      </Card>
+      </a>
     ))
   }
 </div>

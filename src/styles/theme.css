@@ -1,21 +1,35 @@
 :root {
-  --bg-primary: #0f0f11;
-  --bg-secondary: #18181b;
-  --bg-tertiary: #27272a;
-  --text-primary: #fafafa;
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #111111;
+  --bg-tertiary: #1a1a1a;
+  --text-primary: #ffffff;
   --text-secondary: #a1a1aa;
-  --accent: #f59e0b;
-  --accent-muted: #92400e;
-  --border: #27272a;
+  --accent: #e60012;
+  --accent-muted: #ff00c1;
+  --accent-glow: rgba(230, 0, 18, 0.3);
+  --border: #e60012;
 }
 
-.light {
-  --bg-primary: #fafafa;
-  --bg-secondary: #f4f4f5;
-  --bg-tertiary: #e4e4e7;
-  --text-primary: #18181b;
-  --text-secondary: #71717a;
-  --accent: #d97706;
-  --accent-muted: #fbbf24;
-  --border: #e4e4e7;
+.light, .dark {
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #111111;
+  --bg-tertiary: #1a1a1a;
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --accent: #e60012;
+  --accent-muted: #ff00c1;
+  --accent-glow: rgba(230, 0, 18, 0.3);
+  --border: #e60012;
+}
+
+.game-mode {
+  --bg-primary: #050505;
+  --bg-secondary: #0d0d0d;
+  --bg-tertiary: #141414;
+  --text-primary: #ffffff;
+  --text-secondary: #888888;
+  --accent: #e60012;
+  --accent-muted: #ff00c1;
+  --accent-glow: rgba(230, 0, 18, 0.4);
+  --border: #e60012;
 }

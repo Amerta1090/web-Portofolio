@@ -57,16 +57,16 @@ function AnimatedValue({ value, suffix }: { value: number; suffix: string }) {
 
 export default function MetricsCounter({ metrics }: Props) {
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-2 gap-3">
       {metrics.map((m) => (
         <div
           key={m.label}
-          className="bg-bg-secondary border border-border rounded-xl p-4 text-center"
+          className="bg-bg-secondary/50 border border-accent/10 p-4 text-center hover:border-accent/30 transition-colors"
         >
-          <div className="text-2xl md:text-3xl font-bold text-accent">
+          <div className="text-3xl md:text-4xl font-black text-accent tracking-tighter">
             <AnimatedValue value={m.value} suffix={m.suffix} />
           </div>
-          <div className="mt-1 text-sm text-text-secondary">{m.label}</div>
+          <div className="mt-1 text-xs font-mono text-text-secondary/60 uppercase tracking-wider">{m.label}</div>
         </div>
       ))}
     </div>
