@@ -35,6 +35,21 @@ export interface GitHubCommitActivity {
   days: number[];
 }
 
+export interface GitHubRepoActivity {
+  repo_name: string;
+  repo_url: string;
+  commits: Array<{
+    message: string;
+    date: string;
+    url: string;
+  }>;
+}
+
+export interface GitHubReadme {
+  content: string;
+  fetched_at: string;
+}
+
 export interface GitHubData {
   pinned_repos: GitHubRepo[];
   total_stars: number;
@@ -44,4 +59,6 @@ export interface GitHubData {
   contribution_count: number;
   commit_activity: GitHubCommitActivity[];
   contributions: ContributionCalendar;
+  top_repos: GitHubRepo[];
+  repo_activity: GitHubRepoActivity[];
 }

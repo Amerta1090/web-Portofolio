@@ -5,7 +5,9 @@ import type {
   GitHubCommitActivity,
   GitHubData,
   GitHubLangStats,
+  GitHubReadme,
   GitHubRepo,
+  GitHubRepoActivity,
 } from "../types/github";
 
 const USERNAME = "Amerta1090";
@@ -320,13 +322,102 @@ export async function fetchContributions(): Promise<ContributionCalendar> {
   }
 }
 
+export async function fetchReadme(owner: string, repo: string): Promise<GitHubReadme | null> {
+  const cacheKey = `readme-${repo}.json`;
+  const cached = readCache<GitHubReadme>(cacheKey);
+  if (cached) return cached;
+
+  try {
+    const data = await rest<{ content: string; html_url: string }>(
+      `/repos/${owner}/${repo}/readme`,
+    );
+    const decoded = Buffer.from(data.content, "base64").toString("utf-8");
+    const readme: GitHubReadme = {
+      content: decoded,
+      fetched_at: new Date().toISOString(),
+    };
+    writeCache(cacheKey, readme);
+    return readme;
+  } catch (err) {
+    console.warn(`[github] README fetch failed for ${repo}: ${err}`);
+    return null;
+  }
+}
+
+export async function fetchTopRepos(): Promise<GitHubRepo[]> {
+  const cached = readCache<GitHubRepo[]>("top-repos.json");
+  if (cached) return cached;
+
+  try {
+    const repos = await fetchAllRepos();
+    const sorted = repos.sort((a, b) => b.stars - a.stars).slice(0, 10);
+    writeCache("top-repos.json", sorted);
+    return sorted;
+  } catch (err) {
+    console.warn(`[github] Top repos fetch failed: ${err}`);
+    const fallback = readCache<GitHubRepo[]>("top-repos.json");
+    if (fallback) return fallback;
+    return [];
+  }
+}
+
+export async function fetchRepoActivity(): Promise<GitHubRepoActivity[]> {
+  const cached = readCache<GitHubRepoActivity[]>("repo-activity.json");
+  if (cached) return cached;
+
+  try {
+    const repos = await fetchAllRepos();
+    const topRepos = repos.sort((a, b) => b.stars - a.stars).slice(0, 5);
+
+    const activity = await Promise.all(
+      topRepos.map(async (repo) => {
+        try {
+          const commits = await rest<Array<{ commit: { message: string }; html_url: string }>>(
+            `/repos/${USERNAME}/${repo.name}/commits?per_page=5`,
+          );
+
+          return {
+            repo_name: repo.name,
+            repo_url: repo.url,
+            commits: commits.map((c) => ({
+              message: c.commit.message.split("\n")[0],
+              date: "",
+              url: c.html_url,
+            })),
+          };
+        } catch {
+          return { repo_name: repo.name, repo_url: repo.url, commits: [] };
+        }
+      }),
+    );
+
+    writeCache("repo-activity.json", activity);
+    return activity;
+  } catch (err) {
+    console.warn(`[github] Repo activity fetch failed: ${err}`);
+    const fallback = readCache<GitHubRepoActivity[]>("repo-activity.json");
+    if (fallback) return fallback;
+    return [];
+  }
+}
+
 export async function fetchAllGitHubData(): Promise<GitHubData> {
-  const [pinned_repos, languages, commit_activity, contributions, allRepos] = await Promise.all([
+  const [
+    pinned_repos,
+    languages,
+    commit_activity,
+    contributions,
+    allRepos,
+    top_repos,
+    repo_activity,
+  ] = await Promise.all([
     fetchPinnedRepos(),
     fetchLanguages(),
     fetchCommitActivity(),
     fetchContributions(),
     fetchAllRepos(),
+    fetchTopRepos(),
+    fetchRepoActivity(),
   ]);
 
   const total_stars = allRepos.reduce((s, r) => s + r.stars, 0);
@@ -341,6 +432,8 @@ export async function fetchAllGitHubData(): Promise<GitHubData> {
     contribution_count: contributions.totalContributions,
     commit_activity,
     contributions,
+    top_repos,
+    repo_activity,
   };
 }
 
@@ -351,6 +444,8 @@ export function getCachedGitHubData(): GitHubData | null {
     const commits = readCache<GitHubCommitActivity[]>("commit-activity.json");
     const contribs = readCache<ContributionCalendar>("contributions.json");
     const allRepos = readCache<GitHubRepo[]>("all-repos.json");
+    const topRepos = readCache<GitHubRepo[]>("top-repos.json");
+    const repoActivity = readCache<GitHubRepoActivity[]>("repo-activity.json");
 
     if (!pinned || !langs || !commits || !contribs || !allRepos) return null;
 
@@ -366,6 +461,8 @@ export function getCachedGitHubData(): GitHubData | null {
       contribution_count: contribs.totalContributions,
       commit_activity: commits,
       contributions: contribs,
+      top_repos: topRepos ?? [],
+      repo_activity: repoActivity ?? [],
     };
   } catch {
     return null;

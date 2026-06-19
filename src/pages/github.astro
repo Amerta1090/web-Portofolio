@@ -1,12 +1,16 @@
 ---
 import Container from "../components/ui/Container.astro";
+import DataFreshness from "../components/ui/DataFreshness.astro";
 import Section from "../components/ui/Section.astro";
 import Tag from "../components/ui/Tag.astro";
+import CommitHeatmap from "../islands/CommitHeatmap";
+import LanguageDonut from "../islands/LanguageDonut";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { fetchAllGitHubData } from "../lib/github";
 import type { GitHubData } from "../types/github";
 
 const data: GitHubData | null = await fetchAllGitHubData();
+const buildTime = new Date().toISOString();
 ---
 
 <BaseLayout title="GitHub — Abdul Majid Ridwan Tyastonoatmaja" description="GitHub repositories, contributions, and activity.">
@@ -24,6 +28,10 @@ const data: GitHubData | null = await fetchAllGitHubData();
       <>
         <Section title="GitHub Overview" ariaLabel="GitHub overview">
           <Container>
+            <div class="flex items-center justify-between mb-6">
+              <p class="text-text-secondary text-sm">Aggregated stats from all public repositories</p>
+              <DataFreshness fetchedAt={buildTime} label="Built" />
+            </div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
               <div class="bg-bg-secondary border border-border rounded-xl p-6 text-center">
                 <p class="text-3xl font-bold text-text-primary">{data.total_repos}</p>
@@ -94,57 +102,105 @@ const data: GitHubData | null = await fetchAllGitHubData();
           </Container>
         </Section>
 
-        <Section title="Languages" ariaLabel="Languages breakdown">
+        <Section title="Languages" subtitle="Hover for details" ariaLabel="Languages breakdown">
           <Container>
             <div class="bg-bg-secondary border border-border rounded-xl p-6">
-              <div class="space-y-3">
-                {data.languages.map((lang) => (
-                  <div>
-                    <div class="flex justify-between text-sm mb-1">
-                      <span class="text-text-primary font-medium">{lang.language}</span>
-                      <span class="text-text-secondary">{lang.percentage}%</span>
-                    </div>
-                    <div class="h-2 bg-bg-tertiary rounded-full overflow-hidden">
-                      <div
-                        class="h-full bg-accent rounded-full transition-all duration-500"
-                        style={`width: ${lang.percentage}%`}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <LanguageDonut client:load languages={data.languages} />
             </div>
           </Container>
         </Section>
 
-        <Section title="Commit Activity" subtitle="Weekly commits across repositories (last 12 weeks)" variant="alt" ariaLabel="Commit activity">
+        <Section title="Commit Activity" subtitle="Weekly commit intensity (last 12 weeks)" variant="alt" ariaLabel="Commit activity">
           <Container>
             <div class="bg-bg-secondary border border-border rounded-xl p-6">
-              {
-                data.commit_activity.length > 0 ? (
-                  <div class="flex items-end gap-1 h-32">
-                    {data.commit_activity.map((week) => {
-                      const maxCommits = Math.max(...data.commit_activity.map((w) => w.total), 1);
-                      const height = Math.max((week.total / maxCommits) * 100, 4);
-                      return (
-                        <div
-                          class="flex-1 bg-accent/60 hover:bg-accent rounded-t transition-colors relative group"
-                          style={`height: ${height}%`}
-                        >
-                          <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-bg-tertiary text-text-primary text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                            {week.total} commits
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <p class="text-center text-text-secondary py-8">No commit activity data available.</p>
-                )
-              }
+              <CommitHeatmap client:load data={data.commit_activity} />
             </div>
           </Container>
         </Section>
+
+        {data.top_repos.length > 0 && (
+          <Section title="Top Repositories by Stars" ariaLabel="Top repositories">
+            <Container>
+              <div class="bg-bg-secondary border border-border rounded-xl p-6">
+                <div class="space-y-3">
+                  {data.top_repos.map((repo, i) => {
+                    const maxStars = data.top_repos[0]?.stars ?? 1;
+                    const barWidth = Math.max((repo.stars / maxStars) * 100, 2);
+                    return (
+                      <a
+                        href={repo.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="flex items-center gap-4 group hover:bg-bg-tertiary rounded-lg px-3 py-2 transition-colors"
+                      >
+                        <span class="text-sm text-text-secondary w-6 shrink-0 text-right">{i + 1}</span>
+                        <div class="flex-1 min-w-0">
+                          <div class="flex items-center justify-between gap-2 mb-1">
+                            <span class="text-sm font-medium text-text-primary truncate group-hover:text-accent transition-colors">{repo.name}</span>
+                            <span class="text-sm text-text-secondary shrink-0 flex items-center gap-1">
+                              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                              {repo.stars}
+                            </span>
+                          </div>
+                          <div class="h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
+                            <div
+                              class="h-full bg-accent rounded-full transition-all duration-500"
+                              style={`width: ${barWidth}%`}
+                            />
+                          </div>
+                        </div>
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            </Container>
+          </Section>
+        )}
+
+        {data.repo_activity.length > 0 && (
+          <Section title="Repository Activity" subtitle="Recent commits on key repositories" variant="alt" ariaLabel="Repository activity">
+            <Container>
+              <div class="space-y-6">
+                {
+                  data.repo_activity.map((repo) => (
+                    <div class="bg-bg-secondary border border-border rounded-xl p-5">
+                      <a
+                        href={repo.repo_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-sm font-semibold text-text-primary hover:text-accent transition-colors mb-3 inline-block"
+                      >
+                        {repo.repo_name}
+                      </a>
+                      {repo.commits.length > 0 ? (
+                        <ul class="space-y-2 mt-3">
+                          {repo.commits.map((commit) => (
+                            <li>
+                              <a
+                                href={commit.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="flex items-start gap-2 text-sm text-text-secondary hover:text-accent transition-colors group"
+                              >
+                                <svg class="w-4 h-4 mt-0.5 shrink-0 text-text-secondary" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                                <span class="group-hover:text-text-primary transition-colors line-clamp-1">{commit.message}</span>
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p class="text-xs text-text-secondary mt-2">No recent commits</p>
+                      )}
+                    </div>
+                  ))
+                }
+              </div>
+            </Container>
+          </Section>
+        )}
 
         <Section title="Contribution Graph" ariaLabel="Contribution graph">
           <Container>

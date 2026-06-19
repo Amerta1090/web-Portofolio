@@ -1,5 +1,5 @@
-import rss from "@astrojs/rss";
 import { getCollection } from "astro:content";
+import rss from "@astrojs/rss";
 import { SITE } from "../lib/constants";
 
 export async function GET(context: { site: string }) {

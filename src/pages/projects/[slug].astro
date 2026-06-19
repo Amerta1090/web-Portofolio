@@ -3,6 +3,7 @@ import Tag from "../../components/ui/Tag.astro";
 import TechExplorer from "../../islands/TechExplorer";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getProjects } from "../../lib/data";
+import { fetchReadme } from "../../lib/github";
 
 export async function getStaticPaths() {
   const projects = getProjects();
@@ -25,6 +26,27 @@ const nextProject = currentIndex < allProjects.length - 1 ? allProjects[currentI
 
 function slugify(title: string): string {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+}
+
+const githubLink = project.links?.find((l) => l.label.includes("GitHub"));
+let readme: { content: string; fetched_at: string } | null = null;
+if (githubLink) {
+  const match = githubLink.url.match(/github\.com\/([^/]+)\/([^/]+?)(?:\/|$)/);
+  if (match) {
+    const [, owner, repoName] = match;
+    readme = await fetchReadme(owner, repoName);
+  }
+}
+
+function extractReadmeSection(content: string, heading: string): string | null {
+  const regex = new RegExp(`##\\s*${heading}[\\s\\S]*?(?=\\n##\\s|$)`, "i");
+  const match = content.match(regex);
+  if (!match) return null;
+  return match[0]
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/[#*`]/g, "")
+    .trim();
 }
 ---
 
@@ -90,6 +112,48 @@ function slugify(title: string): string {
                     ]}
                   >{link.label}</a>
                 ))}
+              </div>
+            </section>
+          )}
+
+          {readme && (
+            <section id="readme" class="mb-10">
+              <h2 class="text-xl font-semibold text-text-primary mb-4">From GitHub README</h2>
+              <div class="bg-bg-secondary border border-border rounded-xl p-6 md:p-8">
+                <div class="prose prose-sm max-w-none text-text-secondary space-y-4">
+                  {extractReadmeSection(readme.content, "Description") && (
+                    <div>
+                      <h3 class="text-sm font-semibold text-text-primary uppercase tracking-wider mb-2">Description</h3>
+                      <p class="leading-relaxed">{extractReadmeSection(readme.content, "Description")}</p>
+                    </div>
+                  )}
+                  {extractReadmeSection(readme.content, "Features") && (
+                    <div>
+                      <h3 class="text-sm font-semibold text-text-primary uppercase tracking-wider mb-2">Features</h3>
+                      <p class="leading-relaxed">{extractReadmeSection(readme.content, "Features")}</p>
+                    </div>
+                  )}
+                  {extractReadmeSection(readme.content, "Installation") && (
+                    <div>
+                      <h3 class="text-sm font-semibold text-text-primary uppercase tracking-wider mb-2">Installation</h3>
+                      <p class="leading-relaxed font-mono text-xs">{extractReadmeSection(readme.content, "Installation")}</p>
+                    </div>
+                  )}
+                  {extractReadmeSection(readme.content, "Tech") && (
+                    <div>
+                      <h3 class="text-sm font-semibold text-text-primary uppercase tracking-wider mb-2">Tech Stack</h3>
+                      <p class="leading-relaxed">{extractReadmeSection(readme.content, "Tech")}</p>
+                    </div>
+                  )}
+                </div>
+                <div class="mt-6 pt-4 border-t border-border">
+                  <p class="text-xs text-text-secondary">
+                    Synced from GitHub · {new Date(readme.fetched_at).toLocaleDateString("en-US", {
+                      year: "numeric", month: "short", day: "numeric",
+                      hour: "2-digit", minute: "2-digit",
+                    })}
+                  </p>
+                </div>
               </div>
             </section>
           )}
