@@ -1,0 +1,89 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Tag from "../../components/ui/Tag.astro";
+
+const posts = await getCollection("blog", ({ data }) => !data.draft);
+posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const allTags = [...new Set(posts.flatMap((p) => p.data.tags))].sort();
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+}
+
+function readingTime(body: string): number {
+  const words = body.trim().split(/\s+/).length;
+  return Math.max(1, Math.ceil(words / 200));
+}
+---
+
+<BaseLayout title="Blog — Abdul Majid Ridwan Tyastonoatmaja" description="Technical writing on ML, IoT, MLOps, and full-stack development." canonicalUrl="https://abdulmajidr708.dev/blog">
+  <div class="py-12 md:py-24">
+    <div class="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+      <div class="mb-12">
+        <h1 class="text-3xl md:text-4xl font-bold text-text-primary mb-3">Blog</h1>
+        <p class="text-text-secondary text-lg">Technical writing on ML, IoT, MLOps, and full-stack development.</p>
+      </div>
+
+      <div class="flex flex-wrap gap-2 mb-10 pb-6 border-b border-border">
+        <span class="px-3 py-1.5 text-sm rounded-full bg-accent text-bg-primary font-medium">
+          All Posts
+        </span>
+        {allTags.map((tag: string) => (
+          <a
+            href={"/blog/tag/" + tag.replace(/\//g, "~")}
+            class="px-3 py-1.5 text-sm rounded-full bg-bg-tertiary text-text-secondary hover:text-text-primary transition-colors duration-200"
+          >
+            {tag}
+          </a>
+        ))}
+      </div>
+
+      {posts.length > 0 ? (
+        <div class="space-y-8">
+          {posts.map((post) => (
+            <a
+              href={"/blog/" + post.id}
+              class="block group bg-bg-secondary border border-border rounded-xl p-6 hover:border-accent/30 transition-all duration-200 card-glow"
+            >
+              {post.data.image && (
+                <div class="mb-4 -mx-6 -mt-6 rounded-t-xl overflow-hidden">
+                  <img
+                    src={post.data.image}
+                    alt={post.data.imageAlt ?? post.data.title}
+                    class="w-full h-48 object-cover"
+                    loading="lazy"
+                  />
+                </div>
+              )}
+              <div class="flex flex-wrap items-center gap-3 text-xs text-text-secondary mb-3">
+                <time datetime={post.data.date.toISOString()}>
+                  {formatDate(post.data.date)}
+                </time>
+                {post.data.updatedDate && (
+                  <span class="italic">Updated {formatDate(post.data.updatedDate)}</span>
+                )}
+                <span>{readingTime(post.body)} min read</span>
+              </div>
+              <h2 class="text-xl font-semibold text-text-primary group-hover:text-accent transition-colors duration-200 mb-2">
+                {post.data.title}
+              </h2>
+              <p class="text-text-secondary text-sm leading-relaxed mb-4">
+                {post.data.description}
+              </p>
+              <div class="flex flex-wrap gap-2">
+                {post.data.tags.map((tag: string) => (
+                  <Tag>{tag}</Tag>
+                ))}
+              </div>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-16">
+          <p class="text-text-secondary text-lg">No posts found.</p>
+        </div>
+      )}
+    </div>
+  </div>
+</BaseLayout>

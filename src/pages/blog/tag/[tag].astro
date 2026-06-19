@@ -1,0 +1,79 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Tag from "../../../components/ui/Tag.astro";
+
+export async function getStaticPaths() {
+  const slugifyTag = (t: string) => t.replace(/\//g, "~");
+
+  const posts = await getCollection("blog", ({ data }) => !data.draft);
+  const allTags = [...new Set(posts.flatMap((p) => p.data.tags))];
+
+  return allTags.map((tag) => ({
+    params: { tag: slugifyTag(tag) },
+    props: { actualTag: tag },
+  }));
+}
+
+const { actualTag } = Astro.props;
+
+function slugifyTag(t: string): string {
+  return t.replace(/\//g, "~");
+}
+
+const allPosts = await getCollection("blog", ({ data }) => !data.draft);
+const posts = allPosts
+  .filter((p) => p.data.tags.includes(actualTag))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+}
+
+function readingTime(body: string): number {
+  const words = body.trim().split(/\s+/).length;
+  return Math.max(1, Math.ceil(words / 200));
+}
+---
+
+<BaseLayout
+  title={"Blog: " + actualTag + " — Abdul Majid Ridwan Tyastonoatmaja"}
+  description={'Posts tagged with "' + actualTag + '"'}
+  canonicalUrl={"https://abdulmajidr708.dev/blog/tag/" + slugifyTag(actualTag)}
+>
+  <div class="py-12 md:py-24">
+    <div class="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+      <div class="mb-8">
+        <a href="/blog" class="text-sm text-text-secondary hover:text-accent transition-colors">← Back to Blog</a>
+      </div>
+
+      <h1 class="text-3xl md:text-4xl font-bold text-text-primary mb-2">
+        {"Posts tagged: " + actualTag}
+      </h1>
+      <p class="text-text-secondary mb-10">{posts.length + " post" + (posts.length !== 1 ? "s" : "")}</p>
+
+      <div class="space-y-8">
+        {posts.map((post) => (
+          <a
+            href={"/blog/" + post.id}
+            class="block group bg-bg-secondary border border-border rounded-xl p-6 hover:border-accent/30 transition-all duration-200 card-glow"
+          >
+            <div class="flex flex-wrap items-center gap-3 text-xs text-text-secondary mb-3">
+              <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+              <span>{readingTime(post.body) + " min read"}</span>
+            </div>
+            <h2 class="text-xl font-semibold text-text-primary group-hover:text-accent transition-colors mb-2">
+              {post.data.title}
+            </h2>
+            <p class="text-text-secondary text-sm leading-relaxed mb-4">{post.data.description}</p>
+            <div class="flex flex-wrap gap-2">
+              {post.data.tags.map((t: string) => (
+                <Tag>{t}</Tag>
+              ))}
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+</BaseLayout>
