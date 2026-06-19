@@ -33,11 +33,7 @@ export default function CommitHeatmap({ data }: Props) {
           });
 
           return (
-            <div
-              key={week.week}
-              className="flex-1 group relative"
-              style={{ minHeight: "48px" }}
-            >
+            <div key={week.week} className="flex-1 group relative" style={{ minHeight: "48px" }}>
               <div
                 className={`w-full h-full min-h-[2rem] rounded ${bg} transition-all duration-200 hover:scale-105 hover:brightness-110`}
                 style={{
@@ -46,7 +42,8 @@ export default function CommitHeatmap({ data }: Props) {
                 }}
               />
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-bg-tertiary text-text-primary text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
-                {week.total} commits<br />
+                {week.total} commits
+                <br />
                 <span className="text-text-secondary">{label}</span>
               </div>
             </div>

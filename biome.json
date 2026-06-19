@@ -22,6 +22,18 @@
       "trailingCommas": "all"
     }
   },
+  "overrides": [
+    {
+      "include": ["src/islands/AnimatedHero.tsx"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noArrayIndexKey": "off"
+          }
+        }
+      }
+    }
+  ],
   "files": {
     "ignore": [".astro", ".cache", "dist", "node_modules", "public/github"]
   }

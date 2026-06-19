@@ -5,11 +5,11 @@
 
 <button
   id="theme-toggle"
-  class="theme-rotate inline-flex items-center justify-center w-10 h-10 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent"
+  class="theme-rotate inline-flex items-center justify-center w-10 h-10 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
   aria-label="Toggle theme"
+  aria-live="polite"
   data-theme-toggle
 >
-  <!-- Sun icon (shown in dark mode) -->
   <svg
     class="dark:hidden w-5 h-5"
     xmlns="http://www.w3.org/2000/svg"
@@ -17,6 +17,7 @@
     viewBox="0 0 24 24"
     stroke-width="1.5"
     stroke="currentColor"
+    aria-hidden="true"
   >
     <path
       stroke-linecap="round"
@@ -24,7 +25,6 @@
       d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
     />
   </svg>
-  <!-- Moon icon (shown in light mode) -->
   <svg
     class="hidden dark:block w-5 h-5"
     xmlns="http://www.w3.org/2000/svg"
@@ -32,6 +32,7 @@
     viewBox="0 0 24 24"
     stroke-width="1.5"
     stroke="currentColor"
+    aria-hidden="true"
   >
     <path
       stroke-linecap="round"
@@ -55,14 +56,19 @@
     document.addEventListener("DOMContentLoaded", function () {
       const btn = document.querySelector("[data-theme-toggle]");
       if (!btn) return;
+      const isDark = document.documentElement.classList.contains("dark");
+      btn.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
       btn.addEventListener("click", function () {
         const html = document.documentElement;
-        if (html.classList.contains("dark")) {
+        const isDark = html.classList.contains("dark");
+        if (isDark) {
           html.classList.remove("dark");
           localStorage.setItem("theme", "light");
+          btn.setAttribute("aria-label", "Switch to dark mode");
         } else {
           html.classList.add("dark");
           localStorage.setItem("theme", "dark");
+          btn.setAttribute("aria-label", "Switch to light mode");
         }
       });
     });

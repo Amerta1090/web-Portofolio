@@ -1,0 +1,173 @@
+{
+  "site": {
+    "title": "Abdul Majid Ridwan Tyastonoatmaja",
+    "description": "AI/ML Engineer & Systems Builder — Building production ML systems from sensor to deployment.",
+    "author": "Abdul Majid Ridwan Tyastonoatmaja"
+  },
+  "nav": {
+    "home": "Home",
+    "experience": "Experience",
+    "projects": "Projects",
+    "skills": "Skills",
+    "blog": "Blog",
+    "contact": "Contact"
+  },
+  "footer": {
+    "links": "Links",
+    "connect": "Connect",
+    "copyright": "All rights reserved."
+  },
+  "home": {
+    "hero": {
+      "getInTouch": "Get in Touch",
+      "downloadResume": "Download Resume"
+    },
+    "about": {
+      "title": "About"
+    },
+    "experience": {
+      "title": "Experience"
+    },
+    "projects": {
+      "title": "Featured Projects",
+      "subtitle": "Selected work that demonstrates my range"
+    },
+    "skills": {
+      "title": "Skills"
+    },
+    "certifications": {
+      "title": "Certifications"
+    },
+    "honors": {
+      "title": "Honors & Awards"
+    },
+    "volunteering": {
+      "title": "Volunteering"
+    },
+    "github": {
+      "title": "GitHub",
+      "subtitle": "Recent activity and repositories"
+    },
+    "contact": {
+      "title": "Contact",
+      "subtitle": "Have a question or want to work together?",
+      "getInTouch": "Get in Touch",
+      "getInTouchText": "Have a question, project idea, or just want to connect? Feel free to reach out.",
+      "nameLabel": "Name",
+      "emailLabel": "Email",
+      "messageLabel": "Message",
+      "sendMessage": "Send Message",
+      "sending": "Sending...",
+      "successMessage": "Message sent successfully! I'll get back to you soon.",
+      "errorMessage": "Failed to send. Please try again or email me directly.",
+      "networkError": "Network error. Please email me directly at abdulmajidr708@gmail.com"
+    }
+  },
+  "projects": {
+    "title": "All Projects",
+    "back": "Back to Projects",
+    "highlights": "Highlights",
+    "technologies": "Technologies Used",
+    "links": "Links",
+    "fromReadme": "From GitHub README",
+    "description": "Description",
+    "features": "Features",
+    "installation": "Installation",
+    "techStack": "Tech Stack",
+    "gallery": "Gallery",
+    "syncedFrom": "Synced from GitHub",
+    "noDescription": "No description"
+  },
+  "blog": {
+    "title": "Blog",
+    "description": "Technical writing on ML, IoT, MLOps, and full-stack development.",
+    "allPosts": "All Posts",
+    "noPosts": "No posts found.",
+    "backToBlog": "Back to Blog",
+    "onThisPage": "On this page",
+    "minRead": "min read",
+    "updated": "Updated",
+    "share": "Share",
+    "relatedPosts": "Related Posts",
+    "series": "Series",
+    "current": "current",
+    "postsTagged": "Posts tagged"
+  },
+  "github": {
+    "title": "GitHub",
+    "description": "GitHub repositories, contributions, and activity.",
+    "overview": "GitHub Overview",
+    "aggregatedStats": "Aggregated stats from all public repositories",
+    "repositories": "Repositories",
+    "totalStars": "Total Stars",
+    "totalForks": "Total Forks",
+    "contributions": "Contributions",
+    "pinnedRepos": "Pinned Repositories",
+    "languages": "Languages",
+    "hoverDetails": "Hover for details",
+    "commitActivity": "Commit Activity",
+    "commitSubtitle": "Weekly commit intensity (last 12 weeks)",
+    "topRepos": "Top Repositories by Stars",
+    "repoActivity": "Repository Activity",
+    "recentCommits": "Recent commits on key repositories",
+    "noRecentCommits": "No recent commits",
+    "contributionGraph": "Contribution Graph",
+    "contributionsInYear": "contributions in the last year",
+    "less": "Less",
+    "more": "More",
+    "noData": "GitHub data will appear here after the next build.",
+    "noDataHint": "Make sure GITHUB_TOKEN is set and run the build again.",
+    "viewAll": "View all on GitHub",
+    "contribThisYear": "contributions this year",
+    "noCommitData": "No commit activity data available."
+  },
+  "certifications": {
+    "title": "Certifications",
+    "search": "Search certifications...",
+    "viewAll": "View all"
+  },
+  "skills": {
+    "title": "Skills"
+  },
+  "timeline": {
+    "title": "Timeline",
+    "description": "Experience, education, and certifications through the years.",
+    "jumpToYear": "Jump to year",
+    "events": "event",
+    "viewDetails": "View details",
+    "work": "Work",
+    "internship": "Internship",
+    "cert": "Cert"
+  },
+  "resume": {
+    "title": "Resume",
+    "description": "Professional resume and career summary.",
+    "downloadHint": "Use the button below to download or print a PDF version of this resume.",
+    "downloadPdf": "Download PDF",
+    "print": "Print",
+    "summary": "Summary",
+    "experience": "Experience",
+    "skills": "Skills",
+    "contact": "Contact"
+  },
+  "404": {
+    "title": "Page Not Found",
+    "description": "This page doesn't exist or has been moved.",
+    "backToHome": "Back to Home",
+    "viewProjects": "View Projects"
+  },
+  "common": {
+    "present": "Present",
+    "detailsNotAvailable": "Details not available",
+    "noDescription": "No description",
+    "skipToContent": "Skip to content",
+    "toggleTheme": "Toggle theme",
+    "built": "Built",
+    "dataUpdated": "Data updated",
+    "justNow": "just now",
+    "minutesAgo": "m ago",
+    "hoursAgo": "h ago",
+    "daysAgo": "d ago",
+    "loading": "Loading..."
+  }
+}

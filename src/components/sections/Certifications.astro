@@ -55,6 +55,7 @@ const grouped = certifications.reduce((acc: Record<string, Certification[]>, cer
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
+              aria-hidden="true"
             >
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
@@ -66,7 +67,7 @@ const grouped = certifications.reduce((acc: Record<string, Certification[]>, cer
                   <div>
                     <p class="text-text-primary text-sm font-medium">
                       {cert.url
-                        ? <a href={cert.url} target="_blank" rel="noopener noreferrer" class="hover:text-accent transition-colors">{cert.title}</a>
+                        ? <a href={cert.url} target="_blank" rel="noopener noreferrer" class="hover:text-accent transition-colors">{cert.title}<span class="sr-only"> (opens in new tab)</span></a>
                         : cert.title
                       }
                     </p>
@@ -95,7 +96,7 @@ const grouped = certifications.reduce((acc: Record<string, Certification[]>, cer
   <div class="mt-8 text-center">
     <a href="/certifications" class="inline-flex items-center gap-2 text-sm text-accent hover:text-accent-muted transition-colors font-medium">
       View all {certifications.length} certifications
-      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
       </svg>
     </a>

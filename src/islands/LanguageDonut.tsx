@@ -6,8 +6,16 @@ interface Props {
 }
 
 const COLORS = [
-  "#f59e0b", "#3b82f6", "#22c55e", "#ef4444", "#a855f7",
-  "#06b6d4", "#f97316", "#84cc16", "#ec4899", "#14b8a6",
+  "#f59e0b",
+  "#3b82f6",
+  "#22c55e",
+  "#ef4444",
+  "#a855f7",
+  "#06b6d4",
+  "#f97316",
+  "#84cc16",
+  "#ec4899",
+  "#14b8a6",
 ];
 
 function polarToCartesian(cx: number, cy: number, r: number, angleDeg: number) {
@@ -19,7 +27,9 @@ function describeArc(cx: number, cy: number, r: number, startAngle: number, endA
   const start = polarToCartesian(cx, cy, r, endAngle);
   const end = polarToCartesian(cx, cy, r, startAngle);
   const largeArc = endAngle - startAngle > 180 ? 1 : 0;
-  return ["M", cx, cy, "L", start.x, start.y, "A", r, r, 0, largeArc, 0, end.x, end.y, "Z"].join(" ");
+  return ["M", cx, cy, "L", start.x, start.y, "A", r, r, 0, largeArc, 0, end.x, end.y, "Z"].join(
+    " ",
+  );
 }
 
 export default function LanguageDonut({ languages }: Props) {
@@ -49,7 +59,13 @@ export default function LanguageDonut({ languages }: Props) {
   return (
     <div className="flex flex-col md:flex-row items-center gap-8">
       <div className="relative shrink-0">
-        <svg width="200" height="200" viewBox="0 0 200 200" role="img" aria-label="Language usage breakdown donut chart">
+        <svg
+          width="200"
+          height="200"
+          viewBox="0 0 200 200"
+          role="img"
+          aria-label="Language usage breakdown donut chart"
+        >
           <title>Language Usage Breakdown</title>
           {slices.map((slice) => (
             <path
@@ -96,16 +112,19 @@ export default function LanguageDonut({ languages }: Props) {
             className="flex items-center gap-3 px-3 py-1.5 rounded-lg cursor-pointer transition-all duration-200"
             style={{
               backgroundColor:
-                hovered === slice.index
-                  ? "var(--bg-tertiary, #27272a)"
-                  : "transparent",
+                hovered === slice.index ? "var(--bg-tertiary, #27272a)" : "transparent",
             }}
             onMouseEnter={() => setHovered(slice.index)}
             onMouseLeave={() => setHovered(null)}
           >
-            <span className="w-3 h-3 rounded-sm shrink-0" style={{ backgroundColor: slice.color }} />
+            <span
+              className="w-3 h-3 rounded-sm shrink-0"
+              style={{ backgroundColor: slice.color }}
+            />
             <span className="flex-1 text-sm text-text-primary">{slice.lang.language}</span>
-            <span className="text-sm text-text-secondary font-medium">{slice.lang.percentage}%</span>
+            <span className="text-sm text-text-secondary font-medium">
+              {slice.lang.percentage}%
+            </span>
           </div>
         ))}
       </div>

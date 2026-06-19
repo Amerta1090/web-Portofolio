@@ -13,8 +13,8 @@ import Container from "../ui/Container.astro";
         </p>
       </div>
       <div>
-        <h4 class="text-sm font-semibold text-text-primary uppercase tracking-wider mb-3">Links</h4>
-        <ul class="space-y-2">
+        <h4 class="text-sm font-semibold text-text-primary uppercase tracking-wider mb-3" id="footer-links-heading">Links</h4>
+        <ul class="space-y-2" aria-labelledby="footer-links-heading">
           {
             FOOTER_LINKS.map((link) => (
               <li>
@@ -27,16 +27,18 @@ import Container from "../ui/Container.astro";
         </ul>
       </div>
       <div>
-        <h4 class="text-sm font-semibold text-text-primary uppercase tracking-wider mb-3">Connect</h4>
-        <ul class="space-y-2">
+        <h4 class="text-sm font-semibold text-text-primary uppercase tracking-wider mb-3" id="footer-connect-heading">Connect</h4>
+        <ul class="space-y-2" aria-labelledby="footer-connect-heading">
           <li>
             <a href={SITE.github} class="text-sm text-text-secondary hover:text-accent transition-colors" target="_blank" rel="noopener noreferrer">
               GitHub
+              <span class="sr-only">(opens in new tab)</span>
             </a>
           </li>
           <li>
             <a href={SITE.linkedin} class="text-sm text-text-secondary hover:text-accent transition-colors" target="_blank" rel="noopener noreferrer">
               LinkedIn
+              <span class="sr-only">(opens in new tab)</span>
             </a>
           </li>
         </ul>

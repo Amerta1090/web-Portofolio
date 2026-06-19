@@ -53,7 +53,7 @@ function readingTime(body: string): number {
 }
 
 function tagUrl(tag: string): string {
-  return "/blog/tag/" + tag.replace(/\//g, "~");
+  return `/blog/tag/${tag.replace(/\//g, "~")}`;
 }
 
 const toc = headings
@@ -64,11 +64,11 @@ const toc = headings
     isSub: h.depth === 3,
   }));
 
-const canonicalUrl = "https://abdulmajidr708.dev/blog/" + post.id;
+const canonicalUrl = `https://abdulmajidr708.dev/blog/${post.id}`;
 const shareText = encodeURIComponent(post.data.title);
 const shareUrl = encodeURIComponent(canonicalUrl);
-const twitterShareUrl = "https://twitter.com/intent/tweet?text=" + shareText + "&url=" + shareUrl;
-const linkedinShareUrl = "https://www.linkedin.com/sharing/share-offsite/?url=" + shareUrl;
+const twitterShareUrl = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
+const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`;
 ---
 
 <BaseLayout
