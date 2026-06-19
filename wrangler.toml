@@ -1,12 +1,10 @@
 name = "portfolio"
 compatibility_date = "2024-01-01"
 
-[build]
-command = "bun run fetch-data && bun run build"
-output = "dist/"
+pages_build_output_dir = "dist"
 
-[build.environment]
-NODE_VERSION = "20"
+[env.production]
+routes = ["*"]
 
 [[headers]]
 for = "/*"
