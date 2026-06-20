@@ -1,10 +1,10 @@
-# Sprint Planning — EXTREME: Overhaul Total & Game Menu Next-Gen
+# Sprint Planning — EXTREME: Overhaul Total & Title Screen Main Menu
 
-> **Fase:** Puncak — setelah MVP → Medium → Advanced → Game Menu Core → Game Menu Animation.
-> **Tujuan:** Memperbaiki semua celah, merevolusi game menu, optimalisasi ekstrem, dan membawa portfolio ke level yang benar-benar premium.
+> **Fase:** Puncak — setelah MVP → Medium → Advanced → Title Screen Core → Title Screen Animation.
+> **Tujuan:** Memperbaiki semua celah, merevolusi main menu navigation, optimalisasi ekstrem, dan membawa portfolio ke level yang benar-benar premium.
 > **Timeline:** 8-12 minggu (part-time).
 > **Prerequisite:** Semua sprint sebelumnya sudah diimplementasi.
-> **Filosofi:** "Bukan sekadar portfolio — ini adalah interactive experience."
+> **Filosofi:** "Bukan sekadar portfolio — ini adalah interactive experience dengan personality."
 
 ---
 
@@ -39,7 +39,7 @@
 
 ---
 
-### Bug Z0.2: Emoji Icons Tidak Konsisten di Game Menu
+### Bug Z0.2: Emoji Icons Tidak Konsisten di Title Screen
 **Masalah:** `src/components/game-menu/GameMenuEngine.tsx` baris 17-22 menggunakan emoji karakter sebagai icon nav:
 ```typescript
 { id: "home", label: "Home", icon: "◆" },
@@ -59,7 +59,7 @@ Emoji ⚡ sangat kontras dengan tema Persona 5 yang geometric dan sharp. Penggun
 ---
 
 ### Bug Z0.3: AudioContext Leak di useHaptics
-**Masalah:** Setiap hover/select di game menu membuat `new AudioContext()` baru tanpa di-close. AudioContext adalah resource berat yang terbatas (~6 per browser). Ini bisa menyebabkan memory leak dan crash setelah interaksi intensif.
+**Masalah:** Setiap hover/select di main menu membuat `new AudioContext()` baru tanpa di-close. AudioContext adalah resource berat yang terbatas (~6 per browser). Ini bisa menyebabkan memory leak dan crash setelah interaksi intensif.
 
 **Perbaikan:** Gunakan singleton AudioContext + reuse oscillator nodes.
 
@@ -67,37 +67,38 @@ Emoji ⚡ sangat kontras dengan tema Persona 5 yang geometric dan sharp. Penggun
 |---|---|
 | Refactor useHaptics.ts: gunakan lazy singleton AudioContext | 2 |
 | Tambahkan cleanup on unmount | 1 |
-| Tambahkan mute/unmute state (integrasi dengan game mode settings) | 1 |
+| Tambahkan mute/unmute state (integrasi dengan settings) | 1 |
 | Fallback jika AudioContext block oleh autoplay policy | 1 |
 
 ---
 
-### Bug Z0.4: Game Mode Tidak Punya Light Mode Counterpart
-**Masalah:** Class `.game-mode` di `theme.css` hanya override variable dengan dark yang lebih gelap. Tidak ada varian light untuk game mode.
+### Bug Z0.4: Dark Mode Tidak Punya Light Mode Counterpart
+**Masalah:** Class `.dark-mode` di `theme.css` hanya override variable dengan dark yang lebih gelap. Tidak ada varian light untuk mode ini.
 
 | Task | Kompleksitas |
 |---|---|
-| Buat `.light.game-mode` selector dengan palet game-mode versi light | 1 |
-| Update GameModeToggle untuk respect theme saat ini | 1 |
+| Buat `.light.dark-mode` selector dengan palet versi light | 1 |
+| Update DarkModeToggle untuk respect theme saat ini | 1 |
 
 ---
 
-## 🎮 GAME MENU REVOLUTION (Sprint Z1-Z4)
+## 🎬 TITLE SCREEN & MAIN MENU REVOLUTION (Sprint Z1-Z4)
 
-### Analisis Masalah Game Menu Saat Ini:
+### Analisis Masalah Title Screen/Main Menu Saat Ini:
 1. **Hanya 4 nav items** — terlalu sedikit, tidak memanfaatkan halaman yang ada (certifications, contact, blog, github, timeline)
 2. **Tidak ada sub-menu** — semua flat, tidak ada kedalaman navigasi
 3. **Screen content adalah re-hash dari halaman utama** — tidak ada pengalaman unik, hanya styling ulang
 4. **Tidak ada nuansa retro** — tidak ada PS2-era aesthetic, tidak ada scanline pada elemen aktif, tidak ada gradien ala PS2
 5. **Tidak ada perbedaan atmosfer antar screen** — semua terlihat sama, beda data
-6. **Tidak ada OST/background music** — game menu terasa sepi
+6. **Tidak ada background music** — navigasi terasa sepi
 7. **Transisi antar screen terlalu generic** — fade biasa, tidak ada "impact"
+8. **Tidak ada title screen / boot screen** — user langsung masuk ke konten tanpa "pembukaan"
 
 ---
 
-### Sprint Z1 — Game Menu Architecture Revolution
+### Sprint Z1 — Main Menu Architecture Revolution
 
-**Objective:** Restruktur total game menu engine dengan arsitektur yang mendukung sub-menu, complex navigation, dan screen-specific experiences.
+**Objective:** Restruktur total navigation engine dengan arsitektur yang mendukung sub-menu, complex navigation, dan screen-specific experiences.
 
 #### Epic Z1.1: Engine Rewrite — State Machine Advanced
 
@@ -119,7 +120,7 @@ Emoji ⚡ sangat kontras dengan tema Persona 5 yang geometric dan sharp. Penggun
   │   └── Resume
   ├── PORTFOLIO (submenu)
   │   ├── Projects → Filter by Category → Detail
-  │   ├── Skills → Tech Tree Visualization
+  │   ├── Skills → Interactive Visualization
   │   └── Certifications → Grouped by Issuer
   ├── GITHUB (submenu)
   │   ├── Pinned Repos
@@ -181,28 +182,28 @@ Emoji ⚡ sangat kontras dengan tema Persona 5 yang geometric dan sharp. Penggun
 | Task | Kompleksitas |
 |---|---|
 | Buat CSS utility classes untuk PS2 aesthetic (`.ps2-glow`, `.ps2-bevel`, `.ps2-chrome`, `.ps2-shadow-heavy`) | 3 |
-| Implementasi gradien aksen (red→orange→yellow) untuk elemen aktif di game mode | 2 |
+| Implementasi gradien aksen (red→orange→yellow) untuk elemen aktif di dark mode | 2 |
 | Buat efek "reflective plastic" pada panel menu (gradien semi-transparan + highlight stripe) | 3 |
-| Tambahkan noise texture vintage pada background game mode (bukan grain halus, tapi noise komposit) | 2 |
+| Tambahkan noise texture vintage pada background dark mode (bukan grain halus, tapi noise komposit) | 2 |
 | Implementasi efek chromatic aberration pada text judul (RGB split subtle) | 2 |
 | Buat animasi "insertion" ala PS2: menu item muncul dengan efek "slide + skew + fade" | 2 |
 
 #### Epic Z2.2: Screen-Specific Atmosphere
 
-Setiap screen di game menu harus memiliki **atmosfer unik** — tidak boleh seragam.
+Setiap screen harus memiliki **atmosfer unik** — tidak boleh seragam.
 
 | Screen | Tema Visual | Inspirasi |
 |--------|------------|-----------|
 | Boot/Title | Hitam putih, glitch, loading bar | PS2 boot screen |
-| Profile | Hitam + merah, portrait-style | Persona 5 status screen |
-| Experience | Timeline vertikal, efek "scroll" | Final Fantasy menu |
-| Projects | Grid + filter tabs, sliding | Dynasty Warriors select |
-| Skills | Tech tree / skill grid | Final Fantasy X sphere grid |
-| Certifications | Stacked cards, medali | Medal of Honor menu |
-| GitHub | Data viz, stats, neon | Metal Gear Solid codec |
-| Blog | Card list, reading vibe | Silent Hill diary |
-| Contact | Minimal, typing effect | Persona messaging |
-| Settings | Panel + toggles | GTA:SA pause menu |
+| Profile | Hitam + merah, portrait-style | Character status screen |
+| Experience | Timeline vertikal, efek "scroll" | 2000s RPG menu |
+| Projects | Grid + filter tabs, sliding | Media browser |
+| Skills | Node-based visualization | Interactive diagram |
+| Certifications | Stacked cards, medali | Achievement display |
+| GitHub | Data viz, stats, neon | Dashboard HUD |
+| Blog | Card list, reading vibe | Digital diary |
+| Contact | Minimal, typing effect | Terminal interface |
+| Settings | Panel + toggles | System config menu |
 
 | Task | Kompleksitas |
 |---|---|
@@ -217,101 +218,101 @@ Setiap screen di game menu harus memiliki **atmosfer unik** — tidak boleh sera
 | Task | Kompleksitas |
 |---|---|
 | Load font retro: "Rajdhani" atau "Bebas Neue" untuk judul (bold, compressed, era 2000s) | 1 |
-| Buat text style system: `game-title`, `menu-item`, `screen-header`, `body-retro`, `hud-text` | 2 |
+| Buat text style system: `title-screen-title`, `menu-item`, `screen-header`, `body-retro`, `hud-text` | 2 |
 | Implementasi text shadow 3D (multi-layer shadow untuk efek depth) | 1 |
-| Tambahkan outline/stroke hitam tebal di text game menu | 1 |
+| Tambahkan outline/stroke hitam tebal di text menu | 1 |
 | Buat efek "kinetic typography" pada judul screen (tracking + scale animasi) | 2 |
 
 ---
 
-### Sprint Z3 — Next-Gen Game Menu Screens
+### Sprint Z3 — Main Menu Screens
 
 **Objective:** Setiap screen bukan sekadar menampilkan data — tapi memberikan **experience unik**.
 
-#### Epic Z3.1: Profile / Home Screen — "Status Menu"
+#### Epic Z3.1: Profile / Home Screen — "About Me"
 
 | Task | Kompleksitas |
 |---|---|
-| Redesign total: tampilan ala character status screen RPG (HP bar, MP bar, stats, equipment slots) | 4 |
-| Buat "Player Stats" visual: Experience → HP bar, Projects → MP bar, Certs → EXP bar, Languages → Element | 3 |
+| Redesign total: tampilan profile dengan avatar, role, highlights, stats visual | 4 |
+| Buat stat visualization: Experience → progress bar, Projects → counter, Certs → badge count, Languages → tags | 3 |
 | Implementasi animated portrait/avatar dengan efek scanline | 2 |
-| Tambahkan "equipment" slots: current role, current project, current learning | 2 |
-| Buat animated stat numbers (counter dari 0 ke nilai akhir) | 1 |
-| Tambahkan "last save" timestamp (last visit) | 1 |
+| Tambahkan info cards: current role, current project, current learning | 2 |
+| Buat animated number counters (dari 0 ke nilai akhir) | 1 |
+| Tambahkan "last visit" timestamp | 1 |
 
-#### Epic Z3.2: Experience Screen — "Quest Log"
+#### Epic Z3.2: Experience Screen — "Career Timeline"
 
 | Task | Kompleksitas |
 |---|---|
-| Redesign: tampilan quest/mission log RPG (quest name, status, rewards, progress bar) | 4 |
-| Setiap experience adalah "quest" dengan: company = quest giver, role = quest name, duration = timeline | 3 |
+| Redesign: tampilan timeline interaktif (company, role, duration, highlights) | 4 |
+| Setiap experience adalah entri dengan: company, role, timeframe, achievements | 3 |
 | Implementasi animated timeline dengan "path" effect (garis connector yang animate) | 2 |
-| Tambahkan "rewards" per quest (skills yang didapat, technologies mastered) | 2 |
-| Buat detail view: click quest → lihat highlights, technologies, impact | 2 |
-| Implementasi "completed" stamp effect dengan glitch | 1 |
+| Tambahkan "skills gained" per experience | 2 |
+| Buat detail view: klik entri → lihat highlights, technologies, impact | 2 |
+| Implementasi entrance effect dengan glitch pada setiap entri | 1 |
 
-#### Epic Z3.3: Projects Screen — "Weapon/Armory Select"
-
-| Task | Kompleksitas |
-|---|---|
-| Redesign: tampilan weapon select screen (grid dengan preview, stats, rarity) | 4 |
-| Setiap project adalah "weapon" dengan: category = weapon type, featured = rare/legendary | 3 |
-| Implementasi filter dengan visual tabs (bukan text biasa, tapi icon + label) | 2 |
-| Buat detail view: project sebagai "item inspect" (3D rotate atau preview cards) | 3 |
-| Tambahkan "stats" per project: stars count, tech used, impact level | 2 |
-| Implementasi hover effect: item glow + scale + info popup | 1 |
-
-#### Epic Z3.4: Skills Screen — "Skill Tree / Sphere Grid"
+#### Epic Z3.3: Projects Screen — "Portfolio Showcase"
 
 | Task | Kompleksitas |
 |---|---|
-| Redesign: skill tree interaktif ala Final Fantasy X Sphere Grid atau Path of Exile passive tree | 5 |
+| Redesign: tampilan grid portfolio dengan preview, tags, stats | 4 |
+| Setiap project menampilkan: thumbnail, title, category, tech stack, link | 3 |
+| Implementasi filter dengan visual tabs (icon + label) | 2 |
+| Buat detail view: project inspection dengan preview cards | 3 |
+| Tambahkan meta per project: stars count, tech used, impact level | 2 |
+| Implementasi hover effect: card glow + scale + info popup | 1 |
+
+#### Epic Z3.4: Skills Screen — "Interactive Skill Map"
+
+| Task | Kompleksitas |
+|---|---|
+| Redesign: skill visualization interaktif — bisa berupa node graph, radar chart, atau categorized grid | 5 |
 | Implementasi node-based visualization: setiap skill adalah node, terhubung dengan garis | 5 |
 | Color code per kategori (Machine Learning = red, Web = magenta, IoT = blue, dll) | 2 |
-| Buat zoom/pan navigation untuk skill tree (drag untuk geser, scroll untuk zoom) | 4 |
+| Buat zoom/pan navigation (drag untuk geser, scroll untuk zoom) | 4 |
 | Implementasi search dengan highlight effect pada node yang cocok | 2 |
-| Tambahkan "proficiency" sebagai fill level pada node (seperti sphere yang terisi) | 3 |
+| Tambahkan "proficiency" sebagai fill level pada node | 3 |
 | Buat tooltip detail saat hover: skill name, proficiency, related projects | 2 |
-| Implementasi animasi "unlock" saat node pertama kali dilihat | 2 |
+| Implementasi animasi "reveal" saat node pertama kali dilihat | 2 |
 
-#### Epic Z3.5: Certifications Screen — "Achievement / Trophy Room"
+#### Epic Z3.5: Certifications Screen — "Certification Gallery"
 
 | Task | Kompleksitas |
 |---|---|
-| Redesign: tampilan trophy/achievement screen ala PS3/PS4 trophy room | 4 |
-| Setiap sertifikat adalah trophy dengan tier: Bronze, Silver, Gold, Platinum | 3 |
+| Redesign: tampilan galeri sertifikat dengan card interaktif | 4 |
+| Setiap sertifikat adalah card dengan: issuer, date, credential, link verify | 3 |
 | Implementasi grid dengan card 3D tilt effect (ikuti mouse) | 3 |
 | Filter by issuer, tier, year dengan animasi | 2 |
-| Tambahkan "rarity" indicator (sertifikat langka = efek khusus) | 2 |
-| Buat animated counter total trophies | 1 |
+| Tambahkan "featured" indicator (sertifikat penting = efek khusus) | 2 |
+| Buat animated counter total certifications | 1 |
 
-#### Epic Z3.6: GitHub Screen — "Mission Control / Data Center"
+#### Epic Z3.6: GitHub Screen — "GitHub Dashboard"
 
 | Task | Kompleksitas |
 |---|---|
-| Redesign: tampilan data center / HUD command center ala Metal Gear Solid codec | 4 |
-| Implementasi real-time-ish contribution graph dengan highlight animasi | 3 |
+| Redesign: tampilan dashboard GitHub dengan contribution graph, repo stats | 4 |
+| Implementasi contribution graph dengan highlight animasi | 3 |
 | Language donut chart dengan segmen yang bisa diklik (filter repos by language) | 3 |
-| Tambahkan "radar" atau "sensor" visual untuk repo activity | 2 |
-| Buat animated ping effect pada setiap aktivitas baru | 1 |
+| Tambahkan radar atau network visual untuk repo activity | 2 |
+| Buat animated ping effect pada setiap aktivitas | 1 |
 | Implementasi stats dashboard dengan big number counters + progress bars | 2 |
 
-#### Epic Z3.7: Blog Screen — "Data Log / Diary"
+#### Epic Z3.7: Blog Screen — "Journal / Article Log"
 
 | Task | Kompleksitas |
 |---|---|
-| Redesign: tampilan data log / captain's log ala game sci-fi | 3 |
-| Setiap post adalah "entry log" dengan date, title, tags, reading time | 2 |
-| Implementasi list view dengan holographic/scanline effect | 2 |
+| Redesign: tampilan artikel/blog dengan entry list | 3 |
+| Setiap post adalah entri dengan date, title, tags, reading time | 2 |
+| Implementasi list view dengan efek transparan/scanline | 2 |
 | Detail view: text dengan CRT filter (chromatic aberration subtle) | 2 |
-| Tambahkan "transmission received" animation untuk setiap post | 1 |
+| Tambahkan entrance animation untuk setiap post | 1 |
 
-#### Epic Z3.8: Settings Screen — "Options / Config"
+#### Epic Z3.8: Settings Screen — "Preferences"
 
 | Task | Kompleksitas |
 |---|---|
 | Buat settings screen dengan tabs: Display, Audio, Controls, About | 3 |
-| Implementasi toggle switches dengan PS2-style sliding animation | 2 |
+| Implementasi toggle switches dengan sliding animation | 2 |
 | Slider untuk scanline intensity, glow amount, SFX volume | 2 |
 | Tampilkan key bindings dengan visual keyboard layout | 2 |
 | About section: dev credits, version number, tech stack digunakan | 1 |
@@ -319,16 +320,16 @@ Setiap screen di game menu harus memiliki **atmosfer unik** — tidak boleh sera
 
 ---
 
-### Sprint Z4 — Game Menu Sound, Animation & Polish
+### Sprint Z4 — Sound, Animation & Polish
 
 #### Epic Z4.1: Sound Design & BGM
 
 | Task | Kompleksitas |
 |---|---|
 | Buat sound engine dengan Web Audio API: singleton AudioContext, pooled buffers | 3 |
-| Implementasi BGM: loop sederhana dengan Web Audio API oscillator (chiptune/retro style) | 4 |
-| Buat sound effects: cursor move (tick), select (confirm), back (cancel), error (buzz), boot (power on) | 3 |
-| Tambahkan volume control muter/nyalakan dengan persist di localStorage | 1 |
+| Implementasi BGM: loop sederhana dengan Web Audio API oscillator (retro style) | 4 |
+| Buat sound effects: cursor move (tick), select (confirm), back (cancel), error (buzz), power on | 3 |
+| Tambahkan volume control + persist di localStorage | 1 |
 | Implementasi sound randomization (pitch vary kecil) untuk menghindari kebosanan | 2 |
 | Buat visual audio visualizer (small equalizer bars di pojok HUD) | 3 |
 
@@ -348,17 +349,17 @@ Setiap screen di game menu harus memiliki **atmosfer unik** — tidak boleh sera
 
 | Task | Kompleksitas |
 |---|---|
-| Buat HUD konsisten: waktu real-time, battery (device), section indicator, sound indicator | 3 |
+| Buat HUD konsisten: waktu real-time, section indicator, sound indicator | 3 |
 | Implementasi clock display with blink colon | 1 |
 | Tambahkan "section progress" bar di pojok (misal: "Section 03 / 08") | 1 |
-| Buat notification system: toast-style untuk "Achievement Unlocked" | 2 |
-| Implementasi Easter Egg counter (hidden stats: "Times menu opened", "Total navigation distance") | 2 |
+| Buat notification system: toast-style untuk info/feedback | 2 |
+| Implementasi stats counter: "Times menu opened", "Total navigation distance" | 2 |
 
 ---
 
 ## 🎨 UI/UX OVERHAUL — Sisa Halaman (Sprint Z5)
 
-**Objective:** Bawa aesthetic game mode ke seluruh halaman — bukan hanya game menu, tapi juga halaman regular.
+**Objective:** Bawa aesthetic retro ke seluruh halaman — bukan hanya main menu, tapi juga halaman regular.
 
 ### Epic Z5.1: Global Design Consistency
 
@@ -376,13 +377,13 @@ Setiap screen di game menu harus memiliki **atmosfer unik** — tidak boleh sera
 | Implementasi Astro View Transitions dengan custom animation (wipe, slide, fade) | 3 |
 | Buat page transition wrapper: setiap navigasi halaman memiliki impact + reveal | 3 |
 | Tambahkan loading indicator untuk page transition | 1 |
-| Pastikan game mode styles persist antar page navigation | 2 |
+| Pastikan dark mode styles persist antar page navigation | 2 |
 
 ### Epic Z5.3: Micro-Interaction Sisa
 
 | Task | Kompleksitas |
 |---|---|
-| Magnetic button untuk semua CTA (bukan hanya game menu) | 2 |
+| Magnetic button untuk semua CTA (bukan hanya main menu) | 2 |
 | Ink/ripple effect untuk semua interactive element | 2 |
 | Smooth image reveal untuk project cards (lazy load + blur → clear) | 2 |
 | Skeleton loading untuk semua data-driven section | 3 |
@@ -399,9 +400,9 @@ Setiap screen di game menu harus memiliki **atmosfer unik** — tidak boleh sera
 | Analisis bundle size produksi dengan `bun run build && find dist -name "*.js" -exec ls -lh {} \;` | 1 |
 | Code-split Framer Motion: gunakan `LazyMotion` + `m` bukan `motion` | 3 |
 | Tree-shake Three.js: import hanya komponen yang digunakan (bukan seluruh three) | 2 |
-| Dynamic import untuk game menu (load hanya saat dibuka, bukan di initial) | 2 |
+| Dynamic import untuk main menu (load hanya saat dibuka, bukan di initial) | 2 |
 | Lazy load semua React islands dengan `client:visible` bukan `client:load` | 2 |
-| Implementasi `React.lazy` + `Suspense` untuk screen content game menu | 3 |
+| Implementasi `React.lazy` + `Suspense` untuk screen content main menu | 3 |
 
 ### Epic Z6.2: Render Optimization
 
@@ -456,10 +457,10 @@ Setiap screen di game menu harus memiliki **atmosfer unik** — tidak boleh sera
 | Task | Kompleksitas |
 |---|---|
 | Theme toggle: perbaiki agar benar-benar toggle light/dark dengan warna yang berbeda | 2 |
-| Game Mode toggle: pastikan state konsisten setelah page navigation (Astro View Transitions) | 2 |
+| Dark Mode toggle: pastikan state konsisten setelah page navigation (Astro View Transitions) | 2 |
 | Fix kontras warna di light mode untuk semua komponen | 2 |
-| Fix scroll lock saat game menu open → tutup dengan benar | 1 |
-| Fix focus trap: pastikan focus tidak kabur ke background saat game menu aktif | 2 |
+| Fix scroll lock saat main menu open → tutup dengan benar | 1 |
+| Fix focus trap: pastikan focus tidak kabur ke background saat menu aktif | 2 |
 | Fix keyboard navigation: pastikan tidak konflik dengan form input | 1 |
 | Fix ThreeDCanvas resize handler: throttle + debounce | 1 |
 
@@ -467,7 +468,7 @@ Setiap screen di game menu harus memiliki **atmosfer unik** — tidak boleh sera
 
 | Task | Kompleksitas |
 |---|---|
-| Game menu mobile: bottom sheet + thumb-friendly (touch target ≥ 48px) | 4 |
+| Main menu mobile: bottom sheet + thumb-friendly (touch target ≥ 48px) | 4 |
 | All pages responsive check: 320px, 375px, 768px, 1024px, 1440px | 3 |
 | Touch interactions: pastikan tidak ada hover-dependent UI | 2 |
 | Landscape mobile: layout adaptasi | 2 |
@@ -493,18 +494,18 @@ Data yang sudah ada tapi belum dimanfaatkan optimal:
 
 | Dataset | Saat Ini | Potensi |
 |---------|----------|---------|
-| `honors.json` | Hanya di homepage section | Bisa di game menu sebagai "Achievements / Trophies" |
-| `volunteering.json` | Hanya di homepage section | Bisa di game menu sub-Experience "Side Quests" |
+| `honors.json` | Hanya di homepage section | Bisa di main menu sebagai "Achievements" |
+| `volunteering.json` | Hanya di homepage section | Bisa di main menu sub-Experience "Volunteering" |
 | `licenses_certifications.json` | Tidak dipakai? | Bisa digabung dengan certifications |
-| `additional_info.json` | Tidak jelas pemakaiannya | Bisa untuk Easter eggs / trivia |
+| `additional_info.json` | Tidak jelas pemakaiannya | Bisa untuk trivia / interesting facts |
 | GitHub README cache | Di `.cache/github/` | Bisa ditampilkan di detail project |
-| Blog | 3 posts | Bisa ditampilkan di game menu |
+| Blog | 3 posts | Bisa ditampilkan di main menu |
 
 | Task | Kompleksitas |
 |---|---|
-| Integrasi honors ke game menu sebagai "Trophy/Achievement Room" | 2 |
-| Integrasi volunteering ke sub-menu Experience sebagai "Side Quests" | 2 |
-| Integrasi blog ke game menu sebagai "Mission Logs / Data Diary" | 3 |
+| Integrasi honors ke main menu sebagai "Achievements" | 2 |
+| Integrasi volunteering ke sub-menu Experience sebagai "Volunteering" | 2 |
+| Integrasi blog ke main menu sebagai "Journal / Articles" | 3 |
 | Buat Featured/Recommended section di homepage berdasarkan data (bukan hardcoded) | 2 |
 | Implementasi data freshness indicator: "Data updated X hours ago" di semua page | 1 |
 
@@ -532,7 +533,7 @@ Data yang sudah ada tapi belum dimanfaatkan optimal:
 | Task | Kompleksitas |
 |---|---|
 | Analisis data yang ada dan tampilkan insight menarik: "Most used language", "Project trend", dll | 3 |
-| Buat komponen "Did You Know?" yang muncul random di footer atau game menu | 2 |
+| Buat komponen "Did You Know?" yang muncul random di footer atau main menu | 2 |
 | Implementasi statistik: total lines of code (dari GitHub), top category, longest streak | 2 |
 
 ---
@@ -553,7 +554,7 @@ Data yang sudah ada tapi belum dimanfaatkan optimal:
 | Task | Kompleksitas |
 |---|---|
 | Update `blueprint.md` dengan semua perubahan arsitektur | 2 |
-| Dokumentasi game menu component tree + state machine | 2 |
+| Dokumentasi main menu component tree + state machine | 2 |
 | Dokumentasi data pipeline + cara update data | 1 |
 | Dokumentasi performance budget dan cara audit | 1 |
 
@@ -573,24 +574,24 @@ Data yang sudah ada tapi belum dimanfaatkan optimal:
 ### Fase 0: Bug Fixing (1-2 minggu)
 ```
 Z0.1 Light/Dark mode → Z0.2 Emoji icons → Z0.3 AudioContext leak → 
-Z0.4 Game mode light counterpart → Z7.1 Bug fixes umum
+Z0.4 Dark mode light counterpart → Z7.1 Bug fixes umum
 ```
 
-### Fase 1: Game Menu Architecture (2-3 minggu)
+### Fase 1: Main Menu Architecture (2-3 minggu)
 ```
 Z1.1 Engine rewrite → Z1.2 Sub-menu system → Z1.3 Title screen → 
 Z4.2 Animation choreography → Z4.3 HUD system
 ```
 
-### Fase 2: Game Menu Aesthetics (2-3 minggu)
+### Fase 2: Main Menu Aesthetics (2-3 minggu)
 ```
 Z2.1 PS2 design language → Z2.2 Screen-specific atmosphere → 
 Z2.3 Font & typography → Z4.1 Sound design & BGM
 ```
 
-### Fase 3: Game Menu Screens (3-4 minggu)
+### Fase 3: Main Menu Screens (3-4 minggu)
 ```
-Z3.1 Profile → Z3.2 Experience → Z3.3 Projects → Z3.4 Skills tree → 
+Z3.1 Profile → Z3.2 Experience → Z3.3 Projects → Z3.4 Skills → 
 Z3.5 Certifications → Z3.6 GitHub → Z3.7 Blog → Z3.8 Settings
 ```
 
@@ -623,11 +624,11 @@ Z9.2 Documentation → Launch 🚀
 | `TitleScreen.tsx` | React Island | Boot animation + press start |
 | `SubMenuPanel.tsx` | React Island | Sliding sub-menu panel |
 | `SettingsPanel.tsx` | React Island | Display/Audio/Controls settings |
-| `SkillTree.tsx` | React Island | Interactive sphere grid visualization |
+| `SkillTree.tsx` | React Island | Interactive skill visualization |
 | `TrophyRoom.tsx` | React Island | Certification/achievement display |
-| `QuestLog.tsx` | React Island | Experience as quest log |
-| `WeaponSelect.tsx` | React Island | Projects as weapon select |
-| `DataCenter.tsx` | React Island | GitHub data center HUD |
+| `QuestLog.tsx` | React Island | Experience as timeline |
+| `WeaponSelect.tsx` | React Island | Projects as portfolio showcase |
+| `DataCenter.tsx` | React Island | GitHub dashboard HUD |
 | `SoundEngine.ts` | Lib | Web Audio API singleton sound engine |
 | `ScreenRegistry.ts` | Lib | Screen definitions with theme + behavior |
 
@@ -659,9 +660,9 @@ Z9.2 Documentation → Launch 🚀
 | Initial JS bundle | < 80KB |
 | Total page weight | < 400KB |
 | HTTP requests | < 20 |
-| Game menu JS bundle | < 50KB (code-split + lazy) |
+| Main menu JS bundle | < 50KB (code-split + lazy) |
 | Animation FPS | 60fps on mid-range |
-| Game menu open time | < 50ms |
+| Main menu open time | < 50ms |
 
 ---
 
@@ -670,13 +671,13 @@ Z9.2 Documentation → Launch 🚀
 1. **Light/Dark mode tidak berfungsi** — selector `.light` dan `.dark` identik di `theme.css`
 2. **Emoji ⚡ untuk Experience** — tidak konsisten dengan tema geometric P5
 3. **AudioContext leak** — `useHaptics.ts` create new ctx setiap panggilan
-4. **Game menu 4 item doang** — terlalu sedikit, tidak ada sub-menu
+4. **Main menu 4 item doang** — terlalu sedikit, tidak ada sub-menu
 5. **Screens adalah re-hash** — konten sama dengan halaman utama, beda styling tipis
 6. **No retro feel** — tidak ada PS2-era aesthetic sama sekali
 7. **ThreeDCanvas tidak di-destroy** — terus berjalan walau tidak di viewport
-8. **Canvas particles terus jalan** — walau game menu tertutup
-9. **No BGM/SFX** — game menu terasa sepi
-10. **No light mode counterpart** untuk CSS game variables
+8. **Canvas particles terus jalan** — walau menu tertutup
+9. **No BGM/SFX** — navigasi terasa sepi
+10. **No light mode counterpart** untuk CSS dark variables
 11. **Bundle size tidak teroptimasi** — Framer Motion + Three.js full import
 12. **No data freshness indicator** — pengunjung tidak tahu data terakhir update
 13. **Skill screen masih list** — tidak interaktif/rewarding

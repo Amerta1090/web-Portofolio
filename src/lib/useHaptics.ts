@@ -1,51 +1,123 @@
+import { useState, useEffect, useCallback, useRef } from "react";
+
+let sharedCtx: AudioContext | null = null;
+let sharedOsc: OscillatorNode | null = null;
+let sharedGain: GainNode | null = null;
+
+const getAudioContext = (): AudioContext | null => {
+  if (sharedCtx) return sharedCtx;
+  try {
+    const AC = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AC) return null;
+    sharedCtx = new AC();
+    sharedOsc = sharedCtx.createOscillator();
+    sharedGain = sharedCtx.createGain();
+    sharedOsc.connect(sharedGain);
+    sharedGain.connect(sharedCtx.destination);
+    sharedOsc.start();
+    sharedGain.gain.value = 0;
+    return sharedCtx;
+  } catch {
+    return null;
+  }
+};
+
+const ensureResumed = async (): Promise<boolean> => {
+  const ctx = getAudioContext();
+  if (!ctx) return false;
+  if (ctx.state === "suspended") {
+    try {
+      await ctx.resume();
+    } catch {
+      return false;
+    }
+  }
+  return ctx.state === "running";
+};
+
+const playTone = (
+  type: OscillatorType,
+  startFreq: number,
+  endFreq: number,
+  duration: number,
+  volume: number,
+) => {
+  const ctx = getAudioContext();
+  if (!ctx || !sharedOsc || !sharedGain) return;
+
+  const now = ctx.currentTime;
+  sharedOsc.type = type;
+  sharedOsc.frequency.setValueAtTime(startFreq, now);
+  sharedOsc.frequency.exponentialRampToValueAtTime(endFreq, now + duration);
+
+  sharedGain.gain.setValueAtTime(0, now);
+  sharedGain.gain.linearRampToValueAtTime(volume, now + 0.01);
+  sharedGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+};
+
+const getMuted = (): boolean => {
+  try {
+    return localStorage.getItem("haptics-muted") === "true";
+  } catch {
+    return false;
+  }
+};
+
+const setMutedStorage = (muted: boolean) => {
+  try {
+    localStorage.setItem("haptics-muted", muted ? "true" : "false");
+  } catch {
+    // Ignore
+  }
+};
+
 export const useHaptics = () => {
-  const playHoverSound = () => {
-    try {
-      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-      if (!AudioContext) return;
-      const ctx = new AudioContext();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(800, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.05);
-      
-      gain.gain.setValueAtTime(0, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.05, ctx.currentTime + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+  const [isMuted, setIsMuted] = useState(getMuted);
+  const resumeAttempted = useRef(false);
 
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.05);
-    } catch (e) {
-      // Ignore
+  useEffect(() => {
+    if (!resumeAttempted.current && !isMuted) {
+      resumeAttempted.current = true;
+      ensureResumed();
     }
-  };
+  }, [isMuted]);
 
-  const playSelectSound = () => {
-    try {
-      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-      if (!AudioContext) return;
-      const ctx = new AudioContext();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "square";
-      osc.frequency.setValueAtTime(150, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(50, ctx.currentTime + 0.1);
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (!document.hidden && !isMuted) {
+        ensureResumed();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, [isMuted]);
 
-      gain.gain.setValueAtTime(0, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+  const playHoverSound = useCallback(() => {
+    if (isMuted) return;
+    ensureResumed().then((ok) => {
+      if (ok) playTone("sine", 800, 1200, 0.05, 0.05);
+    });
+  }, [isMuted]);
 
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.1);
-    } catch (e) {
-      // Ignore
-    }
-  };
+  const playSelectSound = useCallback(() => {
+    if (isMuted) return;
+    ensureResumed().then((ok) => {
+      if (ok) playTone("square", 150, 50, 0.1, 0.1);
+    });
+  }, [isMuted]);
 
-  return { playHoverSound, playSelectSound };
+  const toggleMute = useCallback(() => {
+    setIsMuted((prev) => {
+      const next = !prev;
+      setMutedStorage(next);
+      return next;
+    });
+  }, []);
+
+  const setMuted = useCallback((muted: boolean) => {
+    setIsMuted(muted);
+    setMutedStorage(muted);
+  }, []);
+
+  return { playHoverSound, playSelectSound, isMuted, toggleMute, setMuted };
 };

@@ -2,15 +2,61 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import skillsData from "../../../../data/skills.json";
 
-const categoryIcons: Record<string, string> = {
-  "Machine Learning & AI": "◆",
-  "Data Science & Analytics": "■",
-  "Web Development": "▲",
-  "IoT & Embedded Systems": "●",
-  "DevOps & MLOps": "★",
-  "Programming Languages": "⚡",
-  "Cloud & Infrastructure": "◉",
-  "Productivity & Automation": "▣",
+const ICON_CLASS = "w-[1em] h-[1em] inline-block align-middle";
+
+const categoryIcons: Record<string, React.ReactNode> = {
+  "Machine Learning & AI": (
+    <svg className={ICON_CLASS} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <polygon points="8,1 15,8 8,15 1,8" />
+      <circle cx="8" cy="8" r="1.5" fill="currentColor" stroke="none" />
+    </svg>
+  ),
+  "Data Science & Analytics": (
+    <svg className={ICON_CLASS} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <rect x="2" y="10" width="3" height="4" />
+      <rect x="6.5" y="6" width="3" height="8" />
+      <rect x="11" y="2" width="3" height="12" />
+    </svg>
+  ),
+  "Web Development": (
+    <svg className={ICON_CLASS} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <rect x="2" y="3" width="12" height="10" rx="1" />
+      <line x1="2" y1="7" x2="14" y2="7" />
+      <line x1="5" y1="3" x2="5" y2="13" />
+      <line x1="11" y1="3" x2="11" y2="13" />
+    </svg>
+  ),
+  "IoT & Embedded Systems": (
+    <svg className={ICON_CLASS} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <polygon points="8,1 14,4.5 14,11.5 8,15 2,11.5 2,4.5" />
+      <circle cx="8" cy="8" r="2.5" fill="currentColor" stroke="none" />
+    </svg>
+  ),
+  "DevOps & MLOps": (
+    <svg className={ICON_CLASS} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <circle cx="8" cy="8" r="3.5" />
+      <circle cx="8" cy="2" r="1" />
+      <circle cx="8" cy="14" r="1" />
+      <circle cx="2" cy="8" r="1" />
+      <circle cx="14" cy="8" r="1" />
+    </svg>
+  ),
+  "Programming Languages": (
+    <svg className={ICON_CLASS} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <polyline points="5,4 2,8 5,12" />
+      <polyline points="11,4 14,8 11,12" />
+    </svg>
+  ),
+  "Cloud & Infrastructure": (
+    <svg className={ICON_CLASS} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M11.5 11.5a3.5 3.5 0 1 0-3-5.5 4 4 0 1 0-4.5 5.5h7.5z" />
+    </svg>
+  ),
+  "Productivity & Automation": (
+    <svg className={ICON_CLASS} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <polygon points="9,1 3,9 7,9 7,15 13,7 9,7" />
+    </svg>
+  ),
 };
 
 export const SkillsScreen: React.FC = () => {
@@ -65,7 +111,7 @@ export const SkillsScreen: React.FC = () => {
               setSearchQuery("");
             }}
           >
-            {categoryIcons[cat.name] || "◇"} {cat.name}
+            <span className="flex items-center gap-1">{categoryIcons[cat.name]} {cat.name}</span>
           </button>
         ))}
       </motion.div>
@@ -94,7 +140,7 @@ export const SkillsScreen: React.FC = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.15 }}
         >
-          <span className="text-accent text-2xl">{categoryIcons[currentCategory.name] || "◇"}</span>
+          <span className="text-accent text-2xl flex items-center">{categoryIcons[currentCategory.name]}</span>
           <span className="text-2xl font-black uppercase tracking-tighter text-text-primary">
             {currentCategory.name}
           </span>

@@ -5,20 +5,20 @@ export default {
     extend: {
       colors: {
         bg: {
-          primary: "#0a0a0a",
-          secondary: "#111111",
-          tertiary: "#1a1a1a",
+          primary: "rgb(var(--bg-primary-rgb) / <alpha-value>)",
+          secondary: "rgb(var(--bg-secondary-rgb) / <alpha-value>)",
+          tertiary: "rgb(var(--bg-tertiary-rgb) / <alpha-value>)",
         },
         text: {
-          primary: "#ffffff",
-          secondary: "#a1a1aa",
+          primary: "rgb(var(--text-primary-rgb) / <alpha-value>)",
+          secondary: "rgb(var(--text-secondary-rgb) / <alpha-value>)",
         },
         accent: {
-          DEFAULT: "#e60012",
-          muted: "#ff00c1",
-          glow: "rgba(230, 0, 18, 0.3)",
+          DEFAULT: "rgb(var(--accent-rgb) / <alpha-value>)",
+          muted: "rgb(var(--accent-muted-rgb) / <alpha-value>)",
+          glow: "rgb(var(--accent-rgb) / 0.3)",
         },
-        border: "#e60012",
+        border: "rgb(var(--accent-rgb) / <alpha-value>)",
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
