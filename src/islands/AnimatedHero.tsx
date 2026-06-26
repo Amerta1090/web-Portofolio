@@ -114,7 +114,7 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
               href={resumeUrl}
               className="inline-flex items-center gap-2 border border-border text-text-primary font-medium px-6 py-3 rounded-lg hover:border-brand/40 transition-all duration-300"
             >
-              <span>Database_Log</span>
+              <span>Download Resume</span>
               <span className="text-sm opacity-60">(.pdf)</span>
             </a>
           </motion.div>
