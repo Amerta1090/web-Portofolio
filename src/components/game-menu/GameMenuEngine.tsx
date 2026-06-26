@@ -1,17 +1,18 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import type React from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import certificationsData from "../../../data/certifications.json";
+import experienceData from "../../../data/experience.json";
+import profileData from "../../../data/profile.json";
+import projectsData from "../../../data/projects.json";
 import { useHaptics } from "../../lib/useHaptics";
-import { HomeScreen } from "./screens/HomeScreen";
+import { SubMenuPanel } from "./SubMenuPanel";
+import { TitleScreen } from "./TitleScreen";
 import { ExperienceScreen } from "./screens/ExperienceScreen";
+import { HomeScreen } from "./screens/HomeScreen";
 import { ProjectsScreen } from "./screens/ProjectsScreen";
 import { SkillsScreen } from "./screens/SkillsScreen";
-import { TitleScreen } from "./TitleScreen";
-import { SubMenuPanel } from "./SubMenuPanel";
-import profileData from "../../../data/profile.json";
-import experienceData from "../../../data/experience.json";
-import projectsData from "../../../data/projects.json";
-import certificationsData from "../../../data/certifications.json";
 
 type MenuState =
   | { type: "boot" }
@@ -51,7 +52,15 @@ const MENU_TREE: MenuItem[] = [
     id: "profile",
     label: "Profile",
     icon: (
-      <svg className={MAIN_ICON_CLASS} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        className={MAIN_ICON_CLASS}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
         <circle cx="12" cy="7" r="4" />
       </svg>
@@ -62,7 +71,15 @@ const MENU_TREE: MenuItem[] = [
         label: "About / Bio",
         screen: "home",
         icon: (
-          <svg className={SUB_ICON_CLASS} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            className={SUB_ICON_CLASS}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" />
           </svg>
         ),
@@ -73,7 +90,15 @@ const MENU_TREE: MenuItem[] = [
         screen: "experience",
         badge: EXPERIENCES.length,
         icon: (
-          <svg className={SUB_ICON_CLASS} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            className={SUB_ICON_CLASS}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
           </svg>
         ),
@@ -83,7 +108,15 @@ const MENU_TREE: MenuItem[] = [
         label: "Resume",
         href: "/resume",
         icon: (
-          <svg className={SUB_ICON_CLASS} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            className={SUB_ICON_CLASS}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
             <polyline points="14 2 14 8 20 8" />
             <line x1="16" y1="13" x2="8" y2="13" />
@@ -97,7 +130,15 @@ const MENU_TREE: MenuItem[] = [
     id: "portfolio",
     label: "Portfolio",
     icon: (
-      <svg className={MAIN_ICON_CLASS} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        className={MAIN_ICON_CLASS}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <rect x="3" y="3" width="7" height="7" rx="1" />
         <rect x="14" y="3" width="7" height="7" rx="1" />
         <rect x="3" y="14" width="7" height="7" rx="1" />
@@ -111,7 +152,15 @@ const MENU_TREE: MenuItem[] = [
         screen: "projects",
         badge: PROJECTS.length,
         icon: (
-          <svg className={SUB_ICON_CLASS} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            className={SUB_ICON_CLASS}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <rect x="3" y="3" width="7" height="7" rx="1" />
             <rect x="14" y="3" width="7" height="7" rx="1" />
             <rect x="3" y="14" width="7" height="7" rx="1" />
@@ -124,7 +173,15 @@ const MENU_TREE: MenuItem[] = [
         label: "Skills",
         screen: "skills",
         icon: (
-          <svg className={SUB_ICON_CLASS} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            className={SUB_ICON_CLASS}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M12 2l3 3-3 3 3 3-3 3 3 3-3 3" />
             <path d="M5 12l3-3 3 3-3 3-3-3z" />
             <path d="M19 12l-3-3-3 3 3 3 3-3z" />
@@ -137,7 +194,15 @@ const MENU_TREE: MenuItem[] = [
         screen: "certifications",
         badge: CERTS.length,
         icon: (
-          <svg className={SUB_ICON_CLASS} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            className={SUB_ICON_CLASS}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <circle cx="12" cy="8" r="6" />
             <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
           </svg>
@@ -149,7 +214,15 @@ const MENU_TREE: MenuItem[] = [
     id: "github",
     label: "GitHub",
     icon: (
-      <svg className={MAIN_ICON_CLASS} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        className={MAIN_ICON_CLASS}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
       </svg>
     ),
@@ -159,7 +232,15 @@ const MENU_TREE: MenuItem[] = [
         label: "Pinned Repos",
         href: "/github",
         icon: (
-          <svg className={SUB_ICON_CLASS} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            className={SUB_ICON_CLASS}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
           </svg>
         ),
@@ -169,7 +250,15 @@ const MENU_TREE: MenuItem[] = [
         label: "Contribution Graph",
         href: "/github",
         icon: (
-          <svg className={SUB_ICON_CLASS} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            className={SUB_ICON_CLASS}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
             <line x1="3" y1="9" x2="21" y2="9" />
             <line x1="9" y1="21" x2="9" y2="9" />
@@ -181,7 +270,15 @@ const MENU_TREE: MenuItem[] = [
         label: "Language Breakdown",
         href: "/github",
         icon: (
-          <svg className={SUB_ICON_CLASS} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            className={SUB_ICON_CLASS}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <circle cx="12" cy="12" r="10" />
             <path d="M2 12h20" />
             <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
@@ -193,7 +290,15 @@ const MENU_TREE: MenuItem[] = [
         label: "Commit Activity",
         href: "/github",
         icon: (
-          <svg className={SUB_ICON_CLASS} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            className={SUB_ICON_CLASS}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
           </svg>
         ),
@@ -204,7 +309,15 @@ const MENU_TREE: MenuItem[] = [
     id: "media",
     label: "Media",
     icon: (
-      <svg className={MAIN_ICON_CLASS} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        className={MAIN_ICON_CLASS}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18" />
         <line x1="7" y1="2" x2="7" y2="22" />
         <line x1="17" y1="2" x2="17" y2="22" />
@@ -221,7 +334,15 @@ const MENU_TREE: MenuItem[] = [
         label: "Blog",
         href: "/blog",
         icon: (
-          <svg className={SUB_ICON_CLASS} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            className={SUB_ICON_CLASS}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
             <polyline points="14 2 14 8 20 8" />
             <line x1="16" y1="13" x2="8" y2="13" />
@@ -234,7 +355,15 @@ const MENU_TREE: MenuItem[] = [
         label: "Timeline",
         href: "/timeline",
         icon: (
-          <svg className={SUB_ICON_CLASS} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            className={SUB_ICON_CLASS}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <line x1="3" y1="12" x2="21" y2="12" />
             <polyline points="8 5 3 12 8 19" />
           </svg>
@@ -245,7 +374,15 @@ const MENU_TREE: MenuItem[] = [
         label: "Gallery",
         href: "/projects",
         icon: (
-          <svg className={SUB_ICON_CLASS} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            className={SUB_ICON_CLASS}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
             <circle cx="8.5" cy="8.5" r="1.5" />
             <polyline points="21 15 16 10 5 21" />
@@ -258,7 +395,15 @@ const MENU_TREE: MenuItem[] = [
     id: "settings",
     label: "Settings",
     icon: (
-      <svg className={MAIN_ICON_CLASS} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        className={MAIN_ICON_CLASS}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <circle cx="12" cy="12" r="3" />
         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
       </svg>
@@ -268,7 +413,15 @@ const MENU_TREE: MenuItem[] = [
         id: "display-settings",
         label: "Display",
         icon: (
-          <svg className={SUB_ICON_CLASS} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            className={SUB_ICON_CLASS}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
             <line x1="8" y1="21" x2="16" y2="21" />
             <line x1="12" y1="17" x2="12" y2="21" />
@@ -279,7 +432,15 @@ const MENU_TREE: MenuItem[] = [
         id: "audio-settings",
         label: "Audio",
         icon: (
-          <svg className={SUB_ICON_CLASS} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            className={SUB_ICON_CLASS}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
             <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
           </svg>
@@ -289,7 +450,15 @@ const MENU_TREE: MenuItem[] = [
         id: "controls-settings",
         label: "Controls",
         icon: (
-          <svg className={SUB_ICON_CLASS} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            className={SUB_ICON_CLASS}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <rect x="2" y="2" width="20" height="20" rx="2" ry="2" />
             <line x1="6" y1="6" x2="6" y2="6.01" />
             <line x1="10" y1="6" x2="10" y2="6.01" />
@@ -301,7 +470,15 @@ const MENU_TREE: MenuItem[] = [
         id: "about-credits",
         label: "About / Credits",
         icon: (
-          <svg className={SUB_ICON_CLASS} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            className={SUB_ICON_CLASS}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <circle cx="12" cy="12" r="10" />
             <line x1="12" y1="16" x2="12" y2="12" />
             <line x1="12" y1="8" x2="12.01" y2="8" />
@@ -315,7 +492,15 @@ const MENU_TREE: MenuItem[] = [
     label: "Contact",
     screen: "contact",
     icon: (
-      <svg className={MAIN_ICON_CLASS} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        className={MAIN_ICON_CLASS}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
         <polyline points="22,6 12,13 2,6" />
       </svg>
@@ -341,7 +526,10 @@ const getDepth = (state: MenuState): number => {
   }
 };
 
-const getAnimationDirection = (fromDepth: number, toDepth: number): "forward" | "backward" | "neutral" => {
+const getAnimationDirection = (
+  fromDepth: number,
+  toDepth: number,
+): "forward" | "backward" | "neutral" => {
   if (toDepth > fromDepth) return "forward";
   if (toDepth < fromDepth) return "backward";
   return "neutral";
@@ -370,7 +558,14 @@ const GameMenuParticles: React.FC = () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const particles: { x: number; y: number; vx: number; vy: number; size: number; alpha: number }[] = [];
+    const particles: {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      size: number;
+      alpha: number;
+    }[] = [];
     for (let i = 0; i < 25; i++) {
       particles.push({
         x: Math.random() * canvas.width,
@@ -461,12 +656,24 @@ const SidebarNavItem: React.FC<{
           {item.label}
         </span>
         {hasChildren && (
-          <svg className="w-3 h-3 text-accent/60" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <svg
+            className="w-3 h-3 text-accent/60"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+          >
             <polyline points="6,4 10,8 6,12" />
           </svg>
         )}
         {isLeaf && item.href && (
-          <svg className="w-3 h-3 text-text-secondary/30" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg
+            className="w-3 h-3 text-text-secondary/30"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <path d="M6 3l5 5-5 5" />
           </svg>
         )}
@@ -504,7 +711,9 @@ const Sidebar: React.FC<{
       <div className="px-6 pt-6 pb-3 border-b border-accent/10">
         <div className="flex items-center gap-3 mb-1">
           <div className="w-2 h-2 bg-accent pulse-ring" />
-          <span className="text-xs font-mono text-accent tracking-widest uppercase">System Menu</span>
+          <span className="text-xs font-mono text-accent tracking-widest uppercase">
+            System Menu
+          </span>
           <span className="text-[10px] font-mono text-text-secondary/40 ml-auto border border-accent/20 px-1.5 py-0.5">
             LV.{depth}
           </span>
@@ -553,7 +762,11 @@ const Sidebar: React.FC<{
   );
 };
 
-const HUD: React.FC<{ activeLabel: string; depth: number; totalItems: number }> = ({ activeLabel, depth, totalItems }) => (
+const HUD: React.FC<{ activeLabel: string; depth: number; totalItems: number }> = ({
+  activeLabel,
+  depth,
+  totalItems,
+}) => (
   <div className="absolute top-0 right-0 z-20 p-6 flex items-start gap-6 pointer-events-none">
     <div className="text-right">
       <div className="text-xs font-mono text-accent tracking-widest uppercase mb-1">
@@ -577,9 +790,10 @@ const ScreenTransition: React.FC<{
     className="absolute inset-0"
     initial={{
       opacity: 0,
-      clipPath: direction > 0
-        ? "polygon(100% 0, 100% 0, 100% 100%, 100% 100%)"
-        : "polygon(0 0, 0 0, 0 100%, 0 100%)",
+      clipPath:
+        direction > 0
+          ? "polygon(100% 0, 100% 0, 100% 100%, 100% 100%)"
+          : "polygon(0 0, 0 0, 0 100%, 0 100%)",
     }}
     animate={{
       opacity: 1,
@@ -587,9 +801,10 @@ const ScreenTransition: React.FC<{
     }}
     exit={{
       opacity: 0,
-      clipPath: direction > 0
-        ? "polygon(0 0, 0 0, 0 100%, 0 100%)"
-        : "polygon(100% 0, 100% 0, 100% 100%, 100% 100%)",
+      clipPath:
+        direction > 0
+          ? "polygon(0 0, 0 0, 0 100%, 0 100%)"
+          : "polygon(100% 0, 100% 0, 100% 100%, 100% 100%)",
     }}
     transition={{ type: "spring", stiffness: 120, damping: 18 }}
   >
@@ -603,9 +818,14 @@ const ContactScreen: React.FC = () => {
     <div className="w-full h-full flex flex-col justify-center px-16 relative overflow-hidden">
       <div className="flex items-center gap-3 mb-6">
         <span className="w-2 h-2 bg-accent pulse-ring" />
-        <span className="text-xs font-mono text-accent tracking-[0.2em] uppercase">Connect // Contact</span>
+        <span className="text-xs font-mono text-accent tracking-[0.2em] uppercase">
+          Connect // Contact
+        </span>
       </div>
-      <h2 className="text-6xl font-black uppercase tracking-tighter text-text-primary mb-6" style={{ transform: "skewX(-12deg)" }}>
+      <h2
+        className="text-6xl font-black uppercase tracking-tighter text-text-primary mb-6"
+        style={{ transform: "skewX(-12deg)" }}
+      >
         <span className="text-accent">Get In</span>
         <br />
         <span>Touch</span>
@@ -615,11 +835,19 @@ const ContactScreen: React.FC = () => {
           href={`mailto:${profile.contact?.email}`}
           className="flex items-center gap-4 px-5 py-4 border border-accent/20 hover:border-accent/40 transition-colors group"
         >
-          <svg className="w-5 h-5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg
+            className="w-5 h-5 text-accent"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
             <polyline points="22,6 12,13 2,6" />
           </svg>
-          <span className="font-mono text-sm text-text-primary group-hover:text-accent transition-colors">{profile.contact?.email}</span>
+          <span className="font-mono text-sm text-text-primary group-hover:text-accent transition-colors">
+            {profile.contact?.email}
+          </span>
         </a>
         <a
           href={profile.contact?.linkedin}
@@ -627,12 +855,20 @@ const ContactScreen: React.FC = () => {
           rel="noopener noreferrer"
           className="flex items-center gap-4 px-5 py-4 border border-accent/20 hover:border-accent/40 transition-colors group"
         >
-          <svg className="w-5 h-5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg
+            className="w-5 h-5 text-accent"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
             <rect x="2" y="9" width="4" height="12" />
             <circle cx="4" cy="4" r="2" />
           </svg>
-          <span className="font-mono text-sm text-text-primary group-hover:text-accent transition-colors">LinkedIn</span>
+          <span className="font-mono text-sm text-text-primary group-hover:text-accent transition-colors">
+            LinkedIn
+          </span>
         </a>
         <a
           href={profile.contact?.github}
@@ -640,17 +876,28 @@ const ContactScreen: React.FC = () => {
           rel="noopener noreferrer"
           className="flex items-center gap-4 px-5 py-4 border border-accent/20 hover:border-accent/40 transition-colors group"
         >
-          <svg className="w-5 h-5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg
+            className="w-5 h-5 text-accent"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
           </svg>
-          <span className="font-mono text-sm text-text-primary group-hover:text-accent transition-colors">GitHub</span>
+          <span className="font-mono text-sm text-text-primary group-hover:text-accent transition-colors">
+            GitHub
+          </span>
         </a>
       </div>
     </div>
   );
 };
 
-export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
+export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
+  isOpen,
+  onClose,
+}) => {
   const { playHoverSound, playSelectSound } = useHaptics();
   const [mounted, setMounted] = useState(false);
 
@@ -673,7 +920,9 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
         setSkipBoot(true);
         setMenuState({ type: "main_menu" });
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   useEffect(() => {
@@ -689,7 +938,11 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
       const toDepth = getDepth(newState);
       setPrevDepth(fromDepth);
 
-      if (newState.type === "sub_menu" || newState.type === "settings" || newState.type === "screen") {
+      if (
+        newState.type === "sub_menu" ||
+        newState.type === "settings" ||
+        newState.type === "screen"
+      ) {
         setHistory((prev) => [...prev, { state: menuState, label, id }]);
       }
 
@@ -697,7 +950,7 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
       setActiveIndex(0);
       playSelectSound();
     },
-    [menuState, playSelectSound]
+    [menuState, playSelectSound],
   );
 
   const navigateBack = useCallback(() => {
@@ -725,7 +978,7 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
         navigateTo(
           { type: "sub_menu", parentId: item.id, parentLabel: item.label },
           item.label,
-          item.id
+          item.id,
         );
       } else if (item.screen) {
         navigateTo({ type: "screen", screenId: item.screen }, item.label, item.id);
@@ -733,7 +986,7 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
         window.location.href = item.href;
       }
     },
-    [navigateTo]
+    [navigateTo],
   );
 
   const handleSelectSubItem = useCallback(
@@ -750,7 +1003,7 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
         window.location.href = item.href;
       }
     },
-    [menuState, navigateTo]
+    [menuState, navigateTo],
   );
 
   const handleHover = useCallback((index: number) => {
@@ -798,7 +1051,7 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
     }
     if (menuState.type === "screen") {
       const parent = MENU_TREE.find((m) =>
-        m.children?.some((c) => c.id === menuState.screenId || c.screen === menuState.screenId)
+        m.children?.some((c) => c.id === menuState.screenId || c.screen === menuState.screenId),
       );
       if (parent) {
         crumbs.push({ id: parent.id, label: parent.label });
@@ -834,7 +1087,7 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
         keyRepeatRef.current = window.setInterval(step, 100);
       }, 250);
     },
-    [playHoverSound]
+    [playHoverSound],
   );
 
   const stopKeyRepeat = useCallback(() => {
@@ -866,7 +1119,11 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
           } else {
             setMenuState({ type: "main_menu" });
             setPrevDepth(-1);
-            try { localStorage.setItem("menu-skip-boot", "true"); } catch { /* ignore */ }
+            try {
+              localStorage.setItem("menu-skip-boot", "true");
+            } catch {
+              /* ignore */
+            }
           }
           playSelectSound();
         }
@@ -889,7 +1146,11 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
         e.preventDefault();
         stopKeyRepeat();
         const isSub = menuState.type === "sub_menu" && subItemsLength > 0;
-        startKeyRepeat(e.key === "ArrowDown" ? "down" : "up", isSub ? subItemsLength : mainItemsLength, isSub);
+        startKeyRepeat(
+          e.key === "ArrowDown" ? "down" : "up",
+          isSub ? subItemsLength : mainItemsLength,
+          isSub,
+        );
         return;
       }
 
@@ -936,7 +1197,11 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
           if (menuState.type === "main_menu" || menuState.type === "sub_menu") {
             const item = MENU_TREE[num];
             if (item?.children) {
-              navigateTo({ type: "sub_menu", parentId: item.id, parentLabel: item.label }, item.label, item.id);
+              navigateTo(
+                { type: "sub_menu", parentId: item.id, parentLabel: item.label },
+                item.label,
+                item.id,
+              );
             } else if (item?.screen) {
               navigateTo({ type: "screen", screenId: item.screen }, item.label, item.id);
             } else if (item?.href) {
@@ -971,10 +1236,20 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
       stopKeyRepeat();
     };
   }, [
-    isOpen, menuState, activeIndex, subIndex, history,
-    onClose, playHoverSound, playSelectSound,
-    navigateBack, handleSelectMainItem, handleSelectSubItem,
-    startKeyRepeat, stopKeyRepeat, navigateTo,
+    isOpen,
+    menuState,
+    activeIndex,
+    subIndex,
+    history,
+    onClose,
+    playHoverSound,
+    playSelectSound,
+    navigateBack,
+    handleSelectMainItem,
+    handleSelectSubItem,
+    startKeyRepeat,
+    stopKeyRepeat,
+    navigateTo,
   ]);
 
   const renderScreen = () => {
@@ -983,30 +1258,59 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
 
     switch (menuState.screenId) {
       case "home":
-        return <ScreenTransition key="home" direction={animDir}><HomeScreen /></ScreenTransition>;
+        return (
+          <ScreenTransition key="home" direction={animDir}>
+            <HomeScreen />
+          </ScreenTransition>
+        );
       case "experience":
-        return <ScreenTransition key="experience" direction={animDir}><ExperienceScreen /></ScreenTransition>;
+        return (
+          <ScreenTransition key="experience" direction={animDir}>
+            <ExperienceScreen />
+          </ScreenTransition>
+        );
       case "projects":
-        return <ScreenTransition key="projects" direction={animDir}><ProjectsScreen /></ScreenTransition>;
+        return (
+          <ScreenTransition key="projects" direction={animDir}>
+            <ProjectsScreen />
+          </ScreenTransition>
+        );
       case "skills":
-        return <ScreenTransition key="skills" direction={animDir}><SkillsScreen /></ScreenTransition>;
+        return (
+          <ScreenTransition key="skills" direction={animDir}>
+            <SkillsScreen />
+          </ScreenTransition>
+        );
       case "certifications":
         return (
           <ScreenTransition key="certifications" direction={animDir}>
             <div className="w-full h-full flex flex-col justify-center px-16">
               <div className="flex items-center gap-3 mb-6">
                 <span className="w-2 h-2 bg-accent pulse-ring" />
-                <span className="text-xs font-mono text-accent tracking-[0.2em] uppercase">Credentials // Certifications</span>
+                <span className="text-xs font-mono text-accent tracking-[0.2em] uppercase">
+                  Credentials // Certifications
+                </span>
               </div>
-              <h2 className="text-5xl font-black uppercase tracking-tighter text-text-primary mb-6" style={{ transform: "skewX(-12deg)" }}>
+              <h2
+                className="text-5xl font-black uppercase tracking-tighter text-text-primary mb-6"
+                style={{ transform: "skewX(-12deg)" }}
+              >
                 <span className="text-accent">{CERTS.length}</span>
                 <span className="ml-3">Certifications</span>
               </h2>
               <div className="grid grid-cols-2 gap-3 overflow-y-auto max-h-[60vh] pr-4">
                 {CERTS.map((cert: any, idx: number) => (
-                  <div key={idx} className="border border-accent/10 bg-bg-secondary/30 p-4 hover:border-accent/40 transition-colors">
-                    <div className="text-xs font-black uppercase tracking-wider text-text-primary mb-1">{cert.title}</div>
-                    <div className="text-[10px] font-mono text-accent">{cert.issuer}{cert.date ? ` • ${cert.date}` : ""}</div>
+                  <div
+                    key={idx}
+                    className="border border-accent/10 bg-bg-secondary/30 p-4 hover:border-accent/40 transition-colors"
+                  >
+                    <div className="text-xs font-black uppercase tracking-wider text-text-primary mb-1">
+                      {cert.title}
+                    </div>
+                    <div className="text-[10px] font-mono text-accent">
+                      {cert.issuer}
+                      {cert.date ? ` • ${cert.date}` : ""}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1014,14 +1318,23 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
           </ScreenTransition>
         );
       case "contact":
-        return <ScreenTransition key="contact" direction={animDir}><ContactScreen /></ScreenTransition>;
+        return (
+          <ScreenTransition key="contact" direction={animDir}>
+            <ContactScreen />
+          </ScreenTransition>
+        );
       default:
-        return <ScreenTransition key="home" direction={animDir}><HomeScreen /></ScreenTransition>;
+        return (
+          <ScreenTransition key="home" direction={animDir}>
+            <HomeScreen />
+          </ScreenTransition>
+        );
     }
   };
 
   const showSidebar = menuState.type === "main_menu" || menuState.type === "sub_menu";
-  const showHUD = menuState.type !== "boot" && menuState.type !== "title" && menuState.type !== "exit";
+  const showHUD =
+    menuState.type !== "boot" && menuState.type !== "title" && menuState.type !== "exit";
   const showSubPanel = menuState.type === "sub_menu" || menuState.type === "screen";
   const showScreen = menuState.type === "screen";
 
@@ -1056,7 +1369,11 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
               onStart={() => {
                 setMenuState({ type: "main_menu" });
                 setPrevDepth(-1);
-                try { localStorage.setItem("menu-skip-boot", "true"); } catch { /* ignore */ }
+                try {
+                  localStorage.setItem("menu-skip-boot", "true");
+                } catch {
+                  /* ignore */
+                }
               }}
             />
           ) : (
@@ -1066,7 +1383,8 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
               <div
                 className="fixed inset-0 z-[1] pointer-events-none"
                 style={{
-                  background: "radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.6) 100%)",
+                  background:
+                    "radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.6) 100%)",
                 }}
               />
 
@@ -1079,17 +1397,29 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
                   items={currentItems}
                   activeIndex={getSidebarActiveIndex()}
                   depth={currentDepth}
-                  onSelect={menuState.type === "main_menu" ? handleSelectMainItem : (idx: number) => {
-                    setActiveIndex(idx);
-                    const item = MENU_TREE[idx];
-                    if (item?.children) {
-                      navigateTo({ type: "sub_menu", parentId: item.id, parentLabel: item.label }, item.label, item.id);
-                    } else if (item?.screen) {
-                      navigateTo({ type: "screen", screenId: item.screen }, item.label, item.id);
-                    } else if (item?.href) {
-                      window.location.href = item.href;
-                    }
-                  }}
+                  onSelect={
+                    menuState.type === "main_menu"
+                      ? handleSelectMainItem
+                      : (idx: number) => {
+                          setActiveIndex(idx);
+                          const item = MENU_TREE[idx];
+                          if (item?.children) {
+                            navigateTo(
+                              { type: "sub_menu", parentId: item.id, parentLabel: item.label },
+                              item.label,
+                              item.id,
+                            );
+                          } else if (item?.screen) {
+                            navigateTo(
+                              { type: "screen", screenId: item.screen },
+                              item.label,
+                              item.id,
+                            );
+                          } else if (item?.href) {
+                            window.location.href = item.href;
+                          }
+                        }
+                  }
                   onHover={(idx: number) => setActiveIndex(idx)}
                   onClose={() => {
                     if (history.length > 0) navigateBack();
@@ -1101,7 +1431,13 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
 
               {/* Main Content Area */}
               <div className="flex-1 relative bg-bg-primary/90 backdrop-blur-sm overflow-hidden">
-                {showHUD && <HUD activeLabel={getCurrentLabel()} depth={currentDepth} totalItems={currentItems.length} />}
+                {showHUD && (
+                  <HUD
+                    activeLabel={getCurrentLabel()}
+                    depth={currentDepth}
+                    totalItems={currentItems.length}
+                  />
+                )}
 
                 {/* Sub-menu panel overlay */}
                 {showSubPanel && (
@@ -1119,11 +1455,11 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
                 )}
 
                 {/* Screen content */}
-                <div className={`absolute inset-0 transition-opacity duration-200 ${showScreen ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
+                <div
+                  className={`absolute inset-0 transition-opacity duration-200 ${showScreen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+                >
                   <div className="absolute inset-0 mt-16">
-                    <AnimatePresence mode="wait">
-                      {renderScreen()}
-                    </AnimatePresence>
+                    <AnimatePresence mode="wait">{renderScreen()}</AnimatePresence>
                   </div>
                 </div>
 

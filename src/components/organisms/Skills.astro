@@ -1,0 +1,31 @@
+---
+import type { SkillsData } from "../../types/skills";
+import Container from "../atoms/Container.astro";
+
+export interface Props {
+  skills: SkillsData;
+}
+
+const { skills } = Astro.props;
+---
+
+<Container>
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+    {
+      skills.categories.map((category) => (
+        <div>
+          <h3 class="text-sm font-semibold text-accent uppercase tracking-wider mb-3">
+            {category.name}
+          </h3>
+          <div class="flex flex-wrap gap-2">
+            {category.skills.map((skill) => (
+              <span class="inline-flex items-center px-3 py-1 text-sm bg-bg-tertiary text-text-secondary rounded-full hover:bg-accent-muted/20 hover:text-accent transition-colors duration-200">
+                {skill.name}
+              </span>
+            ))}
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</Container>

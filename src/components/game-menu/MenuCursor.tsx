@@ -1,5 +1,5 @@
-import React from "react";
 import { motion } from "framer-motion";
+import type React from "react";
 
 export const MenuCursor: React.FC = () => {
   return (

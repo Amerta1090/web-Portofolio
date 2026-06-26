@@ -2,11 +2,11 @@
 import "../styles/global.css";
 import "../styles/theme.css";
 import ClientRouter from "astro/components/ClientRouter.astro";
-import Footer from "../components/layout/Footer.astro";
-import Header from "../components/layout/Header.astro";
+import { ThreeDCanvas } from "../components/atoms/ThreeDCanvas";
+import Footer from "../components/templates/Footer.astro";
+import Header from "../components/templates/Header.astro";
 import ScrollProgress from "../islands/ScrollProgress";
 import { SITE } from "../lib/constants";
-import { ThreeDCanvas } from "../components/ui/ThreeDCanvas";
 
 export interface Props {
   title?: string;

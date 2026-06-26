@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import type React from "react";
+import { useEffect, useState } from "react";
 import { useHaptics } from "../../lib/useHaptics";
 
 export const GameModeToggle: React.FC = () => {
@@ -48,11 +49,29 @@ export const GameModeToggle: React.FC = () => {
         transition={{ type: "spring", stiffness: 200, damping: 10 }}
       >
         {isGameMode ? (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
           </svg>
         ) : (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <rect x="2" y="6" width="20" height="12" rx="2" />
             <path d="M6 12h12" />
             <path d="M10 9v6" />

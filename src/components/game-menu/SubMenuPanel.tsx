@@ -1,5 +1,5 @@
+import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface Breadcrumb {
   id: string;
@@ -96,13 +96,13 @@ export const SubMenuPanel: React.FC<SubMenuPanelProps> = ({
               >
                 <div
                   className={`flex items-center gap-4 px-4 py-3.5 border-l-2 ${
-                    activeIndex === idx
-                      ? "border-accent"
-                      : "border-transparent"
+                    activeIndex === idx ? "border-accent" : "border-transparent"
                   }`}
                 >
                   {item.icon && (
-                    <span className={`flex-shrink-0 ${activeIndex === idx ? "text-accent" : "text-text-secondary"}`}>
+                    <span
+                      className={`flex-shrink-0 ${activeIndex === idx ? "text-accent" : "text-text-secondary"}`}
+                    >
                       {item.icon}
                     </span>
                   )}
@@ -119,7 +119,13 @@ export const SubMenuPanel: React.FC<SubMenuPanelProps> = ({
                     </span>
                   )}
                   {item.href && !item.children && (
-                    <svg className="w-3 h-3 text-text-secondary/40" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg
+                      className="w-3 h-3 text-text-secondary/40"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
                       <path d="M6 3l5 5-5 5" />
                     </svg>
                   )}
@@ -134,11 +140,20 @@ export const SubMenuPanel: React.FC<SubMenuPanelProps> = ({
               className="flex items-center gap-3 text-sm font-mono text-text-secondary hover:text-accent transition-colors group w-full"
               onClick={onBack}
             >
-              <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                className="w-4 h-4"
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <path d="M10 3l-5 5 5 5" />
               </svg>
               <span className="tracking-wider uppercase text-xs">
-                Back to {breadcrumbs.length > 1 ? breadcrumbs[breadcrumbs.length - 2]?.label || "Menu" : "Main Menu"}
+                Back to{" "}
+                {breadcrumbs.length > 1
+                  ? breadcrumbs[breadcrumbs.length - 2]?.label || "Menu"
+                  : "Main Menu"}
               </span>
             </button>
           </div>

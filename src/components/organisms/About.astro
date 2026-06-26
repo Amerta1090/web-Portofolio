@@ -1,0 +1,39 @@
+---
+import MetricsCounter from "../../islands/MetricsCounter";
+import type { Profile } from "../../types/profile";
+
+export interface Props {
+  profile: Profile;
+}
+
+const { profile } = Astro.props;
+const { metrics } = profile;
+
+const metricItems = [
+  { label: "Years Experience", value: metrics.years_experience, suffix: "+" },
+  { label: "Projects Shipped", value: metrics.projects_shipped, suffix: "+" },
+  { label: "Certifications", value: metrics.certifications, suffix: "" },
+  { label: "Languages", value: metrics.languages.length, suffix: "" },
+];
+---
+
+<div class="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+  <div class="grid md:grid-cols-5 gap-8 md:gap-12 items-start">
+    <div class="md:col-span-3">
+      <div class="border-l-4 border-accent pl-6">
+        <p class="text-text-primary leading-relaxed text-lg font-mono leading-relaxed">
+          {profile.summary}
+        </p>
+        <div class="flex items-center gap-2 mt-4">
+          <span class="text-accent text-sm">◆</span>
+          <span class="text-xs font-mono text-text-secondary/60 tracking-wider uppercase">{profile.location}</span>
+          <span class="text-accent/30">//</span>
+          <span class="text-xs font-mono text-text-secondary/60 tracking-wider uppercase">{profile.timezone}</span>
+        </div>
+      </div>
+    </div>
+    <div class="md:col-span-2">
+      <MetricsCounter client:idle metrics={metricItems} />
+    </div>
+  </div>
+</div>

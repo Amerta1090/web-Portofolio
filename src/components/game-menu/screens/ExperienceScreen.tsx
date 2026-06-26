@@ -1,5 +1,5 @@
-import React from "react";
 import { motion } from "framer-motion";
+import type React from "react";
 import experienceData from "../../../../data/experience.json";
 
 const typeColors: Record<string, string> = {
@@ -40,7 +40,9 @@ export const ExperienceScreen: React.FC = () => {
             transition={{ delay: 0.1 + idx * 0.08, type: "spring", stiffness: 100 }}
           >
             {/* Timeline dot */}
-            <div className={`absolute left-[10px] top-2 w-[18px] h-[18px] rounded-full border-2 border-bg-primary ${typeColors[exp.type] || "bg-accent"} z-10`} />
+            <div
+              className={`absolute left-[10px] top-2 w-[18px] h-[18px] rounded-full border-2 border-bg-primary ${typeColors[exp.type] || "bg-accent"} z-10`}
+            />
 
             {/* Content card */}
             <motion.div
@@ -55,7 +57,9 @@ export const ExperienceScreen: React.FC = () => {
                   <div className="flex items-center gap-3 mt-1">
                     <span className="text-accent font-bold font-mono text-sm">{exp.company}</span>
                     <span className="text-text-secondary/40">//</span>
-                    <span className="text-text-secondary text-xs font-mono">{exp.location || "Remote"}</span>
+                    <span className="text-text-secondary text-xs font-mono">
+                      {exp.location || "Remote"}
+                    </span>
                   </div>
                 </div>
                 <div className="text-right flex-shrink-0">

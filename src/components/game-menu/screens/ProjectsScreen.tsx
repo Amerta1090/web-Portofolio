@@ -1,18 +1,31 @@
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import type React from "react";
+import { useState } from "react";
 import projectsData from "../../../../data/projects.json";
 
 const ICON_CLASS = "w-[1em] h-[1em] inline-block align-middle";
 
 const categoryIcons: Record<string, React.ReactNode> = {
   ml: (
-    <svg className={ICON_CLASS} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <svg
+      className={ICON_CLASS}
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
       <polygon points="8,1 15,8 8,15 1,8" />
       <circle cx="8" cy="8" r="1.5" fill="currentColor" stroke="none" />
     </svg>
   ),
   web: (
-    <svg className={ICON_CLASS} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <svg
+      className={ICON_CLASS}
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
       <rect x="2" y="3" width="12" height="10" rx="1" />
       <line x1="2" y1="7" x2="14" y2="7" />
       <line x1="5" y1="3" x2="5" y2="13" />
@@ -20,14 +33,26 @@ const categoryIcons: Record<string, React.ReactNode> = {
     </svg>
   ),
   cli: (
-    <svg className={ICON_CLASS} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <svg
+      className={ICON_CLASS}
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
       <rect x="1" y="2" width="14" height="12" rx="1" />
       <polyline points="4,6 7,8 4,10" />
       <line x1="10" y1="10" x2="12" y2="10" />
     </svg>
   ),
   iot: (
-    <svg className={ICON_CLASS} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <svg
+      className={ICON_CLASS}
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
       <polygon points="8,1 14,4.5 14,11.5 8,15 2,11.5 2,4.5" />
       <circle cx="8" cy="8" r="2.5" fill="currentColor" stroke="none" />
       <line x1="8" y1="1" x2="8" y2="15" strokeWidth="1" />
@@ -35,7 +60,13 @@ const categoryIcons: Record<string, React.ReactNode> = {
     </svg>
   ),
   devops: (
-    <svg className={ICON_CLASS} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <svg
+      className={ICON_CLASS}
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
       <circle cx="8" cy="8" r="3.5" />
       <circle cx="8" cy="2" r="1" />
       <circle cx="8" cy="14" r="1" />
@@ -158,7 +189,9 @@ export const ProjectsScreen: React.FC = () => {
               <div className="flex items-start justify-between gap-3 mb-2">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-accent text-xs flex items-center">{categoryIcons[proj.category]}</span>
+                    <span className="text-accent text-xs flex items-center">
+                      {categoryIcons[proj.category]}
+                    </span>
                     <span className="text-[10px] font-mono text-accent/60 uppercase tracking-wider">
                       {proj.category}
                     </span>

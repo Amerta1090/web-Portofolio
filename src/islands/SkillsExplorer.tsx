@@ -72,7 +72,10 @@ export default function SkillsExplorer({ skills }: Props) {
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filtered.map((category) => (
-          <div key={category.name} className="border border-accent/10 p-5 hover:border-accent/30 transition-colors">
+          <div
+            key={category.name}
+            className="border border-accent/10 p-5 hover:border-accent/30 transition-colors"
+          >
             <div className="flex items-center gap-2 mb-4">
               <span className="text-accent text-lg">{categoryIcons[category.name] || "◇"}</span>
               <h3 className="text-xs font-black uppercase tracking-wider text-text-primary">
@@ -97,20 +100,26 @@ export default function SkillsExplorer({ skills }: Props) {
                     }`}
                   >
                     <div className="flex-1 min-w-0">
-                      <span className={`text-xs font-mono tracking-wider ${
-                        isActive ? "text-accent" : "text-text-secondary group-hover:text-text-primary"
-                      }`}>
+                      <span
+                        className={`text-xs font-mono tracking-wider ${
+                          isActive
+                            ? "text-accent"
+                            : "text-text-secondary group-hover:text-text-primary"
+                        }`}
+                      >
                         {skill.name}
                       </span>
                       <ProficiencyBar level={skill.proficiency} />
                     </div>
-                    <span className={`text-[9px] font-mono ml-2 ${
-                      skill.proficiency >= 5
-                        ? "text-accent"
-                        : skill.proficiency >= 3
-                        ? "text-text-secondary/60"
-                        : "text-text-secondary/30"
-                    }`}>
+                    <span
+                      className={`text-[9px] font-mono ml-2 ${
+                        skill.proficiency >= 5
+                          ? "text-accent"
+                          : skill.proficiency >= 3
+                            ? "text-text-secondary/60"
+                            : "text-text-secondary/30"
+                      }`}
+                    >
                       Lv.{skill.proficiency}
                     </span>
                   </button>

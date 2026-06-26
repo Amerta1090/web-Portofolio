@@ -1,5 +1,5 @@
-import React from "react";
 import { motion } from "framer-motion";
+import type React from "react";
 import profileData from "../../../../data/profile.json";
 
 const stats = [
@@ -41,7 +41,10 @@ export const HomeScreen: React.FC = () => {
         <span className="text-accent block" style={{ transform: "skewX(-12deg)" }}>
           {profile.name?.split(" ").slice(0, 2).join(" ")}
         </span>
-        <span className="text-text-primary block text-6xl mt-1" style={{ transform: "skewX(-12deg)" }}>
+        <span
+          className="text-text-primary block text-6xl mt-1"
+          style={{ transform: "skewX(-12deg)" }}
+        >
           {profile.name?.split(" ").slice(2).join(" ")}
         </span>
       </motion.h1>

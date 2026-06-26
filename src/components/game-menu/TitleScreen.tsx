@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import type React from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface TitleScreenProps {
   showBoot: boolean;
@@ -72,7 +73,8 @@ const BootSequence: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
             <div
               className="absolute inset-0 pointer-events-none"
               style={{
-                background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)",
+                background:
+                  "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)",
                 mixBlendMode: "overlay",
               }}
             />
@@ -89,7 +91,7 @@ const BootSequence: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
             <motion.p
               className="text-xs font-mono text-white/60 mt-3 tracking-widest"
               animate={{ opacity: [0.4, 1, 0.4] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
+              transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
             >
               {glitchText}
             </motion.p>
@@ -200,7 +202,8 @@ const TitleScreenComponent: React.FC<{ onStart: () => void }> = ({ onStart }) =>
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.02) 2px, rgba(255,255,255,0.02) 4px)",
+          background:
+            "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.02) 2px, rgba(255,255,255,0.02) 4px)",
           mixBlendMode: "overlay",
         }}
       />
@@ -219,9 +222,7 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({ showBoot, onBootComple
   return (
     <>
       {showBoot && !bootDone && <BootSequence onComplete={handleBootComplete} />}
-      <AnimatePresence>
-        {bootDone && <TitleScreenComponent onStart={onStart} />}
-      </AnimatePresence>
+      <AnimatePresence>{bootDone && <TitleScreenComponent onStart={onStart} />}</AnimatePresence>
     </>
   );
 };

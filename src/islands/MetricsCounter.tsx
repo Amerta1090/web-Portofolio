@@ -66,7 +66,9 @@ export default function MetricsCounter({ metrics }: Props) {
           <div className="text-3xl md:text-4xl font-black text-accent tracking-tighter">
             <AnimatedValue value={m.value} suffix={m.suffix} />
           </div>
-          <div className="mt-1 text-xs font-mono text-text-secondary/60 uppercase tracking-wider">{m.label}</div>
+          <div className="mt-1 text-xs font-mono text-text-secondary/60 uppercase tracking-wider">
+            {m.label}
+          </div>
         </div>
       ))}
     </div>

@@ -18,7 +18,10 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
     const t3 = setTimeout(() => setStage(3), 900);
     const t4 = setTimeout(() => setStage(4), 1200);
     return () => {
-      clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      clearTimeout(t4);
     };
   }, []);
 
@@ -81,7 +84,10 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
             transition={{ type: "spring", stiffness: 200, damping: 15 }}
           >
             <div className="bg-accent/10 border-l-4 border-accent px-6 py-4">
-              <p className="text-xl md:text-3xl font-black uppercase tracking-widest text-accent" style={{ transform: "skewX(12deg)" }}>
+              <p
+                className="text-xl md:text-3xl font-black uppercase tracking-widest text-accent"
+                style={{ transform: "skewX(12deg)" }}
+              >
                 {headline}
               </p>
             </div>
@@ -120,11 +126,13 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
             animate={stage >= 4 ? { opacity: 1 } : {}}
             transition={{ delay: 0.5 }}
           >
-            <span className="text-[10px] font-mono text-text-secondary/30 tracking-widest uppercase">Scroll</span>
+            <span className="text-[10px] font-mono text-text-secondary/30 tracking-widest uppercase">
+              Scroll
+            </span>
             <motion.div
               className="w-px h-8 bg-accent/30"
               animate={{ height: [8, 24, 8] }}
-              transition={{ duration: 2, repeat: Infinity }}
+              transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
             />
           </motion.div>
         </div>
