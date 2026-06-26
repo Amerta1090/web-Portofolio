@@ -44,7 +44,7 @@ function readingTime(body: string): number {
   <div class="py-12 md:py-24">
     <div class="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
       <div class="mb-8">
-        <a href="/blog" class="text-sm text-text-secondary hover:text-accent transition-colors">← Back to Blog</a>
+        <a href="/blog" class="text-sm text-text-secondary hover:text-brand transition-colors">← Back to Blog</a>
       </div>
 
       <h1 class="text-3xl md:text-4xl font-bold text-text-primary mb-2">
@@ -56,13 +56,13 @@ function readingTime(body: string): number {
         {posts.map((post) => (
           <a
             href={"/blog/" + post.id}
-            class="block group bg-bg-secondary border border-border rounded-xl p-6 hover:border-accent/30 transition-all duration-200 card-glow"
+            class="block group bg-bg-secondary border border-border rounded-xl p-6 hover:border-brand/30 transition-all duration-200"
           >
             <div class="flex flex-wrap items-center gap-3 text-xs text-text-secondary mb-3">
               <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
               <span>{readingTime(post.body) + " min read"}</span>
             </div>
-            <h2 class="text-xl font-semibold text-text-primary group-hover:text-accent transition-colors mb-2">
+            <h2 class="text-xl font-semibold text-text-primary group-hover:text-brand transition-colors mb-2">
               {post.data.title}
             </h2>
             <p class="text-text-secondary text-sm leading-relaxed mb-4">{post.data.description}</p>

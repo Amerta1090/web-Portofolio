@@ -38,8 +38,8 @@ export default function TechExplorer({ skills }: Props) {
               onClick={() => setActiveTech(isActive ? null : skill)}
               className={`px-3 py-1.5 text-sm rounded-full transition-all duration-200 ${
                 isActive
-                  ? "bg-accent text-bg-primary shadow-lg shadow-accent/20"
-                  : "bg-bg-tertiary text-text-secondary hover:bg-accent-muted/20 hover:text-accent"
+                  ? "bg-brand text-bg-primary shadow-lg shadow-brand/20"
+                  : "bg-bg-tertiary text-text-secondary hover:bg-brand/10 hover:text-brand"
               }`}
             >
               {skill}

@@ -44,7 +44,7 @@ export default function AnimatedCounter({ value, suffix = "", duration = 1500 }:
   }, [revealed, value, duration]);
 
   return (
-    <div ref={ref} className="text-2xl md:text-3xl font-bold text-accent tabular-nums">
+    <div ref={ref} className="text-2xl md:text-3xl font-bold text-brand tabular-nums">
       {count}
       {suffix}
     </div>

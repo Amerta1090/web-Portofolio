@@ -1,0 +1,32 @@
+---
+export interface Props {
+  class?: string;
+  alt?: string;
+  width?: number;
+  height?: number;
+  priority?: boolean;
+}
+
+const { class: className, alt = "Profile photo", width = 400, height = 500, priority = false } = Astro.props;
+---
+
+<picture class={className}>
+  <source
+    type="image/webp"
+    srcset={`
+      /images/profile/profile-200x250.webp 200w,
+      /images/profile/profile-300x375.webp 300w,
+      /images/profile/profile-400x500.webp 400w
+    `}
+    sizes="(max-width: 640px) 200px, (max-width: 1024px) 300px, 400px"
+  />
+  <img
+    src="/images/profile/profile-400x500.jpg"
+    alt={alt}
+    width={width}
+    height={height}
+    loading={priority ? "eager" : "lazy"}
+    decoding="async"
+    class="object-cover w-full h-full"
+  />
+</picture>

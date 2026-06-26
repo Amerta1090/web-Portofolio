@@ -93,7 +93,7 @@ export default function ProjectFilter({ projects, baseUrl }: Props) {
             onClick={() => handleCategoryChange(cat.value)}
             className={`px-4 py-2 text-sm rounded-lg font-medium transition-all duration-200 ${
               activeCategory === cat.value
-                ? "bg-accent text-bg-primary"
+                ? "bg-brand text-bg-primary"
                 : "bg-bg-tertiary text-text-secondary hover:text-text-primary hover:bg-bg-tertiary/80"
             }`}
           >
@@ -107,7 +107,7 @@ export default function ProjectFilter({ projects, baseUrl }: Props) {
             value={searchQuery}
             onChange={handleSearchChange}
             placeholder="Search projects..."
-            className="w-full sm:w-56 px-4 py-2 bg-bg-secondary border border-border rounded-lg text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 text-sm"
+            className="w-full sm:w-56 px-4 py-2 bg-bg-secondary border border-border rounded-lg text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition-all duration-200 text-sm"
           />
         </div>
       </div>
@@ -130,7 +130,7 @@ export default function ProjectFilter({ projects, baseUrl }: Props) {
                   {project.title}
                 </h3>
                 {project.category && (
-                  <span className="inline-flex items-center px-2 py-0.5 text-xs bg-accent-muted/20 text-accent rounded-full shrink-0">
+                  <span className="inline-flex items-center px-2 py-0.5 text-xs bg-brand/10 text-brand rounded-full shrink-0">
                     {project.category.toUpperCase()}
                   </span>
                 )}

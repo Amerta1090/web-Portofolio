@@ -80,7 +80,7 @@ const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${
   <div class="py-12 md:py-24">
     <div class="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
       <div class="mb-8">
-        <a href="/blog" class="text-sm text-text-secondary hover:text-accent transition-colors">
+        <a href="/blog" class="text-sm text-text-secondary hover:text-brand transition-colors">
           ← Back to Blog
         </a>
       </div>
@@ -96,7 +96,7 @@ const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${
                 {toc.map((h) => (
                   <a
                     href={"#" + h.slug}
-                    class={"block text-sm py-1 text-text-secondary hover:text-accent transition-colors" + (h.isSub ? " pl-3" : "")}
+                    class={"block text-sm py-1 text-text-secondary hover:text-brand transition-colors" + (h.isSub ? " pl-3" : "")}
                   >
                     {h.text}
                   </a>
@@ -151,14 +151,14 @@ const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${
                     <li>
                       <a
                         href={"/blog/" + p.id}
-                        class={"text-sm flex items-center gap-2 " + (p.id === post.id ? "text-accent font-medium" : "text-text-secondary hover:text-accent") + " transition-colors"}
+                        class={"text-sm flex items-center gap-2 " + (p.id === post.id ? "text-brand font-medium" : "text-text-secondary hover:text-brand") + " transition-colors"}
                       >
                         <span class="w-5 h-5 flex items-center justify-center rounded-full bg-bg-tertiary text-xs">
                           {p.data.seriesOrder ?? "-"}
                         </span>
                         {p.data.title}
                         {p.id === post.id && (
-                          <span class="text-xs text-accent-muted">(current)</span>
+                          <span class="text-xs text-text-secondary">(current)</span>
                         )}
                       </a>
                     </li>
@@ -174,11 +174,11 @@ const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${
                 {relatedPosts.map((rp) => (
                   <a
                     href={"/blog/" + rp.id}
-                    class="block bg-bg-secondary border border-border rounded-xl p-5 hover:border-accent/30 transition-all duration-200 card-glow"
+                    class="block bg-bg-secondary border border-border rounded-xl p-5 hover:border-brand/30 transition-all duration-200"
                   >
                     <div class="flex flex-wrap gap-1.5 mb-2">
                       {rp.data.tags.slice(0, 2).map((t: string) => (
-                        <span class="text-xs text-accent">{t}</span>
+                        <span class="text-xs text-brand">{t}</span>
                       ))}
                     </div>
                     <h4 class="text-sm font-medium text-text-primary mb-1">
@@ -196,9 +196,9 @@ const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${
               {prevPost && (
                 <a
                   href={"/blog/" + prevPost.id}
-                  class="text-sm text-text-secondary hover:text-accent transition-colors"
+                  class="text-sm text-text-secondary hover:text-brand transition-colors"
                 >
-                  ← {prevPost.data.title}
+                  {prevPost.data.title}
                 </a>
               )}
             </div>
@@ -208,18 +208,18 @@ const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${
                 href={twitterShareUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-sm text-text-secondary hover:text-accent transition-colors"
+                class="text-sm text-text-secondary hover:text-brand transition-colors"
               >
-                Twitter
+                View all tags
               </a>
               <a
                 href={linkedinShareUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-sm text-text-secondary hover:text-accent transition-colors"
-              >
-                LinkedIn
-              </a>
+                  class="text-sm text-text-secondary hover:text-brand transition-colors"
+                >
+                  ← Back to Blog
+                </a>
             </div>
             <div>
               {nextPost && (

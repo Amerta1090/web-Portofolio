@@ -21,10 +21,10 @@ export default function CommitHeatmap({ data }: Props) {
         {data.map((week) => {
           const intensity = week.total / maxCommits;
           let bg = "bg-bg-tertiary";
-          if (intensity > 0.75) bg = "bg-accent";
-          else if (intensity > 0.5) bg = "bg-accent/70";
-          else if (intensity > 0.25) bg = "bg-accent-muted/60";
-          else if (intensity > 0) bg = "bg-accent-muted/30";
+          if (intensity > 0.75) bg = "bg-brand";
+          else if (intensity > 0.5) bg = "bg-brand/70";
+          else if (intensity > 0.25) bg = "bg-brand/50";
+          else if (intensity > 0) bg = "bg-brand/30";
 
           const date = new Date(week.week * 1000);
           const label = date.toLocaleDateString("en-US", {
@@ -53,10 +53,10 @@ export default function CommitHeatmap({ data }: Props) {
       <div className="flex items-center justify-end gap-1.5 pt-2">
         <span className="text-[10px] text-text-secondary">Less</span>
         <div className="w-3 h-3 rounded bg-bg-tertiary" />
-        <div className="w-3 h-3 rounded bg-accent-muted/30" />
-        <div className="w-3 h-3 rounded bg-accent-muted/60" />
-        <div className="w-3 h-3 rounded bg-accent/70" />
-        <div className="w-3 h-3 rounded bg-accent" />
+        <div className="w-3 h-3 rounded bg-brand/30" />
+        <div className="w-3 h-3 rounded bg-brand/50" />
+        <div className="w-3 h-3 rounded bg-brand/70" />
+        <div className="w-3 h-3 rounded bg-brand" />
         <span className="text-[10px] text-text-secondary">More</span>
       </div>
     </div>

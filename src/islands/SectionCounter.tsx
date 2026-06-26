@@ -38,7 +38,7 @@ export default function SectionCounter() {
 
   return (
     <div className="fixed right-4 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-center gap-3 pointer-events-none select-none">
-      <span className="text-xs font-medium text-accent tabular-nums">
+      <span className="text-xs font-medium text-brand tabular-nums">
         {String(current).padStart(2, "0")}
         <span className="text-text-secondary">
           {" "}
@@ -50,7 +50,7 @@ export default function SectionCounter() {
           <div
             key={id}
             className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-              SECTION_IDS.indexOf(id) < current ? "bg-accent" : "bg-bg-tertiary"
+              SECTION_IDS.indexOf(id) < current ? "bg-brand" : "bg-bg-tertiary"
             }`}
           />
         ))}

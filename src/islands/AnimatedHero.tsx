@@ -30,9 +30,33 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
 
   return (
     <section className="relative min-h-[calc(100vh-4rem)] flex flex-col justify-center overflow-hidden z-10">
+      {/* Background photo with overlay */}
+      <picture className="absolute inset-0 z-0">
+        <source
+          type="image/webp"
+          srcSet={`
+            /images/hero/hero-bg-768.webp 768w,
+            /images/hero/hero-bg-1280.webp 1280w,
+            /images/hero/hero-bg-1920.webp 1920w
+          `}
+          sizes="100vw"
+        />
+        <img
+          src="/images/hero/hero-bg-1920.jpg"
+          alt=""
+          className="object-cover w-full h-full"
+          loading="eager"
+          decoding="async"
+        />
+      </picture>
+      {/* Terracotta overlay for readability */}
+      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-bg-primary/85 via-bg-primary/60 to-bg-primary/40" />
+
+      {/* Decorative bottom fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 z-[1] bg-gradient-to-t from-bg-primary to-transparent" />
+
       <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8 relative z-20">
         <div className="max-w-4xl relative">
-          {/* Animated tagline */}
           <motion.div
             className="mb-6"
             initial={{ opacity: 0, x: -20 }}
@@ -42,7 +66,6 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
             <span className="text-xs text-text-secondary">{tagline}</span>
           </motion.div>
 
-          {/* Name - First line */}
           <motion.h1
             className="text-5xl md:text-7xl font-bold text-brand leading-tight"
             initial={{ opacity: 0, x: -80 }}
@@ -52,7 +75,6 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
             {firstName}
           </motion.h1>
 
-          {/* Name - Rest */}
           <motion.h1
             className="text-4xl md:text-6xl font-bold text-text-primary leading-tight mt-2"
             initial={{ opacity: 0, x: -60 }}
@@ -62,7 +84,6 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
             {restName}
           </motion.h1>
 
-          {/* Headline */}
           <motion.div
             className="mt-8"
             initial={{ opacity: 0, scale: 0.85 }}
@@ -76,7 +97,6 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
             </div>
           </motion.div>
 
-          {/* CTA Buttons */}
           <motion.div
             className="mt-12 flex gap-4 flex-wrap"
             initial={{ opacity: 0, y: 50 }}
@@ -99,16 +119,13 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
             </a>
           </motion.div>
 
-          {/* Scroll hint */}
           <motion.div
             className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
             initial={{ opacity: 0 }}
             animate={stage >= 4 ? { opacity: 1 } : {}}
             transition={{ delay: 0.5 }}
           >
-            <span className="text-[10px] text-text-secondary/30">
-              Scroll
-            </span>
+            <span className="text-[10px] text-text-secondary/30">Scroll</span>
             <motion.div
               className="w-px h-8 bg-border"
               animate={{ height: [8, 24, 8] }}

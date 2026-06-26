@@ -11,7 +11,7 @@ const tagVariants = cva(
         default: "border-transparent bg-surface-tertiary text-text-secondary",
         secondary: "border-transparent bg-surface-secondary text-text-primary",
         outline: "text-text-secondary border-border",
-        brand: "border-transparent bg-accent/10 text-accent",
+        brand: "border-transparent bg-brand/10 text-brand",
       },
     },
     defaultVariants: {

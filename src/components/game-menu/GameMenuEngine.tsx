@@ -585,7 +585,7 @@ const SidebarNavItem: React.FC<{
         </span>
         {hasChildren && (
           <svg
-            className="w-3 h-3 text-accent/60"
+            className="w-3 h-3 text-text-secondary/40"
             viewBox="0 0 16 16"
             fill="none"
             stroke="currentColor"
@@ -608,7 +608,7 @@ const SidebarNavItem: React.FC<{
         {isActive && (
           <motion.div
             layoutId="sidebarIndicator"
-            className="w-2 h-2 bg-accent"
+            className="w-2 h-2 bg-brand"
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
           />
         )}
@@ -630,7 +630,7 @@ const Sidebar: React.FC<{
 
   return (
     <motion.div
-      className="w-[280px] h-full bg-bg-secondary/95 backdrop-blur-sm flex flex-col border-r border-accent/20 relative z-10"
+      className="w-[280px] h-full bg-bg-secondary/95 backdrop-blur-sm flex flex-col border-r border-border relative z-10"
       initial={{ x: -280 }}
       animate={{ x: 0 }}
       exit={{ x: -280 }}
