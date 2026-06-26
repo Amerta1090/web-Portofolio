@@ -37,6 +37,7 @@ export interface ButtonProps
   loading?: boolean;
   icon?: React.ReactNode;
   iconPosition?: "left" | "right";
+  href?: string;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -51,10 +52,19 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       iconPosition = "left",
       children,
       disabled,
+      href,
       ...props
     },
     ref,
   ) => {
+    if (href) {
+      return (
+        <a href={href} className={cn(buttonVariants({ variant, size, className }))} {...props}>
+          {children}
+        </a>
+      );
+    }
+
     const Comp = asChild ? "span" : "button";
 
     return (
