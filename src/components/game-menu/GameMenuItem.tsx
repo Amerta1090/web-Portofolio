@@ -1,6 +1,5 @@
 import { type Variants, motion } from "framer-motion";
 import type React from "react";
-import { MenuCursor } from "./MenuCursor";
 
 interface GameMenuItemProps {
   label: string;
@@ -14,23 +13,20 @@ interface GameMenuItemProps {
 }
 
 const menuItemVariants: Variants = {
-  hidden: { opacity: 0, x: -50, skewX: -10, scale: 0.9 },
+  hidden: { opacity: 0, x: -30, scale: 0.95 },
   visible: {
     opacity: 1,
     x: 0,
-    skewX: 0,
     scale: 1,
     transition: { type: "spring", stiffness: 300, damping: 20 },
   },
   hover: {
-    scale: 1.05,
-    x: 15,
-    skewX: -5,
+    scale: 1.02,
+    x: 8,
     transition: { type: "spring", stiffness: 400, damping: 10 },
   },
   tap: {
-    scale: 0.95,
-    filter: "brightness(1.5)",
+    scale: 0.97,
     transition: { duration: 0.1 },
   },
 };
@@ -47,7 +43,7 @@ export const GameMenuItem: React.FC<GameMenuItemProps> = ({
 }) => {
   return (
     <motion.div
-      className="relative mb-4 last:mb-0 cursor-pointer"
+      className="relative mb-2 last:mb-0 cursor-pointer"
       variants={menuItemVariants}
       initial="hidden"
       animate="visible"
@@ -56,28 +52,22 @@ export const GameMenuItem: React.FC<GameMenuItemProps> = ({
       onHoverStart={() => onHover(index)}
       onClick={() => onClick(href)}
     >
-      {isActive && <MenuCursor />}
-
       <div
-        className={`flex items-center px-4 py-3 border-2 transition-colors duration-200 ${
+        className={`flex items-center px-4 py-3 rounded-lg border transition-colors duration-200 ${
           isActive
-            ? "border-accent text-accent glitch-hover pulse-glow"
-            : "border-border text-text-primary"
+            ? "border-brand bg-brand/10 text-brand"
+            : "border-border text-text-primary hover:border-brand/30"
         }`}
-        data-text={label}
-        style={{ transform: "skewX(-10deg)" }}
       >
-        <div className="flex-1 flex items-center gap-4" style={{ transform: "skewX(10deg)" }}>
-          {icon && <span className="text-xl">{icon}</span>}
-          <span className="text-2xl font-bold uppercase tracking-wider font-mono">{label}</span>
+        <div className="flex-1 flex items-center gap-3">
+          {icon && <span className="text-lg">{icon}</span>}
+          <span className="text-base font-medium text-text-primary">{label}</span>
         </div>
 
         {shortcut && (
-          <div style={{ transform: "skewX(10deg)" }}>
-            <span className="text-xs font-mono font-bold bg-bg-tertiary px-2 py-1 border border-border">
-              {shortcut}
-            </span>
-          </div>
+          <span className="text-xs text-text-secondary/40 bg-bg-tertiary px-2 py-0.5 rounded">
+            {shortcut}
+          </span>
         )}
       </div>
     </motion.div>

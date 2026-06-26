@@ -17,6 +17,7 @@ export default {
         brand: {
           DEFAULT: "rgb(var(--color-brand-rgb) / <alpha-value>)",
           muted: "rgb(var(--color-brand-muted-rgb) / <alpha-value>)",
+          warm: "rgb(var(--color-brand-warm-rgb) / <alpha-value>)",
         },
         border: "rgb(var(--color-border-rgb) / <alpha-value>)",
         bg: {
@@ -88,49 +89,13 @@ export default {
         40: "160px",
       },
       animation: {
-        glitch: "glitch-anim 0.4s infinite linear alternate-reverse",
-        halftone: "halftone-move 10s linear infinite",
-        "pulse-ring": "pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-        "border-rotate": "border-rotate 4s linear infinite",
         "reveal-up": "reveal-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards",
         fadeIn: "fadeIn 0.4s ease-out forwards",
       },
       keyframes: {
-        "glitch-anim": {
-          "0%": { clipPath: "inset(10% 0 80% 0)", transform: "translate(-2px, 2px) skewX(-15deg)" },
-          "20%": {
-            clipPath: "inset(80% 0 10% 0)",
-            transform: "translate(2px, -2px) skewX(-15deg)",
-          },
-          "40%": {
-            clipPath: "inset(40% 0 50% 0)",
-            transform: "translate(-2px, 2px) skewX(-15deg)",
-          },
-          "60%": { clipPath: "inset(90% 0 5% 0)", transform: "translate(2px, -2px) skewX(-15deg)" },
-          "80%": {
-            clipPath: "inset(20% 0 60% 0)",
-            transform: "translate(-2px, 2px) skewX(-15deg)",
-          },
-          "100%": {
-            clipPath: "inset(50% 0 30% 0)",
-            transform: "translate(2px, -2px) skewX(-15deg)",
-          },
-        },
-        "halftone-move": {
-          "0%": { backgroundPosition: "0 0, 10px 10px" },
-          "100%": { backgroundPosition: "-40px -40px, -30px -30px" },
-        },
-        "pulse-ring": {
-          "0%": { boxShadow: "0 0 0 0 var(--color-brand-glow)" },
-          "70%": { boxShadow: "0 0 0 15px transparent" },
-          "100%": { boxShadow: "0 0 0 0 transparent" },
-        },
-        "border-rotate": {
-          to: { transform: "rotate(360deg)" },
-        },
         "reveal-up": {
-          from: { opacity: "0", transform: "translateY(40px) skewX(-5deg)" },
-          to: { opacity: "1", transform: "translateY(0) skewX(0deg)" },
+          from: { opacity: "0", transform: "translateY(40px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
         },
         fadeIn: {
           from: { opacity: "0", transform: "translateY(12px)" },

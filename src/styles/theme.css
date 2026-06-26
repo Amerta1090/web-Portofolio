@@ -3,22 +3,24 @@
   --radius: 0.5rem;
 
   /* ── Semantic tokens ── */
-  --color-surface-primary: #ffffff;
-  --color-surface-primary-rgb: 255 255 255;
-  --color-surface-secondary: #f8f9fc;
-  --color-surface-secondary-rgb: 248 249 252;
-  --color-surface-tertiary: #f1f2f6;
-  --color-surface-tertiary-rgb: 241 242 246;
-  --color-text-primary: #0f1117;
-  --color-text-primary-rgb: 15 17 23;
-  --color-text-secondary: #6b7280;
-  --color-text-secondary-rgb: 107 114 128;
-  --color-brand: #6c47ff;
-  --color-brand-rgb: 108 71 255;
-  --color-brand-muted: #8b6fff;
-  --color-brand-muted-rgb: 139 111 255;
-  --color-border: #e5e7eb;
-  --color-border-rgb: 229 231 235;
+  --color-surface-primary: #fafaf8;
+  --color-surface-primary-rgb: 250 250 248;
+  --color-surface-secondary: #f4f5f2;
+  --color-surface-secondary-rgb: 244 245 242;
+  --color-surface-tertiary: #edefea;
+  --color-surface-tertiary-rgb: 237 239 234;
+  --color-text-primary: #121310;
+  --color-text-primary-rgb: 18 19 16;
+  --color-text-secondary: #6b7268;
+  --color-text-secondary-rgb: 107 114 104;
+  --color-brand: #7a8c6f;
+  --color-brand-rgb: 122 140 111;
+  --color-brand-muted: #8fa284;
+  --color-brand-muted-rgb: 143 162 132;
+  --color-brand-warm: #c17f59;
+  --color-brand-warm-rgb: 193 127 89;
+  --color-border: #e2e4de;
+  --color-border-rgb: 226 228 222;
 
   /* ── Backward-compatible legacy tokens ── */
   --bg-primary: var(--color-surface-primary);
@@ -36,26 +38,30 @@
   --accent-muted: var(--color-brand-muted);
   --accent-muted-rgb: var(--color-brand-muted-rgb);
   --accent-glow: rgba(var(--color-brand-rgb), 0.15);
+  --accent-warm: var(--color-brand-warm);
+  --accent-warm-rgb: var(--color-brand-warm-rgb);
   --border: var(--color-border);
 }
 
 .light.dark-mode {
-  --color-surface-primary: #0c0e12;
-  --color-surface-primary-rgb: 12 14 18;
-  --color-surface-secondary: #14171c;
-  --color-surface-secondary-rgb: 20 23 28;
-  --color-surface-tertiary: #1e2230;
-  --color-surface-tertiary-rgb: 30 34 48;
-  --color-text-primary: #ededef;
-  --color-text-primary-rgb: 237 237 239;
-  --color-text-secondary: #9ca3af;
-  --color-text-secondary-rgb: 156 163 175;
-  --color-brand: #6c47ff;
-  --color-brand-rgb: 108 71 255;
-  --color-brand-muted: #4b33b3;
-  --color-brand-muted-rgb: 75 51 179;
-  --color-border: #2a2e3a;
-  --color-border-rgb: 42 46 58;
+  --color-surface-primary: #0e0f0c;
+  --color-surface-primary-rgb: 14 15 12;
+  --color-surface-secondary: #151714;
+  --color-surface-secondary-rgb: 21 23 20;
+  --color-surface-tertiary: #1e211d;
+  --color-surface-tertiary-rgb: 30 33 29;
+  --color-text-primary: #ededed;
+  --color-text-primary-rgb: 237 237 237;
+  --color-text-secondary: #9ca39c;
+  --color-text-secondary-rgb: 156 163 156;
+  --color-brand: #7a8c6f;
+  --color-brand-rgb: 122 140 111;
+  --color-brand-muted: #5d6b54;
+  --color-brand-muted-rgb: 93 107 84;
+  --color-brand-warm: #c17f59;
+  --color-brand-warm-rgb: 193 127 89;
+  --color-border: #2a3028;
+  --color-border-rgb: 42 48 40;
 
   --bg-primary: var(--color-surface-primary);
   --bg-primary-rgb: var(--color-surface-primary-rgb);
@@ -72,26 +78,30 @@
   --accent-muted: var(--color-brand-muted);
   --accent-muted-rgb: var(--color-brand-muted-rgb);
   --accent-glow: rgba(var(--color-brand-rgb), 0.3);
+  --accent-warm: var(--color-brand-warm);
+  --accent-warm-rgb: var(--color-brand-warm-rgb);
   --border: var(--color-border);
 }
 
 .dark {
-  --color-surface-primary: #0c0e12;
-  --color-surface-primary-rgb: 12 14 18;
-  --color-surface-secondary: #14171c;
-  --color-surface-secondary-rgb: 20 23 28;
-  --color-surface-tertiary: #1e2230;
-  --color-surface-tertiary-rgb: 30 34 48;
-  --color-text-primary: #ededef;
-  --color-text-primary-rgb: 237 237 239;
-  --color-text-secondary: #9ca3af;
-  --color-text-secondary-rgb: 156 163 175;
-  --color-brand: #6c47ff;
-  --color-brand-rgb: 108 71 255;
-  --color-brand-muted: #4b33b3;
-  --color-brand-muted-rgb: 75 51 179;
-  --color-border: #2a2e3a;
-  --color-border-rgb: 42 46 58;
+  --color-surface-primary: #0e0f0c;
+  --color-surface-primary-rgb: 14 15 12;
+  --color-surface-secondary: #151714;
+  --color-surface-secondary-rgb: 21 23 20;
+  --color-surface-tertiary: #1e211d;
+  --color-surface-tertiary-rgb: 30 33 29;
+  --color-text-primary: #ededed;
+  --color-text-primary-rgb: 237 237 237;
+  --color-text-secondary: #9ca39c;
+  --color-text-secondary-rgb: 156 163 156;
+  --color-brand: #7a8c6f;
+  --color-brand-rgb: 122 140 111;
+  --color-brand-muted: #5d6b54;
+  --color-brand-muted-rgb: 93 107 84;
+  --color-brand-warm: #c17f59;
+  --color-brand-warm-rgb: 193 127 89;
+  --color-border: #2a3028;
+  --color-border-rgb: 42 48 40;
 
   --bg-primary: var(--color-surface-primary);
   --bg-primary-rgb: var(--color-surface-primary-rgb);
@@ -108,41 +118,7 @@
   --accent-muted: var(--color-brand-muted);
   --accent-muted-rgb: var(--color-brand-muted-rgb);
   --accent-glow: rgba(var(--color-brand-rgb), 0.3);
-  --border: var(--color-border);
-}
-
-.game-mode {
-  --color-surface-primary: #050505;
-  --color-surface-primary-rgb: 5 5 5;
-  --color-surface-secondary: #0d0d0d;
-  --color-surface-secondary-rgb: 13 13 13;
-  --color-surface-tertiary: #141414;
-  --color-surface-tertiary-rgb: 20 20 20;
-  --color-text-primary: #ffffff;
-  --color-text-primary-rgb: 255 255 255;
-  --color-text-secondary: #888888;
-  --color-text-secondary-rgb: 136 136 136;
-  --color-brand: #6c47ff;
-  --color-brand-rgb: 108 71 255;
-  --color-brand-muted: #4b33b3;
-  --color-brand-muted-rgb: 75 51 179;
-  --color-border: #2a2e3a;
-  --color-border-rgb: 42 46 58;
-
-  --bg-primary: var(--color-surface-primary);
-  --bg-primary-rgb: var(--color-surface-primary-rgb);
-  --bg-secondary: var(--color-surface-secondary);
-  --bg-secondary-rgb: var(--color-surface-secondary-rgb);
-  --bg-tertiary: var(--color-surface-tertiary);
-  --bg-tertiary-rgb: var(--color-surface-tertiary-rgb);
-  --text-primary: var(--color-text-primary);
-  --text-primary-rgb: var(--color-text-primary-rgb);
-  --text-secondary: var(--color-text-secondary);
-  --text-secondary-rgb: var(--color-text-secondary-rgb);
-  --accent: var(--color-brand);
-  --accent-rgb: var(--color-brand-rgb);
-  --accent-muted: var(--color-brand-muted);
-  --accent-muted-rgb: var(--color-brand-muted-rgb);
-  --accent-glow: rgba(var(--color-brand-rgb), 0.4);
+  --accent-warm: var(--color-brand-warm);
+  --accent-warm-rgb: var(--color-brand-warm-rgb);
   --border: var(--color-border);
 }

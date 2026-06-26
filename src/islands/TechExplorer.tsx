@@ -50,7 +50,7 @@ export default function TechExplorer({ skills }: Props) {
       {activeTech && (
         <div className="p-4 bg-bg-secondary border border-border rounded-xl animate-fadeIn">
           <div className="flex items-center gap-3 mb-1">
-            <span className="text-xs font-semibold text-accent uppercase tracking-wider">
+            <span className="text-xs font-semibold text-brand">
               How it was used
             </span>
           </div>

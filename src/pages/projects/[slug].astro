@@ -123,25 +123,25 @@ function extractReadmeSection(content: string, heading: string): string | null {
                 <div class="prose prose-sm max-w-none text-text-secondary space-y-4">
                   {extractReadmeSection(readme.content, "Description") && (
                     <div>
-                      <h3 class="text-sm font-semibold text-text-primary uppercase tracking-wider mb-2">Description</h3>
+                      <h3 class="text-sm font-semibold text-text-primary mb-2">Description</h3>
                       <p class="leading-relaxed">{extractReadmeSection(readme.content, "Description")}</p>
                     </div>
                   )}
                   {extractReadmeSection(readme.content, "Features") && (
                     <div>
-                      <h3 class="text-sm font-semibold text-text-primary uppercase tracking-wider mb-2">Features</h3>
+                      <h3 class="text-sm font-semibold text-text-primary mb-2">Features</h3>
                       <p class="leading-relaxed">{extractReadmeSection(readme.content, "Features")}</p>
                     </div>
                   )}
                   {extractReadmeSection(readme.content, "Installation") && (
                     <div>
-                      <h3 class="text-sm font-semibold text-text-primary uppercase tracking-wider mb-2">Installation</h3>
-                      <p class="leading-relaxed font-mono text-xs">{extractReadmeSection(readme.content, "Installation")}</p>
+                      <h3 class="text-sm font-semibold text-text-primary mb-2">Installation</h3>
+                      <p class="leading-relaxed text-xs">{extractReadmeSection(readme.content, "Installation")}</p>
                     </div>
                   )}
                   {extractReadmeSection(readme.content, "Tech") && (
                     <div>
-                      <h3 class="text-sm font-semibold text-text-primary uppercase tracking-wider mb-2">Tech Stack</h3>
+                      <h3 class="text-sm font-semibold text-text-primary mb-2">Tech Stack</h3>
                       <p class="leading-relaxed">{extractReadmeSection(readme.content, "Tech")}</p>
                     </div>
                   )}

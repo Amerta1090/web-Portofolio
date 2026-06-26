@@ -8,15 +8,12 @@ import profileData from "../../../data/profile.json";
 import projectsData from "../../../data/projects.json";
 import { useHaptics } from "../../lib/useHaptics";
 import { SubMenuPanel } from "./SubMenuPanel";
-import { TitleScreen } from "./TitleScreen";
 import { ExperienceScreen } from "./screens/ExperienceScreen";
 import { HomeScreen } from "./screens/HomeScreen";
 import { ProjectsScreen } from "./screens/ProjectsScreen";
 import { SkillsScreen } from "./screens/SkillsScreen";
 
 type MenuState =
-  | { type: "boot" }
-  | { type: "title" }
   | { type: "main_menu" }
   | { type: "sub_menu"; parentId: string; parentLabel: string }
   | { type: "screen"; screenId: string }
@@ -510,9 +507,6 @@ const MENU_TREE: MenuItem[] = [
 
 const getDepth = (state: MenuState): number => {
   switch (state.type) {
-    case "boot":
-    case "title":
-      return -1;
     case "main_menu":
       return 0;
     case "sub_menu":
@@ -546,73 +540,7 @@ const findMenuItem = (items: MenuItem[], id: string): MenuItem | undefined => {
   return undefined;
 };
 
-const GameMenuParticles: React.FC = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const particles: {
-      x: number;
-      y: number;
-      vx: number;
-      vy: number;
-      size: number;
-      alpha: number;
-    }[] = [];
-    for (let i = 0; i < 25; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
-        size: Math.random() * 1.5 + 0.5,
-        alpha: Math.random() * 0.3 + 0.1,
-      });
-    }
-
-    let anim: number;
-    let running = true;
-    const animate = () => {
-      if (!running) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach((p) => {
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x < 0) p.x = canvas.width;
-        if (p.x > canvas.width) p.x = 0;
-        if (p.y < 0) p.y = canvas.height;
-        if (p.y > canvas.height) p.y = 0;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(230, 0, 18, ${p.alpha})`;
-        ctx.fill();
-      });
-      anim = requestAnimationFrame(animate);
-    };
-    animate();
-
-    const handleResize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      running = false;
-      cancelAnimationFrame(anim);
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-0" />;
-};
+/* Particles removed in Sprint 5 */
 
 const SidebarNavItem: React.FC<{
   item: MenuItem;
@@ -641,16 +569,16 @@ const SidebarNavItem: React.FC<{
       whileTap={{ scale: 0.97 }}
     >
       <div
-        className={`py-4 px-6 border-r-4 flex items-center gap-4 transition-all duration-150 ${
+        className={`py-3 px-5 border-l-2 flex items-center gap-3 transition-all duration-150 rounded-r-lg ${
           isActive
-            ? "border-accent bg-accent/10 text-accent"
-            : "border-transparent text-text-secondary hover:text-text-primary hover:border-accent/30"
+            ? "border-brand bg-brand/10 text-brand"
+            : "border-transparent text-text-secondary hover:text-text-primary hover:border-brand/30"
         }`}
       >
-        <span className={`flex-shrink-0 ${isActive ? "text-accent" : ""}`}>{item.icon}</span>
+        <span className={`flex-shrink-0 ${isActive ? "text-brand" : ""}`}>{item.icon}</span>
         <span
-          className={`flex-1 text-xl font-black uppercase tracking-[0.15em] block leading-none ${
-            isActive ? "text-accent" : ""
+          className={`flex-1 text-base font-medium ${
+            isActive ? "text-brand" : ""
           }`}
         >
           {item.label}
@@ -708,21 +636,9 @@ const Sidebar: React.FC<{
       exit={{ x: -280 }}
       transition={{ type: "spring", stiffness: 200, damping: 25 }}
     >
-      <div className="px-6 pt-6 pb-3 border-b border-accent/10">
-        <div className="flex items-center gap-3 mb-1">
-          <div className="w-2 h-2 bg-accent pulse-ring" />
-          <span className="text-xs font-mono text-accent tracking-widest uppercase">
-            System Menu
-          </span>
-          <span className="text-[10px] font-mono text-text-secondary/40 ml-auto border border-accent/20 px-1.5 py-0.5">
-            LV.{depth}
-          </span>
-        </div>
-        <h2
-          className="text-4xl font-black uppercase text-accent tracking-[0.2em] p5-text-stroke"
-          style={{ WebkitTextStroke: "1px #e60012" }}
-        >
-          NAV
+      <div className="px-5 pt-5 pb-3 border-b border-border">
+        <h2 className="text-lg font-semibold text-text-primary">
+          Menu
         </h2>
       </div>
 
@@ -739,23 +655,23 @@ const Sidebar: React.FC<{
               playHoverSound={playHoverSound}
             />
             {idx < 9 && (
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-mono text-text-secondary/20 pointer-events-none">
-                [{shortcuts[idx]}]
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-text-secondary/30 pointer-events-none">
+                {shortcuts[idx]}
               </span>
             )}
           </div>
         ))}
       </div>
 
-      <div className="px-6 py-4 border-t border-accent/10">
+      <div className="px-5 py-4 border-t border-border">
         <button
-          className="w-full flex items-center gap-3 text-sm font-mono text-text-secondary hover:text-accent transition-colors group"
+          className="flex items-center gap-2 text-sm text-text-secondary hover:text-brand transition-colors"
           onClick={onClose}
         >
-          <span className="border border-accent/30 px-2 py-0.5 text-accent text-xs group-hover:bg-accent/10 transition-colors">
-            ESC
-          </span>
-          <span className="tracking-widest uppercase">Exit</span>
+          <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M10 3l-5 5 5 5" />
+          </svg>
+          Exit
         </button>
       </div>
     </motion.div>
@@ -767,17 +683,9 @@ const HUD: React.FC<{ activeLabel: string; depth: number; totalItems: number }> 
   depth,
   totalItems,
 }) => (
-  <div className="absolute top-0 right-0 z-20 p-6 flex items-start gap-6 pointer-events-none">
-    <div className="text-right">
-      <div className="text-xs font-mono text-accent tracking-widest uppercase mb-1">
-        {activeLabel.toUpperCase()}
-      </div>
-      <div className="text-[10px] font-mono text-text-secondary/50 tracking-wider">
-        LV.{depth} // {totalItems} ITEMS
-      </div>
-    </div>
-    <div className="w-10 h-10 border border-accent/30 flex items-center justify-center">
-      <div className="w-2 h-2 bg-accent pulse-ring" />
+  <div className="absolute top-0 right-0 z-20 p-6 pointer-events-none">
+    <div className="text-xs text-text-secondary">
+      {activeLabel} &middot; {totalItems} items
     </div>
   </div>
 );
@@ -816,27 +724,21 @@ const ContactScreen: React.FC = () => {
   const profile = PROFILE_DATA;
   return (
     <div className="w-full h-full flex flex-col justify-center px-16 relative overflow-hidden">
-      <div className="flex items-center gap-3 mb-6">
-        <span className="w-2 h-2 bg-accent pulse-ring" />
-        <span className="text-xs font-mono text-accent tracking-[0.2em] uppercase">
-          Connect // Contact
-        </span>
+      <div className="mb-6">
+        <span className="text-xs text-text-secondary">Connect / Contact</span>
       </div>
-      <h2
-        className="text-6xl font-black uppercase tracking-tighter text-text-primary mb-6"
-        style={{ transform: "skewX(-12deg)" }}
-      >
-        <span className="text-accent">Get In</span>
+      <h2 className="text-4xl font-bold text-text-primary mb-6">
+        <span className="text-brand">Get In</span>
         <br />
         <span>Touch</span>
       </h2>
       <div className="flex flex-col gap-4 max-w-md">
         <a
           href={`mailto:${profile.contact?.email}`}
-          className="flex items-center gap-4 px-5 py-4 border border-accent/20 hover:border-accent/40 transition-colors group"
+          className="flex items-center gap-4 px-5 py-4 border border-border hover:border-brand/40 rounded-lg transition-colors group"
         >
           <svg
-            className="w-5 h-5 text-accent"
+            className="w-5 h-5 text-text-secondary"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -845,7 +747,7 @@ const ContactScreen: React.FC = () => {
             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
             <polyline points="22,6 12,13 2,6" />
           </svg>
-          <span className="font-mono text-sm text-text-primary group-hover:text-accent transition-colors">
+          <span className="text-sm text-text-primary group-hover:text-brand transition-colors">
             {profile.contact?.email}
           </span>
         </a>
@@ -853,10 +755,10 @@ const ContactScreen: React.FC = () => {
           href={profile.contact?.linkedin}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-4 px-5 py-4 border border-accent/20 hover:border-accent/40 transition-colors group"
+          className="flex items-center gap-4 px-5 py-4 border border-border hover:border-brand/40 rounded-lg transition-colors group"
         >
           <svg
-            className="w-5 h-5 text-accent"
+            className="w-5 h-5 text-text-secondary"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -866,7 +768,7 @@ const ContactScreen: React.FC = () => {
             <rect x="2" y="9" width="4" height="12" />
             <circle cx="4" cy="4" r="2" />
           </svg>
-          <span className="font-mono text-sm text-text-primary group-hover:text-accent transition-colors">
+          <span className="text-sm text-text-primary group-hover:text-brand transition-colors">
             LinkedIn
           </span>
         </a>
@@ -874,10 +776,10 @@ const ContactScreen: React.FC = () => {
           href={profile.contact?.github}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-4 px-5 py-4 border border-accent/20 hover:border-accent/40 transition-colors group"
+          className="flex items-center gap-4 px-5 py-4 border border-border hover:border-brand/40 rounded-lg transition-colors group"
         >
           <svg
-            className="w-5 h-5 text-accent"
+            className="w-5 h-5 text-text-secondary"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -885,7 +787,7 @@ const ContactScreen: React.FC = () => {
           >
             <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
           </svg>
-          <span className="font-mono text-sm text-text-primary group-hover:text-accent transition-colors">
+          <span className="text-sm text-text-primary group-hover:text-brand transition-colors">
             GitHub
           </span>
         </a>
@@ -901,36 +803,18 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
   const { playHoverSound, playSelectSound } = useHaptics();
   const [mounted, setMounted] = useState(false);
 
-  const [menuState, setMenuState] = useState<MenuState>({ type: "boot" });
+  const [menuState, setMenuState] = useState<MenuState>({ type: "main_menu" });
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [subIndex, setSubIndex] = useState(0);
   const [prevDepth, setPrevDepth] = useState(-1);
-  const [skipBoot, setSkipBoot] = useState(false);
 
   const keyRepeatRef = useRef<number | null>(null);
   const keyRepeatTimeoutRef = useRef<number | null>(null);
-  const initializedRef = useRef(false);
 
   useEffect(() => {
     setMounted(true);
-    try {
-      const saved = localStorage.getItem("menu-skip-boot");
-      if (saved === "true") {
-        setSkipBoot(true);
-        setMenuState({ type: "main_menu" });
-      }
-    } catch {
-      /* ignore */
-    }
   }, []);
-
-  useEffect(() => {
-    if (isOpen && skipBoot && !initializedRef.current) {
-      initializedRef.current = true;
-      setMenuState({ type: "main_menu" });
-    }
-  }, [isOpen, skipBoot]);
 
   const navigateTo = useCallback(
     (newState: MenuState, label: string, id: string) => {
@@ -1111,25 +995,6 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
         : 0;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (menuState.type === "title" || menuState.type === "boot") {
-        if (e.key === "Enter" || e.key === " " || e.key === "Escape") {
-          e.preventDefault();
-          if (menuState.type === "boot") {
-            setMenuState({ type: "title" });
-          } else {
-            setMenuState({ type: "main_menu" });
-            setPrevDepth(-1);
-            try {
-              localStorage.setItem("menu-skip-boot", "true");
-            } catch {
-              /* ignore */
-            }
-          }
-          playSelectSound();
-        }
-        return;
-      }
-
       if (e.key === "Escape") {
         e.preventDefault();
         if (history.length > 0) {
@@ -1285,31 +1150,25 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
         return (
           <ScreenTransition key="certifications" direction={animDir}>
             <div className="w-full h-full flex flex-col justify-center px-16">
-              <div className="flex items-center gap-3 mb-6">
-                <span className="w-2 h-2 bg-accent pulse-ring" />
-                <span className="text-xs font-mono text-accent tracking-[0.2em] uppercase">
-                  Credentials // Certifications
-                </span>
+              <div className="mb-6">
+                <span className="text-xs text-text-secondary">Credentials / Certifications</span>
               </div>
-              <h2
-                className="text-5xl font-black uppercase tracking-tighter text-text-primary mb-6"
-                style={{ transform: "skewX(-12deg)" }}
-              >
-                <span className="text-accent">{CERTS.length}</span>
-                <span className="ml-3">Certifications</span>
+              <h2 className="text-3xl font-bold text-text-primary mb-6">
+                <span className="text-brand">{CERTS.length}</span>
+                <span className="ml-2">Certifications</span>
               </h2>
               <div className="grid grid-cols-2 gap-3 overflow-y-auto max-h-[60vh] pr-4">
                 {CERTS.map((cert: any, idx: number) => (
                   <div
                     key={idx}
-                    className="border border-accent/10 bg-bg-secondary/30 p-4 hover:border-accent/40 transition-colors"
+                    className="border border-border bg-bg-secondary/30 rounded-lg p-4 hover:border-brand/40 transition-colors"
                   >
-                    <div className="text-xs font-black uppercase tracking-wider text-text-primary mb-1">
+                    <div className="text-sm font-medium text-text-primary mb-1">
                       {cert.title}
                     </div>
-                    <div className="text-[10px] font-mono text-accent">
+                    <div className="text-xs text-text-secondary">
                       {cert.issuer}
-                      {cert.date ? ` • ${cert.date}` : ""}
+                      {cert.date ? ` · ${cert.date}` : ""}
                     </div>
                   </div>
                 ))}
@@ -1333,8 +1192,7 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
   };
 
   const showSidebar = menuState.type === "main_menu" || menuState.type === "sub_menu";
-  const showHUD =
-    menuState.type !== "boot" && menuState.type !== "title" && menuState.type !== "exit";
+  const showHUD = menuState.type !== "exit";
   const showSubPanel = menuState.type === "sub_menu" || menuState.type === "screen";
   const showScreen = menuState.type === "screen";
 
@@ -1361,126 +1219,78 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
           exit={{ opacity: 0, transition: { duration: 0.15 } }}
           style={{ pointerEvents: "auto" }}
         >
-          {/* Title Screen / Boot */}
-          {menuState.type === "boot" || menuState.type === "title" ? (
-            <TitleScreen
-              showBoot={menuState.type === "boot"}
-              onBootComplete={() => setMenuState({ type: "title" })}
-              onStart={() => {
-                setMenuState({ type: "main_menu" });
-                setPrevDepth(-1);
-                try {
-                  localStorage.setItem("menu-skip-boot", "true");
-                } catch {
-                  /* ignore */
-                }
+          {/* Sidebar */}
+          {showSidebar && (
+            <Sidebar
+              items={currentItems}
+              activeIndex={getSidebarActiveIndex()}
+              depth={currentDepth}
+              onSelect={
+                menuState.type === "main_menu"
+                  ? handleSelectMainItem
+                  : (idx: number) => {
+                      setActiveIndex(idx);
+                      const item = MENU_TREE[idx];
+                      if (item?.children) {
+                        navigateTo(
+                          { type: "sub_menu", parentId: item.id, parentLabel: item.label },
+                          item.label,
+                          item.id,
+                        );
+                      } else if (item?.screen) {
+                        navigateTo(
+                          { type: "screen", screenId: item.screen },
+                          item.label,
+                          item.id,
+                        );
+                      } else if (item?.href) {
+                        window.location.href = item.href;
+                      }
+                    }
+              }
+              onHover={(idx: number) => setActiveIndex(idx)}
+              onClose={() => {
+                if (history.length > 0) navigateBack();
+                else onClose();
               }}
+              playHoverSound={playHoverSound}
             />
-          ) : (
-            <>
-              {/* Scanlines + Vignette */}
-              <div className="fixed inset-0 z-0 pointer-events-none game-mode-scanlines" />
-              <div
-                className="fixed inset-0 z-[1] pointer-events-none"
-                style={{
-                  background:
-                    "radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.6) 100%)",
-                }}
-              />
-
-              {/* Particles */}
-              <GameMenuParticles />
-
-              {/* Sidebar */}
-              {showSidebar && (
-                <Sidebar
-                  items={currentItems}
-                  activeIndex={getSidebarActiveIndex()}
-                  depth={currentDepth}
-                  onSelect={
-                    menuState.type === "main_menu"
-                      ? handleSelectMainItem
-                      : (idx: number) => {
-                          setActiveIndex(idx);
-                          const item = MENU_TREE[idx];
-                          if (item?.children) {
-                            navigateTo(
-                              { type: "sub_menu", parentId: item.id, parentLabel: item.label },
-                              item.label,
-                              item.id,
-                            );
-                          } else if (item?.screen) {
-                            navigateTo(
-                              { type: "screen", screenId: item.screen },
-                              item.label,
-                              item.id,
-                            );
-                          } else if (item?.href) {
-                            window.location.href = item.href;
-                          }
-                        }
-                  }
-                  onHover={(idx: number) => setActiveIndex(idx)}
-                  onClose={() => {
-                    if (history.length > 0) navigateBack();
-                    else onClose();
-                  }}
-                  playHoverSound={playHoverSound}
-                />
-              )}
-
-              {/* Main Content Area */}
-              <div className="flex-1 relative bg-bg-primary/90 backdrop-blur-sm overflow-hidden">
-                {showHUD && (
-                  <HUD
-                    activeLabel={getCurrentLabel()}
-                    depth={currentDepth}
-                    totalItems={currentItems.length}
-                  />
-                )}
-
-                {/* Sub-menu panel overlay */}
-                {showSubPanel && (
-                  <SubMenuPanel
-                    isOpen={menuState.type === "sub_menu"}
-                    title={menuState.type === "sub_menu" ? menuState.parentLabel : ""}
-                    breadcrumbs={getBreadcrumbs()}
-                    items={subMenuItems}
-                    activeIndex={menuState.type === "sub_menu" ? subIndex : -1}
-                    depth={currentDepth}
-                    onSelect={handleSelectSubItem}
-                    onHover={(idx: number) => setSubIndex(idx)}
-                    onBack={navigateBack}
-                  />
-                )}
-
-                {/* Screen content */}
-                <div
-                  className={`absolute inset-0 transition-opacity duration-200 ${showScreen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
-                >
-                  <div className="absolute inset-0 mt-16">
-                    <AnimatePresence mode="wait">{renderScreen()}</AnimatePresence>
-                  </div>
-                </div>
-
-                {/* Main menu hint */}
-
-                {menuState.type === "main_menu" && (
-                  <div className="absolute bottom-6 left-6 flex items-center gap-3 text-[10px] font-mono text-text-secondary/30 pointer-events-none">
-                    <span>↑↓ NAVIGATE</span>
-                    <span className="w-1 h-1 bg-accent/30" />
-                    <span>→ OPEN</span>
-                    <span className="w-1 h-1 bg-accent/30" />
-                    <span>ENTER SELECT</span>
-                    <span className="w-1 h-1 bg-accent/30" />
-                    <span>ESC BACK</span>
-                    <span className="w-1 h-1 bg-accent/30" />
-                    <span>[1-9] SHORTCUT</span>
-                  </div>
-                )}
-              </div>
-            </>
           )}
+
+          {/* Main Content Area */}
+          <div className="flex-1 relative bg-bg-primary overflow-hidden">
+            {showHUD && (
+              <HUD
+                activeLabel={getCurrentLabel()}
+                depth={currentDepth}
+                totalItems={currentItems.length}
+              />
+            )}
+
+            {/* Sub-menu panel overlay */}
+            {showSubPanel && (
+              <SubMenuPanel
+                isOpen={menuState.type === "sub_menu"}
+                title={menuState.type === "sub_menu" ? menuState.parentLabel : ""}
+                breadcrumbs={getBreadcrumbs()}
+                items={subMenuItems}
+                activeIndex={menuState.type === "sub_menu" ? subIndex : -1}
+                depth={currentDepth}
+                onSelect={handleSelectSubItem}
+                onHover={(idx: number) => setSubIndex(idx)}
+                onBack={navigateBack}
+              />
+            )}
+
+            {/* Screen content */}
+            <div
+              className={`absolute inset-0 transition-opacity duration-200 ${showScreen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+            >
+              <div className="absolute inset-0 mt-16">
+                <AnimatePresence mode="wait">{renderScreen()}</AnimatePresence>
+              </div>
+            </div>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

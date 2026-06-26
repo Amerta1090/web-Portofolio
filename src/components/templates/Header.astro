@@ -7,22 +7,37 @@ const { currentPath = "/" } = Astro.props;
 import Container from "../atoms/Container.astro";
 import ThemeToggle from "../atoms/ThemeToggle.astro";
 import { GameMenuWrapper } from "../game-menu/GameMenuWrapper";
-import { GameModeToggle } from "../game-menu/GameModeToggle";
+
+const navLinks = [
+  { href: "/", label: "Home" },
+  { href: "/#experience", label: "Experience" },
+  { href: "/#projects", label: "Projects" },
+  { href: "/#skills", label: "Skills" },
+  { href: "/#contact", label: "Contact" },
+];
 ---
 
-<header class="fixed top-0 left-0 right-0 z-50 bg-bg-primary/80 backdrop-blur-md border-b border-accent/10">
+<header class="fixed top-0 left-0 right-0 z-50 bg-bg-primary/80 backdrop-blur-md border-b border-border">
   <Container>
     <nav class="flex items-center justify-between h-16" aria-label="Primary">
-      <a href="/" class="text-xl font-black text-accent hover:text-accent/80 transition-colors uppercase tracking-widest" aria-label="Home" style="transform: skewX(-8deg);">
-        <span class="flex items-center gap-2">
-          <span class="w-2 h-2 bg-accent inline-block pulse-ring" />
-          AMERTA
-        </span>
+      <a href="/" class="text-xl font-bold text-text-primary hover:text-brand transition-colors" aria-label="Home">
+        AMERTA
       </a>
+      <div class="hidden md:flex items-center gap-6">
+        {
+          navLinks.map((link) => (
+            <a
+              href={link.href}
+              class="text-sm text-text-secondary hover:text-brand transition-colors"
+            >
+              {link.label}
+            </a>
+          ))
+        }
+      </div>
       <div class="flex items-center gap-2">
-        <GameModeToggle client:load />
         <GameMenuWrapper client:load />
-        <div class="w-px h-5 bg-accent/20 mx-1"></div>
+        <div class="w-px h-5 bg-border mx-1"></div>
         <ThemeToggle />
       </div>
     </nav>

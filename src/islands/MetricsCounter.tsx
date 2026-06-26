@@ -61,12 +61,12 @@ export default function MetricsCounter({ metrics }: Props) {
       {metrics.map((m) => (
         <div
           key={m.label}
-          className="bg-bg-secondary/50 border border-accent/10 p-4 text-center hover:border-accent/30 transition-colors"
+          className="bg-bg-secondary/50 border border-border rounded-lg p-4 text-center hover:border-brand/30 transition-colors"
         >
-          <div className="text-3xl md:text-4xl font-black text-accent tracking-tighter">
+          <div className="text-3xl md:text-4xl font-bold text-brand">
             <AnimatedValue value={m.value} suffix={m.suffix} />
           </div>
-          <div className="mt-1 text-xs font-mono text-text-secondary/60 uppercase tracking-wider">
+          <div className="mt-1 text-xs text-text-secondary/60">
             {m.label}
           </div>
         </div>

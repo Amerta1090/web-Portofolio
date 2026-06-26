@@ -37,22 +37,21 @@ const grouped = certifications.reduce((acc: Record<string, Certification[]>, cer
 
 <div class="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
   <div class="mb-6">
-    <span class="text-xs font-mono text-accent border border-accent/30 px-2 py-1 uppercase tracking-widest">
-      {certifications.length} CERTIFICATIONS
+    <span class="text-xs text-text-secondary border border-border px-2 py-1 rounded">
+      {certifications.length} Certifications
     </span>
   </div>
   <div class="space-y-3">
     {
       Object.entries(grouped).map(([issuer, certs]) => (
-        <details class="group bg-bg-secondary/50 border border-accent/10 overflow-hidden">
-          <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-accent/5 transition-colors list-none">
+        <details class="group bg-bg-secondary/50 border border-border rounded-lg overflow-hidden">
+          <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-brand/5 transition-colors list-none rounded-lg">
             <div class="flex items-center gap-3">
-              <span class="text-accent">◆</span>
-              <h3 class="font-black uppercase tracking-wider text-text-primary text-sm">{issuer}</h3>
-              <span class="text-[10px] font-mono text-accent/60 border border-accent/20 px-1.5 py-0.5">{certs.length}</span>
+              <h3 class="font-semibold text-text-primary text-sm">{issuer}</h3>
+              <span class="text-[10px] text-text-secondary/60 border border-border px-1.5 py-0.5 rounded">{certs.length}</span>
             </div>
             <svg
-              class="w-4 h-4 text-accent/60 group-open:rotate-180 transition-transform duration-200"
+              class="w-4 h-4 text-text-secondary/40 group-open:rotate-180 transition-transform duration-200"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -61,29 +60,29 @@ const grouped = certifications.reduce((acc: Record<string, Certification[]>, cer
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </summary>
-          <div class="border-t border-accent/10">
+          <div class="border-t border-border">
             {certs.map((cert) => (
-              <div class="p-4 border-b border-accent/5 last:border-b-0 hover:bg-accent/5 transition-colors">
+              <div class="p-4 border-b border-border last:border-b-0 hover:bg-brand/5 transition-colors">
                 <div class="flex items-start justify-between gap-4">
                   <div>
-                    <p class="text-text-primary text-sm font-mono">
+                    <p class="text-text-primary text-sm">
                       {cert.url
-                        ? <a href={cert.url} target="_blank" rel="noopener noreferrer" class="hover:text-accent transition-colors">{cert.title}<span class="sr-only"> (opens in new tab)</span></a>
+                        ? <a href={cert.url} target="_blank" rel="noopener noreferrer" class="hover:text-brand transition-colors">{cert.title}<span class="sr-only"> (opens in new tab)</span></a>
                         : cert.title
                       }
                     </p>
                     {cert.date && (
-                      <p class="text-xs text-text-secondary/60 mt-0.5 font-mono">{formatDate(cert.date)}</p>
+                      <p class="text-xs text-text-secondary/60 mt-0.5">{formatDate(cert.date)}</p>
                     )}
                   </div>
                   {cert.credential_id && (
-                    <span class="text-[10px] font-mono text-text-secondary/30 flex-shrink-0">ID: {cert.credential_id}</span>
+                    <span class="text-[10px] text-text-secondary/30 flex-shrink-0">ID: {cert.credential_id}</span>
                   )}
                 </div>
                 {cert.skills && cert.skills.length > 0 && (
                   <div class="flex flex-wrap gap-1.5 mt-2">
                     {cert.skills.map((skill) => (
-                      <span class="text-[9px] font-mono px-1.5 py-0.5 bg-accent/5 text-accent/60 uppercase tracking-wider">{skill}</span>
+                      <span class="text-[9px] px-1.5 py-0.5 border border-border text-text-secondary rounded">{skill}</span>
                     ))}
                   </div>
                 )}
@@ -95,7 +94,7 @@ const grouped = certifications.reduce((acc: Record<string, Certification[]>, cer
     }
   </div>
   <div class="mt-8 text-center">
-    <a href="/certifications" class="inline-flex items-center gap-2 text-sm font-mono text-accent hover:text-accent-muted transition-colors uppercase tracking-wider group">
+    <a href="/certifications" class="inline-flex items-center gap-2 text-sm text-brand hover:text-brand-muted transition-colors group">
       View all {certifications.length} certifications
       <span class="group-hover:translate-x-1 transition-transform">→</span>
     </a>

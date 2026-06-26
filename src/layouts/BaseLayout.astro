@@ -2,7 +2,6 @@
 import "../styles/global.css";
 import "../styles/theme.css";
 import ClientRouter from "astro/components/ClientRouter.astro";
-import { ThreeDCanvas } from "../components/atoms/ThreeDCanvas";
 import Footer from "../components/templates/Footer.astro";
 import Header from "../components/templates/Header.astro";
 import ScrollProgress from "../islands/ScrollProgress";
@@ -128,11 +127,7 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
       <script is:inline data-cf-beacon={JSON.stringify({ token: cfAnalyticsToken })} src="https://static.cloudflareinsights.com/beacon.min.js" defer></script>
     )}
   </head>
-  <body class="min-h-screen bg-bg-primary text-text-primary noise-overlay">
-    <!-- 3D Canvas Background -->
-    <div class="fixed inset-0 z-0 pointer-events-none">
-      <ThreeDCanvas client:load />
-    </div>
+  <body class="min-h-screen bg-bg-primary text-text-primary">
 
     <div class="relative z-10">
       <a href="#main-content" class="skip-to-content">Skip to content</a>
