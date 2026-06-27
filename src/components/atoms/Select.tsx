@@ -22,9 +22,6 @@ const SelectTrigger = React.forwardRef<
     <SelectPrimitive.Icon asChild>
       <svg
         className="h-4 w-4 opacity-50"
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -86,9 +83,6 @@ const SelectItem = React.forwardRef<
       <SelectPrimitive.ItemIndicator>
         <svg
           className="h-4 w-4"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"

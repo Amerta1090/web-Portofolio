@@ -1,3 +1,4 @@
+import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
@@ -108,7 +109,7 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
               className="inline-flex items-center gap-2 bg-brand text-bg-primary font-medium px-6 py-3 rounded-lg hover:bg-brand-muted transition-all duration-300"
             >
               <span>Get in Touch</span>
-              <span className="group-hover:translate-x-1 transition-transform">→</span>
+              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </a>
             <a
               href={resumeUrl}

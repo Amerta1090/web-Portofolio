@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
+import { BrainCircuit, Container, Cpu, Globe2, Terminal } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
 import projectsData from "../../../../data/projects.json";
@@ -6,11 +7,11 @@ import projectsData from "../../../../data/projects.json";
 const ICON_CLASS = "w-[1em] h-[1em] inline-block align-middle";
 
 const categoryIcons: Record<string, React.ReactNode> = {
-  ml: <svg className={ICON_CLASS} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><polygon points="8,1 15,8 8,15 1,8" /><circle cx="8" cy="8" r="1.5" fill="currentColor" stroke="none" /></svg>,
-  web: <svg className={ICON_CLASS} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="3" width="12" height="10" rx="1" /><line x1="2" y1="7" x2="14" y2="7" /></svg>,
-  cli: <svg className={ICON_CLASS} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="2" width="14" height="12" rx="1" /><polyline points="4,6 7,8 4,10" /><line x1="10" y1="10" x2="12" y2="10" /></svg>,
-  iot: <svg className={ICON_CLASS} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><polygon points="8,1 14,4.5 14,11.5 8,15 2,11.5 2,4.5" /><circle cx="8" cy="8" r="2.5" fill="currentColor" stroke="none" /></svg>,
-  devops: <svg className={ICON_CLASS} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="8" cy="8" r="3.5" /><circle cx="8" cy="2" r="1" /><circle cx="8" cy="14" r="1" /><circle cx="2" cy="8" r="1" /><circle cx="14" cy="8" r="1" /></svg>,
+  ml: <BrainCircuit className={ICON_CLASS} />,
+  web: <Globe2 className={ICON_CLASS} />,
+  cli: <Terminal className={ICON_CLASS} />,
+  iot: <Cpu className={ICON_CLASS} />,
+  devops: <Container className={ICON_CLASS} />,
 };
 
 export const ProjectsScreen: React.FC = () => {

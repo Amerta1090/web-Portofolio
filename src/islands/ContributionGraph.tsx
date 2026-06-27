@@ -40,16 +40,16 @@ export default function ContributionGraph({ data }: Props) {
         </div>
       </div>
       <style>{`
-        [data-level="1"] { background-color: #92400e66; }
-        [data-level="2"] { background-color: #92400e99; }
-        [data-level="3"] { background-color: #92400ecc; }
-        [data-level="4"] { background-color: #f59e0b; }
+        [data-level="1"] { background-color: #7A8C6F40; }
+        [data-level="2"] { background-color: #7A8C6F80; }
+        [data-level="3"] { background-color: #7A8C6Fb3; }
+        [data-level="4"] { background-color: #7A8C6F; }
         [data-level="0"] { background-color: #27272a; }
         :root:not(.dark) [data-level="0"] { background-color: #e5e7eb; }
-        :root:not(.dark) [data-level="1"] { background-color: #fde68a; }
-        :root:not(.dark) [data-level="2"] { background-color: #fcd34d; }
-        :root:not(.dark) [data-level="3"] { background-color: #f59e0b; }
-        :root:not(.dark) [data-level="4"] { background-color: #d97706; }
+        :root:not(.dark) [data-level="1"] { background-color: #C17F5940; }
+        :root:not(.dark) [data-level="2"] { background-color: #C17F5980; }
+        :root:not(.dark) [data-level="3"] { background-color: #C17F59b3; }
+        :root:not(.dark) [data-level="4"] { background-color: #C17F59; }
       `}</style>
     </div>
   );

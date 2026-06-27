@@ -150,8 +150,6 @@ pre {
   top: 0;
 }
 
-/* No retro-gaming CSS — removed in Sprint 5 */
-
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
@@ -167,22 +165,6 @@ pre {
   background: var(--accent-muted);
 }
 
-/* Section Reveal Animations */
-@keyframes reveal-up {
-  from {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.section-reveal {
-  animation: reveal-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
 /* Fade In */
 .animate-fadeIn {
   animation: fadeIn 0.4s ease-out forwards;
@@ -196,21 +178,6 @@ pre {
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-/* Timeline Draw */
-.timeline-line-draw {
-  animation: timelineGrow 1s ease-out forwards;
-  transform-origin: top;
-}
-
-@keyframes timelineGrow {
-  from {
-    transform: scaleY(0);
-  }
-  to {
-    transform: scaleY(1);
   }
 }
 

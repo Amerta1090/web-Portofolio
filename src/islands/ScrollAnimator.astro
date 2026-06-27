@@ -1,7 +1,8 @@
 ---
 // Inline script that enables scroll-triggered fade-up animations
 // for elements with the `data-reveal` attribute.
-// This runs in the client and respects prefers-reduced-motion.
+// Uses subtle 8px offset for a more premium feel.
+// Respects prefers-reduced-motion.
 ---
 
 <script is:inline>
@@ -27,7 +28,7 @@
 <style>
   [data-reveal] {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(8px);
     transition: opacity 0.6s ease-out, transform 0.6s ease-out;
   }
   [data-reveal].revealed {
