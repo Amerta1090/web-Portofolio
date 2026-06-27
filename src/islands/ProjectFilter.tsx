@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useFilterStore } from "../lib/useFilterStore";
 
 interface ProjectLink {
   label: string;
@@ -36,17 +37,19 @@ function slugify(title: string): string {
 }
 
 export default function ProjectFilter({ projects, baseUrl }: Props) {
-  const [activeCategory, setActiveCategory] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
+  const activeCategory = useFilterStore((s) => s.activeCategory);
+  const searchQuery = useFilterStore((s) => s.searchQuery);
+  const setActiveCategory = useFilterStore((s) => s.setActiveCategory);
+  const setSearchQuery = useFilterStore((s) => s.setSearchQuery);
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const cat = params.get("category") || "";
     const q = params.get("q") || "";
-    setActiveCategory(cat);
-    setSearchQuery(q);
-  }, []);
+    if (cat) setActiveCategory(cat);
+    if (q) setSearchQuery(q);
+  }, [setActiveCategory, setSearchQuery]);
 
   const updateUrl = useCallback(
     (category: string, query: string) => {

@@ -1,23 +1,21 @@
 import { lazy, Suspense, useEffect, useState } from "react";
+import { useCapabilityStore } from "../lib/useCapabilityStore";
 
 const LazyScene = lazy(() => import("./SceneContent"));
 
 export default function AmbientScene() {
   const [mounted, setMounted] = useState(false);
-  const [canRender, setCanRender] = useState(true);
+  const initialize = useCapabilityStore((s) => s.initialize);
+  const isMobile = useCapabilityStore((s) => s.isMobile);
+  const prefersReducedMotion = useCapabilityStore((s) => s.prefersReducedMotion);
+  const initialized = useCapabilityStore((s) => s.initialized);
 
   useEffect(() => {
     setMounted(true);
-    try {
-      const isMobile = window.matchMedia("(max-width: 768px)").matches;
-      const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (isMobile || prefersReduced) {
-        setCanRender(false);
-      }
-    } catch {
-      setCanRender(false);
-    }
-  }, []);
+    if (!initialized) initialize();
+  }, [initialize, initialized]);
+
+  const canRender = !isMobile && !prefersReducedMotion;
 
   if (!mounted || !canRender) return null;
 
