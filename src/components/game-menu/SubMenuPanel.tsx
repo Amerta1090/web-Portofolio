@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
+import { ArrowLeftFromLine, ChevronRight } from "lucide-react";
 import React from "react";
 
 interface Breadcrumb {
@@ -107,19 +108,7 @@ export const SubMenuPanel: React.FC<SubMenuPanelProps> = ({
                       {item.badge}
                     </span>
                   )}
-                  {item.href && (
-                    <svg
-                      className="w-3 h-3 text-text-secondary/40"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="m9 18 6-6-6-6" />
-                    </svg>
-                  )}
+                  {item.href && <ChevronRight size={12} className="text-text-secondary/40 shrink-0" />}
                 </div>
               </motion.div>
             ))}
@@ -130,10 +119,7 @@ export const SubMenuPanel: React.FC<SubMenuPanelProps> = ({
               className="flex items-center gap-2 text-sm text-text-secondary hover:text-brand transition-colors"
               onClick={onBack}
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="m12 19-7-7 7-7" />
-                <path d="M19 12H5" />
-              </svg>
+              <ArrowLeftFromLine size={16} />
               Back to {breadcrumbs.length > 1 ? breadcrumbs[breadcrumbs.length - 2]?.label || "Menu" : "Main Menu"}
             </button>
           </div>

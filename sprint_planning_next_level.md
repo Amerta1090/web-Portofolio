@@ -627,7 +627,7 @@ Light mode:
 
 ---
 
-## Sprint 10 — Accessibility Audit
+## Sprint 9 — Accessibility Audit
 
 **Objective:** Ensure the site meets WCAG AA standards.
 
@@ -656,13 +656,13 @@ Light mode:
 
 ---
 
-## Sprint 11 — State Management with Zustand
+## Sprint 10 — State Management with Zustand
 
 **Objective:** Add Zustand for global state. Lightweight state management for theme, filter, and UI state.
 
 **Duration:** 2-3 days.
 
-**Prerequisite:** Sprint 1-10 complete (design system stable).
+**Prerequisite:** Sprint 1-9 complete (design system stable).
 
 ---
 
@@ -680,17 +680,17 @@ Light mode:
 - Project filter state centralized
 - Capability store auto-detects device tier
 
-## Sprint 16 — Motion Design System & Framer Motion Mastery
+## Sprint 11 — Motion Design System & Framer Motion Mastery
 
 **Objective:** Build a cohesive motion design system — not just random animations, but a deliberate, predictable motion language. Master Framer Motion advanced APIs. Establish motion tokens (duration, easing, stagger) as first-class design primitives.
 
 **Duration:** 5-6 days.
 
-**Prerequisite:** Sprint 1-12 complete (design system stable). Framer Motion already installed.
+**Prerequisite:** Sprint 1-10 complete (design system stable). Framer Motion already installed.
 
 ---
 
-### Epic 16.1: Motion Design Tokens
+### Epic 11.1: Motion Design Tokens
 
 **Context:** Currently, animation values (duration, delay, easing, stagger) are scattered across components as magic numbers. A motion design system defines these as tokens — consistent, named, reusable values that express brand personality through movement.
 
@@ -722,7 +722,7 @@ Light mode:
 ---
 
 
-## Sprint 17 — Scroll Storytelling & Interactive Narrative
+## Sprint 12 — Scroll Storytelling & Interactive Narrative
 
 **Objective:** Transform the portfolio from a flat page into a scroll-driven narrative experience. Use advanced scroll techniques (parallax, scroll-triggered timelines, progress-driven reveals) to guide users through content in a deliberate, memorable sequence.
 
@@ -730,7 +730,7 @@ Light mode:
 
 ---
 
-### Epic 17.1: Scroll Progress Architecture
+### Epic 12.1: Scroll Progress Architecture
 
 **Context:** Current scroll tracking is basic (ScrollProgress bar, SectionCounter). Build a comprehensive scroll infrastructure that powers all scroll-driven effects consistently.
 
@@ -738,7 +738,7 @@ Light mode:
 |------|-----------|-------------|-------------|
 | Create `useScrollProgress` hook — normalized scroll progress (0→1 across page or per section) | 3 | None | Scroll-driven animation foundation |
 | Create `useSectionInView` — tracks which section is in view, progress through each section | 3 | Section.astro | Section-aware scroll tracking |
-| Create `ScrollProvider` context — shares scroll data across all islands without prop drilling | 2 | Zustand/Sprint 13 | One scroll listener to rule them all |
+| Create `ScrollProvider` context — shares scroll data across all islands without prop drilling | 2 | Zustand/Sprint 11 | One scroll listener to rule them all |
 | Refactor `ScrollProgress.tsx` to use `useScrollProgress` | 1 | ScrollProgress | Clean internal logic |
 | Refactor `SectionCounter.tsx` to use `useSectionInView` | 1 | SectionCounter | Clean internal logic |
 | Add **scroll velocity** — track scroll speed for dynamic effects (fast scroll = dramatic, slow = subtle) | 2 | useScrollProgress | `useVelocity` from Framer |
@@ -751,7 +751,7 @@ Light mode:
 
 ---
 
-### Epic 17.2: Parallax & Depth Effects
+### Epic 12.2: Parallax & Depth Effects
 
 **Context:** Parallax creates perceived depth by moving elements at different speeds. Used deliberately (not as a gimmick), it elevates the visual experience and makes scrolling feel responsive.
 
@@ -772,7 +772,7 @@ Light mode:
 
 ---
 
-### Epic 17.3: GSAP Integration (Selective)
+### Epic 12.3: GSAP Integration (Selective)
 
 **Context:** Framer Motion handles most animation needs, but GSAP's `ScrollTrigger` is unmatched for complex scroll-driven timelines, pinning sections, and scrubbing animation progress with scroll position. Use GSAP only where Framer Motion falls short — not as a replacement.
 
@@ -800,7 +800,7 @@ Light mode:
 
 ---
 
-### Epic 17.4: Interactive Storytelling Sections
+### Epic 12.4: Interactive Storytelling Sections
 
 **Context:** A portfolio should tell a story, not just list facts. Build 2-3 "narrative moments" where scrolling reveals information progressively — like a mini interactive documentary of the user's career.
 
@@ -831,9 +831,9 @@ Contact      → "Let's create"                — Clean CTA
 
 ---
 
-### Epic 17.5: Data Scrollytelling System
+### Epic 12.5: Data Scrollytelling System
 
-**Context:** Sprint 25 has D3 charts (real-time, network, loss curves). What's missing is a dedicated *data scrollytelling* system — where chart progress is bound to scroll position, annotations appear per data point, and narrative text is pinned beside the visualization. This is the NYT / Bloomberg / The Pudding pattern.
+**Context:** Sprint 14 has D3 charts (real-time, network, loss curves). What's missing is a dedicated *data scrollytelling* system — where chart progress is bound to scroll position, annotations appear per data point, and narrative text is pinned beside the visualization. This is the NYT / Bloomberg / The Pudding pattern.
 
 | Task | Complexity | Dependencies | Description |
 |------|-----------|-------------|-------------|
@@ -853,7 +853,7 @@ Contact      → "Let's create"                — Clean CTA
 ---
 
 
-## Sprint 20 — 3D Scene Polish
+## Sprint 13 — 3D Scene Polish
 
 **Objective:** Improve the existing R3F scene. Remove raw Three.js code, add performance monitoring, ensure graceful degradation.
 
@@ -878,17 +878,10 @@ Contact      → "Let's create"                — Clean CTA
 - Scene is visually refined, not distracting
 - Falls back gracefully if WebGL unavailable
 
-*Sprint 21 removed — custom shaders overkill for this project*
-
-*Sprint 22 removed — GPU particles overkill for this project*
-
-*Sprint 23 removed — QA and polish for deleted content unnecessary*
 
 
-*Sprint 24 removed — Apple-tier showcase overkill for portfolio scope*
 
-
-## Sprint 25 — ML Metrics Visualization
+## Sprint 14 — ML Metrics Visualization
 
 **Objective:** Build interactive D3-based visualizations for ML projects — loss curves, network graphs, and performance metrics. Gives visitors a tangible sense of the ML work.
 
@@ -911,16 +904,16 @@ Contact      → "Let's create"                — Clean CTA
 - All charts support dark/light mode
 - No heavy ML frameworks added to bundle (D3 only)
 
-*Sprint 26 removed — experimental web features out of scope for portfolio v1*
 
 
-## Sprint 27 — Portfolio Integration & Performance Budget
+
+## Sprint 15 — Portfolio Integration & Performance Budget
 
 **Objective:** Integrate all built features into a cohesive experience. Set capability tiers for progressive enhancement. Enforce performance budgets.
 
 **Duration:** 3-4 days.
 
-### Epic 27.1: Integration & Capability Tiers
+### Epic 15.1: Integration & Capability Tiers
 
 **Context:** The portfolio has features across UI, motion, and 3D. Create a unified experience with capability detection.
 
@@ -937,7 +930,7 @@ Contact      → "Let's create"                — Clean CTA
 - Portfolio functions fully at Tier 1 (no JS required)
 - Each tier adds meaningful value
 
-### Epic 27.2: Performance Budget
+### Epic 15.2: Performance Budget
 
 | Task | Complexity | Dependencies | Description |
 |------|-----------|-------------|-------------|
@@ -957,16 +950,16 @@ Contact      → "Let's create"                — Clean CTA
 - Memory leaks: 0
 
 
-*Sprint 28 removed — image effects are enhancements, not core requirement*
 
 
-## Sprint 29 — Split Text & Text Scramble
+
+## Sprint 16 — Split Text & Text Scramble
 
 **Objective:** Add character-level text animations — split text engine for per-char reveals and text scramble effect.
 
 **Duration:** 2-3 days.
 
-### Epic 29.1: Split Text Engine
+### Epic 16.1: Split Text Engine
 
 | Task | Complexity | Dependencies | Description |
 |------|-----------|-------------|-------------|
@@ -977,7 +970,7 @@ Contact      → "Let's create"                — Clean CTA
 - Text splits into characters/words/lines correctly
 - RevealText animates character by character
 
-### Epic 29.2: Text Scramble
+### Epic 16.2: Text Scramble
 
 | Task | Complexity | Dependencies | Description |
 |------|-----------|-------------|-------------|
@@ -989,16 +982,16 @@ Contact      → "Let's create"                — Clean CTA
 - Scroll-triggered scramble starts on viewport entry
 
 
-*Sprint 30 removed — fluid/organic UI overkill for portfolio scope*
 
 
-## Sprint 31 — CSS Scroll-Driven & Container Queries
+
+## Sprint 17 — CSS Scroll-Driven & Container Queries
 
 **Objective:** Use modern CSS features (scroll-driven animations, container queries, `:has()`) to reduce JavaScript dependencies.
 
 **Duration:** 2-3 days.
 
-### Epic 31.1: CSS Scroll-Driven Animations
+### Epic 17.1: CSS Scroll-Driven Animations
 
 **Context:** Chrome supports CSS `scroll-timeline` and `view-timeline` — animate elements based on scroll position with zero JavaScript.
 
@@ -1013,7 +1006,7 @@ Contact      → "Let's create"                — Clean CTA
 - Progress bar works with zero JavaScript
 - Falls back to JS (IntersectionObserver) on Firefox/Safari
 
-### Epic 31.2: CSS `:has()`, `@container` & `anchor()`
+### Epic 17.2: CSS `:has()`, `@container` & `anchor()`
 
 | Task | Complexity | Dependencies | Description |
 |------|-----------|-------------|-------------|
@@ -1027,13 +1020,13 @@ Contact      → "Let's create"                — Clean CTA
 - `@container` queries adjust card layout per available space
 
 
-## Sprint 32 — Theme Customizer & Context-Aware UI
+## Sprint 18 — Theme Customizer & Context-Aware UI
 
 **Objective:** Let visitors personalize the portfolio (accent color, density) and add time-aware greetings.
 
 **Duration:** 3-4 days.
 
-### Epic 32.1: Theme Customizer
+### Epic 18.1: Theme Customizer
 
 | Task | Complexity | Dependencies | Description |
 |------|-----------|-------------|-------------|
@@ -1049,7 +1042,7 @@ Contact      → "Let's create"                — Clean CTA
 - Color and density apply live
 - Themes persist across page reloads
 
-### Epic 32.2: Context-Aware UI
+### Epic 18.2: Context-Aware UI
 
 | Task | Complexity | Dependencies | Description |
 |------|-----------|-------------|-------------|
@@ -1064,19 +1057,19 @@ Contact      → "Let's create"                — Clean CTA
 - All features respect privacy
 
 
-## Sprint 33 — The "Wow Audit"
+## Sprint 19 — The "Wow Audit"
 
-**Objective:** The final quality gate. Review every creative technique across all 33 sprinds. Remove anything that doesn't truly wow or that harms usability. Ensure the cumulative effect is greater than the sum of its parts.
+**Objective:** The final quality gate. Review every creative technique across all 20 sprints. Remove anything that doesn't truly wow or that harms usability. Ensure the cumulative effect is greater than the sum of its parts.
 
 **Duration:** 4-5 days.
 
 ---
 
-### Epic 33.1: Feature Value Assessment
+### Epic 19.1: Feature Value Assessment
 
 | Task | Complexity | Dependencies | Description |
 |------|-----------|-------------|-------------|
-| List every creative technique implemented across all 33 sprints | 2 | All sprints | Master feature list |
+| List every creative technique implemented across all 20 sprints | 2 | All sprints | Master feature list |
 | Rate each on: **Wow Factor** (1-5), **Performance Cost** (1-5), **Maintenance Burden** (1-5), **Usability Impact** (+2 to -2) | 3 | All sprints | Objective scoring |
 | **Remove** features scoring low on Wow + negative on Usability | 2 | Feature list | Ruthless cuts |
 | **Simplify** features scoring high on Cost + high on Maintenance (reduce complexity, not remove) | 3 | Targeted features | Practical cuts |
@@ -1088,7 +1081,7 @@ Contact      → "Let's create"                — Clean CTA
 
 ---
 
-### Epic 33.2: "Blind User Test"
+### Epic 19.2: "Blind User Test"
 
 | Task | Complexity | Dependencies | Description |
 |------|-----------|-------------|-------------|
@@ -1103,7 +1096,7 @@ Contact      → "Let's create"                — Clean CTA
 
 ---
 
-### Epic 33.3: The "Off" Mode
+### Epic 19.3: The "Off" Mode
 
 | Task | Complexity | Dependencies | Description |
 |------|-----------|-------------|-------------|
@@ -1118,7 +1111,7 @@ Contact      → "Let's create"                — Clean CTA
 
 ---
 
-### Epic 33.4: Final Bundle & Performance Pass
+### Epic 19.4: Final Bundle & Performance Pass
 
 | Task | Complexity | Dependencies | Description |
 |------|-----------|-------------|-------------|
@@ -1135,16 +1128,16 @@ Contact      → "Let's create"                — Clean CTA
 
 ---
 
-*Sprint 34 removed — WebGL transitions unnecessary for portfolio scope*
 
 
-## Sprint 35 — Micro-interaction Components
+
+## Sprint 20 — Micro-interaction Components
 
 **Objective:** Build a few reusable interaction components — InteractionButton, InteractionCard, Skeleton — to polish interactive elements.
 
 **Duration:** 2-3 days.
 
-### Epic 35.1: Interaction Components
+### Epic 20.1: Interaction Components
 
 | Task | Complexity | Dependencies | Description |
 |------|-----------|-------------|-------------|
@@ -1171,18 +1164,18 @@ Contact      → "Let's create"                — Clean CTA
 | **6** | Icon Migration | lucide-react icons | Consistent iconography |
 | **7** | Lenis Smooth Scrolling + Scroll Animations | Smooth scrolling | Premium scroll feel |
 | **8** | Three.js Enhancement + Ambient Polish | Refine 3D scene | Ambient 3D backdrop |
-| **10** | Accessibility Audit + Performance Optimization | WCAG AA compliance | Inclusive design |
-| **11** | State Management with Zustand | Zustand stores | Centralized state |
-| **16** | Motion Design System & Framer Motion Mastery | Motion tokens, Easing, Stagger | Cohesive motion language |
-| **17** | Scroll Storytelling & Interactive Narrative | GSAP ScrollTrigger, Parallax | Narrative scroll |
-| **20** | 3D Scene Polish | R3F cleanup, performance monitoring | Clean R3F implementation |
-| **25** | ML Metrics Visualization | D3 charts for ML metrics | Interactive data viz |
-| **27** | Portfolio Integration & Performance Budget | Capability tiers, performance budgets | Unified product |
-| **29** | Split Text & Text Scramble | Character-level text animations | Expressive text |
-| **31** | CSS Scroll-Driven & Container Queries | CSS scroll-timeline, @container, :has() | Zero-JS effects |
-| **32** | Theme Customizer & Context-Aware UI | Accent color, density, time-aware greeting | Adaptive UX |
-| **33** | The "Wow Audit" | Feature assessment, Lightning Mode | Curated excellence |
-| **35** | Micro-interaction Components | InteractionButton, InteractionCard, Skeleton | Polished interactive elements |
+| **9** | Accessibility Audit + Performance Optimization | WCAG AA compliance | Inclusive design |
+| **10** | State Management with Zustand | Zustand stores | Centralized state |
+| **11** | Motion Design System & Framer Motion Mastery | Motion tokens, Easing, Stagger | Cohesive motion language |
+| **12** | Scroll Storytelling & Interactive Narrative | GSAP ScrollTrigger, Parallax | Narrative scroll |
+| **13** | 3D Scene Polish | R3F cleanup, performance monitoring | Clean R3F implementation |
+| **14** | ML Metrics Visualization | D3 charts for ML metrics | Interactive data viz |
+| **15** | Portfolio Integration & Performance Budget | Capability tiers, performance budgets | Unified product |
+| **16** | Split Text & Text Scramble | Character-level text animations | Expressive text |
+| **17** | CSS Scroll-Driven & Container Queries | CSS scroll-timeline, @container, :has() | Zero-JS effects |
+| **18** | Theme Customizer & Context-Aware UI | Accent color, density, time-aware greeting | Adaptive UX |
+| **19** | The "Wow Audit" | Feature assessment, Lightning Mode | Curated excellence |
+| **20** | Micro-interaction Components | InteractionButton, InteractionCard, Skeleton | Polished interactive elements |
 
 ---
 
@@ -1196,35 +1189,35 @@ This plan covers **20 focused sprints** across core frontend engineering domains
 |--------|-----------|---------|
 | **Design System** | Sprint 1-2 | ✅ Comprehensive — tokens, themes, mode support |
 | **Component Architecture** | Sprint 3-6 | ✅ Production-grade patterns |
-| **Accessibility** | Sprint 10 | ✅ WCAG AA audit |
-| **Motion Design** | Sprint 16-17 | ✅ Motion tokens + scroll storytelling |
-| **3D / WebGL** | Sprint 8, 20 | ✅ R3F scene with performance monitoring |
-| **State Management** | Sprint 11 | ✅ Zustand stores for theme/filter/capabilities |
-| **Data Visualization** | Sprint 25 | ✅ D3-based ML metrics charts |
-| **Portfolio Integration** | Sprint 27 | ✅ Capability tiers + performance budgets |
-| **Text Effects** | Sprint 29 | ✅ Split text + text scramble |
-| **CSS Modern Features** | Sprint 31 | ✅ Scroll-driven animations + container queries |
-| **Theme Customization** | Sprint 32 | ✅ Accent color + density + time-aware UI |
-| **Micro-interactions** | Sprint 35 | ✅ InteractionButton, InteractionCard, Skeleton |
-| **Quality / Audit** | Sprint 33 | ✅ Feature assessment + Lightning Mode |
+| **Accessibility** | Sprint 9 | ✅ WCAG AA audit |
+| **Motion Design** | Sprint 11-12 | ✅ Motion tokens + scroll storytelling |
+| **3D / WebGL** | Sprint 8, 13 | ✅ R3F scene with performance monitoring |
+| **State Management** | Sprint 10 | ✅ Zustand stores for theme/filter/capabilities |
+| **Data Visualization** | Sprint 14 | ✅ D3-based ML metrics charts |
+| **Portfolio Integration** | Sprint 15 | ✅ Capability tiers + performance budgets |
+| **Text Effects** | Sprint 16 | ✅ Split text + text scramble |
+| **CSS Modern Features** | Sprint 17 | ✅ Scroll-driven animations + container queries |
+| **Theme Customization** | Sprint 18 | ✅ Accent color + density + time-aware UI |
+| **Micro-interactions** | Sprint 20 | ✅ InteractionButton, InteractionCard, Skeleton |
+| **Quality / Audit** | Sprint 19 | ✅ Feature assessment + Lightning Mode |
 
 ### What Was Cut (and Why)
 
 | Removed Sprint | Rationale |
 |----------------|-----------|
-| Sprint 8 (original), 11-12, 14-15 | Game menu refactor, game polish, sanity check, performance sprint, testing — overkill for portfolio scope |
-| Sprint 18-19, 21-24 | Micro-interactions QA, shaders, particles, Apple-tier showcase, creative QA — overkill for portfolio scope |
-| Sprint 26, 28, 30, 34 | Experimental web, image sorcery, fluid UI, WebGL transitions — nice-to-haves cut for focus |
+| Early game-menu sprints (original Sprint 8, 11-15) | Game menu refactor, game polish, sanity check, performance sprint, testing — overkill for portfolio scope |
+| Mid-plan creative sprints (original 18-24) | Micro-interactions QA, shaders, particles, Apple-tier showcase, creative QA — overkill for portfolio scope |
+| Late experimental sprints (original 26, 28, 30, 34) | Experimental web, image sorcery, fluid UI, WebGL transitions — nice-to-haves cut for focus |
 
 ### Scorecard
 
 | Metric | Target | Actual Estimate |
 |--------|--------|----------------|
 | **Total Sprints** | — | 20 focused sprints |
-| **Core UI/UX** | 100% | 100% (Sprints 1-11) |
-| **Creative Enhancements** | 100% | ~80% (Sprints 16-35, trimmed) |
+| **Core UI/UX** | 100% | 100% (Sprints 1-10) |
+| **Creative Enhancements** | 100% | ~80% (Sprints 11-20, trimmed) |
 | **Performance Budget** | <300KB JS (gzipped) | Achievable with lazy loading |
-| **Accessibility** | WCAG AA | Covered (Sprint 10) |
+| **Accessibility** | WCAG AA | Covered (Sprint 9) |
 | **Bundle Splitting** | 2+ tiers | Basic / Enhanced |
 | **Maintainability** | High | Standardized patterns + Zustand + typed hooks |
 
@@ -1232,7 +1225,7 @@ This plan covers **20 focused sprints** across core frontend engineering domains
 
 **✅ Core domains covered.** This trimmed plan delivers a polished, professional portfolio with design system, accessibility, motion, 3D polish, and interactive data visualizations — without the bloat of custom shaders, GPU particles, or cinematic showcases.
 
-**🎯 Recommendation:** Build Sprints 1-11 first for a solid foundation. Then selectively add creative enhancements (Sprints 16-35) based on available time. The portfolio will already stand out after Sprints 1-11.
+**🎯 Recommendation:** Build Sprints 1-10 first for a solid foundation. Then selectively add creative enhancements (Sprints 11-20) based on available time. The portfolio will already stand out after Sprints 1-10.
 
 The plan is ready. Time to build.
 

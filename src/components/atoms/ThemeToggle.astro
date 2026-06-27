@@ -42,31 +42,22 @@
 
 <script is:inline>
   (function () {
-    const stored = localStorage.getItem("theme");
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    if (stored === "light" || (!stored && !prefersDark)) {
-      document.documentElement.classList.remove("dark");
-    } else {
-      document.documentElement.classList.add("dark");
-    }
-    document.addEventListener("DOMContentLoaded", function () {
-      const btn = document.querySelector("[data-theme-toggle]");
-      if (!btn) return;
-      const isDark = document.documentElement.classList.contains("dark");
-      btn.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
-      btn.addEventListener("click", function () {
-        const html = document.documentElement;
-        const isDark = html.classList.contains("dark");
-        if (isDark) {
-          html.classList.remove("dark");
-          localStorage.setItem("theme", "light");
-          btn.setAttribute("aria-label", "Switch to dark mode");
-        } else {
-          html.classList.add("dark");
-          localStorage.setItem("theme", "dark");
-          btn.setAttribute("aria-label", "Switch to light mode");
-        }
-      });
+    const btn = document.querySelector("[data-theme-toggle]");
+    if (!btn) return;
+    const isDark = document.documentElement.classList.contains("dark");
+    btn.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
+    btn.addEventListener("click", function () {
+      const html = document.documentElement;
+      const isDark = html.classList.contains("dark");
+      if (isDark) {
+        html.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+        btn.setAttribute("aria-label", "Switch to dark mode");
+      } else {
+        html.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+        btn.setAttribute("aria-label", "Switch to light mode");
+      }
     });
   })();
 </script>

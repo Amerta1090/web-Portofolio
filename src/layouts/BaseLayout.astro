@@ -4,6 +4,7 @@ import "../styles/theme.css";
 import ClientRouter from "astro/components/ClientRouter.astro";
 import Footer from "../components/templates/Footer.astro";
 import Header from "../components/templates/Header.astro";
+import AmbientScene from "../islands/AmbientScene";
 import SmoothScroll from "../islands/SmoothScroll";
 import ScrollProgress from "../islands/ScrollProgress";
 import { Toaster } from "sonner";
@@ -130,6 +131,7 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
   </head>
   <body class="min-h-screen bg-bg-primary text-text-primary">
 
+    <AmbientScene client:visible />
     <div class="relative z-10">
       <a href="#main-content" class="skip-to-content">Skip to content</a>
       <SmoothScroll client:load />

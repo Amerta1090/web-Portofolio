@@ -1,6 +1,5 @@
 ---
 import type { Volunteering } from "../../types/volunteering";
-import Card from "../molecules/Card.astro";
 
 export interface Props {
   volunteerings: Volunteering[];
@@ -32,7 +31,7 @@ function formatDate(date: string | null): string {
 <div class="grid md:grid-cols-2 gap-6">
   {
     volunteerings.map((v) => (
-      <Card variant="elevated">
+      <div class="rounded-lg border border-border bg-surface-primary text-text-primary shadow-md p-6">
         <h3 class="text-base font-semibold text-text-primary mb-1">{v.role}</h3>
         <p class="text-sm text-text-secondary">{v.organization}</p>
         {v.cause && <p class="text-xs text-text-secondary mt-1">{v.cause}</p>}
@@ -49,7 +48,7 @@ function formatDate(date: string | null): string {
             ))}
           </ul>
         )}
-      </Card>
+      </div>
     ))
   }
 </div>

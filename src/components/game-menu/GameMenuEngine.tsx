@@ -1,4 +1,10 @@
 import { AnimatePresence, motion } from "framer-motion";
+import {
+  Activity, ArrowLeftFromLine, Award, BarChart3, ChevronRight,
+  Code2, Columns3, FileText, FolderKanban, Gamepad2, Globe,
+  History, House, Images, Info, LayoutGrid, Mail, Monitor,
+  Settings, Star, User, Volume2,
+} from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -36,8 +42,8 @@ interface MenuItem {
   badge?: string | number;
 }
 
-const MAIN_ICON_CLASS = "w-6 h-6";
-const SUB_ICON_CLASS = "w-4 h-4";
+const MAIN_ICON_SIZE = 24;
+const SUB_ICON_SIZE = 16;
 
 const PROFILE_DATA = profileData as any;
 const EXPERIENCES = experienceData as any[];
@@ -48,162 +54,53 @@ const MENU_TREE: MenuItem[] = [
   {
     id: "profile",
     label: "Profile",
-    icon: (
-      <svg
-        className={MAIN_ICON_CLASS}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-        <circle cx="12" cy="7" r="4" />
-      </svg>
-    ),
+    icon: <User size={MAIN_ICON_SIZE} />,
     children: [
       {
         id: "home",
         label: "About / Bio",
         screen: "home",
-        icon: (
-          <svg
-            className={SUB_ICON_CLASS}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" />
-          </svg>
-        ),
+        icon: <House size={SUB_ICON_SIZE} />,
       },
       {
         id: "experience",
         label: "Experience",
         screen: "experience",
         badge: EXPERIENCES.length,
-        icon: (
-          <svg
-            className={SUB_ICON_CLASS}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-          </svg>
-        ),
+        icon: <Star size={SUB_ICON_SIZE} />,
       },
       {
         id: "resume",
         label: "Resume",
         href: "/resume",
-        icon: (
-          <svg
-            className={SUB_ICON_CLASS}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-            <polyline points="14 2 14 8 20 8" />
-            <line x1="16" y1="13" x2="8" y2="13" />
-            <line x1="16" y1="17" x2="8" y2="17" />
-          </svg>
-        ),
+        icon: <FileText size={SUB_ICON_SIZE} />,
       },
     ],
   },
   {
     id: "portfolio",
     label: "Portfolio",
-    icon: (
-      <svg
-        className={MAIN_ICON_CLASS}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <rect x="3" y="3" width="7" height="7" rx="1" />
-        <rect x="14" y="3" width="7" height="7" rx="1" />
-        <rect x="3" y="14" width="7" height="7" rx="1" />
-        <rect x="14" y="14" width="7" height="7" rx="1" />
-      </svg>
-    ),
+    icon: <LayoutGrid size={MAIN_ICON_SIZE} />,
     children: [
       {
         id: "projects",
         label: "Projects",
         screen: "projects",
         badge: PROJECTS.length,
-        icon: (
-          <svg
-            className={SUB_ICON_CLASS}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <rect x="3" y="3" width="7" height="7" rx="1" />
-            <rect x="14" y="3" width="7" height="7" rx="1" />
-            <rect x="3" y="14" width="7" height="7" rx="1" />
-            <rect x="14" y="14" width="7" height="7" rx="1" />
-          </svg>
-        ),
+        icon: <FolderKanban size={SUB_ICON_SIZE} />,
       },
       {
         id: "skills",
         label: "Skills",
         screen: "skills",
-        icon: (
-          <svg
-            className={SUB_ICON_CLASS}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M12 2l3 3-3 3 3 3-3 3 3 3-3 3" />
-            <path d="M5 12l3-3 3 3-3 3-3-3z" />
-            <path d="M19 12l-3-3-3 3 3 3 3-3z" />
-          </svg>
-        ),
+        icon: <Code2 size={SUB_ICON_SIZE} />,
       },
       {
         id: "certifications",
         label: "Certifications",
         screen: "certifications",
         badge: CERTS.length,
-        icon: (
-          <svg
-            className={SUB_ICON_CLASS}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="12" cy="8" r="6" />
-            <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
-          </svg>
-        ),
+        icon: <Award size={SUB_ICON_SIZE} />,
       },
     ],
   },
@@ -211,15 +108,7 @@ const MENU_TREE: MenuItem[] = [
     id: "github",
     label: "GitHub",
     icon: (
-      <svg
-        className={MAIN_ICON_CLASS}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
+      <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
       </svg>
     ),
@@ -228,259 +117,77 @@ const MENU_TREE: MenuItem[] = [
         id: "pinned-repos",
         label: "Pinned Repos",
         href: "/github",
-        icon: (
-          <svg
-            className={SUB_ICON_CLASS}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-          </svg>
-        ),
+        icon: <FolderKanban size={SUB_ICON_SIZE} />,
       },
       {
         id: "contributions",
         label: "Contribution Graph",
         href: "/github",
-        icon: (
-          <svg
-            className={SUB_ICON_CLASS}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-            <line x1="3" y1="9" x2="21" y2="9" />
-            <line x1="9" y1="21" x2="9" y2="9" />
-          </svg>
-        ),
+        icon: <BarChart3 size={SUB_ICON_SIZE} />,
       },
       {
         id: "languages",
         label: "Language Breakdown",
         href: "/github",
-        icon: (
-          <svg
-            className={SUB_ICON_CLASS}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <path d="M2 12h20" />
-            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-          </svg>
-        ),
+        icon: <Globe size={SUB_ICON_SIZE} />,
       },
       {
         id: "activity",
         label: "Commit Activity",
         href: "/github",
-        icon: (
-          <svg
-            className={SUB_ICON_CLASS}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-          </svg>
-        ),
+        icon: <Activity size={SUB_ICON_SIZE} />,
       },
     ],
   },
   {
     id: "media",
     label: "Media",
-    icon: (
-      <svg
-        className={MAIN_ICON_CLASS}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18" />
-        <line x1="7" y1="2" x2="7" y2="22" />
-        <line x1="17" y1="2" x2="17" y2="22" />
-        <line x1="2" y1="12" x2="22" y2="12" />
-        <line x1="2" y1="7" x2="7" y2="7" />
-        <line x1="2" y1="17" x2="7" y2="17" />
-        <line x1="17" y1="7" x2="22" y2="7" />
-        <line x1="17" y1="17" x2="22" y2="17" />
-      </svg>
-    ),
+    icon: <Columns3 size={MAIN_ICON_SIZE} />,
     children: [
       {
         id: "blog",
         label: "Blog",
         href: "/blog",
-        icon: (
-          <svg
-            className={SUB_ICON_CLASS}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-            <polyline points="14 2 14 8 20 8" />
-            <line x1="16" y1="13" x2="8" y2="13" />
-            <line x1="16" y1="17" x2="8" y2="17" />
-          </svg>
-        ),
+        icon: <FileText size={SUB_ICON_SIZE} />,
       },
       {
         id: "timeline",
         label: "Timeline",
         href: "/timeline",
-        icon: (
-          <svg
-            className={SUB_ICON_CLASS}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <polyline points="8 5 3 12 8 19" />
-          </svg>
-        ),
+        icon: <History size={SUB_ICON_SIZE} />,
       },
       {
         id: "gallery",
         label: "Gallery",
         href: "/projects",
-        icon: (
-          <svg
-            className={SUB_ICON_CLASS}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-            <circle cx="8.5" cy="8.5" r="1.5" />
-            <polyline points="21 15 16 10 5 21" />
-          </svg>
-        ),
+        icon: <Images size={SUB_ICON_SIZE} />,
       },
     ],
   },
   {
     id: "settings",
     label: "Settings",
-    icon: (
-      <svg
-        className={MAIN_ICON_CLASS}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <circle cx="12" cy="12" r="3" />
-        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-      </svg>
-    ),
+    icon: <Settings size={MAIN_ICON_SIZE} />,
     children: [
       {
         id: "display-settings",
         label: "Display",
-        icon: (
-          <svg
-            className={SUB_ICON_CLASS}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-            <line x1="8" y1="21" x2="16" y2="21" />
-            <line x1="12" y1="17" x2="12" y2="21" />
-          </svg>
-        ),
+        icon: <Monitor size={SUB_ICON_SIZE} />,
       },
       {
         id: "audio-settings",
         label: "Audio",
-        icon: (
-          <svg
-            className={SUB_ICON_CLASS}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
-          </svg>
-        ),
+        icon: <Volume2 size={SUB_ICON_SIZE} />,
       },
       {
         id: "controls-settings",
         label: "Controls",
-        icon: (
-          <svg
-            className={SUB_ICON_CLASS}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <rect x="2" y="2" width="20" height="20" rx="2" ry="2" />
-            <line x1="6" y1="6" x2="6" y2="6.01" />
-            <line x1="10" y1="6" x2="10" y2="6.01" />
-            <line x1="14" y1="6" x2="14" y2="6.01" />
-          </svg>
-        ),
+        icon: <Gamepad2 size={SUB_ICON_SIZE} />,
       },
       {
         id: "about-credits",
         label: "About / Credits",
-        icon: (
-          <svg
-            className={SUB_ICON_CLASS}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="16" x2="12" y2="12" />
-            <line x1="12" y1="8" x2="12.01" y2="8" />
-          </svg>
-        ),
+        icon: <Info size={SUB_ICON_SIZE} />,
       },
     ],
   },
@@ -488,20 +195,7 @@ const MENU_TREE: MenuItem[] = [
     id: "contact",
     label: "Contact",
     screen: "contact",
-    icon: (
-      <svg
-        className={MAIN_ICON_CLASS}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-        <polyline points="22,6 12,13 2,6" />
-      </svg>
-    ),
+    icon: <Mail size={MAIN_ICON_SIZE} />,
   },
 ];
 
@@ -583,32 +277,8 @@ const SidebarNavItem: React.FC<{
         >
           {item.label}
         </span>
-        {hasChildren && (
-          <svg
-            className="w-3 h-3 text-text-secondary/40"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="m9 18 6-6-6-6" />
-          </svg>
-        )}
-        {isLeaf && item.href && (
-          <svg
-            className="w-3 h-3 text-text-secondary/30"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M9 18l6-6-6-6" />
-          </svg>
-        )}
+        {hasChildren && <ChevronRight size={12} className="text-text-secondary/40 shrink-0" />}
+        {isLeaf && item.href && <ChevronRight size={12} className="text-text-secondary/30 shrink-0" />}
         {isActive && (
           <motion.div
             layoutId="sidebarIndicator"
@@ -672,10 +342,7 @@ const Sidebar: React.FC<{
           className="flex items-center gap-2 text-sm text-text-secondary hover:text-brand transition-colors"
           onClick={onClose}
         >
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 19l-7-7 7-7" />
-            <path d="M19 12H5" />
-          </svg>
+          <ArrowLeftFromLine size={16} />
           Exit
         </button>
       </div>
@@ -742,18 +409,7 @@ const ContactScreen: React.FC = () => {
           href={`mailto:${profile.contact?.email}`}
           className="flex items-center gap-4 px-5 py-4 border border-border hover:border-brand/40 rounded-lg transition-colors group"
         >
-          <svg
-            className="w-5 h-5 text-text-secondary"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <rect x="2" y="4" width="20" height="16" rx="2" />
-            <path d="M22 7l-10 7L2 7" />
-          </svg>
+          <Mail size={20} className="text-text-secondary shrink-0" />
           <span className="text-sm text-text-primary group-hover:text-brand transition-colors">
             {profile.contact?.email}
           </span>
@@ -764,15 +420,7 @@ const ContactScreen: React.FC = () => {
           rel="noopener noreferrer"
           className="flex items-center gap-4 px-5 py-4 border border-border hover:border-brand/40 rounded-lg transition-colors group"
         >
-          <svg
-            className="w-5 h-5 text-text-secondary"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
+          <svg className="w-5 h-5 text-text-secondary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
             <rect x="2" y="9" width="4" height="12" />
             <circle cx="4" cy="4" r="2" />
@@ -787,15 +435,7 @@ const ContactScreen: React.FC = () => {
           rel="noopener noreferrer"
           className="flex items-center gap-4 px-5 py-4 border border-border hover:border-brand/40 rounded-lg transition-colors group"
         >
-          <svg
-            className="w-5 h-5 text-text-secondary"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
+          <svg className="w-5 h-5 text-text-secondary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
             <path d="M9 18c-4.51 2-5-2-7-2" />
           </svg>
