@@ -33,11 +33,11 @@
   --text-primary-rgb: var(--color-text-primary-rgb);
   --text-secondary: var(--color-text-secondary);
   --text-secondary-rgb: var(--color-text-secondary-rgb);
-  --accent: var(--color-brand);
-  --accent-rgb: var(--color-brand-rgb);
+  --accent: #5d6b54;
+  --accent-rgb: 93 107 84;
   --accent-muted: var(--color-brand-muted);
   --accent-muted-rgb: var(--color-brand-muted-rgb);
-  --accent-glow: rgba(var(--color-brand-rgb), 0.15);
+  --accent-glow: rgba(var(--accent-rgb), 0.15);
   --accent-warm: var(--color-brand-warm);
   --accent-warm-rgb: var(--color-brand-warm-rgb);
   --border: var(--color-border);

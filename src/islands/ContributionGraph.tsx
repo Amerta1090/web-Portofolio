@@ -11,16 +11,20 @@ function ContributionCell({ level }: { level: number }) {
 export default function ContributionGraph({ data }: Props) {
   if (!data.weeks.length) {
     return (
-      <div className="text-center py-8 text-text-secondary text-sm">
+      <div className="text-center py-8 text-text-secondary text-sm" role="status">
         No contribution data available.
       </div>
     );
   }
 
+  const totalContributions = data.weeks.reduce(
+    (sum, week) => sum + week.days.reduce((daySum, day) => daySum + day.count, 0),
+    0,
+  );
   const DAY_ABBREVS = ["", "Mon", "", "Wed", "", "Fri", ""];
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto" role="img" aria-label={`Contribution graph: ${totalContributions} contributions in the last year`}>
       <div className="flex gap-0.5">
         <div className="flex flex-col gap-0.5 pr-1 pt-2">
           {DAY_ABBREVS.map((day) => (
@@ -39,6 +43,9 @@ export default function ContributionGraph({ data }: Props) {
           ))}
         </div>
       </div>
+      <span className="sr-only">
+        {totalContributions} total contributions. Each column represents a week, each cell represents a day with contribution level from 0 (no contributions) to 4 (most contributions).
+      </span>
       <style>{`
         [data-level="1"] { background-color: #7A8C6F40; }
         [data-level="2"] { background-color: #7A8C6F80; }

@@ -40,6 +40,9 @@ export default function CommitHeatmap({ data }: Props) {
                   height: `${Math.max((week.total / maxCommits) * 100, 8)}%`,
                   minHeight: "8px",
                 }}
+                role="img"
+                aria-label={`${label}: ${week.total} commits`}
+                tabIndex={0}
               />
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-bg-tertiary text-text-primary text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
                 {week.total} commits

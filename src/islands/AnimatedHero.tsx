@@ -1,5 +1,5 @@
 import { ArrowRight } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 interface Props {
@@ -10,9 +10,14 @@ interface Props {
 }
 
 export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Props) {
-  const [stage, setStage] = useState(0);
+  const prefersReduced = useReducedMotion();
+  const [stage, setStage] = useState(!!prefersReduced ? 4 : 0);
 
   useEffect(() => {
+    if (!!prefersReduced) {
+      setStage(4);
+      return;
+    }
     const t1 = setTimeout(() => setStage(1), 100);
     const t2 = setTimeout(() => setStage(2), 500);
     const t3 = setTimeout(() => setStage(3), 900);
@@ -23,7 +28,7 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
       clearTimeout(t3);
       clearTimeout(t4);
     };
-  }, []);
+  }, [prefersReduced]);
 
   const nameWords = name.split(" ");
   const firstName = nameWords[0];
@@ -127,11 +132,14 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
             transition={{ delay: 0.5 }}
           >
             <span className="text-[10px] text-text-secondary/30">Scroll</span>
-            <motion.div
-              className="w-px h-8 bg-border"
-              animate={{ height: [8, 24, 8] }}
-              transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-            />
+            {!prefersReduced && (
+              <motion.div
+                className="w-px h-8 bg-border"
+                animate={{ height: [8, 24, 8] }}
+                transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+              />
+            )}
+            {prefersReduced && <div className="w-px h-3 bg-border" />}
           </motion.div>
         </div>
       </div>

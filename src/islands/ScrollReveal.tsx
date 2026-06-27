@@ -1,5 +1,5 @@
 import { type ReactNode } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 interface Props {
   children: ReactNode;
@@ -8,6 +8,12 @@ interface Props {
 }
 
 export default function ScrollReveal({ children, className = "", delay = 0 }: Props) {
+  const prefersReduced = useReducedMotion();
+
+  if (!!prefersReduced) {
+    return <div className={className}>{children}</div>;
+  }
+
   return (
     <motion.div
       className={className}

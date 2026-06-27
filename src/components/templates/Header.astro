@@ -17,24 +17,27 @@ const navLinks = [
 ];
 ---
 
-<header class="fixed top-0 left-0 right-0 z-50 bg-bg-primary/80 backdrop-blur-md border-b border-border">
+<header class="fixed top-0 left-0 right-0 z-50 bg-bg-primary/80 backdrop-blur-md border-b border-border" role="banner">
   <Container>
     <nav class="flex items-center justify-between h-16" aria-label="Primary">
       <a href="/" class="text-xl font-bold text-text-primary hover:text-brand transition-colors" aria-label="Home">
         AMERTA
       </a>
-      <div class="hidden md:flex items-center gap-6">
+      <ul class="hidden md:flex items-center gap-6 list-none">
         {
           navLinks.map((link) => (
-            <a
-              href={link.href}
-              class="text-sm text-text-secondary hover:text-brand transition-colors"
-            >
-              {link.label}
-            </a>
+            <li>
+              <a
+                href={link.href}
+                class="text-sm text-text-secondary hover:text-brand transition-colors"
+                aria-current={currentPath === link.href ? "page" : undefined}
+              >
+                {link.label}
+              </a>
+            </li>
           ))
         }
-      </div>
+      </ul>
       <div class="flex items-center gap-2">
         <GameMenuWrapper client:load />
         <div class="w-px h-5 bg-border mx-1"></div>

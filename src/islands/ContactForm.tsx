@@ -43,8 +43,12 @@ export default function ContactForm() {
     }
   };
 
+  const nameErrorId = "cf-name-error";
+  const emailErrorId = "cf-email-error";
+  const messageErrorId = "cf-message-error";
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <div style={{ position: "absolute", left: "-9999px" }} aria-hidden="true">
         <input {...register("honeypot")} tabIndex={-1} autoComplete="off" />
       </div>
@@ -57,12 +61,14 @@ export default function ContactForm() {
           id="cf-name"
           {...register("name")}
           placeholder="Your name"
-          className={`w-full px-4 py-2.5 bg-bg-secondary border rounded-lg text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 ${
+          aria-invalid={!!errors.name}
+          aria-describedby={errors.name ? nameErrorId : undefined}
+          className={`w-full px-4 py-2.5 bg-bg-secondary border rounded-lg text-text-primary placeholder:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:border-transparent transition-all duration-200 ${
             errors.name ? "border-red-500" : "border-border"
           }`}
         />
         {errors.name && (
-          <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
+          <p id={nameErrorId} className="mt-1 text-sm text-red-500" role="alert">{errors.name.message}</p>
         )}
       </div>
 
@@ -75,12 +81,14 @@ export default function ContactForm() {
           type="email"
           {...register("email")}
           placeholder="your@email.com"
-          className={`w-full px-4 py-2.5 bg-bg-secondary border rounded-lg text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 ${
+          aria-invalid={!!errors.email}
+          aria-describedby={errors.email ? emailErrorId : undefined}
+          className={`w-full px-4 py-2.5 bg-bg-secondary border rounded-lg text-text-primary placeholder:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:border-transparent transition-all duration-200 ${
             errors.email ? "border-red-500" : "border-border"
           }`}
         />
         {errors.email && (
-          <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
+          <p id={emailErrorId} className="mt-1 text-sm text-red-500" role="alert">{errors.email.message}</p>
         )}
       </div>
 
@@ -93,12 +101,14 @@ export default function ContactForm() {
           {...register("message")}
           rows={4}
           placeholder="Your message..."
-          className={`w-full px-4 py-2.5 bg-bg-secondary border rounded-lg text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 resize-none ${
+          aria-invalid={!!errors.message}
+          aria-describedby={errors.message ? messageErrorId : undefined}
+          className={`w-full px-4 py-2.5 bg-bg-secondary border rounded-lg text-text-primary placeholder:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:border-transparent transition-all duration-200 resize-none ${
             errors.message ? "border-red-500" : "border-border"
           }`}
         />
         {errors.message && (
-          <p className="mt-1 text-sm text-red-500">{errors.message.message}</p>
+          <p id={messageErrorId} className="mt-1 text-sm text-red-500" role="alert">{errors.message.message}</p>
         )}
       </div>
 
