@@ -5,4 +5,6 @@ export interface Certification {
   credential_id: string | null;
   skills: string[];
   url: string | null;
+  /** Issuer logo image path */
+  badge?: string;
 }

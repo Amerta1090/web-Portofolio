@@ -9,4 +9,6 @@ export interface Experience {
   highlights: string[];
   technologies: string[];
   url: string | null;
+  /** Company logo image path */
+  logo?: string;
 }

@@ -1,5 +1,6 @@
 import { type ReactNode } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import { duration, easing } from "../lib/motion";
 
 interface Props {
   children: ReactNode;
@@ -21,8 +22,8 @@ export default function ScrollReveal({ children, className = "", delay = 0 }: Pr
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{
-        duration: 0.6,
-        ease: [0.16, 1, 0.3, 1],
+        duration: duration.deliberate,
+        ease: easing["ease-out-expo"],
         delay,
       }}
     >

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { duration as motionDuration } from "../lib/motion";
 
 interface Props {
   value: number;
@@ -6,7 +7,7 @@ interface Props {
   duration?: number;
 }
 
-export default function AnimatedCounter({ value, suffix = "", duration = 1500 }: Props) {
+export default function AnimatedCounter({ value, suffix = "", duration = motionDuration.narrative * 1000 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [count, setCount] = useState(0);
   const [revealed, setRevealed] = useState(false);

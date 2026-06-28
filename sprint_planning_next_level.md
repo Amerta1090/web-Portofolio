@@ -1152,6 +1152,235 @@ Contact      → "Let's create"                — Clean CTA
 - All states respect `prefers-reduced-motion`
 
 
+## Sprint 21 — Premium Visual Assets & Showcase Design
+
+**Objective:** Transform the portfolio from a text-driven experience to a rich visual showcase. Add 11 premium "wow" effects — all driven by real images/assets (SVG placeholders until you provide them).
+
+**Duration:** 10-14 days (part-time).
+
+**Prerequisite:** Sprints 1-20 complete. SVG placeholders used for all image fields; real assets can be dropped in later.
+
+---
+
+### Epic 21.1: Project Screenshot Gallery
+
+**Context:** 18 projects, zero screenshots. The single biggest visual gap on the portfolio.
+
+| # | Task | Complexity | Placeholder | Description |
+|---|------|-----------|-------------|-------------|
+| 1 | Extend `Project` type — add `image: string` (primary screenshot), `images: string[]` (gallery) | 1 | — | Type change only |
+| 2 | Populate `image` field for all 18 projects in `data/projects.json` | 1 | `"/images/placeholder/project.svg"` | SVG placeholder with project title overlay |
+| 3 | Create `<ProjectThumbnail>` atom — responsive `<picture>` with lazy loading, aspect-ratio container | 2 | SVG placeholder | Shows placeholder until real image provided |
+| 4 | Create `<ImageReveal>` wrapper — scroll-triggered clip-path reveal (`clip-path: inset(0 0 100% 0)` → `inset(0 0 0 0)`) | 3 | — | Framer Motion clip-path animation, uses motion.ts tokens |
+| 5 | Update `Projects.astro` organism cards — add thumbnail image at top of each card | 2 | SVG per project | Card becomes image + title + description layout |
+| 6 | Add 3D tilt effect on project cards (`<TiltCard>` wrapper) — max 3deg rotation following mouse | 3 | — | Reuses MagneticButton pattern, CSS perspective |
+| 7 | Add hover zoom effect on thumbnail — scale 1.05 with brand overlay | 1 | — | CSS `transform: scale` on hover |
+| 8 | Build `<ProjectGallery>` for `[slug].astro` detail page — masonry or grid of images with lightbox | 4 | SVG placeholders | Click to expand, arrow navigation |
+| 9 | Create `<BrowserFrame>` molecule — wraps screenshot in browser chrome (toolbar + URL bar + content) | 2 | SVG mockup | Makes screenshots look like real app previews |
+| 10 | Create `<PhoneFrame>` molecule — vertical phone frame for mobile project screenshots | 2 | SVG mockup | For IoT/mobile app projects |
+
+**Assets You'll Need to Provide (18 primary + optional extras):**
+```
+public/images/projects/<project-id>-thumb.webp   — 800×600, card thumbnail
+public/images/projects/<project-id>-hero.webp     — 1920×1080, detail-page hero
+public/images/projects/<project-id>-gallery-1..N.webp  — optional extra screenshots
+```
+
+---
+
+### Epic 21.2: Experience Company Logos
+
+**Context:** 7 experience entries with zero visual branding.
+
+| # | Task | Complexity | Placeholder | Description |
+|---|------|-----------|-------------|-------------|
+| 1 | Add `logo` field to `Experience` type and all 7 entries in `data/experience.json` | 1 | `"/images/placeholder/company.svg"` | Generic building/briefcase SVG icon |
+| 2 | Create `<CompanyLogo>` atom — circular or rounded frame with company logo | 1 | SVG placeholder | 48×48 rounded container |
+| 3 | Update `Experience.astro` timeline — add logo to left side of each timeline entry | 2 | Placeholder per company | Logo + vertical timeline line |
+| 4 | Add entrance animation — logo fades in + scale from 0.8 with stagger | 1 | — | Uses motion.ts `staggerItem` variant |
+
+**Assets You'll Need to Provide (7 logos):**
+```
+public/images/experience/<company-id>.webp   — 96×96, circular-crop friendly
+```
+Companies: Ferswit, Forum Asisten, AMIKOM, Aksoro, Bangkit, Samsung Innovation Campus, IDCamp.
+
+---
+
+### Epic 21.3: Hero Animated Profile Photo
+
+**Context:** Profile photo only appears in About section. Hero has no personality photo.
+
+| # | Task | Complexity | Placeholder | Description |
+|---|------|-----------|-------------|-------------|
+| 1 | Create `<HeroAvatar>` component — profile photo with decorative geometric frame | 3 | Existing `profile-400x500.webp` | Reuses existing profile photo |
+| 2 | Add floating animation — subtle y-axis drift (3px, 4s loop) using Framer Motion | 2 | — | Feels alive, not static |
+| 3 | Add decorative frame — rotating/breathing brand-colored geometric border (hexagon or circle) | 3 | CSS `clip-path` or SVG mask | Brand-geometric frame |
+| 4 | Position in hero — right side on desktop, below text on mobile | 1 | — | Responsive grid |
+| 5 | Add entrance animation — scale + fade in with hero stage sequence | 1 | — | Syncs with existing 4-stage hero entrance |
+| 6 | Add hover effect — photo "unlocks" slightly (rotate 2deg, shadow lift) | 1 | — | CSS transition |
+
+**Asset:** Uses existing `profile-400x500.webp`. Consider a more hero-worthy photo later.
+
+---
+
+### Epic 21.4: Certification Badge Wall
+
+**Context:** 54 certifications — text-only accordion. No visual badges.
+
+| # | Task | Complexity | Placeholder | Description |
+|---|------|-----------|-------------|-------------|
+| 1 | Add `badge` field to `Certification` type and all 54 entries in `data/certifications.json` | 2 | `"/images/placeholder/badge.svg"` | Generic badge SVG |
+| 2 | Add `issuerLogo` field — per-issuer logo reference | 1 | `"/images/placeholder/issuer.svg"` | Dicoding, Google, Cisco, etc. |
+| 3 | Create `<BadgeGrid>` organism — filterable grid of certification badges | 3 | Badge placeholders | Grid with issuer filter tabs |
+| 4 | Create `<CertBadge>` atom — circular badge image with issuer name overlay | 2 | SVG badge | Badge image + text on hover |
+| 5 | Add hover animation — badge lifts, shows detail tooltip | 2 | — | Uses Tooltip atom + motion.ts |
+| 6 | Add "count by issuer" grouping — visual section per issuer with header | 1 | — | Clean grouping |
+
+**Assets You'll Need to Provide (54 badges + 6 issuer logos):**
+```
+public/images/certs/badges/<cert-id>.webp       — 120×120 badge images
+public/images/certs/issuers/<issuer>.webp       — issuer logos
+```
+
+---
+
+### Epic 21.5: Animated Skill Icons
+
+**Context:** Icon names stored in skill data (`"brain"`, `"code"`, etc.) but never rendered.
+
+| # | Task | Complexity | Placeholder | Description |
+|---|------|-----------|-------------|-------------|
+| 1 | Create custom SVG icon set for all 8 skill categories — inline SVGs with brand colors | 2 | lucide-react icons as fallback | Use same icons from game-menu screens |
+| 2 | Update `SkillsExplorer.tsx` — render category icon next to category name in tab buttons | 1 | lucide-react | Icon + label in pill button |
+| 3 | Add hover animation — icon rotates/transforms on hover | 2 | — | CSS or Framer Motion per icon |
+| 4 | Render skill icon in skill cards — small icon before skill name | 1 | lucide-react | Same mapping |
+| 5 | Create `<SkillIcon>` atom component — icon lookup + animation wrapper | 2 | lucide-react fallback | Future-ready for custom SVGs |
+
+**Asset:** lucide-react icons work as fallback. Custom SVGs optional.
+
+---
+
+### Epic 21.6: Blog Hero Images
+
+**Context:** 3 blog posts all use the same placeholder `/og-image.png`.
+
+| # | Task | Complexity | Placeholder | Description |
+|---|------|-----------|-------------|-------------|
+| 1 | Create per-post hero images in blog frontmatter — update all 3 `.md` files | 1 | `"/images/placeholder/blog.svg"` | Per-post placeholder SVG |
+| 2 | Update `BlogLayout.astro` — render hero image at top of article as full-bleed banner | 2 | SVG placeholder | 1200×600, below header |
+| 3 | Add scroll reveal for blog hero — parallax or blur-to-clear on scroll | 2 | — | Subtle effect using motion.ts |
+| 4 | Update blog index cards — use post-specific image | 1 | SVG placeholder | Thumbnail in blog card |
+
+**Assets You'll Need to Provide (3 images):**
+```
+public/images/blog/<post-slug>-hero.webp   — 1200×600 each
+```
+
+---
+
+### Epic 21.7: Honors Trophy Gallery
+
+**Context:** 3 awards — text only.
+
+| # | Task | Complexity | Placeholder | Description |
+|---|------|-----------|-------------|-------------|
+| 1 | Add `image` field to `Honor` type and all 3 entries in `data/honors.json` | 1 | `"/images/placeholder/trophy.svg"` | Trophy/medal SVG |
+| 2 | Redesign `Honors.astro` — visual card with trophy image + event + description | 2 | SVG placeholder | Card with image left, text right |
+| 3 | Add animated border glow on featured honors | 1 | — | Pulse on AMICTA winner using motion.ts |
+
+**Assets You'll Need to Provide (3 images):**
+```
+public/images/honors/<honor-id>.webp   — 400×400 each
+```
+
+---
+
+### Epic 21.8: Custom Cursor
+
+**Context:** No custom cursor — default browser cursor everywhere.
+
+| # | Task | Complexity | Description |
+|---|------|-----------|-------------|
+| 1 | Create `<CustomCursor>` island — dot follower + ring behind cursor | 3 | Pure CSS + Framer Motion, no images needed |
+| 2 | Add hover states — cursor ring expands on hoverable elements | 2 | `document.querySelectorAll('a, button, [tabindex]')` |
+| 3 | Add click ripple effect — ring pulses on click | 1 | Scale animation |
+| 4 | Add text selection cursor — ring hides when selecting text | 1 | `::selection` check |
+| 5 | Disable on touch devices — mobile/tablet default cursor | 1 | `matchMedia('(hover: hover)')` |
+| 6 | Respect `prefers-reduced-motion` — hide custom cursor | 1 | Motion check |
+
+**No external assets needed** — pure code effect.
+
+---
+
+### Epic 21.9: 3D Tilt Project Cards
+
+**Context:** Basic hover lift exists. No 3D perspective tilt.
+
+| # | Task | Complexity | Description |
+|---|------|-----------|-------------|
+| 1 | Create `<TiltCard>` molecule — 3D rotation based on mouse position | 3 | CSS `perspective` + `transform: rotateX/Y` |
+| 2 | Add max rotation angles — `maxTilt={3}` degrees | 2 | Prevent excessive tilt |
+| 3 | Add glare effect — gradient overlay that moves with tilt | 2 | `background: radial-gradient` follows cursor |
+| 4 | Apply to project cards, certification cards | 1 | Wrap existing card components |
+
+**No external assets needed** — pure CSS + JS effect.
+
+---
+
+### Epic 21.10: Hero Split Text Animation
+
+**Context:** Existing Sprint 16 covers `SplitText` and `RevealText`. This epic integrates those into the hero.
+
+| # | Task | Complexity | Dependencies | Description |
+|---|------|-----------|-------------|-------------|
+| 1 | Connect `SplitText` into hero — first name character-by-character from left | 2 | Sprint 16 | Premium Apple-style reveal |
+| 2 | Connect `RevealText` into hero headline — word-by-word stagger | 2 | Sprint 16 | Different pace from name |
+| 3 | Fallback for reduced motion — render text normally | 1 | — | Use existing motion design system |
+
+**No external assets needed** — uses existing Sprint 16 componentry.
+
+---
+
+### Epic 21.11: Testimonials Section
+
+**Context:** Zero social proof on the portfolio.
+
+| # | Task | Complexity | Placeholder | Description |
+|---|------|-----------|-------------|-------------|
+| 1 | Create `data/testimonials.json` with schema: `{ name, role, company, quote, avatar?, url? }` | 1 | `"/images/placeholder/avatar.svg"` | 2-3 placeholder entries |
+| 2 | Create `<Testimonials>` organism — card grid or single featured quote | 2 | SVG avatars | Clean cards with avatar + quote |
+| 3 | Add "featured testimonial" variant — larger card, more visual weight | 2 | — | For the most impactful quote |
+| 4 | Add scroll reveal — stagger entry for each testimonial | 1 | — | Uses ScrollReveal island |
+| 5 | Integrate into homepage — new section after GitHub/Contact | 1 | — | One more section before footer |
+
+**Assets You'll Need to Provide (2-6 avatar images + quote text):**
+```
+public/images/testimonials/<person-id>.webp   — 96×96, circular
+```
+
+---
+
+### Implementation Order (recommended)
+
+| Phase | Epics | Why First |
+|-------|-------|-----------|
+| **Phase 1** (no assets) | 21.8 Custom Cursor, 21.9 Tilt Cards, 21.10 Split Text, 21.3 Hero Avatar | Zero asset dependency, high wow-per-effort |
+| **Phase 2** (lucide fallback) | 21.5 Skill Icons | Works immediately with existing icons |
+| **Phase 3** (needs your assets) | 21.1 Project Gallery, 21.2 Company Logos, 21.4 Badge Wall, 21.6 Blog Images, 21.7 Honors Gallery, 21.11 Testimonials | All need real images — implemented with SVG placeholders |
+
+### DoD (Definition of Done)
+
+- [ ] All 11 epics implemented with responsive layouts
+- [ ] SVG placeholders render correctly in all viewport sizes
+- [ ] Every placeholder annotated with `{/* ASSET NEEDED: path/to/real/image.webp */}` comment
+- [ ] All animations respect `prefers-reduced-motion`
+- [ ] No visual regressions on existing content
+- [ ] Build completes without errors
+- [ ] Components gracefully degrade when images are missing
+
+---
+
 ## Summary of All Sprints
 
 | # | Sprint | Focus | Key Outcome |
@@ -1176,6 +1405,7 @@ Contact      → "Let's create"                — Clean CTA
 | **18** | Theme Customizer & Context-Aware UI | Accent color, density, time-aware greeting | Adaptive UX |
 | **19** | The "Wow Audit" | Feature assessment, Lightning Mode | Curated excellence |
 | **20** | Micro-interaction Components | InteractionButton, InteractionCard, Skeleton | Polished interactive elements |
+| **21** | Premium Visual Assets & Showcase | Project images, company logos, cert badges, skill icons, custom cursor, tilt cards, testimonials | Rich visual showcase |
 
 ---
 
@@ -1200,6 +1430,7 @@ This plan covers **20 focused sprints** across core frontend engineering domains
 | **Theme Customization** | Sprint 18 | ✅ Accent color + density + time-aware UI |
 | **Micro-interactions** | Sprint 20 | ✅ InteractionButton, InteractionCard, Skeleton |
 | **Quality / Audit** | Sprint 19 | ✅ Feature assessment + Lightning Mode |
+| **Visual Assets** | Sprint 21 | ✅ Project screenshots, company logos, cert badges, skill icons, testimonials |
 
 ### What Was Cut (and Why)
 
@@ -1213,7 +1444,7 @@ This plan covers **20 focused sprints** across core frontend engineering domains
 
 | Metric | Target | Actual Estimate |
 |--------|--------|----------------|
-| **Total Sprints** | — | 20 focused sprints |
+| **Total Sprints** | — | 21 focused sprints |
 | **Core UI/UX** | 100% | 100% (Sprints 1-10) |
 | **Creative Enhancements** | 100% | ~80% (Sprints 11-20, trimmed) |
 | **Performance Budget** | <300KB JS (gzipped) | Achievable with lazy loading |
@@ -1223,9 +1454,9 @@ This plan covers **20 focused sprints** across core frontend engineering domains
 
 ### Final Verdict
 
-**✅ Core domains covered.** This trimmed plan delivers a polished, professional portfolio with design system, accessibility, motion, 3D polish, and interactive data visualizations — without the bloat of custom shaders, GPU particles, or cinematic showcases.
+**✅ Core domains covered.** This plan delivers a polished, professional portfolio with design system, accessibility, motion, 3D polish, interactive data visualizations, and a rich visual asset layer — without the bloat of custom shaders, GPU particles, or cinematic showcases.
 
-**🎯 Recommendation:** Build Sprints 1-10 first for a solid foundation. Then selectively add creative enhancements (Sprints 11-20) based on available time. The portfolio will already stand out after Sprints 1-10.
+**🎯 Recommendation:** Build Sprints 1-10 first for a solid foundation. Then add creative enhancements (Sprints 11-20) based on available time. Sprint 21 (visual assets) is the final polish layer — implement after you've secured the actual image assets (project screenshots, logos, badges).
 
 The plan is ready. Time to build.
 

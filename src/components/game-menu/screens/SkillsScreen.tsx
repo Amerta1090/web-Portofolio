@@ -11,6 +11,7 @@ import {
 import type React from "react";
 import { useState } from "react";
 import skillsData from "../../../../data/skills.json";
+import { duration, easing, stagger, distance } from "../../../lib/motion";
 
 const ICON_CLASS = "w-[1em] h-[1em] inline-block align-middle";
 
@@ -45,18 +46,18 @@ export const SkillsScreen: React.FC = () => {
     <div className="w-full h-full px-16 py-8 relative overflow-y-auto">
       <motion.div
         className="mb-6"
-        initial={{ opacity: 0, x: -20 }}
+        initial={{ opacity: 0, x: -distance.moderate }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.05 }}
+        transition={{ delay: duration.fast }}
       >
         <span className="text-xs text-text-secondary">Abilities / Skills</span>
       </motion.div>
 
       <motion.div
         className="flex flex-wrap gap-1.5 mb-6"
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: distance.subtle }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
+        transition={{ delay: duration.normal }}
       >
         {categories.map((cat: any, idx: number) => (
           <button
@@ -80,7 +81,7 @@ export const SkillsScreen: React.FC = () => {
         className="mb-6"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.13 }}
+        transition={{ delay: duration.slow }}
       >
         <input
           type="text"
@@ -96,7 +97,7 @@ export const SkillsScreen: React.FC = () => {
           className="flex items-center gap-3 mb-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.15 }}
+          transition={{ delay: duration.slow }}
         >
           <span className="text-brand text-xl flex items-center">{categoryIcons[currentCategory.name]}</span>
           <span className="text-xl font-semibold text-text-primary">{currentCategory.name}</span>
@@ -117,7 +118,7 @@ export const SkillsScreen: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.15 }}
+          transition={{ duration: duration.fast }}
         >
           {displaySkills.map((skill: any, idx: number) => (
             <motion.div
@@ -125,7 +126,7 @@ export const SkillsScreen: React.FC = () => {
               className="border border-border rounded-lg bg-bg-secondary/30 p-4 hover:border-brand/30 transition-all group"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.025 }}
+              transition={{ delay: idx * stagger.quick }}
               whileHover={{ y: -2 }}
             >
               <div className="flex items-center justify-between gap-3 mb-2">
@@ -137,7 +138,7 @@ export const SkillsScreen: React.FC = () => {
                   className="h-full bg-brand rounded-full"
                   initial={{ width: 0 }}
                   animate={{ width: `${((skill.proficiency || 0) / 5) * 100}%` }}
-                  transition={{ delay: 0.2 + idx * 0.03, duration: 0.5, ease: "easeOut" }}
+                  transition={{ delay: duration.normal + idx * stagger.normal, duration: duration.slow, ease: easing["ease-out-expo"] }}
                 />
               </div>
               {searchQuery && (

@@ -4,20 +4,23 @@
     "event": "Ignition Informatics 2024",
     "date": "2024",
     "category": "competition",
-    "description": null
+    "description": null,
+    "image": "/images/placeholder/trophy.svg"
   },
   {
     "title": "Winner - AMICTA 2025",
     "event": "AMICTA Awards",
     "date": "2025",
     "category": "competition",
-    "description": "Artificial Intelligence Category"
+    "description": "Artificial Intelligence Category",
+    "image": "/images/placeholder/trophy.svg"
   },
   {
     "title": "2nd Place Winner in Artificial Intelligence",
     "event": "ARCADIA Award 2026",
     "date": "2026",
     "category": "competition",
-    "description": null
+    "description": null,
+    "image": "/images/placeholder/trophy.svg"
   }
 ]

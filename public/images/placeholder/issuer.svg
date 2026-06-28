@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="40" viewBox="0 0 80 40">
+  <rect width="80" height="40" rx="6" fill="#EDEFEA"/>
+  <rect x="0" y="0" width="80" height="40" rx="6" fill="rgba(122,140,111,0.06)"/>
+  <g transform="translate(40,20)" text-anchor="middle" font-family="Inter, system-ui, sans-serif">
+    <rect x="-24" y="-10" width="48" height="16" rx="3" fill="#7A8C6F" opacity="0.1"/>
+    <text y="3" font-size="7" fill="#6B7268" font-weight="500">ISSUER</text>
+    <text y="18" font-size="6" fill="#C17F59">ASSET NEEDED</text>
+  </g>
+</svg>

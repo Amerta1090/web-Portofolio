@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
+  <rect width="120" height="120" rx="12" fill="#EDEFEA"/>
+  <rect x="0" y="0" width="120" height="120" rx="12" fill="rgba(122,140,111,0.08)"/>
+  <g transform="translate(60,60)" text-anchor="middle" font-family="Inter, system-ui, sans-serif">
+    <circle r="28" fill="none" stroke="#7A8C6F" stroke-width="1.5" opacity="0.3"/>
+    <circle r="18" fill="none" stroke="#C17F59" stroke-width="1" opacity="0.2"/>
+    <path d="M-4-4 L4-4 L4-4 L8 0 L4 4 L-4 4 L-8 0Z" fill="#7A8C6F" opacity="0.15"/>
+    <text y="48" font-size="7" fill="#6B7268" font-weight="500">BADGE</text>
+    <text y="58" font-size="6" fill="#C17F59">ASSET NEEDED</text>
+  </g>
+</svg>

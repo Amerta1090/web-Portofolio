@@ -1,13 +1,14 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   Activity, ArrowLeftFromLine, Award, BarChart3, ChevronRight,
-  Code2, Columns3, FileText, FolderKanban, Gamepad2, Globe,
-  History, House, Images, Info, LayoutGrid, Mail, Monitor,
-  Settings, Star, User, Volume2,
+  Code2, Columns3, ExternalLink, FileText, FolderKanban, Gamepad2,
+  GitFork, Globe, History, House, Images, Info, LayoutGrid,
+  Mail, Monitor, Settings, Star, User, Volume2,
 } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { duration, easing, stagger, distance } from "../../lib/motion";
 import certificationsData from "../../../data/certifications.json";
 import experienceData from "../../../data/experience.json";
 import profileData from "../../../data/profile.json";
@@ -107,11 +108,7 @@ const MENU_TREE: MenuItem[] = [
   {
     id: "github",
     label: "GitHub",
-    icon: (
-      <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
-      </svg>
-    ),
+    icon: <GitFork className="w-6 h-6" aria-hidden="true" />,
     children: [
       {
         id: "pinned-repos",
@@ -259,7 +256,7 @@ const SidebarNavItem: React.FC<{
         }
       }}
       onClick={() => onSelect(index)}
-      whileHover={{ x: 6 }}
+      whileHover={{ x: distance.subtle }}
       whileTap={{ scale: 0.97 }}
     >
       <div
@@ -283,7 +280,7 @@ const SidebarNavItem: React.FC<{
           <motion.div
             layoutId="sidebarIndicator"
             className="w-2 h-2 bg-brand"
-            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            transition={easing["ease-spring-snappy"]}
           />
         )}
       </div>
@@ -309,7 +306,7 @@ const Sidebar: React.FC<{
       initial={!!prefersReduced ? { x: 0 } : { x: -280 }}
       animate={{ x: 0 }}
       exit={!!prefersReduced ? { x: 0 } : { x: -280 }}
-      transition={{ type: "spring", stiffness: 200, damping: 25 }}
+      transition={easing["ease-spring-gentle"]}
     >
       <div className="px-5 pt-5 pb-3 border-b border-border">
         <h2 className="text-lg font-semibold text-text-primary">
@@ -387,7 +384,7 @@ const ScreenTransition: React.FC<{
           ? "polygon(0 0, 0 0, 0 100%, 0 100%)"
           : "polygon(100% 0, 100% 0, 100% 100%, 100% 100%)",
     }}
-    transition={{ type: "spring", stiffness: 120, damping: 18 }}
+    transition={easing["ease-spring-gentle"]}
   >
     {children}
   </motion.div>
@@ -421,11 +418,7 @@ const ContactScreen: React.FC = () => {
           rel="noopener noreferrer"
           className="flex items-center gap-4 px-5 py-4 border border-border hover:border-brand/40 rounded-lg transition-colors group"
         >
-          <svg className="w-5 h-5 text-text-secondary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-            <rect x="2" y="9" width="4" height="12" />
-            <circle cx="4" cy="4" r="2" />
-          </svg>
+          <ExternalLink className="w-5 h-5 text-text-secondary shrink-0" aria-hidden="true" />
           <span className="text-sm text-text-primary group-hover:text-brand transition-colors">
             LinkedIn
           </span>
@@ -436,10 +429,7 @@ const ContactScreen: React.FC = () => {
           rel="noopener noreferrer"
           className="flex items-center gap-4 px-5 py-4 border border-border hover:border-brand/40 rounded-lg transition-colors group"
         >
-          <svg className="w-5 h-5 text-text-secondary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
-            <path d="M9 18c-4.51 2-5-2-7-2" />
-          </svg>
+          <GitFork className="w-5 h-5 text-text-secondary shrink-0" aria-hidden="true" />
           <span className="text-sm text-text-primary group-hover:text-brand transition-colors">
             GitHub
           </span>
@@ -873,7 +863,7 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
           aria-label="Navigation menu"
           initial={!!prefersReduced ? { opacity: 1 } : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={!!prefersReduced ? { opacity: 1 } : { opacity: 0, transition: { duration: 0.15 } }}
+          exit={!!prefersReduced ? { opacity: 1 } : { opacity: 0, transition: { duration: duration.fast } }}
           style={{ pointerEvents: "auto" }}
         >
           {/* Sidebar */}

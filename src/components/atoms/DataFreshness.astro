@@ -1,4 +1,6 @@
 ---
+import { Clock } from "lucide-react";
+
 export interface Props {
   fetchedAt?: string;
   label?: string;
@@ -24,10 +26,7 @@ function timeAgo(dateStr: string): string {
 {
   fetchedAt && (
     <p class="text-xs text-text-secondary flex items-center gap-1.5">
-      <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10" />
-        <polyline points="12 6 12 12 16 14" />
-      </svg>
+      <Clock class="w-3 h-3" aria-hidden="true" />
       {label} {timeAgo(fetchedAt)}
     </p>
   )

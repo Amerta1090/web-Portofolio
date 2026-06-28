@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import type React from "react";
 import experienceData from "../../../../data/experience.json";
+import { duration, easing, stagger, distance } from "../../../lib/motion";
 
 const typeColors: Record<string, string> = {
   "full-time": "bg-brand",
@@ -17,9 +18,9 @@ export const ExperienceScreen: React.FC = () => {
     <div className="w-full h-full px-16 py-8 relative overflow-y-auto">
       <motion.div
         className="mb-6"
-        initial={{ opacity: 0, x: -20 }}
+        initial={{ opacity: 0, x: -distance.moderate }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.05 }}
+        transition={{ delay: duration.fast }}
       >
         <span className="text-xs text-text-secondary">Work History / Experience</span>
       </motion.div>
@@ -31,9 +32,9 @@ export const ExperienceScreen: React.FC = () => {
           <motion.div
             key={exp.id || idx}
             className="flex items-start gap-6 relative pl-12"
-            initial={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, x: -distance.moderate }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 + idx * 0.08, type: "spring", stiffness: 100 }}
+            transition={{ delay: duration.fast + idx * stagger.relaxed, ...easing["ease-spring-gentle"] }}
           >
             <div
               className={`absolute left-[10px] top-2 w-[18px] h-[18px] rounded-full border-2 border-bg-primary ${typeColors[exp.type] || "bg-brand"} z-10`}
@@ -41,7 +42,7 @@ export const ExperienceScreen: React.FC = () => {
 
             <motion.div
               className="flex-1 border border-border rounded-lg bg-bg-secondary/50 p-5 hover:border-brand/30 transition-colors"
-              whileHover={{ x: 4 }}
+              whileHover={{ x: distance.micro }}
             >
               <div className="flex items-start justify-between gap-4 mb-2">
                 <div>

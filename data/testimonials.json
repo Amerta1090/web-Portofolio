@@ -1,0 +1,29 @@
+[
+  {
+    "id": "testimonial-1",
+    "name": "Nama Klien 1",
+    "role": "Posisi",
+    "company": "Perusahaan",
+    "text": "Testimonial placeholder — ganti dengan kutipan asli dari klien atau rekan kerja.",
+    "avatar": "/images/placeholder/avatar.svg",
+    "company_logo": "/images/placeholder/company.svg"
+  },
+  {
+    "id": "testimonial-2",
+    "name": "Nama Klien 2",
+    "role": "Posisi",
+    "company": "Perusahaan",
+    "text": "Testimonial placeholder — ganti dengan kutipan asli dari klien atau rekan kerja.",
+    "avatar": "/images/placeholder/avatar.svg",
+    "company_logo": "/images/placeholder/company.svg"
+  },
+  {
+    "id": "testimonial-3",
+    "name": "Nama Klien 3",
+    "role": "Posisi",
+    "company": "Perusahaan",
+    "text": "Testimonial placeholder — ganti dengan kutipan asli dari klien atau rekan kerja.",
+    "avatar": "/images/placeholder/avatar.svg",
+    "company_logo": "/images/placeholder/company.svg"
+  }
+]

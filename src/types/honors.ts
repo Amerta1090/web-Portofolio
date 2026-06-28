@@ -4,4 +4,6 @@ export interface Honor {
   date: string;
   category: string;
   description: string | null;
+  /** Trophy / award image path */
+  image?: string;
 }

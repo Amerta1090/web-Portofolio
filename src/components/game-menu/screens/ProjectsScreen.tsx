@@ -3,6 +3,7 @@ import { BrainCircuit, Container, Cpu, Globe2, Terminal } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
 import projectsData from "../../../../data/projects.json";
+import { duration, stagger, distance } from "../../../lib/motion";
 
 const ICON_CLASS = "w-[1em] h-[1em] inline-block align-middle";
 
@@ -29,18 +30,18 @@ export const ProjectsScreen: React.FC = () => {
     <div className="w-full h-full px-16 py-8 relative overflow-y-auto">
       <motion.div
         className="mb-6"
-        initial={{ opacity: 0, x: -20 }}
+        initial={{ opacity: 0, x: -distance.moderate }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.05 }}
+        transition={{ delay: duration.fast }}
       >
         <span className="text-xs text-text-secondary">Portfolio / Projects</span>
       </motion.div>
 
       <motion.div
         className="flex gap-2 mb-6 flex-wrap"
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: distance.subtle }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
+        transition={{ delay: duration.normal }}
       >
         <button
           className={`text-xs px-3 py-1.5 rounded border transition-colors ${
@@ -70,9 +71,9 @@ export const ProjectsScreen: React.FC = () => {
       {!activeFilter && featured.length > 0 && (
         <motion.div
           className="mb-6 border border-border rounded-lg bg-brand/5 p-4"
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: distance.subtle }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
+          transition={{ delay: duration.slow }}
         >
           <div className="text-xs text-brand font-medium mb-3">Featured</div>
           <div className="flex gap-3">
@@ -95,16 +96,16 @@ export const ProjectsScreen: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.15 }}
+          transition={{ duration: duration.fast }}
         >
           {filtered.map((proj: any, idx: number) => (
             <motion.div
               key={proj.title}
               className="border border-border rounded-lg bg-bg-secondary/30 p-5 hover:border-brand/30 transition-all cursor-default group"
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: distance.moderate }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.03 }}
-              whileHover={{ y: -3 }}
+              transition={{ delay: idx * stagger.normal }}
+              whileHover={{ y: -distance.micro }}
             >
               <div className="flex items-start justify-between gap-3 mb-2">
                 <div className="flex-1 min-w-0">

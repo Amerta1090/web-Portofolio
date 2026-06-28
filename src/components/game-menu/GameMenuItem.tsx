@@ -1,5 +1,6 @@
 import { type Variants, motion } from "framer-motion";
 import type React from "react";
+import { duration, easing, distance } from "../../lib/motion";
 
 interface GameMenuItemProps {
   label: string;
@@ -13,21 +14,21 @@ interface GameMenuItemProps {
 }
 
 const menuItemVariants: Variants = {
-  hidden: { opacity: 0, x: -30, scale: 0.95 },
+  hidden: { opacity: 0, x: -distance.significant, scale: 0.95 },
   visible: {
     opacity: 1,
     x: 0,
     scale: 1,
-    transition: { type: "spring", stiffness: 300, damping: 20 },
+    transition: easing["ease-spring-gentle"],
   },
   hover: {
     scale: 1.02,
-    x: 8,
-    transition: { type: "spring", stiffness: 400, damping: 10 },
+    x: distance.subtle,
+    transition: easing["ease-spring-snappy"],
   },
   tap: {
     scale: 0.97,
-    transition: { duration: 0.1 },
+    transition: { duration: duration.instant },
   },
 };
 

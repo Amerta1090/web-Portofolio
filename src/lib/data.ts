@@ -4,6 +4,7 @@ import type { Honor } from "../types/honors";
 import type { Profile } from "../types/profile";
 import type { Project } from "../types/projects";
 import type { SkillsData } from "../types/skills";
+import type { Testimonial } from "../types/testimonials";
 import type { TimelineItem } from "../types/timeline";
 import type { Volunteering } from "../types/volunteering";
 
@@ -13,6 +14,7 @@ import honorsData from "../../data/honors.json";
 import profileData from "../../data/profile.json";
 import projectsData from "../../data/projects.json";
 import skillsData from "../../data/skills.json";
+import testimonialsData from "../../data/testimonials.json";
 import volunteeringData from "../../data/volunteering.json";
 
 export function getProfile(): Profile {
@@ -51,6 +53,10 @@ export function getVolunteering(): Volunteering[] {
 
 export function getHonors(): Honor[] {
   return honorsData as Honor[];
+}
+
+export function getTestimonials(): Testimonial[] {
+  return testimonialsData as Testimonial[];
 }
 
 function parseDate(dateStr: string | null): { year: number; month: number } | null {

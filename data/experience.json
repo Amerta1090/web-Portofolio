@@ -14,8 +14,15 @@
       "Managed VPS infrastructure, deployment, monitoring",
       "Implemented automation and AI-driven solutions"
     ],
-    "technologies": ["Python", "Django", "JavaScript", "PostgreSQL", "Docker"],
-    "url": null
+    "technologies": [
+      "Python",
+      "Django",
+      "JavaScript",
+      "PostgreSQL",
+      "Docker"
+    ],
+    "url": null,
+    "logo": "/images/placeholder/company.svg"
   },
   {
     "id": "forum-asisten",
@@ -29,8 +36,14 @@
       "Assisted in laboratory instruction for informatics students",
       "Supported curriculum delivery and practical exam administration"
     ],
-    "technologies": ["Python", "Data Science", "Tableau", "SPSS"],
-    "url": null
+    "technologies": [
+      "Python",
+      "Data Science",
+      "Tableau",
+      "SPSS"
+    ],
+    "url": null,
+    "logo": "/images/placeholder/company.svg"
   },
   {
     "id": "amikom-ai",
@@ -44,8 +57,13 @@
       "Developed AI and machine learning solutions for academic projects",
       "Contributed to research and development of intelligent systems"
     ],
-    "technologies": ["Machine Learning", "Python", "Deep Learning"],
-    "url": null
+    "technologies": [
+      "Machine Learning",
+      "Python",
+      "Deep Learning"
+    ],
+    "url": null,
+    "logo": "/images/placeholder/company.svg"
   },
   {
     "id": "aksoro",
@@ -59,8 +77,12 @@
       "Trained AI models through prompt engineering",
       "Developed prompt strategies for improved model outputs"
     ],
-    "technologies": ["Prompt Engineering", "AI"],
-    "url": null
+    "technologies": [
+      "Prompt Engineering",
+      "AI"
+    ],
+    "url": null,
+    "logo": "/images/placeholder/company.svg"
   },
   {
     "id": "bangkit",
@@ -75,8 +97,13 @@
       "Built AI-powered wellness application as capstone project",
       "Developed skills in TensorFlow, NLP, and computer vision"
     ],
-    "technologies": ["TensorFlow", "Machine Learning", "Python"],
-    "url": null
+    "technologies": [
+      "TensorFlow",
+      "Machine Learning",
+      "Python"
+    ],
+    "url": null,
+    "logo": "/images/placeholder/company.svg"
   },
   {
     "id": "samsung-innovation",
@@ -90,8 +117,13 @@
       "Participated in IoT and coding education program",
       "Developed embedded systems and IoT projects"
     ],
-    "technologies": ["IoT", "Embedded Systems", "C++"],
-    "url": null
+    "technologies": [
+      "IoT",
+      "Embedded Systems",
+      "C++"
+    ],
+    "url": null,
+    "logo": "/images/placeholder/company.svg"
   },
   {
     "id": "idcamp",
@@ -105,7 +137,12 @@
       "Completed data science and web development coursework",
       "Built student retention prediction system as final project"
     ],
-    "technologies": ["Data Science", "Machine Learning", "Python"],
-    "url": null
+    "technologies": [
+      "Data Science",
+      "Machine Learning",
+      "Python"
+    ],
+    "url": null,
+    "logo": "/images/placeholder/company.svg"
   }
 ]

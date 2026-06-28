@@ -1,6 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { duration, easing } from "../lib/motion";
 
 interface Props {
   name: string;
@@ -18,10 +19,10 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
       setStage(4);
       return;
     }
-    const t1 = setTimeout(() => setStage(1), 100);
-    const t2 = setTimeout(() => setStage(2), 500);
-    const t3 = setTimeout(() => setStage(3), 900);
-    const t4 = setTimeout(() => setStage(4), 1200);
+    const t1 = setTimeout(() => setStage(1), duration.fast * 1000);
+    const t2 = setTimeout(() => setStage(2), duration.slow * 1000);
+    const t3 = setTimeout(() => setStage(3), (duration.normal + duration.deliberate) * 1000);
+    const t4 = setTimeout(() => setStage(4), duration.narrative * 1000);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
@@ -67,7 +68,7 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
             className="mb-6"
             initial={{ opacity: 0, x: -20 }}
             animate={stage >= 1 ? { opacity: 1, x: 0 } : {}}
-            transition={{ type: "spring", stiffness: 100 }}
+            transition={easing["ease-spring-gentle"]}
           >
             <span className="text-xs text-text-secondary">{tagline}</span>
           </motion.div>
@@ -76,7 +77,7 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
             className="text-5xl md:text-7xl font-bold text-brand leading-tight"
             initial={{ opacity: 0, x: -80 }}
             animate={stage >= 2 ? { opacity: 1, x: 0 } : {}}
-            transition={{ type: "spring", stiffness: 80, damping: 15 }}
+            transition={{ ...easing["ease-spring-gentle"], stiffness: 80, damping: 15 }}
           >
             {firstName}
           </motion.h1>
@@ -85,7 +86,7 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
             className="text-4xl md:text-6xl font-bold text-text-primary leading-tight mt-2"
             initial={{ opacity: 0, x: -60 }}
             animate={stage >= 2 ? { opacity: 1, x: 0 } : {}}
-            transition={{ type: "spring", stiffness: 80, damping: 15, delay: 0.1 }}
+            transition={{ ...easing["ease-spring-gentle"], stiffness: 80, damping: 15, delay: duration.fast }}
           >
             {restName}
           </motion.h1>
@@ -94,7 +95,7 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
             className="mt-8"
             initial={{ opacity: 0, scale: 0.85 }}
             animate={stage >= 3 ? { opacity: 1, scale: 1 } : {}}
-            transition={{ type: "spring", stiffness: 200, damping: 15 }}
+            transition={{ ...easing["ease-spring-gentle"], stiffness: 200, damping: 15 }}
           >
             <div className="border-l-4 border-brand pl-5">
               <p className="text-xl md:text-2xl font-medium text-text-primary">
@@ -107,7 +108,7 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
             className="mt-12 flex gap-4 flex-wrap"
             initial={{ opacity: 0, y: 50 }}
             animate={stage >= 4 ? { opacity: 1, y: 0 } : {}}
-            transition={{ type: "spring", stiffness: 150, damping: 20 }}
+            transition={easing["ease-spring-gentle"]}
           >
             <a
               href="/#contact"
@@ -129,14 +130,14 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
             className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
             initial={{ opacity: 0 }}
             animate={stage >= 4 ? { opacity: 1 } : {}}
-            transition={{ delay: 0.5 }}
+            transition={{ delay: duration.slow }}
           >
             <span className="text-[10px] text-text-secondary/30">Scroll</span>
             {!prefersReduced && (
               <motion.div
                 className="w-px h-8 bg-border"
                 animate={{ height: [8, 24, 8] }}
-                transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+                transition={{ duration: duration.narrative + duration.deliberate, repeat: Number.POSITIVE_INFINITY }}
               />
             )}
             {prefersReduced && <div className="w-px h-3 bg-border" />}

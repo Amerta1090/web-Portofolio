@@ -1,4 +1,5 @@
 ---
+import { ArrowRight, Star } from "lucide-react";
 import type { GitHubData } from "../../types/github";
 
 export interface Props {
@@ -36,7 +37,7 @@ const topRepos = data.pinned_repos.slice(0, 3);
               </span>
             )}
             <span class="flex items-center gap-1">
-              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+              <Star class="w-3 h-3" aria-hidden="true" />
               {repo.stars}
             </span>
           </div>
@@ -60,6 +61,6 @@ const topRepos = data.pinned_repos.slice(0, 3);
     class="text-xs text-brand hover:text-brand-muted transition-colors ml-auto group flex items-center gap-1"
   >
     View all
-    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
+    <ArrowRight class="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
   </a>
 </div>

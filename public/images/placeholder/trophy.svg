@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#EDEFEA"/>
+  <rect x="0" y="0" width="400" height="400" fill="rgba(122,140,111,0.08)"/>
+  <g transform="translate(200,160)" text-anchor="middle" font-family="Inter, system-ui, sans-serif">
+    <path d="M160 60 Q200 40 240 60 L240 100 Q240 140 200 150 Q160 140 160 100Z" fill="#7A8C6F" opacity="0.12"/>
+    <path d="M180 150 L180 200 M220 150 L220 200" stroke="#7A8C6F" stroke-width="3" stroke-linecap="round" opacity="0.2"/>
+    <path d="M160 200 L240 200" stroke="#7A8C6F" stroke-width="4" stroke-linecap="round" opacity="0.15"/>
+    <text y="250" font-size="14" fill="#6B7268" font-weight="500">Honor / Trophy</text>
+    <text y="272" font-size="11" fill="#9CA39C">400×400</text>
+    <text y="300" font-size="10" fill="#C17F59" font-weight="500">ASSET NEEDED</text>
+  </g>
+</svg>

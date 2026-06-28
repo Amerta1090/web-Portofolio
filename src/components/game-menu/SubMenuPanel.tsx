@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeftFromLine, ChevronRight } from "lucide-react";
 import React from "react";
+import { duration, easing, stagger, distance } from "../../lib/motion";
 
 interface Breadcrumb {
   id: string;
@@ -29,11 +30,11 @@ interface SubMenuPanelProps {
 }
 
 const itemVariants = {
-  hidden: { opacity: 0, x: 20 },
+  hidden: { opacity: 0, x: distance.moderate },
   visible: (i: number) => ({
     opacity: 1,
     x: 0,
-    transition: { delay: i * 0.04, type: "spring", stiffness: 200, damping: 22 },
+    transition: { delay: i * stagger.normal, ...easing["ease-spring-gentle"] },
   }),
 };
 
@@ -56,7 +57,7 @@ export const SubMenuPanel: React.FC<SubMenuPanelProps> = ({
           initial={{ x: 320 }}
           animate={{ x: 0 }}
           exit={{ x: 320 }}
-          transition={{ type: "spring", stiffness: 200, damping: 25 }}
+          transition={easing["ease-spring-gentle"]}
         >
           <div className="px-5 pt-5 pb-3 border-b border-border">
             <div className="flex items-center gap-2 text-xs text-text-secondary/60 mb-2">
