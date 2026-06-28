@@ -5,6 +5,10 @@ import TechExplorer from "../../islands/TechExplorer";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getProjects } from "../../lib/data";
 import { fetchReadme } from "../../lib/github";
+import { getMLMetrics } from "../../lib/ml-metrics";
+import LossCurve from "../../components/atoms/LossCurve";
+import NetworkGraph from "../../components/atoms/NetworkGraph";
+import ConfusionMatrix from "../../components/atoms/ConfusionMatrix";
 
 export async function getStaticPaths() {
   const projects = getProjects();
@@ -39,6 +43,8 @@ if (githubLink) {
   }
 }
 
+const mlMetrics = getMLMetrics(project.title);
+
 function extractReadmeSection(content: string, heading: string): string | null {
   const regex = new RegExp(`##\\s*${heading}[\\s\\S]*?(?=\\n##\\s|$)`, "i");
   const match = content.match(regex);
@@ -64,6 +70,7 @@ function extractReadmeSection(content: string, heading: string): string | null {
             <a href="#overview" class="block px-3 py-2 text-sm text-text-secondary hover:text-accent hover:bg-bg-tertiary rounded-lg transition-all">Overview</a>
             <a href="#highlights" class="block px-3 py-2 text-sm text-text-secondary hover:text-accent hover:bg-bg-tertiary rounded-lg transition-all">Highlights</a>
             <a href="#technologies" class="block px-3 py-2 text-sm text-text-secondary hover:text-accent hover:bg-bg-tertiary rounded-lg transition-all">Technologies</a>
+            {mlMetrics && <a href="#ml-metrics" class="block px-3 py-2 text-sm text-text-secondary hover:text-accent hover:bg-bg-tertiary rounded-lg transition-all">ML Metrics</a>}
             <a href="#links" class="block px-3 py-2 text-sm text-text-secondary hover:text-accent hover:bg-bg-tertiary rounded-lg transition-all">Links</a>
           </div>
         </nav>
@@ -98,6 +105,35 @@ function extractReadmeSection(content: string, heading: string): string | null {
               {project.skills.map((skill) => <Tag>{skill}</Tag>)}
             </div>
           </section>
+
+          {mlMetrics && (
+            <section id="ml-metrics" class="mb-10">
+              <h2 class="text-xl font-semibold text-text-primary mb-4">ML Metrics</h2>
+              <div class="space-y-8">
+                {mlMetrics.lossCurve && (
+                  <div class="bg-bg-secondary border border-border rounded-xl p-4 md:p-6">
+                    <h3 class="text-sm font-semibold text-text-primary mb-1">Training & Validation Loss</h3>
+                    <p class="text-xs text-text-secondary mb-4">Model convergence over training epochs</p>
+                    <LossCurve client:load data={mlMetrics.lossCurve} />
+                  </div>
+                )}
+                {mlMetrics.networkGraph && (
+                  <div class="bg-bg-secondary border border-border rounded-xl p-4 md:p-6">
+                    <h3 class="text-sm font-semibold text-text-primary mb-1">Model Architecture</h3>
+                    <p class="text-xs text-text-secondary mb-4">System pipeline — drag nodes to explore connections</p>
+                    <NetworkGraph client:load nodes={mlMetrics.networkGraph.nodes} links={mlMetrics.networkGraph.links} />
+                  </div>
+                )}
+                {mlMetrics.confusionMatrix && (
+                  <div class="bg-bg-secondary border border-border rounded-xl p-4 md:p-6">
+                    <h3 class="text-sm font-semibold text-text-primary mb-1">Confusion Matrix</h3>
+                    <p class="text-xs text-text-secondary mb-4">Classification performance — hover for precision/recall/F1</p>
+                    <ConfusionMatrix client:load matrix={mlMetrics.confusionMatrix.matrix} labels={mlMetrics.confusionMatrix.labels} />
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
 
           {project.links && project.links.length > 0 && (
             <section id="links" class="mb-10">
