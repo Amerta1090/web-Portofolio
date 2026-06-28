@@ -99,8 +99,14 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
 
     <script is:inline>
       (function () {
-        const stored = localStorage.getItem("theme");
-        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        var stored = localStorage.getItem("theme-mode");
+        if (!stored) {
+          try {
+            var z = localStorage.getItem("theme");
+            if (z) { var p = JSON.parse(z); if (p && p.state) stored = p.state.theme; }
+          } catch (e) {}
+        }
+        var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
         if (stored === "light" || (!stored && !prefersDark)) {
           document.documentElement.classList.remove("dark");
         } else {

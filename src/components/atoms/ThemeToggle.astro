@@ -20,17 +20,20 @@ import { Moon, Sun } from "lucide-react";
     const isDark = document.documentElement.classList.contains("dark");
     btn.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
     btn.addEventListener("click", function () {
-      const html = document.documentElement;
-      const isDark = html.classList.contains("dark");
+      var html = document.documentElement;
+      var isDark = html.classList.contains("dark");
       if (isDark) {
         html.classList.remove("dark");
-        localStorage.setItem("theme", "light");
         btn.setAttribute("aria-label", "Switch to dark mode");
       } else {
         html.classList.add("dark");
-        localStorage.setItem("theme", "dark");
         btn.setAttribute("aria-label", "Switch to light mode");
       }
+      var next = isDark ? "light" : "dark";
+      localStorage.setItem("theme-mode", next);
+      try {
+        localStorage.setItem("theme", JSON.stringify({ state: { theme: next }, version: 0 }));
+      } catch (e) {}
     });
   })();
 </script>
