@@ -1,5 +1,7 @@
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useScrollProgress } from "../../lib/useScrollProgress";
+import { useCapabilityStore } from "../../lib/useCapabilityStore";
+import { useExperienceTier, getEffectiveTier } from "../../lib/useExperienceTier";
 
 const elements = [
   { size: 6, x: "10%", speed: 0.15, color: "bg-brand/10", shape: "circle" },
@@ -10,10 +12,12 @@ const elements = [
 ];
 
 export default function FloatingElements() {
-  const prefersReduced = useReducedMotion();
+  const experienceTier = useCapabilityStore((s) => s.experienceTier);
+  const override = useExperienceTier((s) => s.override);
+  const effectiveTier = getEffectiveTier(experienceTier, override);
   const { scrollY } = useScrollProgress();
 
-  if (prefersReduced) return null;
+  if (effectiveTier !== "tier-3") return null;
 
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">

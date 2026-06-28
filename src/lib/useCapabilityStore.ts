@@ -2,8 +2,13 @@ import { create } from "zustand";
 
 type DeviceTier = "high" | "medium" | "low";
 
+/** Experience tier for progressive enhancement */
+export type ExperienceTier = "tier-1" | "tier-2" | "tier-3";
+
 interface CapabilityState {
   tier: DeviceTier;
+  /** Mapped experience tier based on device capability */
+  experienceTier: ExperienceTier;
   isMobile: boolean;
   prefersReducedMotion: boolean;
   webglSupported: boolean;
@@ -11,8 +16,24 @@ interface CapabilityState {
   initialize: () => void;
 }
 
+function mapExperienceTier(params: {
+  deviceTier: DeviceTier;
+  isMobile: boolean;
+  prefersReducedMotion: boolean;
+  webglSupported: boolean;
+}): ExperienceTier {
+  if (params.deviceTier === "low" || params.prefersReducedMotion) {
+    return "tier-1";
+  }
+  if (params.deviceTier === "medium" || params.isMobile || !params.webglSupported) {
+    return "tier-2";
+  }
+  return "tier-3";
+}
+
 export const useCapabilityStore = create<CapabilityState>()((set) => ({
   tier: "high",
+  experienceTier: "tier-3",
   isMobile: false,
   prefersReducedMotion: false,
   webglSupported: true,
@@ -42,6 +63,13 @@ export const useCapabilityStore = create<CapabilityState>()((set) => ({
       webglSupported = false;
     }
 
-    set({ tier, isMobile, prefersReducedMotion, webglSupported, initialized: true });
+    const experienceTier = mapExperienceTier({
+      deviceTier: tier,
+      isMobile,
+      prefersReducedMotion,
+      webglSupported,
+    });
+
+    set({ tier, experienceTier, isMobile, prefersReducedMotion, webglSupported, initialized: true });
   },
 }));

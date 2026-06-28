@@ -1,13 +1,17 @@
 import { useEffect, useRef } from "react";
 import Lenis from "lenis";
 import { duration } from "../lib/motion";
+import { useCapabilityStore } from "../lib/useCapabilityStore";
+import { useExperienceTier, getEffectiveTier } from "../lib/useExperienceTier";
 
 export default function SmoothScroll() {
   const lenisRef = useRef<Lenis | null>(null);
+  const experienceTier = useCapabilityStore((s) => s.experienceTier);
+  const override = useExperienceTier((s) => s.override);
 
   useEffect(() => {
-    const motionOk = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!motionOk) return;
+    const effectiveTier = getEffectiveTier(experienceTier, override);
+    if (effectiveTier === "tier-1") return;
 
     const lenis = new Lenis({
       duration: duration.narrative,

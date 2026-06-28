@@ -234,3 +234,10 @@ pre {
   text-transform: none !important;
   letter-spacing: normal !important;
 }
+
+/* ── Experience Tier CSS hooks ── */
+[data-experience-tier="tier-1"] .tier-2-only,
+[data-experience-tier="tier-1"] .tier-3-only,
+[data-experience-tier="tier-2"] .tier-3-only {
+  display: none !important;
+}

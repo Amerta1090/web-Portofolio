@@ -109,6 +109,27 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
       })();
     </script>
 
+    <script is:inline>
+      (function () {
+        var isMobile = window.matchMedia("(max-width: 768px)").matches;
+        var prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var memory = navigator.deviceMemory || 8;
+        var cores = navigator.hardwareConcurrency || 4;
+        var hasWebGL = false;
+        try {
+          var c = document.createElement("canvas");
+          hasWebGL = !!(c.getContext("webgl") || c.getContext("webgl2"));
+        } catch (e) {}
+        var tier = "tier-3";
+        if (isMobile || prefersReduced || memory <= 2 || cores <= 2) {
+          tier = "tier-1";
+        } else if (memory <= 4 || cores <= 4 || !hasWebGL) {
+          tier = "tier-2";
+        }
+        document.documentElement.dataset.experienceTier = tier;
+      })();
+    </script>
+
     <script is:inline src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.js" defer></script>
 
     <script is:inline>
