@@ -12,6 +12,8 @@ import AnimatedHero from "../islands/AnimatedHero";
 import ScrollAnimator from "../islands/ScrollAnimator.astro";
 import SectionCounter from "../islands/SectionCounter";
 import SkillsExplorer from "../islands/SkillsExplorer";
+import JourneyTimeline from "../islands/JourneyTimeline";
+import ImpactMetrics from "../islands/ImpactMetrics";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import {
   getCertifications,
@@ -51,6 +53,16 @@ const gitHubData = await fetchAllGitHubData();
 
   <Section data-reveal id="experience" title="Experience" variant="alt" ariaLabel="Work experience">
     <Experience experiences={experiences} />
+  </Section>
+
+  <Section data-reveal id="journey" title="The Journey" subtitle="A scroll through my professional path" variant="alt" ariaLabel="Career journey">
+    <JourneyTimeline client:visible experiences={experiences.map((e) => ({
+      title: e.role,
+      company: e.company,
+      period: `${e.start_date} — ${e.end_date ?? "Present"}`,
+      description: e.highlights?.join(". ") ?? "",
+      skills: e.technologies,
+    }))} />
   </Section>
 
   <Section data-reveal id="projects" title="Featured Projects" subtitle="Selected work that demonstrates my range" ariaLabel="Featured projects">

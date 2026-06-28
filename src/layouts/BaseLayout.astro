@@ -7,6 +7,7 @@ import Header from "../components/templates/Header.astro";
 import AmbientScene from "../islands/AmbientScene";
 import SmoothScroll from "../islands/SmoothScroll";
 import ScrollProgress from "../islands/ScrollProgress";
+import FloatingElements from "../components/atoms/FloatingElements";
 import { Toaster } from "sonner";
 import { SITE } from "../lib/constants";
 
@@ -132,6 +133,7 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
   <body class="min-h-screen bg-bg-primary text-text-primary">
 
     <AmbientScene client:visible />
+    <FloatingElements />
     <div class="relative z-10">
       <a href="#main-content" class="skip-to-content">Skip to content</a>
       <SmoothScroll client:load />

@@ -2,6 +2,7 @@ import { ArrowRight } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { duration, easing } from "../lib/motion";
+import { useScrollProgress } from "../lib/useScrollProgress";
 
 interface Props {
   name: string;
@@ -12,6 +13,7 @@ interface Props {
 
 export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Props) {
   const prefersReduced = useReducedMotion();
+  const { scrollY } = useScrollProgress();
   const [stage, setStage] = useState(!!prefersReduced ? 4 : 0);
 
   useEffect(() => {
@@ -37,8 +39,11 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
 
   return (
     <section className="relative min-h-[calc(100vh-4rem)] flex flex-col justify-center overflow-hidden z-10">
-      {/* Background photo with overlay */}
-      <picture className="absolute inset-0 z-0">
+      {/* Background photo with parallax depth */}
+      <motion.picture
+        className="absolute inset-0 z-0"
+        style={prefersReduced ? {} : { y: scrollY * 0.15, willChange: "transform" }}
+      >
         <source
           type="image/webp"
           srcSet={`
@@ -55,14 +60,21 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
           loading="eager"
           decoding="async"
         />
-      </picture>
-      {/* Terracotta overlay for readability */}
+      </motion.picture>
+      {/* Terracotta overlay with parallax depth */}
+      <motion.div
+        className="absolute inset-0 z-[1] bg-gradient-to-r from-bg-primary/85 via-bg-primary/60 to-bg-primary/40"
+        style={prefersReduced ? {} : { y: scrollY * 0.05, willChange: "transform" }}
+      />
       <div className="absolute inset-0 z-[1] bg-gradient-to-r from-bg-primary/85 via-bg-primary/60 to-bg-primary/40" />
 
       {/* Decorative bottom fade */}
       <div className="absolute bottom-0 left-0 right-0 h-32 z-[1] bg-gradient-to-t from-bg-primary to-transparent" />
 
-      <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8 relative z-20">
+      <motion.div
+        className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8 relative z-20"
+        style={prefersReduced ? {} : { y: scrollY * -0.02, willChange: "transform" }}
+      >
         <div className="max-w-4xl relative">
           <motion.div
             className="mb-6"
@@ -143,7 +155,7 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
             {prefersReduced && <div className="w-px h-3 bg-border" />}
           </motion.div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

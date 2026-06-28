@@ -1,5 +1,5 @@
 ---
-import MetricsCounter from "../../islands/MetricsCounter";
+import ImpactMetrics from "../../islands/ImpactMetrics";
 import ProfileImage from "../atoms/ProfileImage.astro";
 import type { Profile } from "../../types/profile";
 
@@ -11,10 +11,10 @@ const { profile } = Astro.props;
 const { metrics } = profile;
 
 const metricItems = [
-  { label: "Years Experience", value: metrics.years_experience, suffix: "+" },
-  { label: "Projects Shipped", value: metrics.projects_shipped, suffix: "+" },
-  { label: "Certifications", value: metrics.certifications, suffix: "" },
-  { label: "Languages", value: metrics.languages.length, suffix: "" },
+  { label: "Years Experience", value: metrics.years_experience, suffix: "+", context: "In AI/ML and software engineering" },
+  { label: "Projects Shipped", value: metrics.projects_shipped, suffix: "+", context: "From concept to production" },
+  { label: "Certifications", value: metrics.certifications, suffix: "", context: "Across cloud, ML, and systems" },
+  { label: "Languages", value: metrics.languages.length, suffix: "", context: "Programming & spoken languages" },
 ];
 ---
 
@@ -32,7 +32,7 @@ const metricItems = [
         </div>
       </div>
       <div class="mt-8">
-        <MetricsCounter client:idle metrics={metricItems} />
+        <ImpactMetrics client:idle metrics={metricItems} />
       </div>
     </div>
     <div class="md:col-span-2 order-1 md:order-2 flex justify-center md:justify-end">
