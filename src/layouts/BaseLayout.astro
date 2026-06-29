@@ -4,13 +4,14 @@ import "../styles/theme.css";
 import "../lib/scroll-animations.css";
 import "../lib/layout-queries.css";
 import ClientRouter from "astro/components/ClientRouter.astro";
+import { Toaster } from "sonner";
+import FloatingElements from "../components/atoms/FloatingElements";
 import Footer from "../components/templates/Footer.astro";
 import Header from "../components/templates/Header.astro";
 import AmbientScene from "../islands/AmbientScene";
-import SmoothScroll from "../islands/SmoothScroll";
 import ScrollProgress from "../islands/ScrollProgress";
-import FloatingElements from "../components/atoms/FloatingElements";
-import { Toaster } from "sonner";
+import SmoothScroll from "../islands/SmoothScroll";
+import TimeAwareTheme from "../islands/TimeAwareTheme";
 import { SITE } from "../lib/constants";
 
 export interface Props {
@@ -174,6 +175,7 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
       </main>
       <Footer />
     </div>
+    <TimeAwareTheme client:load />
     <Toaster
       client:load
       position="bottom-right"

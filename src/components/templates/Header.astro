@@ -4,6 +4,7 @@ export interface Props {
 }
 
 const { currentPath = "/" } = Astro.props;
+import ThemeCustomizer from "../../islands/ThemeCustomizer";
 import Container from "../atoms/Container.astro";
 import ThemeToggle from "../atoms/ThemeToggle.astro";
 import { GameMenuWrapper } from "../game-menu/GameMenuWrapper";
@@ -39,6 +40,7 @@ const navLinks = [
         }
       </ul>
       <div class="flex items-center gap-2">
+        <ThemeCustomizer client:load />
         <GameMenuWrapper client:load />
         <div class="w-px h-5 bg-border mx-1"></div>
         <ThemeToggle />

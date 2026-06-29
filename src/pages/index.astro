@@ -8,12 +8,12 @@ import GitHubShowcase from "../components/organisms/GitHubShowcase.astro";
 import Honors from "../components/organisms/Honors.astro";
 import Projects from "../components/organisms/Projects.astro";
 import Volunteering from "../components/organisms/Volunteering.astro";
-import AnimatedHero from "../islands/AnimatedHero";
+import ImpactMetrics from "../islands/ImpactMetrics";
+import JourneyTimeline from "../islands/JourneyTimeline";
 import ScrollAnimator from "../islands/ScrollAnimator.astro";
 import SectionCounter from "../islands/SectionCounter";
 import SkillsExplorer from "../islands/SkillsExplorer";
-import JourneyTimeline from "../islands/JourneyTimeline";
-import ImpactMetrics from "../islands/ImpactMetrics";
+import TimeAwareHero from "../islands/TimeAwareHero";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import {
   getCertifications,
@@ -38,7 +38,7 @@ const gitHubData = await fetchAllGitHubData();
 
 <BaseLayout>
   <section id="hero" aria-label="Hero">
-    <AnimatedHero
+    <TimeAwareHero
       client:idle
       name={profile.name}
       headline={profile.headline}
