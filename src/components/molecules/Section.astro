@@ -11,7 +11,7 @@ export interface Props {
 
 const { title, subtitle, id, variant = "default", class: className, ariaLabel } = Astro.props;
 
-const cls = `py-16 md:py-32 relative overflow-hidden ${variant === "alt" ? "bg-bg-secondary border-y border-border" : ""} ${className ?? ""}`;
+const cls = `py-16 md:py-32 relative overflow-hidden container-query-section ${variant === "alt" ? "bg-bg-secondary border-y border-border" : ""} ${className ?? ""}`;
 const revealAttr = Astro.props["data-reveal"] ? { "data-reveal": "" } : {};
 ---
 

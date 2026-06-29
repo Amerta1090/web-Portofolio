@@ -1,0 +1,91 @@
+/* ── CSS :has() Selectors — Parent-Aware Styling ── */
+
+/* Card hover: when any interactive child is hovered, elevate the card */
+.card:has(a:hover, button:hover, [tabindex]:hover) {
+  border-color: var(--color-brand);
+  box-shadow: 0 4px 20px rgb(from var(--color-brand) r g b / 0.15);
+}
+
+/* Card: when featured badge is present, subtle brand left border */
+.card:has(.featured-badge) {
+  border-left: 3px solid var(--color-brand);
+}
+
+/* Section heading: when followed by a subtitle, add bottom spacing */
+.section-header:has(+ .section-subtitle) {
+  margin-bottom: 0.25rem;
+}
+
+/* Grid: when empty state is shown, center it */
+.grid:has(.empty-state) {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+/* Form field: when in error state, show red border */
+.form-field:has([aria-invalid="true"]) label {
+  color: var(--color-brand-warm);
+}
+
+/* Nav: when link is current page, highlight it */
+nav:has([aria-current="page"]) [aria-current="page"] {
+  color: var(--color-brand);
+  font-weight: 600;
+}
+
+/* ── @container Queries ── */
+@supports (container-type: inline-size) {
+  .container-query-section {
+    container-type: inline-size;
+    container-name: section;
+  }
+
+  .container-query-grid {
+    container-type: inline-size;
+    container-name: card-grid;
+  }
+
+  @container card-grid (max-width: 500px) {
+    .cq-grid-item {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @container card-grid (min-width: 501px) and (max-width: 800px) {
+    .cq-grid-item {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @container card-grid (min-width: 801px) {
+    .cq-grid-item {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  /* Project card adjusts within container */
+  @container card-grid (max-width: 350px) {
+    .cq-card .cq-card-media {
+      display: none;
+    }
+    .cq-card .cq-card-body {
+      padding: 0.75rem;
+    }
+  }
+
+  @container card-grid (min-width: 351px) {
+    .cq-card {
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+  }
+}
+
+/* ── Fallback for non-supporting browsers ── */
+@supports not (container-type: inline-size) {
+  .cq-grid-item {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}

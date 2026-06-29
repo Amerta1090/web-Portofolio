@@ -1,6 +1,8 @@
 ---
 import "../styles/global.css";
 import "../styles/theme.css";
+import "../lib/scroll-animations.css";
+import "../lib/layout-queries.css";
 import ClientRouter from "astro/components/ClientRouter.astro";
 import Footer from "../components/templates/Footer.astro";
 import Header from "../components/templates/Header.astro";
@@ -163,6 +165,7 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
     <FloatingElements />
     <div class="relative z-10">
       <a href="#main-content" class="skip-to-content">Skip to content</a>
+      <div class="scroll-progress-css" role="progressbar" aria-label="Page scroll progress"></div>
       <SmoothScroll client:load />
       <ScrollProgress client:load />
       <Header currentPath={currentPath} />
