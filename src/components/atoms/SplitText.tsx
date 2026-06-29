@@ -1,23 +1,13 @@
-import { type ReactNode } from "react";
-
 interface SplitTextProps {
   text: string;
   as?: "h1" | "h2" | "h3" | "p" | "span";
   className?: string;
-  /** Delay per character in ms */
-  charDelay?: number;
-  /** Delay per word in ms */
-  wordDelay?: number;
-  /** Animation duration in ms per unit */
-  duration?: number;
-  /** Wraps each word, else each character */
   byWord?: boolean;
-  children?: ReactNode;
 }
 
 /**
  * SplitText — wraps each character/word in a <span> for staggered animations.
- * Replace with gsap/SplitText or Framer Motion's staggerChildren when ready.
+ * For animated reveals, use RevealText instead.
  *
  * Usage:
  *   <SplitText text="Hello World" byWord />
@@ -28,10 +18,7 @@ export default function SplitText({
   as: Tag = "span",
   className = "",
   byWord = false,
-  _charDelay,
-  _wordDelay,
-  _duration,
-}: SplitTextProps & { _charDelay?: number; _wordDelay?: number; _duration?: number }) {
+}: SplitTextProps) {
   if (byWord) {
     const words = text.split(" ");
     return (
