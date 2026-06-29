@@ -43,9 +43,8 @@ export function useSectionInView(sectionIds: string[]): SectionInViewData {
               const parentRect = e.rootBounds ?? { top: 0, height: window.innerHeight };
               const offset = parentRect.top - rect.top;
               const sectionHeight = rect.height;
-              const progress = sectionHeight > 0
-                ? Math.max(0, Math.min(1, offset / sectionHeight))
-                : 0;
+              const progress =
+                sectionHeight > 0 ? Math.max(0, Math.min(1, offset / sectionHeight)) : 0;
               bestProgress = progress;
             }
           }

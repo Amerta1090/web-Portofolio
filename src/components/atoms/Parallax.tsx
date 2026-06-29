@@ -21,10 +21,7 @@ export function Parallax({ children, speed = 0.5, className, as = "div" }: Paral
   const y = scrollY * speed;
 
   return (
-    <motion.div
-      className={className}
-      style={{ y, willChange: "transform" }}
-    >
+    <motion.div className={className} style={{ y, willChange: "transform" }}>
       {children}
     </motion.div>
   );

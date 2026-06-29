@@ -110,12 +110,7 @@ export default function SkillConstellation({ skills }: Props) {
                   stroke="rgb(var(--color-brand-rgb) / 0.3)"
                   strokeWidth="1"
                 />
-                <circle
-                  cx={pos.x}
-                  cy={pos.y}
-                  r={4}
-                  fill="rgb(var(--color-brand-rgb) / 0.6)"
-                />
+                <circle cx={pos.x} cy={pos.y} r={4} fill="rgb(var(--color-brand-rgb) / 0.6)" />
               </g>
             ))}
           </svg>

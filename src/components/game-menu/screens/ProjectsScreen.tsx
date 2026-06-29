@@ -78,7 +78,10 @@ export const ProjectsScreen: React.FC = () => {
           <div className="text-xs text-brand font-medium mb-3">Featured</div>
           <div className="flex gap-3">
             {featured.slice(0, 3).map((proj: any) => (
-              <div key={proj.title} className="flex-1 border border-border rounded-lg p-3 bg-bg-secondary/50">
+              <div
+                key={proj.title}
+                className="flex-1 border border-border rounded-lg p-3 bg-bg-secondary/50"
+              >
                 <div className="text-sm font-medium text-text-primary mb-1">
                   {proj.title.length > 30 ? proj.title.slice(0, 30) + "..." : proj.title}
                 </div>
@@ -110,10 +113,14 @@ export const ProjectsScreen: React.FC = () => {
               <div className="flex items-start justify-between gap-3 mb-2">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-brand text-xs flex items-center">{categoryIcons[proj.category]}</span>
+                    <span className="text-brand text-xs flex items-center">
+                      {categoryIcons[proj.category]}
+                    </span>
                     <span className="text-xs text-text-secondary">{proj.category}</span>
                     {proj.featured && (
-                      <span className="text-xs text-brand border border-brand/30 px-1 rounded">Featured</span>
+                      <span className="text-xs text-brand border border-brand/30 px-1 rounded">
+                        Featured
+                      </span>
                     )}
                   </div>
                   <h3 className="text-base font-semibold text-text-primary leading-tight">
@@ -127,7 +134,10 @@ export const ProjectsScreen: React.FC = () => {
               {proj.skills && proj.skills.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-3">
                   {proj.skills.slice(0, 3).map((skill: string) => (
-                    <span key={skill} className="text-xs px-1.5 py-0.5 border border-border text-text-secondary rounded">
+                    <span
+                      key={skill}
+                      className="text-xs px-1.5 py-0.5 border border-border text-text-secondary rounded"
+                    >
                       {skill.length > 12 ? skill.slice(0, 12) + "..." : skill}
                     </span>
                   ))}

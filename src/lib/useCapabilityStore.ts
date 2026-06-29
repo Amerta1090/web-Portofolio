@@ -42,11 +42,8 @@ export const useCapabilityStore = create<CapabilityState>()((set) => ({
     if (typeof window === "undefined") return;
 
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    const memory = (navigator as Navigator & { deviceMemory?: number })
-      .deviceMemory || 8;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory || 8;
     const cores = navigator.hardwareConcurrency || 4;
 
     let tier: DeviceTier = "high";
@@ -56,9 +53,7 @@ export const useCapabilityStore = create<CapabilityState>()((set) => ({
     let webglSupported = true;
     try {
       const canvas = document.createElement("canvas");
-      webglSupported = !!(
-        canvas.getContext("webgl") || canvas.getContext("webgl2")
-      );
+      webglSupported = !!(canvas.getContext("webgl") || canvas.getContext("webgl2"));
     } catch {
       webglSupported = false;
     }
@@ -70,6 +65,13 @@ export const useCapabilityStore = create<CapabilityState>()((set) => ({
       webglSupported,
     });
 
-    set({ tier, experienceTier, isMobile, prefersReducedMotion, webglSupported, initialized: true });
+    set({
+      tier,
+      experienceTier,
+      isMobile,
+      prefersReducedMotion,
+      webglSupported,
+      initialized: true,
+    });
   },
 }));

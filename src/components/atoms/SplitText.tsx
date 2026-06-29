@@ -24,11 +24,7 @@ export default function SplitText({
     return (
       <Tag className={className} aria-label={text}>
         {words.map((word, i) => (
-          <span
-            key={`${word}-${i}`}
-            className="split-word inline-block"
-            style={{ opacity: 0 }}
-          >
+          <span key={`${word}-${i}`} className="split-word inline-block" style={{ opacity: 0 }}>
             {word}
             {i < words.length - 1 && "\u00A0"}
           </span>
@@ -41,11 +37,7 @@ export default function SplitText({
   return (
     <Tag className={className} aria-label={text}>
       {chars.map((char, i) => (
-        <span
-          key={`${char}-${i}`}
-          className="split-char inline-block"
-          style={{ opacity: 0 }}
-        >
+        <span key={`${char}-${i}`} className="split-char inline-block" style={{ opacity: 0 }}>
           {char === " " ? "\u00A0" : char}
         </span>
       ))}

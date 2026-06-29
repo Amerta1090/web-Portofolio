@@ -65,9 +65,7 @@ export default function SkillsExplorer({ skills }: Props) {
             className="border border-border rounded-lg p-5 hover:border-brand/30 transition-colors"
           >
             <div className="flex items-center gap-2 mb-4">
-              <h3 className="text-sm font-semibold text-text-primary">
-                {category.name}
-              </h3>
+              <h3 className="text-sm font-semibold text-text-primary">{category.name}</h3>
               <span className="text-[10px] text-text-secondary/40 ml-auto">
                 {category.skills.length}
               </span>

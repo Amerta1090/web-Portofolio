@@ -20,10 +20,13 @@ export const BUDGETS = {
 } as const;
 
 /** Runtime budget check helper — logs warnings when exceeded */
-export function checkPerformanceBudget(label: string, value: number, budget: number, unit = "ms"): void {
+export function checkPerformanceBudget(
+  label: string,
+  value: number,
+  budget: number,
+  unit = "ms",
+): void {
   if (value > budget) {
-    console.warn(
-      `[Budget] ${label}: ${value}${unit} exceeds budget of ${budget}${unit}`,
-    );
+    console.warn(`[Budget] ${label}: ${value}${unit} exceeds budget of ${budget}${unit}`);
   }
 }

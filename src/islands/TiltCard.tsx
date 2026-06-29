@@ -47,7 +47,7 @@ export default function TiltCard({
         setGlareX(glare);
       }
     },
-    [maxTilt, perspective, scale, glare]
+    [maxTilt, perspective, scale, glare],
   );
 
   const handleMouseLeave = useCallback(() => {

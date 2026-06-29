@@ -83,9 +83,7 @@ export default function CustomCursor({ enableOnTouch = false }: CustomCursorProp
     document.addEventListener("mousemove", onMove, { passive: true });
     document.addEventListener("mouseleave", onLeave);
 
-    const hoverables = document.querySelectorAll<HTMLElement>(
-      "a, button, [data-cursor-hover]"
-    );
+    const hoverables = document.querySelectorAll<HTMLElement>("a, button, [data-cursor-hover]");
     hoverables.forEach((el) => {
       el.addEventListener("mouseenter", onHoverableEnter);
       el.addEventListener("mouseleave", onHoverableLeave);

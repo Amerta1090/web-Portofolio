@@ -22,9 +22,7 @@ export function ScrollytellingSection({
       data-progress={progress.toFixed(3)}
       data-active-step={activeStep}
     >
-      <div className="md:grid md:grid-cols-2 md:gap-12 items-start">
-        {children}
-      </div>
+      <div className="md:grid md:grid-cols-2 md:gap-12 items-start">{children}</div>
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1" aria-hidden="true">
         {Array.from({ length: totalSteps }).map((_, i) => (
           <div

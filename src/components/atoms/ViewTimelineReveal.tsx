@@ -7,9 +7,7 @@ interface Props {
 }
 
 function supportsCssScrollTimeline(): boolean {
-  return CSS && "supports" in CSS
-    ? CSS.supports("animation-timeline: scroll()")
-    : false;
+  return CSS && "supports" in CSS ? CSS.supports("animation-timeline: scroll()") : false;
 }
 
 export default function ViewTimelineReveal({ children, className = "", stagger = false }: Props) {
@@ -59,7 +57,8 @@ function JsFallback({ children, className }: { children: ReactNode; className?: 
       style={{
         opacity: isVisible ? 1 : 0,
         transform: isVisible ? "translateY(0)" : "translateY(16px)",
-        transition: "opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1)",
+        transition:
+          "opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1)",
       }}
     >
       {children}

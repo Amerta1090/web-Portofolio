@@ -42,7 +42,10 @@ export default function LossCurve({
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const [dimensions, setDimensions] = useState({ width: propWidth ?? 600, height: propHeight ?? 350 });
+  const [dimensions, setDimensions] = useState({
+    width: propWidth ?? 600,
+    height: propHeight ?? 350,
+  });
   const prefersReduced = useReducedMotion();
   const theme = useThemeStore((s) => s.theme);
   const isDark = theme === "dark";
@@ -95,12 +98,7 @@ export default function LossCurve({
 
     g.append("g")
       .attr("transform", `translate(0,${innerHeight})`)
-      .call(
-        d3
-          .axisBottom(xScale)
-          .ticks(Math.min(data.length, 10))
-          .tickFormat(d3.format("d")),
-      )
+      .call(d3.axisBottom(xScale).ticks(Math.min(data.length, 10)).tickFormat(d3.format("d")))
       .attr("font-size", "11px")
       .call((g) => g.selectAll("line").attr("stroke", colors.grid))
       .call((g) => g.selectAll("path").attr("stroke", colors.grid))
@@ -220,7 +218,8 @@ export default function LossCurve({
         tooltip
           .style("opacity", 1)
           .style("left", `${Math.min(x + 16, width - 180)}px`)
-          .style("top", `${Math.min(Math.min(y1, y2) - 40, height - 100)}px`).html(`
+          .style("top", `${Math.min(Math.min(y1, y2) - 40, height - 100)}px`)
+          .html(`
             <div style="font-weight:600;margin-bottom:4px">Epoch ${d.epoch}</div>
             <div style="display:flex;align-items:center;gap:6px">
               <span style="width:8px;height:8px;border-radius:1px;background:${colors.training};display:inline-block"></span>
@@ -251,7 +250,11 @@ export default function LossCurve({
   }, [data, dimensions, isDark, animate, prefersReduced]);
 
   return (
-    <div ref={containerRef} className={`relative w-full ${className}`} style={{ aspectRatio: dimensions.width / dimensions.height }}>
+    <div
+      ref={containerRef}
+      className={`relative w-full ${className}`}
+      style={{ aspectRatio: dimensions.width / dimensions.height }}
+    >
       <svg
         ref={svgRef}
         width={dimensions.width}

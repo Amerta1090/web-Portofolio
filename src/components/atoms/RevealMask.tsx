@@ -9,11 +9,7 @@ interface RevealMaskProps {
   duration?: number;
 }
 
-export function RevealMask({
-  children,
-  className,
-  direction = "left",
-}: RevealMaskProps) {
+export function RevealMask({ children, className, direction = "left" }: RevealMaskProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {

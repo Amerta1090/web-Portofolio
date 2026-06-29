@@ -9,7 +9,13 @@ interface IconProps {
   "aria-hidden"?: boolean | "true" | "false";
 }
 
-export function Icon({ icon: LucideIcon, className, size = 16, strokeWidth = 2, ...props }: IconProps) {
+export function Icon({
+  icon: LucideIcon,
+  className,
+  size = 16,
+  strokeWidth = 2,
+  ...props
+}: IconProps) {
   return (
     <LucideIcon
       className={cn("shrink-0", className)}

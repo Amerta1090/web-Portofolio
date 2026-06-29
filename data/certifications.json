@@ -22,10 +22,7 @@
     "issuer": "Dicoding Indonesia",
     "date": "2025-06",
     "credential_id": "EYX4K1096PDL",
-    "skills": [
-      "Machine Learning",
-      "MLflow"
-    ],
+    "skills": ["Machine Learning", "MLflow"],
     "url": "https://www.dicoding.com/certificates/EYX4K1096PDL",
     "badge": "/images/placeholder/badge.svg"
   },
@@ -34,10 +31,7 @@
     "issuer": "Dicoding Indonesia",
     "date": "2025-06",
     "credential_id": "2VX3KGVR3XYQ",
-    "skills": [
-      "Prompt Engineering",
-      "AI Prompting"
-    ],
+    "skills": ["Prompt Engineering", "AI Prompting"],
     "url": "https://www.dicoding.com/certificates/2VX3KGVR3XYQ",
     "badge": "/images/placeholder/badge.svg"
   },
@@ -46,9 +40,7 @@
     "issuer": "Dicoding Indonesia",
     "date": "2025-05",
     "credential_id": "4EXGV018QXRL",
-    "skills": [
-      "Artificial Intelligence (AI)"
-    ],
+    "skills": ["Artificial Intelligence (AI)"],
     "url": "https://www.dicoding.com/certificates/4EXGV018QXRL",
     "badge": "/images/placeholder/badge.svg"
   },
@@ -57,10 +49,7 @@
     "issuer": "Dicoding Indonesia",
     "date": "2025-05",
     "credential_id": "QLZ93L39MZ5D",
-    "skills": [
-      "AI Prompting",
-      "Artificial Intelligence (AI)"
-    ],
+    "skills": ["AI Prompting", "Artificial Intelligence (AI)"],
     "url": "https://www.dicoding.com/certificates/QLZ93L39MZ5D",
     "badge": "/images/placeholder/badge.svg"
   },
@@ -69,10 +58,7 @@
     "issuer": "Dicoding Indonesia",
     "date": "2025-05",
     "credential_id": "RVZKWNR9QZD5",
-    "skills": [
-      "Artificial Intelligence (AI)",
-      "AI Prompting"
-    ],
+    "skills": ["Artificial Intelligence (AI)", "AI Prompting"],
     "url": "https://www.dicoding.com/certificates/RVZKWNR9QZD5",
     "badge": "/images/placeholder/badge.svg"
   },
@@ -81,9 +67,7 @@
     "issuer": "Dicoding Indonesia",
     "date": "2025-03",
     "credential_id": "MRZMNWY7KPYQ",
-    "skills": [
-      "Machine Learning"
-    ],
+    "skills": ["Machine Learning"],
     "url": "https://www.dicoding.com/certificates/MRZMNWY7KPYQ",
     "badge": "/images/placeholder/badge.svg"
   },
@@ -92,10 +76,7 @@
     "issuer": "Google Cloud Skills Boost",
     "date": "2025-02",
     "credential_id": null,
-    "skills": [
-      "Machine Learning",
-      "Artificial Intelligence (AI)"
-    ],
+    "skills": ["Machine Learning", "Artificial Intelligence (AI)"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -104,10 +85,7 @@
     "issuer": "Google Cloud Skills Boost",
     "date": "2025-02",
     "credential_id": null,
-    "skills": [
-      "Machine Learning",
-      "Google Cloud Platform (GCP)"
-    ],
+    "skills": ["Machine Learning", "Google Cloud Platform (GCP)"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -116,10 +94,7 @@
     "issuer": "Google Cloud Skills Boost",
     "date": "2025-02",
     "credential_id": null,
-    "skills": [
-      "Machine Learning",
-      "Artificial Intelligence (AI)"
-    ],
+    "skills": ["Machine Learning", "Artificial Intelligence (AI)"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -128,10 +103,7 @@
     "issuer": "Google Cloud Skills Boost",
     "date": "2025-02",
     "credential_id": null,
-    "skills": [
-      "Machine Learning",
-      "Artificial Intelligence (AI)"
-    ],
+    "skills": ["Machine Learning", "Artificial Intelligence (AI)"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -140,10 +112,7 @@
     "issuer": "Google Cloud Skills Boost",
     "date": "2025-02",
     "credential_id": null,
-    "skills": [
-      "Machine Learning",
-      "Artificial Intelligence (AI)"
-    ],
+    "skills": ["Machine Learning", "Artificial Intelligence (AI)"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -152,10 +121,7 @@
     "issuer": "Google Cloud Skills Boost",
     "date": "2025-02",
     "credential_id": null,
-    "skills": [
-      "Prompt Engineering",
-      "AI Prompting"
-    ],
+    "skills": ["Prompt Engineering", "AI Prompting"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -209,9 +175,7 @@
     "issuer": "DeepLearning.AI",
     "date": "2024-11",
     "credential_id": "HUF3VAYZ3D8I",
-    "skills": [
-      "Machine Learning"
-    ],
+    "skills": ["Machine Learning"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -238,9 +202,7 @@
     "issuer": "DeepLearning.AI",
     "date": "2024-11",
     "credential_id": "YXVHA4N40O1L",
-    "skills": [
-      "Machine Learning"
-    ],
+    "skills": ["Machine Learning"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -258,10 +220,7 @@
     "issuer": "DeepLearning.AI",
     "date": "2024-11",
     "credential_id": "101UFY6VP8W8",
-    "skills": [
-      "Machine Learning",
-      "Artificial Intelligence (AI)"
-    ],
+    "skills": ["Machine Learning", "Artificial Intelligence (AI)"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -270,10 +229,7 @@
     "issuer": "DeepLearning.AI",
     "date": "2024-11",
     "credential_id": "T2Z5HXSVD44Y",
-    "skills": [
-      "Machine Learning",
-      "Artificial Intelligence (AI)"
-    ],
+    "skills": ["Machine Learning", "Artificial Intelligence (AI)"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -282,10 +238,7 @@
     "issuer": "DeepLearning.AI",
     "date": "2024-10",
     "credential_id": "8G2F09C22NHY",
-    "skills": [
-      "Machine Learning",
-      "Artificial Intelligence (AI)"
-    ],
+    "skills": ["Machine Learning", "Artificial Intelligence (AI)"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -294,10 +247,7 @@
     "issuer": "DeepLearning.AI",
     "date": "2024-10",
     "credential_id": "8TY6VWVSDK80",
-    "skills": [
-      "Machine Learning",
-      "Artificial Intelligence (AI)"
-    ],
+    "skills": ["Machine Learning", "Artificial Intelligence (AI)"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -306,9 +256,7 @@
     "issuer": "DeepLearning.AI",
     "date": "2024-10",
     "credential_id": "6J1DXGOAZ1EZ",
-    "skills": [
-      "Machine Learning"
-    ],
+    "skills": ["Machine Learning"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -317,9 +265,7 @@
     "issuer": "DeepLearning.AI",
     "date": "2024-10",
     "credential_id": "U8PT5G10L9B1",
-    "skills": [
-      "Machine Learning"
-    ],
+    "skills": ["Machine Learning"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -328,9 +274,7 @@
     "issuer": "DeepLearning.AI",
     "date": "2024-10",
     "credential_id": "6NIGRVU17ELC",
-    "skills": [
-      "Machine Learning"
-    ],
+    "skills": ["Machine Learning"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -339,9 +283,7 @@
     "issuer": "DeepLearning.AI",
     "date": "2024-10",
     "credential_id": "3Y4BNC1PV6VY",
-    "skills": [
-      "Machine Learning"
-    ],
+    "skills": ["Machine Learning"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -350,10 +292,7 @@
     "issuer": "DeepLearning.AI",
     "date": "2024-10",
     "credential_id": "8VZAR6KT11D2",
-    "skills": [
-      "Machine Learning",
-      "Data Science"
-    ],
+    "skills": ["Machine Learning", "Data Science"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -362,10 +301,7 @@
     "issuer": "Google",
     "date": "2024-09",
     "credential_id": "SQN7F4F2VYPX",
-    "skills": [
-      "Python (Programming Language)",
-      "Bash"
-    ],
+    "skills": ["Python (Programming Language)", "Bash"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -374,9 +310,7 @@
     "issuer": "Google",
     "date": "2024-09",
     "credential_id": "YUF9TT7IKZTT",
-    "skills": [
-      "Python (Programming Language)"
-    ],
+    "skills": ["Python (Programming Language)"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -394,10 +328,7 @@
     "issuer": "Skilvul",
     "date": "2024-07",
     "credential_id": "nbpdDJSeSCiZ2w0xMP6fAg",
-    "skills": [
-      "Internet of Things (IoT)",
-      "Raspberry Pi"
-    ],
+    "skills": ["Internet of Things (IoT)", "Raspberry Pi"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -406,10 +337,7 @@
     "issuer": "Dicoding Indonesia",
     "date": "2024-06",
     "credential_id": "53XEO1ORYZRN",
-    "skills": [
-      "Data Science",
-      "Machine Learning"
-    ],
+    "skills": ["Data Science", "Machine Learning"],
     "url": "https://www.dicoding.com/certificates/53XEO1ORYZRN",
     "badge": "/images/placeholder/badge.svg"
   },
@@ -418,9 +346,7 @@
     "issuer": "Dicoding Indonesia",
     "date": "2024-06",
     "credential_id": "L4PQ19RLOXO1",
-    "skills": [
-      "JavaScript"
-    ],
+    "skills": ["JavaScript"],
     "url": "https://www.dicoding.com/certificates/L4PQ19RLOXO1",
     "badge": "/images/placeholder/badge.svg"
   },
@@ -429,9 +355,7 @@
     "issuer": "Skilvul",
     "date": "2024-06",
     "credential_id": "m_TRSOQPT46p0-CJVE0mgw",
-    "skills": [
-      "Internet of Things (IoT)"
-    ],
+    "skills": ["Internet of Things (IoT)"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -440,10 +364,7 @@
     "issuer": "Skilvul",
     "date": "2024-06",
     "credential_id": "duXt_9keQomerf5R_wdwoQ",
-    "skills": [
-      "Internet of Things (IoT)",
-      "ESP32 Microcontrollers"
-    ],
+    "skills": ["Internet of Things (IoT)", "ESP32 Microcontrollers"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -452,9 +373,7 @@
     "issuer": "Skilvul",
     "date": "2024-04",
     "credential_id": "4bQuh9yOQ72Y08YJxF26MA",
-    "skills": [
-      "Internet of Things (IoT)"
-    ],
+    "skills": ["Internet of Things (IoT)"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -463,10 +382,7 @@
     "issuer": "Skilvul",
     "date": "2024-03",
     "credential_id": "DwfVW4LCRDacft3l0R3-Hw",
-    "skills": [
-      "Data Structures",
-      "Python (Programming Language)"
-    ],
+    "skills": ["Data Structures", "Python (Programming Language)"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -475,9 +391,7 @@
     "issuer": "Skilvul",
     "date": "2024-03",
     "credential_id": "67_uTSO_QjaVwUGAuhW8Zw",
-    "skills": [
-      "Python (Programming Language)"
-    ],
+    "skills": ["Python (Programming Language)"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -486,10 +400,7 @@
     "issuer": "Cisco",
     "date": "2024-03",
     "credential_id": null,
-    "skills": [
-      "Cisco Certified",
-      "Cisco Networking"
-    ],
+    "skills": ["Cisco Certified", "Cisco Networking"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -498,9 +409,7 @@
     "issuer": "Skilvul",
     "date": "2024-03",
     "credential_id": "3_sm0P1xQLCvq3MCiuPhgQ",
-    "skills": [
-      "Python (Programming Language)"
-    ],
+    "skills": ["Python (Programming Language)"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -518,10 +427,7 @@
     "issuer": "Cisco",
     "date": "2024-02",
     "credential_id": null,
-    "skills": [
-      "Cisco Networking",
-      "Cisco Certified"
-    ],
+    "skills": ["Cisco Networking", "Cisco Certified"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -530,10 +436,7 @@
     "issuer": "Cisco",
     "date": "2024-02",
     "credential_id": null,
-    "skills": [
-      "Cybersecurity",
-      "Cisco Certified"
-    ],
+    "skills": ["Cybersecurity", "Cisco Certified"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -542,10 +445,7 @@
     "issuer": "Cisco",
     "date": "2024-01",
     "credential_id": null,
-    "skills": [
-      "Cisco Networking",
-      "Cisco Certified"
-    ],
+    "skills": ["Cisco Networking", "Cisco Certified"],
     "url": null,
     "badge": "/images/placeholder/badge.svg"
   },
@@ -554,10 +454,7 @@
     "issuer": "Dicoding Indonesia",
     "date": "2023-12",
     "credential_id": "L4PQQ8N82PO1",
-    "skills": [
-      "Machine Learning",
-      "Python (Programming Language)"
-    ],
+    "skills": ["Machine Learning", "Python (Programming Language)"],
     "url": "https://www.dicoding.com/certificates/L4PQQ8N82PO1",
     "badge": "/images/placeholder/badge.svg"
   },
@@ -566,10 +463,7 @@
     "issuer": "Dicoding Indonesia",
     "date": "2023-11",
     "credential_id": "KEXL8E86MZG2",
-    "skills": [
-      "Machine Learning",
-      "Python (Programming Language)"
-    ],
+    "skills": ["Machine Learning", "Python (Programming Language)"],
     "url": "https://www.dicoding.com/certificates/KEXL8E86MZG2",
     "badge": "/images/placeholder/badge.svg"
   },
@@ -578,10 +472,7 @@
     "issuer": "Dicoding Indonesia",
     "date": "2023-11",
     "credential_id": "JMZV1YVJRXN9",
-    "skills": [
-      "Data Analysis",
-      "Python (Programming Language)"
-    ],
+    "skills": ["Data Analysis", "Python (Programming Language)"],
     "url": "https://www.dicoding.com/certificates/JMZV1YVJRXN9",
     "badge": "/images/placeholder/badge.svg"
   },
@@ -590,10 +481,7 @@
     "issuer": "Dicoding Indonesia",
     "date": "2023-11",
     "credential_id": "KEXLLKJK4XG2",
-    "skills": [
-      "Python (Programming Language)",
-      "Data Science"
-    ],
+    "skills": ["Python (Programming Language)", "Data Science"],
     "url": "https://www.dicoding.com/certificates/KEXLLKJK4XG2",
     "badge": "/images/placeholder/badge.svg"
   },
@@ -602,9 +490,7 @@
     "issuer": "Dicoding Indonesia",
     "date": "2023-11",
     "credential_id": "2VX363KOQXYQ",
-    "skills": [
-      "Data Science"
-    ],
+    "skills": ["Data Science"],
     "url": "https://www.dicoding.com/certificates/2VX363KOQXYQ",
     "badge": "/images/placeholder/badge.svg"
   },
@@ -613,9 +499,7 @@
     "issuer": "Dicoding Indonesia",
     "date": "2023-09",
     "credential_id": "2VX36JDW3XYQ",
-    "skills": [
-      "SQL"
-    ],
+    "skills": ["SQL"],
     "url": "https://www.dicoding.com/certificates/2VX36JDW3XYQ",
     "badge": "/images/placeholder/badge.svg"
   },
@@ -642,9 +526,7 @@
     "issuer": "Dicoding Indonesia",
     "date": "2023-07",
     "credential_id": "1OP80MOM8XQK",
-    "skills": [
-      "JavaScript"
-    ],
+    "skills": ["JavaScript"],
     "url": "https://www.dicoding.com/certificates/1OP80MOM8XQK",
     "badge": "/images/placeholder/badge.svg"
   },
@@ -653,9 +535,7 @@
     "issuer": "Dicoding Indonesia",
     "date": "2023-07",
     "credential_id": "ERZRGJ9JWPYV",
-    "skills": [
-      "JavaScript"
-    ],
+    "skills": ["JavaScript"],
     "url": "https://www.dicoding.com/certificates/ERZRGJ9JWPYV",
     "badge": "/images/placeholder/badge.svg"
   },
@@ -673,9 +553,7 @@
     "issuer": "Dicoding Indonesia",
     "date": "2023-01",
     "credential_id": "81P28L63OPOY",
-    "skills": [
-      "Data Science"
-    ],
+    "skills": ["Data Science"],
     "url": "https://www.dicoding.com/certificates/81P28L63OPOY",
     "badge": "/images/placeholder/badge.svg"
   }

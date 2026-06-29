@@ -1,9 +1,10 @@
 import { useReducedMotion } from "framer-motion";
 import { AnimatePresence, motion } from "framer-motion";
-import { Palette, RotateCcw, X } from "lucide-react";
+import { Palette, RotateCcw, X, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { distance, duration, easing } from "../lib/motion";
+import { useExperienceTier } from "../lib/useExperienceTier";
 import { ACCENT_COLORS, PRESET_THEMES, useThemeStore } from "../lib/useThemeStore";
 import { useTimeOfDay } from "../lib/useTimeOfDay";
 
@@ -20,6 +21,8 @@ export default function ThemeCustomizer() {
   const setDensity = useThemeStore((s) => s.setDensity);
   const applyPreset = useThemeStore((s) => s.applyPreset);
   const reset = useThemeStore((s) => s.reset);
+  const lightningMode = useExperienceTier((s) => s.lightningMode);
+  const toggleLightningMode = useExperienceTier((s) => s.toggleLightningMode);
 
   useEffect(() => {
     setMounted(true);
@@ -131,6 +134,28 @@ export default function ThemeCustomizer() {
                   Compact
                 </button>
               </div>
+            </div>
+
+            {/* Lightning Mode */}
+            <div className="mb-4">
+              <span className="text-xs text-text-secondary mb-2 block">Performance</span>
+              <button
+                type="button"
+                onClick={toggleLightningMode}
+                className={`w-full flex items-center justify-center gap-2 text-xs px-3 py-2 rounded-lg border transition-all ${
+                  lightningMode
+                    ? "border-brand bg-brand/10 text-brand"
+                    : "border-border text-text-secondary hover:border-brand/30"
+                }`}
+              >
+                <Zap size={12} />
+                {lightningMode ? "Lightning Mode On" : "Lightning Mode Off"}
+              </button>
+              <p className="text-[10px] text-text-secondary mt-1.5 leading-relaxed">
+                {lightningMode
+                  ? "All non-essential effects disabled. Fastest experience."
+                  : "Disables animations, 3D, and effects for maximum speed."}
+              </p>
             </div>
 
             {/* Reset */}

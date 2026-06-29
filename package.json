@@ -13,7 +13,8 @@
     "check": "astro check",
     "typecheck": "tsc --noEmit",
     "validate-data": "node scripts/validate-data.mjs",
-    "fetch-data": "node scripts/fetch-data.mjs"
+    "fetch-data": "node scripts/fetch-data.mjs",
+    "check-budget": "bun run build && node scripts/check-performance-budget.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^6.0.3",

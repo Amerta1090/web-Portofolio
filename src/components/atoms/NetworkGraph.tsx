@@ -65,7 +65,10 @@ export default function NetworkGraph({
   const svgRef = useRef<SVGSVGElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const simulationRef = useRef<d3.Simulation<SimNode, SimLink> | null>(null);
-  const [dimensions, setDimensions] = useState({ width: propWidth ?? 600, height: propHeight ?? 400 });
+  const [dimensions, setDimensions] = useState({
+    width: propWidth ?? 600,
+    height: propHeight ?? 400,
+  });
   const prefersReduced = useReducedMotion();
   const theme = useThemeStore((s) => s.theme);
   const isDark = theme === "dark";
@@ -103,9 +106,12 @@ export default function NetworkGraph({
 
     const g = svg.append("g");
 
-    const zoom = d3.zoom<SVGSVGElement, unknown>().scaleExtent([0.2, 5]).on("zoom", (event) => {
-      g.attr("transform", event.transform);
-    });
+    const zoom = d3
+      .zoom<SVGSVGElement, unknown>()
+      .scaleExtent([0.2, 5])
+      .on("zoom", (event) => {
+        g.attr("transform", event.transform);
+      });
 
     svg.call(zoom).on("dblclick.zoom", null);
 
@@ -134,12 +140,7 @@ export default function NetworkGraph({
       .attr("stroke-width", colors.linkWidth)
       .attr("stroke-opacity", 0.6);
 
-    const nodeGroup = g
-      .append("g")
-      .selectAll("g")
-      .data(simNodes)
-      .join("g")
-      .style("cursor", "grab");
+    const nodeGroup = g.append("g").selectAll("g").data(simNodes).join("g").style("cursor", "grab");
 
     const circleGroup = nodeGroup
       .append("circle")
@@ -158,7 +159,8 @@ export default function NetworkGraph({
       .attr("font-size", "10px")
       .attr("pointer-events", "none");
 
-    const dragBehavior = d3.drag<SVGGElement, SimNode>()
+    const dragBehavior = d3
+      .drag<SVGGElement, SimNode>()
       .on("start", (event, d) => {
         if (!event.active) simulationRef.current?.alphaTarget(0.3).restart();
         d.fx = d.x;
@@ -176,7 +178,11 @@ export default function NetworkGraph({
         d3.select(event.sourceEvent.target as SVGGElement).style("cursor", "grab");
       });
 
-    nodeGroup.call(dragBehavior as unknown as (selection: d3.Selection<d3.BaseType, SimNode, d3.BaseType, unknown>) => void);
+    nodeGroup.call(
+      dragBehavior as unknown as (
+        selection: d3.Selection<d3.BaseType, SimNode, d3.BaseType, unknown>,
+      ) => void,
+    );
 
     const tooltipEl = d3.select(tooltipRef.current);
 
@@ -198,7 +204,9 @@ export default function NetworkGraph({
         nodeGroup
           .transition()
           .duration(200)
-          .attr("opacity", (node: SimNode) => (node.id === d.id || connectedIds.has(node.id) ? 1 : 0.15));
+          .attr("opacity", (node: SimNode) =>
+            node.id === d.id || connectedIds.has(node.id) ? 1 : 0.15,
+          );
 
         linkGroup
           .transition()
@@ -226,9 +234,7 @@ export default function NetworkGraph({
           `);
       })
       .on("mousemove", (event: MouseEvent) => {
-        tooltipEl
-          .style("left", `${event.offsetX + 12}px`)
-          .style("top", `${event.offsetY + 12}px`);
+        tooltipEl.style("left", `${event.offsetX + 12}px`).style("top", `${event.offsetY + 12}px`);
       })
       .on("mouseleave", () => {
         nodeGroup.transition().duration(300).attr("opacity", 1);
@@ -241,7 +247,10 @@ export default function NetworkGraph({
       .forceSimulation(simNodes)
       .force(
         "link",
-        d3.forceLink<SimNode, SimLink>(simLinks).id((d) => d.id).distance(100),
+        d3
+          .forceLink<SimNode, SimLink>(simLinks)
+          .id((d) => d.id)
+          .distance(100),
       )
       .force("charge", d3.forceManyBody().strength(-200))
       .force("center", d3.forceCenter(width / 2, height / 2))

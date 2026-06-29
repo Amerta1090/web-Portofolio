@@ -1,9 +1,29 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
-  Activity, ArrowLeftFromLine, Award, BarChart3, ChevronRight,
-  Code2, Columns3, ExternalLink, FileText, FolderKanban, Gamepad2,
-  GitFork, Globe, History, House, Images, Info, LayoutGrid,
-  Mail, Monitor, Settings, Star, User, Volume2,
+  Activity,
+  ArrowLeftFromLine,
+  Award,
+  BarChart3,
+  ChevronRight,
+  Code2,
+  Columns3,
+  ExternalLink,
+  FileText,
+  FolderKanban,
+  Gamepad2,
+  GitFork,
+  Globe,
+  History,
+  House,
+  Images,
+  Info,
+  LayoutGrid,
+  Mail,
+  Monitor,
+  Settings,
+  Star,
+  User,
+  Volume2,
 } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -267,15 +287,13 @@ const SidebarNavItem: React.FC<{
         }`}
       >
         <span className={`flex-shrink-0 ${isActive ? "text-brand" : ""}`}>{item.icon}</span>
-        <span
-          className={`flex-1 text-base font-medium ${
-            isActive ? "text-brand" : ""
-          }`}
-        >
+        <span className={`flex-1 text-base font-medium ${isActive ? "text-brand" : ""}`}>
           {item.label}
         </span>
         {hasChildren && <ChevronRight size={12} className="text-text-secondary/40 shrink-0" />}
-        {isLeaf && item.href && <ChevronRight size={12} className="text-text-secondary/30 shrink-0" />}
+        {isLeaf && item.href && (
+          <ChevronRight size={12} className="text-text-secondary/30 shrink-0" />
+        )}
         {isActive && (
           <motion.div
             layoutId="sidebarIndicator"
@@ -297,7 +315,16 @@ const Sidebar: React.FC<{
   onClose: () => void;
   playHoverSound: () => void;
   prefersReduced?: boolean;
-}> = ({ items, activeIndex, depth, onSelect, onHover, onClose, playHoverSound, prefersReduced }) => {
+}> = ({
+  items,
+  activeIndex,
+  depth,
+  onSelect,
+  onHover,
+  onClose,
+  playHoverSound,
+  prefersReduced,
+}) => {
   const shortcuts = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
   return (
@@ -309,9 +336,7 @@ const Sidebar: React.FC<{
       transition={easing["ease-spring-gentle"]}
     >
       <div className="px-5 pt-5 pb-3 border-b border-border">
-        <h2 className="text-lg font-semibold text-text-primary">
-          Menu
-        </h2>
+        <h2 className="text-lg font-semibold text-text-primary">Menu</h2>
       </div>
 
       <div className="flex-1 flex flex-col justify-center py-6">
@@ -807,9 +832,7 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
                     key={idx}
                     className="border border-border bg-bg-secondary/30 rounded-lg p-4 hover:border-brand/40 transition-colors"
                   >
-                    <div className="text-sm font-medium text-text-primary mb-1">
-                      {cert.title}
-                    </div>
+                    <div className="text-sm font-medium text-text-primary mb-1">{cert.title}</div>
                     <div className="text-xs text-text-secondary">
                       {cert.issuer}
                       {cert.date ? ` · ${cert.date}` : ""}
@@ -863,7 +886,11 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
           aria-label="Navigation menu"
           initial={!!prefersReduced ? { opacity: 1 } : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={!!prefersReduced ? { opacity: 1 } : { opacity: 0, transition: { duration: duration.fast } }}
+          exit={
+            !!prefersReduced
+              ? { opacity: 1 }
+              : { opacity: 0, transition: { duration: duration.fast } }
+          }
           style={{ pointerEvents: "auto" }}
         >
           {/* Sidebar */}
@@ -886,11 +913,7 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
                           item.id,
                         );
                       } else if (item?.screen) {
-                        navigateTo(
-                          { type: "screen", screenId: item.screen },
-                          item.label,
-                          item.id,
-                        );
+                        navigateTo({ type: "screen", screenId: item.screen }, item.label, item.id);
                       } else if (item?.href) {
                         window.location.href = item.href;
                       }

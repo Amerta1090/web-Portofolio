@@ -68,7 +68,9 @@ export default function ContactForm() {
           }`}
         />
         {errors.name && (
-          <p id={nameErrorId} className="mt-1 text-sm text-red-500" role="alert">{errors.name.message}</p>
+          <p id={nameErrorId} className="mt-1 text-sm text-red-500" role="alert">
+            {errors.name.message}
+          </p>
         )}
       </div>
 
@@ -88,7 +90,9 @@ export default function ContactForm() {
           }`}
         />
         {errors.email && (
-          <p id={emailErrorId} className="mt-1 text-sm text-red-500" role="alert">{errors.email.message}</p>
+          <p id={emailErrorId} className="mt-1 text-sm text-red-500" role="alert">
+            {errors.email.message}
+          </p>
         )}
       </div>
 
@@ -108,11 +112,19 @@ export default function ContactForm() {
           }`}
         />
         {errors.message && (
-          <p id={messageErrorId} className="mt-1 text-sm text-red-500" role="alert">{errors.message.message}</p>
+          <p id={messageErrorId} className="mt-1 text-sm text-red-500" role="alert">
+            {errors.message.message}
+          </p>
         )}
       </div>
 
-      <Button type="submit" variant="primary" size="md" loading={isSubmitting} disabled={isSubmitting}>
+      <Button
+        type="submit"
+        variant="primary"
+        size="md"
+        loading={isSubmitting}
+        disabled={isSubmitting}
+      >
         {isSubmitting ? "Sending..." : "Send Message"}
       </Button>
     </form>

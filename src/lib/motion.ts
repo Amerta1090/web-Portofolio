@@ -80,7 +80,10 @@ export const variants = {
   /** Simple fade from 0 to 1 */
   fadeIn: {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: duration.normal, ease: easing["ease-out-expo"] } },
+    visible: {
+      opacity: 1,
+      transition: { duration: duration.normal, ease: easing["ease-out-expo"] },
+    },
   },
 
   /** Slide up with fade */

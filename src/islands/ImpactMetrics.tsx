@@ -14,7 +14,11 @@ interface Props {
   metrics: Metric[];
 }
 
-function AnimatedValue({ value, suffix, revealed }: { value: number; suffix: string; revealed: boolean }) {
+function AnimatedValue({
+  value,
+  suffix,
+  revealed,
+}: { value: number; suffix: string; revealed: boolean }) {
   const display = revealed ? value : 0;
   return (
     <span className="tabular-nums">
@@ -61,9 +65,7 @@ export default function ImpactMetrics({ metrics }: Props) {
               <div className="text-3xl md:text-4xl font-bold text-brand">
                 <AnimatedValue value={m.value} suffix={m.suffix} revealed={revealed} />
               </div>
-              <div className="mt-2 text-xs text-text-secondary/80 font-medium">
-                {m.label}
-              </div>
+              <div className="mt-2 text-xs text-text-secondary/80 font-medium">{m.label}</div>
               {m.context && (
                 <div className="mt-1 text-[10px] text-text-secondary/40 leading-tight max-w-[120px] mx-auto">
                   {m.context}

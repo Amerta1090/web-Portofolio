@@ -98,11 +98,7 @@ export default function TextScramble({
 
   return (
     <div ref={ref}>
-      <Tag
-        className={className}
-        onMouseEnter={handleMouseEnter}
-        aria-label={text}
-      >
+      <Tag className={className} onMouseEnter={handleMouseEnter} aria-label={text}>
         {displayText}
       </Tag>
     </div>

@@ -7,7 +7,11 @@ interface Props {
   duration?: number;
 }
 
-export default function AnimatedCounter({ value, suffix = "", duration = motionDuration.narrative * 1000 }: Props) {
+export default function AnimatedCounter({
+  value,
+  suffix = "",
+  duration = motionDuration.narrative * 1000,
+}: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [count, setCount] = useState(0);
   const [revealed, setRevealed] = useState(false);

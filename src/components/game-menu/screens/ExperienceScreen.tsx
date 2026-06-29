@@ -34,7 +34,10 @@ export const ExperienceScreen: React.FC = () => {
             className="flex items-start gap-6 relative pl-12"
             initial={{ opacity: 0, x: -distance.moderate }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: duration.fast + idx * stagger.relaxed, ...easing["ease-spring-gentle"] }}
+            transition={{
+              delay: duration.fast + idx * stagger.relaxed,
+              ...easing["ease-spring-gentle"],
+            }}
           >
             <div
               className={`absolute left-[10px] top-2 w-[18px] h-[18px] rounded-full border-2 border-bg-primary ${typeColors[exp.type] || "bg-brand"} z-10`}

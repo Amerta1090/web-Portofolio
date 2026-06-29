@@ -120,6 +120,19 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
 
     <script is:inline>
       (function () {
+        /* ── Lightning Mode override ── */
+        try {
+          var stored = localStorage.getItem("experience-tier");
+          if (stored) {
+            var parsed = JSON.parse(stored);
+            if (parsed && parsed.state && parsed.state.lightningMode) {
+              document.documentElement.dataset.experienceTier = "tier-1";
+              return;
+            }
+          }
+        } catch (e) {}
+
+        /* ── Auto-detect experience tier ── */
         var isMobile = window.matchMedia("(max-width: 768px)").matches;
         var prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         var memory = navigator.deviceMemory || 8;

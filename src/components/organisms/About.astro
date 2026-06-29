@@ -11,10 +11,30 @@ const { profile } = Astro.props;
 const { metrics } = profile;
 
 const metricItems = [
-  { label: "Years Experience", value: metrics.years_experience, suffix: "+", context: "In AI/ML and software engineering" },
-  { label: "Projects Shipped", value: metrics.projects_shipped, suffix: "+", context: "From concept to production" },
-  { label: "Certifications", value: metrics.certifications, suffix: "", context: "Across cloud, ML, and systems" },
-  { label: "Languages", value: metrics.languages.length, suffix: "", context: "Programming & spoken languages" },
+  {
+    label: "Years Experience",
+    value: metrics.years_experience,
+    suffix: "+",
+    context: "In AI/ML and software engineering",
+  },
+  {
+    label: "Projects Shipped",
+    value: metrics.projects_shipped,
+    suffix: "+",
+    context: "From concept to production",
+  },
+  {
+    label: "Certifications",
+    value: metrics.certifications,
+    suffix: "",
+    context: "Across cloud, ML, and systems",
+  },
+  {
+    label: "Languages",
+    value: metrics.languages.length,
+    suffix: "",
+    context: "Programming & spoken languages",
+  },
 ];
 ---
 

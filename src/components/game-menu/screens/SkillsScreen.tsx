@@ -1,13 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  BarChart3,
-  BrainCircuit,
-  Cloud,
-  Code2,
-  Container,
-  Cpu,
-  Zap,
-} from "lucide-react";
+import { BarChart3, BrainCircuit, Cloud, Code2, Container, Cpu, Zap } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
 import skillsData from "../../../../data/skills.json";
@@ -72,7 +64,9 @@ export const SkillsScreen: React.FC = () => {
               setSearchQuery("");
             }}
           >
-            <span className="flex items-center gap-1">{categoryIcons[cat.name]} {cat.name}</span>
+            <span className="flex items-center gap-1">
+              {categoryIcons[cat.name]} {cat.name}
+            </span>
           </button>
         ))}
       </motion.div>
@@ -99,15 +93,24 @@ export const SkillsScreen: React.FC = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: duration.slow }}
         >
-          <span className="text-brand text-xl flex items-center">{categoryIcons[currentCategory.name]}</span>
+          <span className="text-brand text-xl flex items-center">
+            {categoryIcons[currentCategory.name]}
+          </span>
           <span className="text-xl font-semibold text-text-primary">{currentCategory.name}</span>
-          <span className="text-xs text-text-secondary/50">{currentCategory.skills?.length || 0} skills</span>
+          <span className="text-xs text-text-secondary/50">
+            {currentCategory.skills?.length || 0} skills
+          </span>
         </motion.div>
       )}
 
       {searchQuery && (
-        <motion.div className="text-xs text-text-secondary/60 mb-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          Found {searchedSkills?.length || 0} result{searchedSkills?.length !== 1 ? "s" : ""} for "{searchQuery}"
+        <motion.div
+          className="text-xs text-text-secondary/60 mb-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          Found {searchedSkills?.length || 0} result{searchedSkills?.length !== 1 ? "s" : ""} for "
+          {searchQuery}"
         </motion.div>
       )}
 
@@ -131,14 +134,20 @@ export const SkillsScreen: React.FC = () => {
             >
               <div className="flex items-center justify-between gap-3 mb-2">
                 <h3 className="text-sm font-medium text-text-primary">{skill.name}</h3>
-                <span className="text-xs text-text-secondary">Proficiency: {skill.proficiency || 0}/5</span>
+                <span className="text-xs text-text-secondary">
+                  Proficiency: {skill.proficiency || 0}/5
+                </span>
               </div>
               <div className="w-full h-1.5 bg-bg-primary rounded-full overflow-hidden">
                 <motion.div
                   className="h-full bg-brand rounded-full"
                   initial={{ width: 0 }}
                   animate={{ width: `${((skill.proficiency || 0) / 5) * 100}%` }}
-                  transition={{ delay: duration.normal + idx * stagger.normal, duration: duration.slow, ease: easing["ease-out-expo"] }}
+                  transition={{
+                    delay: duration.normal + idx * stagger.normal,
+                    duration: duration.slow,
+                    ease: easing["ease-out-expo"],
+                  }}
                 />
               </div>
               {searchQuery && (

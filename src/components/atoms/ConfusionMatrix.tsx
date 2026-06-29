@@ -49,7 +49,11 @@ function colorScale(value: number, max: number, isDark: boolean): string {
 function hexToRgb(hex: string): [number, number, number] {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   if (!result) return [128, 128, 128];
-  return [Number.parseInt(result[1], 16), Number.parseInt(result[2], 16), Number.parseInt(result[3], 16)];
+  return [
+    Number.parseInt(result[1], 16),
+    Number.parseInt(result[2], 16),
+    Number.parseInt(result[3], 16),
+  ];
 }
 
 export default function ConfusionMatrix({
@@ -62,7 +66,10 @@ export default function ConfusionMatrix({
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const [dimensions, setDimensions] = useState({ width: propWidth ?? 500, height: propHeight ?? 500 });
+  const [dimensions, setDimensions] = useState({
+    width: propWidth ?? 500,
+    height: propHeight ?? 500,
+  });
   const prefersReduced = useReducedMotion();
   const theme = useThemeStore((s) => s.theme);
   const isDark = theme === "dark";
@@ -95,7 +102,10 @@ export default function ConfusionMatrix({
     const { width, height } = dimensions;
     const colors = themeColors(isDark);
     const margin = { top: 60, right: 40, bottom: 60, left: 80 };
-    const innerSize = Math.min(width - margin.left - margin.right, height - margin.top - margin.bottom);
+    const innerSize = Math.min(
+      width - margin.left - margin.right,
+      height - margin.top - margin.bottom,
+    );
     const cellSize = innerSize / matrix.length;
 
     svg.selectAll("*").remove();
@@ -200,7 +210,8 @@ export default function ConfusionMatrix({
         };
         cellDetail.f1 =
           cellDetail.precision + cellDetail.recall > 0
-            ? (2 * cellDetail.precision * cellDetail.recall) / (cellDetail.precision + cellDetail.recall)
+            ? (2 * cellDetail.precision * cellDetail.recall) /
+              (cellDetail.precision + cellDetail.recall)
             : 0;
 
         g.append("rect")
@@ -217,7 +228,8 @@ export default function ConfusionMatrix({
             tooltip
               .style("opacity", 1)
               .style("left", `${Math.min(event.offsetX + 12, width - 200)}px`)
-              .style("top", `${Math.min(event.offsetY + 12, height - 160)}px`).html(`
+              .style("top", `${Math.min(event.offsetY + 12, height - 160)}px`)
+              .html(`
                 <div style="font-weight:600;margin-bottom:4px">
                   Actual: <span style="color:${colors.text}">${cellDetail.actual}</span>
                   → Predicted: <span style="color:${colors.text}">${cellDetail.predicted}</span>
@@ -248,16 +260,17 @@ export default function ConfusionMatrix({
           })
           .on("mouseleave", () => {
             tooltip.style("opacity", 0);
-            g.selectAll(".cell-highlight")
-              .attr("stroke", "transparent")
-              .attr("stroke-width", 0);
+            g.selectAll(".cell-highlight").attr("stroke", "transparent").attr("stroke-width", 0);
           });
       });
     });
 
     g.selectAll("rect")
       .filter(function () {
-        return d3.select(this).attr("stroke") === "transparent" || d3.select(this).attr("stroke-width") === "0";
+        return (
+          d3.select(this).attr("stroke") === "transparent" ||
+          d3.select(this).attr("stroke-width") === "0"
+        );
       })
       .attr("class", "cell-highlight");
   }, [matrix, labels, dimensions, isDark, prefersReduced]);

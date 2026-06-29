@@ -33,10 +33,13 @@ export function PinnedSection({
   });
 
   return (
-    <div ref={pinRef} className={`relative ${className ?? ""}`} id={id} style={{ height: pinHeight }}>
-      <div className="sticky top-0 h-screen flex items-center overflow-hidden">
-        {children}
-      </div>
+    <div
+      ref={pinRef}
+      className={`relative ${className ?? ""}`}
+      id={id}
+      style={{ height: pinHeight }}
+    >
+      <div className="sticky top-0 h-screen flex items-center overflow-hidden">{children}</div>
     </div>
   );
 }

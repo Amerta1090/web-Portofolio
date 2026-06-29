@@ -20,10 +20,7 @@ export default function SectionCounter() {
     <div className="fixed right-4 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-center gap-3 pointer-events-none select-none">
       <span className="text-xs font-medium text-brand tabular-nums">
         {String(current).padStart(2, "0")}
-        <span className="text-text-secondary">
-          {" "}
-          / {String(sectionCount).padStart(2, "0")}
-        </span>
+        <span className="text-text-secondary"> / {String(sectionCount).padStart(2, "0")}</span>
       </span>
       <div className="flex flex-col gap-1.5">
         {SECTION_IDS.map((id) => (

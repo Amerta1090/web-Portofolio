@@ -39,7 +39,7 @@ export function useScrollProgress(): ScrollProgressData {
 
           let vel = 0;
           if (dt > 0) {
-            vel = Math.abs(dy) / dt * 1000;
+            vel = (Math.abs(dy) / dt) * 1000;
           }
 
           let dir: "up" | "down" | "idle" = "idle";

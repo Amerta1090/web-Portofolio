@@ -6,11 +6,7 @@ const ScrollContext = createContext<ScrollProgressData | null>(null);
 export function ScrollProvider({ children }: { children: ReactNode }) {
   const scrollData = useScrollProgress();
 
-  return (
-    <ScrollContext.Provider value={scrollData}>
-      {children}
-    </ScrollContext.Provider>
-  );
+  return <ScrollContext.Provider value={scrollData}>{children}</ScrollContext.Provider>;
 }
 
 export function useScroll(): ScrollProgressData {

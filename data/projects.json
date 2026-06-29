@@ -16,13 +16,9 @@
           "url": "https://github.com/Amerta1090/web-Portofolio"
         }
       ],
-      "skills": [
-        "Web Development"
-      ],
+      "skills": ["Web Development"],
       "image": "/images/placeholder/project.svg",
-      "images": [
-        "/images/placeholder/project.svg"
-      ]
+      "images": ["/images/placeholder/project.svg"]
     },
     {
       "title": "NyatetDuwit — Offline-First Personal Finance PWA",
@@ -40,14 +36,9 @@
           "url": "https://github.com/Amerta1090/Nyatet-Duwit-PWA"
         }
       ],
-      "skills": [
-        "Progressive Web Applications (PWAs)",
-        "IndexedDB"
-      ],
+      "skills": ["Progressive Web Applications (PWAs)", "IndexedDB"],
       "image": "/images/placeholder/project.svg",
-      "images": [
-        "/images/placeholder/project.svg"
-      ]
+      "images": ["/images/placeholder/project.svg"]
     },
     {
       "title": "IJO PLIS — IHSG & USD/IDR Forecasting Platform",
@@ -65,18 +56,10 @@
           "url": "https://github.com/Amerta1090/IHSG-Ijo-Plis-Django"
         }
       ],
-      "skills": [
-        "Python (Programming Language)",
-        "Machine Learning"
-      ],
-      "media": [
-        "IHSG Predictor",
-        "IDR Predictor"
-      ],
+      "skills": ["Python (Programming Language)", "Machine Learning"],
+      "media": ["IHSG Predictor", "IDR Predictor"],
       "image": "/images/placeholder/project.svg",
-      "images": [
-        "/images/placeholder/project.svg"
-      ]
+      "images": ["/images/placeholder/project.svg"]
     },
     {
       "title": "Premium Sudoku: Overengineered Puzzle Experience",
@@ -89,14 +72,9 @@
           "url": "https://github.com/Amerta1090/sudoku"
         }
       ],
-      "skills": [
-        "Linux",
-        "Linux Desktop"
-      ],
+      "skills": ["Linux", "Linux Desktop"],
       "image": "/images/placeholder/project.svg",
-      "images": [
-        "/images/placeholder/project.svg"
-      ]
+      "images": ["/images/placeholder/project.svg"]
     },
     {
       "title": "Red Devil Dynamics — AI Goal Timing Predictor for Manchester United",
@@ -114,14 +92,9 @@
           "url": "https://github.com/Amerta1090/Red-Devil-Dynamics-"
         }
       ],
-      "skills": [
-        "Python (Programming Language)",
-        "FastAPI"
-      ],
+      "skills": ["Python (Programming Language)", "FastAPI"],
       "image": "/images/placeholder/project.svg",
-      "images": [
-        "/images/placeholder/project.svg"
-      ]
+      "images": ["/images/placeholder/project.svg"]
     },
     {
       "title": "TreeMake: CLI Project Scaffolding Tool",
@@ -134,14 +107,9 @@
           "url": "https://github.com/Amerta1090/tree-maker"
         }
       ],
-      "skills": [
-        "Python (Programming Language)",
-        "Linux"
-      ],
+      "skills": ["Python (Programming Language)", "Linux"],
       "image": "/images/placeholder/project.svg",
-      "images": [
-        "/images/placeholder/project.svg"
-      ]
+      "images": ["/images/placeholder/project.svg"]
     },
     {
       "title": "AI Quranic Tafsir Assistant: Hybrid Sparse-Dense Retrieval & RAG",
@@ -156,14 +124,9 @@
           "url": "https://github.com/Amerta1090/Chatbot_Kathir_Streamlit"
         }
       ],
-      "skills": [
-        "Python (Programming Language)",
-        "Natural Language Processing (NLP)"
-      ],
+      "skills": ["Python (Programming Language)", "Natural Language Processing (NLP)"],
       "image": "/images/placeholder/project.svg",
-      "images": [
-        "/images/placeholder/project.svg"
-      ]
+      "images": ["/images/placeholder/project.svg"]
     },
     {
       "title": "TemuSehat ADK – Herbal AI Agent for Early Symptom Triage",
@@ -176,14 +139,9 @@
           "url": "https://github.com/Amerta1090/temuSehat_aiAgent_ADK"
         }
       ],
-      "skills": [
-        "AI Agents",
-        "Large Language Models (LLM)"
-      ],
+      "skills": ["AI Agents", "Large Language Models (LLM)"],
       "image": "/images/placeholder/project.svg",
-      "images": [
-        "/images/placeholder/project.svg"
-      ]
+      "images": ["/images/placeholder/project.svg"]
     },
     {
       "title": "Journal CLI: Automated Micro-Journaling via Google Sheets API",
@@ -196,14 +154,9 @@
           "url": "https://github.com/Amerta1090/Journal-CLI"
         }
       ],
-      "skills": [
-        "Google Sheets",
-        "Google Workspace"
-      ],
+      "skills": ["Google Sheets", "Google Workspace"],
       "image": "/images/placeholder/project.svg",
-      "images": [
-        "/images/placeholder/project.svg"
-      ]
+      "images": ["/images/placeholder/project.svg"]
     },
     {
       "title": "Pathwise Career AI: Personalized Guidance Through Data-Driven Insights",
@@ -216,14 +169,9 @@
           "url": "https://github.com/Amerta1090/Career_recommendation"
         }
       ],
-      "skills": [
-        "Machine Learning",
-        "Recommender Systems"
-      ],
+      "skills": ["Machine Learning", "Recommender Systems"],
       "image": "/images/placeholder/project.svg",
-      "images": [
-        "/images/placeholder/project.svg"
-      ]
+      "images": ["/images/placeholder/project.svg"]
     },
     {
       "title": "Production-Ready MLOps Pipeline: House Pricing Model with Real-Time Monitoring",
@@ -231,19 +179,14 @@
       "period": "Jun 2025 – Jul 2025",
       "description": "I engineered a comprehensive MLOps ecosystem designed to transition a housing price prediction model from a static experiment into a robust, production-monitored service. The project began with a structured machine learning workflow, utilizing custom preprocessing scripts and a dedicated modeling pipeline to ensure data consistency and high predictive accuracy. To facilitate a professional deployment environment, I integrated a CI/CD workflow that automates testing and integration, ensuring that every update to the model or serving logic is verified before reaching production. The serving layer is powered by a custom inference engine and a Prometheus exporter, which bridges the gap between raw model predictions and operational observability. A core highlight of this project is the implementation of full-stack monitoring using Prometheus and Grafana to track the model's health in real time. By developing a dedicated exporter, I successfully visualized critical production metrics, including prediction latency, request counts, and live accuracy tracking. This setup allows for proactive detection of performance degradation and resource bottlenecks through intuitive Grafana dashboards. The project demonstrates a complete lifecycle approach—from initial data experimentation and CI/CD automation to live service monitoring—ensuring the machine learning model remains reliable, scalable, and transparent in a production setting.",
       "links": [],
-      "skills": [
-        "MLOps",
-        "Prometheus"
-      ],
+      "skills": ["MLOps", "Prometheus"],
       "media": [
         "monitoring_accuracy.png",
         "monitoring_latency.png",
         "monitoring_request_count.png"
       ],
       "image": "/images/placeholder/project.svg",
-      "images": [
-        "/images/placeholder/project.svg"
-      ]
+      "images": ["/images/placeholder/project.svg"]
     },
     {
       "title": "CLI Productivity Engine: A JSON-Driven Task Management System",
@@ -256,14 +199,9 @@
           "url": "https://github.com/Amerta1090/python-todolist-cli"
         }
       ],
-      "skills": [
-        "Python (Programming Language)",
-        "Object-Oriented Programming (OOP)"
-      ],
+      "skills": ["Python (Programming Language)", "Object-Oriented Programming (OOP)"],
       "image": "/images/placeholder/project.svg",
-      "images": [
-        "/images/placeholder/project.svg"
-      ]
+      "images": ["/images/placeholder/project.svg"]
     },
     {
       "title": "MLOps Integration: Real-Time Incremental Learning with MLflow",
@@ -276,14 +214,9 @@
           "url": "https://github.com/Amerta1090/online_learning-model"
         }
       ],
-      "skills": [
-        "Machine Learning",
-        "MLOps"
-      ],
+      "skills": ["Machine Learning", "MLOps"],
       "image": "/images/placeholder/project.svg",
-      "images": [
-        "/images/placeholder/project.svg"
-      ]
+      "images": ["/images/placeholder/project.svg"]
     },
     {
       "title": "Resepku – Multi-Modal Recipe Discovery with Image and Text-Based Queries",
@@ -297,14 +230,9 @@
           "url": "https://github.com/aaneverything/resepBagus"
         }
       ],
-      "skills": [
-        "Information Retrieval",
-        "Artificial Intelligence (AI)"
-      ],
+      "skills": ["Information Retrieval", "Artificial Intelligence (AI)"],
       "image": "/images/placeholder/project.svg",
-      "images": [
-        "/images/placeholder/project.svg"
-      ]
+      "images": ["/images/placeholder/project.svg"]
     },
     {
       "title": "Google Workspace Automation: Recurring Event & Task Scheduler",
@@ -317,14 +245,9 @@
           "url": "https://github.com/Amerta1090/Automated-Scheduling-Google-Calender-For-Recurring-events"
         }
       ],
-      "skills": [
-        "Automation",
-        "Google Apps Script"
-      ],
+      "skills": ["Automation", "Google Apps Script"],
       "image": "/images/placeholder/project.svg",
-      "images": [
-        "/images/placeholder/project.svg"
-      ]
+      "images": ["/images/placeholder/project.svg"]
     },
     {
       "title": "Personalized Book Recommendation System: Multi-Model Discovery Engine",
@@ -337,14 +260,9 @@
           "url": "https://github.com/Amerta1090/Book_Recommendation_System"
         }
       ],
-      "skills": [
-        "Natural Language Processing (NLP)",
-        "Data Engineering"
-      ],
+      "skills": ["Natural Language Processing (NLP)", "Data Engineering"],
       "image": "/images/placeholder/project.svg",
-      "images": [
-        "/images/placeholder/project.svg"
-      ]
+      "images": ["/images/placeholder/project.svg"]
     },
     {
       "title": "Predictive Analytics for Real Estate: Housing Price Estimation in South Tangerang",
@@ -357,14 +275,9 @@
           "url": "https://github.com/Amerta1090/Tangerang-House-Pricing-Prediction"
         }
       ],
-      "skills": [
-        "Machine Learning",
-        "Data Engineering"
-      ],
+      "skills": ["Machine Learning", "Data Engineering"],
       "image": "/images/placeholder/project.svg",
-      "images": [
-        "/images/placeholder/project.svg"
-      ]
+      "images": ["/images/placeholder/project.svg"]
     },
     {
       "title": "Algorithmic Image Compressor: Precision Size Optimization",
@@ -377,14 +290,9 @@
           "url": "https://github.com/Amerta1090/Image-Compress-jpg-png"
         }
       ],
-      "skills": [
-        "Python (Programming Language)",
-        "Image Processing"
-      ],
+      "skills": ["Python (Programming Language)", "Image Processing"],
       "image": "/images/placeholder/project.svg",
-      "images": [
-        "/images/placeholder/project.svg"
-      ]
+      "images": ["/images/placeholder/project.svg"]
     },
     {
       "title": "SweetLife Mobile App – AI-Powered Wellness & Diabetes-Friendly Lifestyle Companion",
@@ -398,14 +306,9 @@
           "url": "https://github.com/SweetLife-Core/SweetLifeApp"
         }
       ],
-      "skills": [
-        "Recommender Systems",
-        "Machine Learning"
-      ],
+      "skills": ["Recommender Systems", "Machine Learning"],
       "image": "/images/placeholder/project.svg",
-      "images": [
-        "/images/placeholder/project.svg"
-      ]
+      "images": ["/images/placeholder/project.svg"]
     },
     {
       "title": "Smart Laundry Bin: IoT-Based Load & Cost Monitoring System",
@@ -414,19 +317,10 @@
       "association": "Universitas AMIKOM Yogyakarta",
       "description": "Developed an IoT-based smart bucket designed to optimize laundry management and household budgeting. By integrating load and distance sensors with the Wemos D1 R1 (ESP8266) platform, this system provides real-time data to help users track their laundry habits efficiently via a mobile dashboard. Key Features: 1. Capacity & Weight Tracking: Real-time monitoring of bucket capacity (1-100%) and precise clothing weight using a Load Cell and Ultrasonic sensor. 2. Cost Estimation: Automatically calculates estimated laundry costs based on weight-to-price algorithms. 3. Resource Optimization: Provides smart recommendations for detergent/softener usage (sachet units) to prevent chemical waste. 4. Mobile Connectivity: Seamless remote monitoring and limitations through the Blynk IoT platform.",
       "links": [],
-      "skills": [
-        "Internet of Things (IoT)",
-        "Embedded Systems"
-      ],
-      "media": [
-        "Prototype",
-        "Prototype 1",
-        "Prototype 2"
-      ],
+      "skills": ["Internet of Things (IoT)", "Embedded Systems"],
+      "media": ["Prototype", "Prototype 1", "Prototype 2"],
       "image": "/images/placeholder/project.svg",
-      "images": [
-        "/images/placeholder/project.svg"
-      ]
+      "images": ["/images/placeholder/project.svg"]
     },
     {
       "title": "Student Retention Analysis & Prediction System: Reducing Dropout Rates",
@@ -440,14 +334,9 @@
           "url": "https://github.com/Amerta1090/jayaprediksiinstitusi/blob/main/README.md"
         }
       ],
-      "skills": [
-        "Data Science",
-        "Machine Learning"
-      ],
+      "skills": ["Data Science", "Machine Learning"],
       "image": "/images/placeholder/project.svg",
-      "images": [
-        "/images/placeholder/project.svg"
-      ]
+      "images": ["/images/placeholder/project.svg"]
     },
     {
       "title": "Automated Chicken Coop Environment Controller",
@@ -456,19 +345,10 @@
       "association": "Universitas AMIKOM Yogyakarta",
       "description": "Developed an IoT-based smart poultry management system designed to maintain an ideal microclimate for livestock. The system automates temperature regulation using a DHT sensor to ensure optimal growth conditions. When the temperature exceeds the ideal threshold, the system triggers a cooling fan, and when it drops, it activates heating lamps. Key Features: 1. Real-time Monitoring: Integrated with Blynk IoT platform for remote control and status monitoring of fans and lights via smartphone. 2. Automated Climate Control: Implemented logic to maintain a specific temperature range suitable for poultry health. 3. Power Management: Designed to support dual power input (AC/DC) with an AC-to-DC converter for reliability. Components Used: ESP8266, DHT Temperature Sensor, Relay Modules, PC Cooling Fans, Heating Lamps, and AC-DC Converters.",
       "links": [],
-      "skills": [
-        "Internet of Things (IoT)",
-        "Embedded Systems"
-      ],
-      "media": [
-        "Prototype",
-        "Prototype 1",
-        "Prototype 2"
-      ],
+      "skills": ["Internet of Things (IoT)", "Embedded Systems"],
+      "media": ["Prototype", "Prototype 1", "Prototype 2"],
       "image": "/images/placeholder/project.svg",
-      "images": [
-        "/images/placeholder/project.svg"
-      ]
+      "images": ["/images/placeholder/project.svg"]
     }
   ]
 }

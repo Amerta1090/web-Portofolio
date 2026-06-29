@@ -68,18 +68,11 @@ export default function JourneyTimeline({ experiences }: Props) {
           />
           {/* Timeline dots */}
           {experiences.map((exp, idx) => (
-            <div
-              key={idx}
-              className="journey-item relative pb-12 last:pb-0"
-            >
+            <div key={idx} className="journey-item relative pb-12 last:pb-0">
               <div className="absolute -left-[1.15rem] md:-left-[1.4rem] top-1 w-2.5 h-2.5 rounded-full border-2 border-brand bg-bg-primary z-10" />
               <div className="pl-4">
-                <span className="text-xs text-text-secondary/60 font-medium">
-                  {exp.period}
-                </span>
-                <h3 className="text-lg font-semibold text-text-primary mt-1">
-                  {exp.title}
-                </h3>
+                <span className="text-xs text-text-secondary/60 font-medium">{exp.period}</span>
+                <h3 className="text-lg font-semibold text-text-primary mt-1">{exp.title}</h3>
                 <p className="text-sm text-brand font-medium">{exp.company}</p>
                 <p className="text-sm text-text-secondary mt-2 leading-relaxed max-w-prose">
                   {exp.description}

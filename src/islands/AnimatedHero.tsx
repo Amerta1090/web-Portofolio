@@ -98,7 +98,12 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
             className="text-4xl md:text-6xl font-bold text-text-primary leading-tight mt-2"
             initial={{ opacity: 0, x: -60 }}
             animate={stage >= 2 ? { opacity: 1, x: 0 } : {}}
-            transition={{ ...easing["ease-spring-gentle"], stiffness: 80, damping: 15, delay: duration.fast }}
+            transition={{
+              ...easing["ease-spring-gentle"],
+              stiffness: 80,
+              damping: 15,
+              delay: duration.fast,
+            }}
           >
             {restName}
           </motion.h1>
@@ -110,9 +115,7 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
             transition={{ ...easing["ease-spring-gentle"], stiffness: 200, damping: 15 }}
           >
             <div className="border-l-4 border-brand pl-5">
-              <p className="text-xl md:text-2xl font-medium text-text-primary">
-                {headline}
-              </p>
+              <p className="text-xl md:text-2xl font-medium text-text-primary">{headline}</p>
             </div>
           </motion.div>
 
@@ -149,7 +152,10 @@ export default function AnimatedHero({ name, headline, tagline, resumeUrl }: Pro
               <motion.div
                 className="w-px h-8 bg-border"
                 animate={{ height: [8, 24, 8] }}
-                transition={{ duration: duration.narrative + duration.deliberate, repeat: Number.POSITIVE_INFINITY }}
+                transition={{
+                  duration: duration.narrative + duration.deliberate,
+                  repeat: Number.POSITIVE_INFINITY,
+                }}
               />
             )}
             {prefersReduced && <div className="w-px h-3 bg-border" />}

@@ -70,9 +70,7 @@ export const SubMenuPanel: React.FC<SubMenuPanelProps> = ({
                 </React.Fragment>
               ))}
             </div>
-            <h3 className="text-lg font-semibold text-text-primary">
-              {title}
-            </h3>
+            <h3 className="text-lg font-semibold text-text-primary">{title}</h3>
           </div>
 
           <div className="flex-1 overflow-y-auto py-2">
@@ -95,13 +93,17 @@ export const SubMenuPanel: React.FC<SubMenuPanelProps> = ({
                   }`}
                 >
                   {item.icon && (
-                    <span className={`flex-shrink-0 ${activeIndex === idx ? "text-brand" : "text-text-secondary"}`}>
+                    <span
+                      className={`flex-shrink-0 ${activeIndex === idx ? "text-brand" : "text-text-secondary"}`}
+                    >
                       {item.icon}
                     </span>
                   )}
-                  <span className={`flex-1 text-sm font-medium ${
+                  <span
+                    className={`flex-1 text-sm font-medium ${
                       activeIndex === idx ? "text-brand" : "text-text-primary"
-                    }`}>
+                    }`}
+                  >
                     {item.label}
                   </span>
                   {item.badge != null && (
@@ -109,7 +111,9 @@ export const SubMenuPanel: React.FC<SubMenuPanelProps> = ({
                       {item.badge}
                     </span>
                   )}
-                  {item.href && <ChevronRight size={12} className="text-text-secondary/40 shrink-0" />}
+                  {item.href && (
+                    <ChevronRight size={12} className="text-text-secondary/40 shrink-0" />
+                  )}
                 </div>
               </motion.div>
             ))}
@@ -121,7 +125,10 @@ export const SubMenuPanel: React.FC<SubMenuPanelProps> = ({
               onClick={onBack}
             >
               <ArrowLeftFromLine size={16} />
-              Back to {breadcrumbs.length > 1 ? breadcrumbs[breadcrumbs.length - 2]?.label || "Menu" : "Main Menu"}
+              Back to{" "}
+              {breadcrumbs.length > 1
+                ? breadcrumbs[breadcrumbs.length - 2]?.label || "Menu"
+                : "Main Menu"}
             </button>
           </div>
         </motion.div>

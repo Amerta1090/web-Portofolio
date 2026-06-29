@@ -52,9 +52,7 @@ export default function TestimonialCarousel({
                 )}
               </div>
               <div>
-                <strong className="text-sm text-[#2A3228]">
-                  {testimonials[active].name}
-                </strong>
+                <strong className="text-sm text-[#2A3228]">{testimonials[active].name}</strong>
                 <p className="text-xs text-[#7A8C6F]">
                   {testimonials[active].role} — {testimonials[active].company}
                 </p>
