@@ -46,6 +46,15 @@ const typeColors: Record<string, string> = {
           .map((exp) => (
             <div class="relative pl-14">
               <div class={`absolute left-[10px] top-2 w-[20px] h-[20px] rounded-full border-2 border-bg-primary ${typeColors[exp.type] || "bg-brand"} z-10`} />
+              <div class="absolute left-[-17px] top-[-4px] w-12 h-12 z-20 hidden md:flex items-center justify-center">
+                <img
+                  src={exp.logo || "/images/placeholder/company.svg"}
+                  alt={exp.company}
+                  class="w-10 h-10 rounded-full object-contain bg-bg-primary border-2 border-border"
+                  loading="lazy"
+                  onerror="this.src='/images/placeholder/company.svg'"
+                />
+              </div>
               <div class="card bg-bg-secondary/50 border border-border rounded-lg p-6">
                 <div class="flex flex-wrap items-start justify-between gap-2 mb-3">
                   <div>

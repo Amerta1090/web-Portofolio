@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { InteractionCard } from "../components/atoms/InteractionCard";
+import { InteractionSkeleton } from "../components/atoms/InteractionSkeleton";
+import SkillIcon from "../components/atoms/SkillIcon";
 
 interface Skill {
   name: string;
@@ -60,11 +63,14 @@ export default function SkillsExplorer({ skills }: Props) {
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filtered.map((category) => (
-          <div
+          <InteractionCard
             key={category.name}
-            className="border border-border rounded-lg p-5 hover:border-brand/30 transition-colors"
+            variant="outlined"
+            lift={3}
+            glow={true}
           >
             <div className="flex items-center gap-2 mb-4">
+              <SkillIcon name={category.icon} size={18} className="text-brand" />
               <h3 className="text-sm font-semibold text-text-primary">{category.name}</h3>
               <span className="text-[10px] text-text-secondary/40 ml-auto">
                 {category.skills.length}
@@ -111,14 +117,23 @@ export default function SkillsExplorer({ skills }: Props) {
                 );
               })}
             </div>
-          </div>
+          </InteractionCard>
         ))}
       </div>
 
-      {activeSkill && (
+      {activeSkill && filtered.length > 0 && (
         <div className="mt-6 border border-border rounded-lg bg-brand/5 p-4">
           <p className="text-xs text-text-secondary">
             Filtering by: <span className="text-brand font-medium">{activeSkill}</span>
+          </p>
+        </div>
+      )}
+
+      {activeSkill && filtered.length === 0 && (
+        <div className="mt-6">
+          <InteractionSkeleton.Text lines={3} />
+          <p className="text-xs text-text-secondary/50 mt-2">
+            No skills match "<span className="text-text-secondary">{activeSkill}</span>"
           </p>
         </div>
       )}

@@ -6,14 +6,15 @@ import Contact from "../components/organisms/Contact.astro";
 import Experience from "../components/organisms/Experience.astro";
 import GitHubShowcase from "../components/organisms/GitHubShowcase.astro";
 import Honors from "../components/organisms/Honors.astro";
-import Projects from "../components/organisms/Projects.astro";
 import Volunteering from "../components/organisms/Volunteering.astro";
 import ImpactMetrics from "../islands/ImpactMetrics";
 import JourneyTimeline from "../islands/JourneyTimeline";
+import ProjectCardGrid from "../islands/ProjectCardGrid";
 import ScrollAnimator from "../islands/ScrollAnimator.astro";
 import SectionCounter from "../islands/SectionCounter";
 import SkillsExplorer from "../islands/SkillsExplorer";
 import TimeAwareHero from "../islands/TimeAwareHero";
+import TestimonialCarousel from "../islands/TestimonialCarousel";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import {
   getCertifications,
@@ -22,6 +23,7 @@ import {
   getHonors,
   getProfile,
   getSkills,
+  getTestimonials,
   getVolunteering,
 } from "../lib/data";
 import { fetchAllGitHubData } from "../lib/github";
@@ -33,6 +35,7 @@ const skills = getSkills();
 const certifications = getCertifications();
 const honors = getHonors();
 const volunteerings = getVolunteering();
+const testimonials = getTestimonials();
 const gitHubData = await fetchAllGitHubData();
 ---
 
@@ -66,7 +69,7 @@ const gitHubData = await fetchAllGitHubData();
   </Section>
 
   <Section data-reveal id="projects" title="Featured Projects" subtitle="Selected work that demonstrates my range" ariaLabel="Featured projects">
-    <Projects projects={featuredProjects} />
+    <ProjectCardGrid client:load projects={featuredProjects} />
   </Section>
 
   <Section data-reveal id="skills" title="Skills" variant="alt" ariaLabel="Skills and technologies">
@@ -101,6 +104,14 @@ const gitHubData = await fetchAllGitHubData();
     gitHubData.pinned_repos.length > 0 && (
       <Section data-reveal id="github" title="GitHub" subtitle="Recent activity and repositories" variant="alt" ariaLabel="GitHub activity">
         <GitHubShowcase data={gitHubData} />
+      </Section>
+    )
+  }
+
+  {
+    testimonials.length > 0 && (
+      <Section data-reveal id="testimonials" title="Testimonials" subtitle="What people say about working with me" variant="alt" ariaLabel="Testimonials">
+        <TestimonialCarousel client:load testimonials={testimonials} autoPlay={true} interval={6000} />
       </Section>
     )
   }

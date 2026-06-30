@@ -1,22 +1,27 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Button } from "../components/atoms/Button";
+import { InteractionButton } from "../components/atoms/InteractionButton";
 import { contactSchema, type ContactFormValues } from "../lib/contact-schema";
 
-const ACCESS_KEY = "YOUR_ACCESS_KEY_HERE";
+const ACCESS_KEY = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY || "YOUR_ACCESS_KEY_HERE";
 
 export default function ContactForm() {
   const {
     register,
-    handleSubmit,
+    getValues,
+    trigger,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
   });
 
-  const onSubmit = async (data: ContactFormValues) => {
+  const onSubmit = async (): Promise<boolean> => {
+    const isValid = await trigger();
+    if (!isValid) return false;
+
+    const data = getValues();
     try {
       const formData = new FormData();
       formData.append("access_key", ACCESS_KEY);
@@ -35,11 +40,13 @@ export default function ContactForm() {
       if (json.success) {
         toast.success("Message sent successfully! I'll get back to you soon.");
         reset();
-      } else {
-        toast.error(json.message || "Failed to send. Please try again or email me directly.");
+        return true;
       }
+      toast.error(json.message || "Failed to send. Please try again or email me directly.");
+      return false;
     } catch {
       toast.error("Network error. Please email me directly at abdulmajidr708@gmail.com");
+      return false;
     }
   };
 
@@ -48,7 +55,7 @@ export default function ContactForm() {
   const messageErrorId = "cf-message-error";
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+    <form onSubmit={(e) => e.preventDefault()} className="space-y-4" noValidate>
       <div style={{ position: "absolute", left: "-9999px" }} aria-hidden="true">
         <input {...register("honeypot")} tabIndex={-1} autoComplete="off" />
       </div>
@@ -118,15 +125,15 @@ export default function ContactForm() {
         )}
       </div>
 
-      <Button
+      <InteractionButton
         type="submit"
         variant="primary"
         size="md"
-        loading={isSubmitting}
-        disabled={isSubmitting}
+        onClick={onSubmit}
+        feedbackDuration={3000}
       >
-        {isSubmitting ? "Sending..." : "Send Message"}
-      </Button>
+        Send Message
+      </InteractionButton>
     </form>
   );
 }

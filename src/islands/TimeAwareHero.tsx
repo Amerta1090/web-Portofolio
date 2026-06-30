@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { duration, easing } from "../lib/motion";
 import { useScrollProgress } from "../lib/useScrollProgress";
 import { useTimeOfDay } from "../lib/useTimeOfDay";
+import RevealText from "../components/atoms/RevealText";
+import HeroAvatar from "../components/atoms/HeroAvatar";
 
 interface Props {
   name: string;
@@ -88,7 +90,7 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl }: Pr
         className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8 relative z-20"
         style={prefersReduced ? {} : { y: scrollY * -0.02, willChange: "transform" }}
       >
-        <div className="max-w-4xl relative">
+        <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 lg:gap-16">
           <motion.div
             className="mb-6"
             initial={{ opacity: 0, x: -20 }}
@@ -100,39 +102,39 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl }: Pr
             </span>
           </motion.div>
 
-          <motion.h1
-            className="text-5xl md:text-7xl font-bold text-brand leading-tight"
-            initial={{ opacity: 0, x: -80 }}
-            animate={stage >= 2 ? { opacity: 1, x: 0 } : {}}
-            transition={{ ...easing["ease-spring-gentle"], stiffness: 80, damping: 15 }}
-          >
-            {firstName(name)}
-          </motion.h1>
+          <div className={stage < 2 ? "invisible" : ""}>
+            {stage >= 2 && (
+              <RevealText
+                text={firstName(name)}
+                as="h1"
+                className="text-5xl md:text-7xl font-bold text-brand leading-tight"
+                staggerDelay={0.04}
+              />
+            )}
+            {stage >= 2 && (
+              <RevealText
+                text={restName(name)}
+                as="h1"
+                className="text-4xl md:text-6xl font-bold text-text-primary leading-tight mt-2"
+                byWord
+                staggerDelay={0.06}
+              />
+            )}
+          </div>
 
-          <motion.h1
-            className="text-4xl md:text-6xl font-bold text-text-primary leading-tight mt-2"
-            initial={{ opacity: 0, x: -60 }}
-            animate={stage >= 2 ? { opacity: 1, x: 0 } : {}}
-            transition={{
-              ...easing["ease-spring-gentle"],
-              stiffness: 80,
-              damping: 15,
-              delay: duration.fast,
-            }}
-          >
-            {restName(name)}
-          </motion.h1>
-
-          <motion.div
-            className="mt-8"
-            initial={{ opacity: 0, scale: 0.85 }}
-            animate={stage >= 3 ? { opacity: 1, scale: 1 } : {}}
-            transition={{ ...easing["ease-spring-gentle"], stiffness: 200, damping: 15 }}
-          >
-            <div className="border-l-4 border-brand pl-5">
-              <p className="text-xl md:text-2xl font-medium text-text-primary">{headline}</p>
-            </div>
-          </motion.div>
+          <div className={`mt-8 ${stage < 3 ? "invisible" : ""}`}>
+            {stage >= 3 && (
+              <div className="border-l-4 border-brand pl-5">
+                <RevealText
+                  text={headline}
+                  as="p"
+                  className="text-xl md:text-2xl font-medium text-text-primary"
+                  byWord
+                  staggerDelay={0.08}
+                />
+              </div>
+            )}
+          </div>
 
           <motion.div
             className="mt-12 flex gap-4 flex-wrap"
@@ -176,6 +178,8 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl }: Pr
             {prefersReduced && <div className="w-px h-3 bg-border" />}
           </motion.div>
         </div>
+
+        <HeroAvatar className="hidden lg:block mt-8 lg:mt-0" />
       </motion.div>
     </section>
   );

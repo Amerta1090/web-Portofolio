@@ -12,6 +12,7 @@ import AmbientScene from "../islands/AmbientScene";
 import ScrollProgress from "../islands/ScrollProgress";
 import SmoothScroll from "../islands/SmoothScroll";
 import TimeAwareTheme from "../islands/TimeAwareTheme";
+import CustomCursor from "../islands/CustomCursor";
 import { SITE } from "../lib/constants";
 
 export interface Props {
@@ -188,6 +189,7 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
       </main>
       <Footer />
     </div>
+    <CustomCursor client:load />
     <TimeAwareTheme client:load />
     <Toaster
       client:load

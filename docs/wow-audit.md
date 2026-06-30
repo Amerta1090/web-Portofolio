@@ -84,6 +84,10 @@ To conduct the blind user test:
 
 **Feedback mechanism:** A user feedback component can be added (future) or use the existing contact form.
 
+> **Note:** This blind user test was not formally conducted. The portfolio has received positive organic feedback from peers and the "wow" audit was performed through codebase self-review. For a production-ready portfolio, conduct this test before public launch.
+>
+> **Remediation status:** The Lightning Mode and `prefers-reduced-motion` fallbacks (Epic 19.3) are fully implemented and verified. The feature assessment (Epic 19.1) is complete with all 47 features rated and documented.
+
 ---
 
 ## Epic 19.3: The "Off" Mode
@@ -127,3 +131,7 @@ Run `bun run build && bun run preview` then:
 
 - Compare `dist/` size before vs after Sprint 19 changes
 - Verify all pages render correctly at each tier (use `?tier=1`, `?tier=2`, `?tier=3` query params)
+
+> **Note:** Formal Lighthouse and bundle measurement were not executed as part of this iteration. The performance budget constants are defined in `src/lib/performance-budget.ts` and enforced via CI script (`bun run check-budget`). The site builds without errors and passes TypeScript checks.
+>
+> **Remediation status:** Run `bun run build && bun run check-budget` for automated bundle size verification, then run Lighthouse manually for full audit.
