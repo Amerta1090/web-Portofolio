@@ -77,12 +77,20 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl }: Pr
         className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8 relative z-20 flex-1 flex items-center"
         style={prefersReduced ? {} : { y: scrollY * -0.02, willChange: "transform" }}
       >
-        <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center">
-          <div className="flex flex-col gap-6">
+        <div className="flex flex-col items-center gap-8 md:gap-10">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={loaded ? { opacity: 1, scale: 1 } : {}}
+            transition={{ ...easing["ease-spring-gentle"], delay: duration.fast }}
+          >
+            <HeroAvatar animate={false} />
+          </motion.div>
+
+          <div className="flex flex-col gap-6 text-center">
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={loaded ? { opacity: 1, y: 0 } : {}}
-              transition={{ ...easing["ease-spring-gentle"], delay: duration.fast }}
+              transition={{ ...easing["ease-spring-gentle"], delay: duration.normal }}
             >
               <span className="text-xs text-text-secondary">
                 {greeting} &mdash; {tagline}
@@ -104,13 +112,13 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl }: Pr
               animate={loaded ? { opacity: 1, x: 0 } : {}}
               transition={{ ...easing["ease-spring-gentle"], delay: duration.slow }}
             >
-              <div className="border-l-4 border-brand pl-5">
+              <div className="border-l-4 border-brand pl-5 text-left">
                 <p className="text-xl md:text-2xl font-medium text-text-primary">{headline}</p>
               </div>
             </motion.div>
 
             <motion.div
-              className="flex gap-4 flex-wrap pt-2"
+              className="flex gap-4 flex-wrap pt-2 justify-center"
               initial={{ opacity: 0, y: 12 }}
               animate={loaded ? { opacity: 1, y: 0 } : {}}
               transition={{ ...easing["ease-spring-gentle"], delay: duration.deliberate }}
@@ -131,15 +139,6 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl }: Pr
               </a>
             </motion.div>
           </div>
-
-          <motion.div
-            className="flex justify-center lg:justify-end"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={loaded ? { opacity: 1, scale: 1 } : {}}
-            transition={{ ...easing["ease-spring-gentle"], delay: duration.normal }}
-          >
-            <HeroAvatar animate={false} />
-          </motion.div>
         </div>
       </motion.div>
 
