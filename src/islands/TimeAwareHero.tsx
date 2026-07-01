@@ -77,7 +77,7 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl }: Pr
         className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8 relative z-20 flex-1 flex items-center"
         style={prefersReduced ? {} : { y: scrollY * -0.02, willChange: "transform" }}
       >
-        <div className="flex flex-col items-center gap-8 md:gap-10">
+        <div className="flex flex-col items-start gap-8 md:gap-10">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={loaded ? { opacity: 1, scale: 1 } : {}}
@@ -86,7 +86,7 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl }: Pr
             <HeroAvatar animate={false} />
           </motion.div>
 
-          <div className="flex flex-col gap-6 text-center">
+          <div className="flex flex-col gap-6">
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={loaded ? { opacity: 1, y: 0 } : {}}
@@ -118,7 +118,7 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl }: Pr
             </motion.div>
 
             <motion.div
-              className="flex gap-4 flex-wrap pt-2 justify-center"
+              className="flex gap-4 flex-wrap pt-2"
               initial={{ opacity: 0, y: 12 }}
               animate={loaded ? { opacity: 1, y: 0 } : {}}
               transition={{ ...easing["ease-spring-gentle"], delay: duration.deliberate }}
