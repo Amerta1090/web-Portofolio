@@ -1,9 +1,9 @@
 ---
-import { Mail } from "lucide-react";
 import { FOOTER_LINKS, SITE } from "../../lib/constants";
 import Container from "../atoms/Container.astro";
 import IconGitHub from "../atoms/IconGitHub.astro";
 import IconLinkedIn from "../atoms/IconLinkedIn.astro";
+import IconMail from "../atoms/IconMail.astro";
 ---
 
 <footer class="border-t border-border bg-bg-secondary/80" role="contentinfo">
@@ -48,7 +48,7 @@ import IconLinkedIn from "../atoms/IconLinkedIn.astro";
           </li>
           <li>
             <a href="/contact" class="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-brand transition-colors">
-              <Mail class="w-4 h-4" aria-hidden="true" />
+              <IconMail size={16} />
               Contact
             </a>
           </li>

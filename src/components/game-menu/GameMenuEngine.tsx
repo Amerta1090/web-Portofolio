@@ -9,13 +9,11 @@ import {
   Columns3,
   FileText,
   FolderKanban,
-
   Globe,
   History,
   House,
   Images,
   LayoutGrid,
-  Mail,
   Star,
   User,
 } from "lucide-react";
@@ -30,6 +28,7 @@ import projectsData from "../../../data/projects.json";
 import { useHaptics } from "../../lib/useHaptics";
 import IconGitHub from "../atoms/IconGitHub";
 import IconLinkedIn from "../atoms/IconLinkedIn";
+import IconMail from "../atoms/IconMail";
 import { SubMenuPanel } from "./SubMenuPanel";
 import { ExperienceScreen } from "./screens/ExperienceScreen";
 import { HomeScreen } from "./screens/HomeScreen";
@@ -180,7 +179,7 @@ const MENU_TREE: MenuItem[] = [
     id: "contact",
     label: "Contact",
     screen: "contact",
-    icon: <Mail size={MAIN_ICON_SIZE} />,
+    icon: <IconMail size={MAIN_ICON_SIZE} />,
   },
 ];
 
@@ -398,7 +397,7 @@ const ContactScreen: React.FC = () => {
           href={`mailto:${profile.contact?.email}`}
           className="flex items-center gap-4 px-5 py-4 border border-border hover:border-brand/40 rounded-lg transition-colors group"
         >
-          <Mail size={20} className="text-text-secondary shrink-0" />
+          <IconMail size={20} className="text-text-secondary shrink-0" />
           <span className="text-sm text-text-primary group-hover:text-brand transition-colors">
             {profile.contact?.email}
           </span>
