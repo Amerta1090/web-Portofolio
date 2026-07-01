@@ -67,7 +67,7 @@ async function rest<T>(url: string): Promise<T> {
 
 export async function fetchPinnedRepos(): Promise<GitHubRepo[]> {
   const cached = readCache<GitHubRepo[]>("pinned-repos.json");
-  if (cached) return cached;
+  if (cached && cached.length > 0) return cached;
 
   const query = `{
     user(login: "${USERNAME}") {
@@ -133,7 +133,7 @@ export async function fetchPinnedRepos(): Promise<GitHubRepo[]> {
 
 export async function fetchAllRepos(): Promise<GitHubRepo[]> {
   const cached = readCache<GitHubRepo[]>("all-repos.json");
-  if (cached) return cached;
+  if (cached && cached.length > 0) return cached;
 
   try {
     const repos = await rest<
@@ -172,7 +172,7 @@ export async function fetchAllRepos(): Promise<GitHubRepo[]> {
 
 export async function fetchLanguages(): Promise<GitHubLangStats[]> {
   const cached = readCache<GitHubLangStats[]>("languages.json");
-  if (cached) return cached;
+  if (cached && cached.length > 0) return cached;
 
   try {
     const repos = await fetchAllRepos();
@@ -214,7 +214,7 @@ export async function fetchLanguages(): Promise<GitHubLangStats[]> {
 
 export async function fetchCommitActivity(): Promise<GitHubCommitActivity[]> {
   const cached = readCache<GitHubCommitActivity[]>("commit-activity.json");
-  if (cached) return cached;
+  if (cached && cached.length > 0) return cached;
 
   try {
     const repos = await fetchAllRepos();
@@ -346,7 +346,7 @@ export async function fetchReadme(owner: string, repo: string): Promise<GitHubRe
 
 export async function fetchTopRepos(): Promise<GitHubRepo[]> {
   const cached = readCache<GitHubRepo[]>("top-repos.json");
-  if (cached) return cached;
+  if (cached && cached.length > 0) return cached;
 
   try {
     const repos = await fetchAllRepos();
@@ -363,7 +363,7 @@ export async function fetchTopRepos(): Promise<GitHubRepo[]> {
 
 export async function fetchRepoActivity(): Promise<GitHubRepoActivity[]> {
   const cached = readCache<GitHubRepoActivity[]>("repo-activity.json");
-  if (cached) return cached;
+  if (cached && cached.length > 0) return cached;
 
   try {
     const repos = await fetchAllRepos();

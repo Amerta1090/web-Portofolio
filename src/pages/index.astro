@@ -101,7 +101,7 @@ const gitHubData = await fetchAllGitHubData();
   }
 
   {
-    gitHubData.pinned_repos.length > 0 && (
+    (gitHubData.pinned_repos.length > 0 || gitHubData.top_repos.length > 0) && (
       <Section data-reveal id="github" title="GitHub" subtitle="Recent activity and repositories" variant="alt" ariaLabel="GitHub activity">
         <GitHubShowcase data={gitHubData} />
       </Section>

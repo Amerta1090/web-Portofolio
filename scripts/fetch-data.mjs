@@ -1,5 +1,5 @@
 import { execSync } from "node:child_process";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -92,7 +92,7 @@ const contribQuery = `{
       contributionCalendar {
         totalContributions
         weeks {
-          contributionDays { contributionCount; date; color }
+          contributionDays { contributionCount date color }
         }
       }
     }
@@ -102,15 +102,91 @@ const contribQuery = `{
 console.log("Fetching GitHub data...\n");
 console.log("  GraphQL queries:");
 
-await fetchGraphQL(pinnedQuery, "pinned-repos");
-await fetchGraphQL(contribQuery, "contributions");
+// Transform GraphQL response to match src/lib/github.ts expected format
+await fetchGraphQL(pinnedQuery, "pinned-repos-raw");
+// Convert raw GraphQL response to mapped array format
+try {
+  const rawPath = resolve(cacheDir, "pinned-repos-raw.json");
+  const rawData = JSON.parse(readFileSync(rawPath, "utf-8"));
+  const nodes = rawData.data?.user?.pinnedItems?.nodes ?? [];
+  const mapped = nodes.map((n) => ({
+    name: n.name,
+    description: n.description,
+    url: n.url,
+    stars: n.stargazerCount,
+    forks: n.forkCount,
+    language: n.primaryLanguage?.name ?? null,
+    topics: n.repositoryTopics?.nodes?.map((t) => t.topic.name) ?? [],
+    updated_at: n.updatedAt,
+  }));
+  writeFileSync(resolve(cacheDir, "pinned-repos.json"), JSON.stringify(mapped, null, 2));
+  results.success.push("pinned-repos");
+  console.log("  ✓ pinned-repos (transformed)");
+} catch (err) {
+  results.failed.push("pinned-repos");
+  console.error(`  ✗ pinned-repos: ${err.message}`);
+}
+
+await fetchGraphQL(contribQuery, "contributions-raw");
+// Transform contributions to match ContributionCalendar format
+try {
+  const rawPath = resolve(cacheDir, "contributions-raw.json");
+  const rawData = JSON.parse(readFileSync(rawPath, "utf-8"));
+  const cal = rawData.data?.user?.contributionsCollection?.contributionCalendar;
+  if (cal) {
+    const mapped = {
+      totalContributions: cal.totalContributions ?? 0,
+      weeks: (cal.weeks ?? []).map((w) => ({
+        days: (w.contributionDays ?? []).map((d) => {
+          let level = 0;
+          if (d.contributionCount > 0) {
+            if (d.contributionCount <= 3) level = 1;
+            else if (d.contributionCount <= 6) level = 2;
+            else if (d.contributionCount <= 9) level = 3;
+            else level = 4;
+          }
+          return { count: d.contributionCount, date: d.date, level };
+        }),
+      })),
+    };
+    writeFileSync(resolve(cacheDir, "contributions.json"), JSON.stringify(mapped, null, 2));
+    results.success.push("contributions");
+    console.log("  ✓ contributions (transformed)");
+  } else {
+    throw new Error("Missing contributionCalendar in response");
+  }
+} catch (err) {
+  results.failed.push("contributions");
+  if (!results.failed.includes("contributions-raw")) console.error(`  ✗ contributions: ${err.message}`);
+}
 
 console.log("\n  REST endpoints:");
 
 await fetchJSON(
   `https://api.github.com/users/${USERNAME}/repos?per_page=100&sort=updated&direction=desc`,
-  "all-repos",
+  "all-repos-raw",
 );
+// Transform all-repos to match GitHubRepo format
+try {
+  const rawPath = resolve(cacheDir, "all-repos-raw.json");
+  const rawData = JSON.parse(readFileSync(rawPath, "utf-8"));
+  const mapped = (Array.isArray(rawData) ? rawData : []).map((r) => ({
+    name: r.name,
+    description: r.description,
+    url: r.html_url,
+    stars: r.stargazers_count ?? 0,
+    forks: r.forks_count ?? 0,
+    language: r.language ?? null,
+    topics: r.topics ?? [],
+    updated_at: r.updated_at,
+  }));
+  writeFileSync(resolve(cacheDir, "all-repos.json"), JSON.stringify(mapped, null, 2));
+  results.success.push("all-repos");
+  console.log("  ✓ all-repos (transformed)");
+} catch (err) {
+  results.failed.push("all-repos");
+  console.error(`  ✗ all-repos: ${err.message}`);
+}
 
 console.log("\n");
 

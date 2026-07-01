@@ -11,12 +11,13 @@ import { fetchAllGitHubData } from "../lib/github";
 import type { GitHubData } from "../types/github";
 
 const data: GitHubData | null = await fetchAllGitHubData();
+const repos = data?.pinned_repos.length ? data.pinned_repos : (data?.top_repos ?? []);
 const buildTime = new Date().toISOString();
 ---
 
 <BaseLayout title="GitHub — Abdul Majid Ridwan Tyastonoatmaja" description="GitHub repositories, contributions, and activity.">
   {
-    !data || data.pinned_repos.length === 0 ? (
+    !data || repos.length === 0 ? (
       <Section title="GitHub" ariaLabel="GitHub showcase">
         <Container>
           <div class="text-center py-16">
@@ -54,11 +55,11 @@ const buildTime = new Date().toISOString();
           </Container>
         </Section>
 
-        <Section title="Pinned Repositories" variant="alt" ariaLabel="Pinned repositories">
+        <Section title="Repositories" variant="alt" ariaLabel="Repositories">
           <Container>
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {
-                data.pinned_repos.map((repo) => (
+                repos.map((repo) => (
                   <a
                     href={repo.url}
                     target="_blank"

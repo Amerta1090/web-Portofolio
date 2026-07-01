@@ -7,13 +7,13 @@ export interface Props {
 }
 
 const { data } = Astro.props;
-const topRepos = data.pinned_repos.slice(0, 3);
+const displayRepos = data.pinned_repos.length ? data.pinned_repos.slice(0, 3) : data.top_repos.slice(0, 3);
 ---
 
 {
-  topRepos.length > 0 && (
+  displayRepos.length > 0 && (
     <div class="grid md:grid-cols-3 gap-4 mb-8">
-      {topRepos.map((repo) => (
+      {displayRepos.map((repo) => (
         <a
           href={repo.url}
           target="_blank"
