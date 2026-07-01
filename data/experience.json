@@ -16,7 +16,7 @@
     ],
     "technologies": ["Python", "Django", "JavaScript", "PostgreSQL", "Docker"],
     "url": null,
-    "logo": "/images/placeholder/company.svg"
+    "logo": "/images/logos/ferswit.jpg"
   },
   {
     "id": "forum-asisten",
@@ -32,7 +32,7 @@
     ],
     "technologies": ["Python", "Data Science", "Tableau", "SPSS"],
     "url": null,
-    "logo": "/images/placeholder/company.svg"
+    "logo": "/images/logos/forum-asisten.jpg"
   },
   {
     "id": "amikom-ai",
@@ -48,7 +48,7 @@
     ],
     "technologies": ["Machine Learning", "Python", "Deep Learning"],
     "url": null,
-    "logo": "/images/placeholder/company.svg"
+    "logo": "/images/logos/program-studi-informatika-amikom.jpg"
   },
   {
     "id": "aksoro",
@@ -64,7 +64,7 @@
     ],
     "technologies": ["Prompt Engineering", "AI"],
     "url": null,
-    "logo": "/images/placeholder/company.svg"
+    "logo": "/images/logos/aksoro.jpg"
   },
   {
     "id": "bangkit",
@@ -81,7 +81,7 @@
     ],
     "technologies": ["TensorFlow", "Machine Learning", "Python"],
     "url": null,
-    "logo": "/images/placeholder/company.svg"
+    "logo": "/images/logos/bangkit-academy.jpg"
   },
   {
     "id": "samsung-innovation",
@@ -97,7 +97,7 @@
     ],
     "technologies": ["IoT", "Embedded Systems", "C++"],
     "url": null,
-    "logo": "/images/placeholder/company.svg"
+    "logo": "/images/logos/samsung-innovation-campus.jpg"
   },
   {
     "id": "idcamp",
@@ -113,6 +113,6 @@
     ],
     "technologies": ["Data Science", "Machine Learning", "Python"],
     "url": null,
-    "logo": "/images/placeholder/company.svg"
+    "logo": "/images/logos/idcamp.jpg"
   }
 ]

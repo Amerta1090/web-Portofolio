@@ -5,7 +5,7 @@
     "date": "2024",
     "category": "competition",
     "description": null,
-    "image": "/images/placeholder/trophy.svg"
+    "image": "/images/logos/amikom.jpg"
   },
   {
     "title": "Winner - AMICTA 2025",
@@ -13,7 +13,7 @@
     "date": "2025",
     "category": "competition",
     "description": "Artificial Intelligence Category",
-    "image": "/images/placeholder/trophy.svg"
+    "image": "/images/logos/amikom.jpg"
   },
   {
     "title": "2nd Place Winner in Artificial Intelligence",
@@ -21,6 +21,6 @@
     "date": "2026",
     "category": "competition",
     "description": null,
-    "image": "/images/placeholder/trophy.svg"
+    "image": "/images/logos/amikom.jpg"
   }
 ]

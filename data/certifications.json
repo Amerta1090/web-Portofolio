@@ -6,7 +6,7 @@
     "credential_id": null,
     "skills": [],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/efset.jpg"
   },
   {
     "title": "Belajar Fundamental Pemrosesan Data",
@@ -15,115 +15,149 @@
     "credential_id": "JMZVVV65RZN9",
     "skills": [],
     "url": "https://www.dicoding.com/certificates/JMZVVV65RZN9",
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/dicoding.jpg"
   },
   {
     "title": "Membangun Sistem Machine Learning",
     "issuer": "Dicoding Indonesia",
     "date": "2025-06",
     "credential_id": "EYX4K1096PDL",
-    "skills": ["Machine Learning", "MLflow"],
+    "skills": [
+      "Machine Learning",
+      "MLflow"
+    ],
     "url": "https://www.dicoding.com/certificates/EYX4K1096PDL",
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/dicoding.jpg"
   },
   {
     "title": "Prompt Engineering untuk Software Developer",
     "issuer": "Dicoding Indonesia",
     "date": "2025-06",
     "credential_id": "2VX3KGVR3XYQ",
-    "skills": ["Prompt Engineering", "AI Prompting"],
+    "skills": [
+      "Prompt Engineering",
+      "AI Prompting"
+    ],
     "url": "https://www.dicoding.com/certificates/2VX3KGVR3XYQ",
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/dicoding.jpg"
   },
   {
     "title": "Belajar Dasar AI",
     "issuer": "Dicoding Indonesia",
     "date": "2025-05",
     "credential_id": "4EXGV018QXRL",
-    "skills": ["Artificial Intelligence (AI)"],
+    "skills": [
+      "Artificial Intelligence (AI)"
+    ],
     "url": "https://www.dicoding.com/certificates/4EXGV018QXRL",
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/dicoding.jpg"
   },
   {
     "title": "Belajar Penggunaan Generative AI",
     "issuer": "Dicoding Indonesia",
     "date": "2025-05",
     "credential_id": "QLZ93L39MZ5D",
-    "skills": ["AI Prompting", "Artificial Intelligence (AI)"],
+    "skills": [
+      "AI Prompting",
+      "Artificial Intelligence (AI)"
+    ],
     "url": "https://www.dicoding.com/certificates/QLZ93L39MZ5D",
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/dicoding.jpg"
   },
   {
     "title": "AI Praktis untuk Produktivitas",
     "issuer": "Dicoding Indonesia",
     "date": "2025-05",
     "credential_id": "RVZKWNR9QZD5",
-    "skills": ["Artificial Intelligence (AI)", "AI Prompting"],
+    "skills": [
+      "Artificial Intelligence (AI)",
+      "AI Prompting"
+    ],
     "url": "https://www.dicoding.com/certificates/RVZKWNR9QZD5",
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/dicoding.jpg"
   },
   {
     "title": "Machine Learning Terapan",
     "issuer": "Dicoding Indonesia",
     "date": "2025-03",
     "credential_id": "MRZMNWY7KPYQ",
-    "skills": ["Machine Learning"],
+    "skills": [
+      "Machine Learning"
+    ],
     "url": "https://www.dicoding.com/certificates/MRZMNWY7KPYQ",
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/dicoding.jpg"
   },
   {
     "title": "Use Machine Learning APIs on Google Cloud",
     "issuer": "Google Cloud Skills Boost",
     "date": "2025-02",
     "credential_id": null,
-    "skills": ["Machine Learning", "Artificial Intelligence (AI)"],
+    "skills": [
+      "Machine Learning",
+      "Artificial Intelligence (AI)"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/google-cloud-skills-boost.jpg"
   },
   {
     "title": "Automate Data Capture at Scale with Document",
     "issuer": "Google Cloud Skills Boost",
     "date": "2025-02",
     "credential_id": null,
-    "skills": ["Machine Learning", "Google Cloud Platform (GCP)"],
+    "skills": [
+      "Machine Learning",
+      "Google Cloud Platform (GCP)"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/google-cloud-skills-boost.jpg"
   },
   {
     "title": "Prepare Data for ML APIs on Google Cloud",
     "issuer": "Google Cloud Skills Boost",
     "date": "2025-02",
     "credential_id": null,
-    "skills": ["Machine Learning", "Artificial Intelligence (AI)"],
+    "skills": [
+      "Machine Learning",
+      "Artificial Intelligence (AI)"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/google-cloud-skills-boost.jpg"
   },
   {
     "title": "Cloud Speech API: 3 Ways",
     "issuer": "Google Cloud Skills Boost",
     "date": "2025-02",
     "credential_id": null,
-    "skills": ["Machine Learning", "Artificial Intelligence (AI)"],
+    "skills": [
+      "Machine Learning",
+      "Artificial Intelligence (AI)"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/google-cloud-skills-boost.jpg"
   },
   {
     "title": "Build Real World AI Applications with Gemini and Imagen",
     "issuer": "Google Cloud Skills Boost",
     "date": "2025-02",
     "credential_id": null,
-    "skills": ["Machine Learning", "Artificial Intelligence (AI)"],
+    "skills": [
+      "Machine Learning",
+      "Artificial Intelligence (AI)"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/google-cloud-skills-boost.jpg"
   },
   {
     "title": "Prompt Design in Vertex AI",
     "issuer": "Google Cloud Skills Boost",
     "date": "2025-02",
     "credential_id": null,
-    "skills": ["Prompt Engineering", "AI Prompting"],
+    "skills": [
+      "Prompt Engineering",
+      "AI Prompting"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/google-cloud-skills-boost.jpg"
   },
   {
     "title": "Build Basic Generative Adversarial Networks (GANs)",
@@ -132,7 +166,7 @@
     "credential_id": "SI4U71PB7QS8",
     "skills": [],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/deeplearning-ai.jpg"
   },
   {
     "title": "Generative AI for Everyone",
@@ -141,7 +175,7 @@
     "credential_id": "74GRIZJBV46P",
     "skills": [],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/deeplearning-ai.jpg"
   },
   {
     "title": "Advanced Computer Vision with TensorFlow",
@@ -150,7 +184,7 @@
     "credential_id": "SO3G8Y5TLK7R",
     "skills": [],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/deeplearning-ai.jpg"
   },
   {
     "title": "Custom and Distributed Training with TensorFlow",
@@ -159,7 +193,7 @@
     "credential_id": "QI1984U4BWRJ",
     "skills": [],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/deeplearning-ai.jpg"
   },
   {
     "title": "Custom Models, Layers, and Loss Functions with TensorFlow",
@@ -168,16 +202,18 @@
     "credential_id": "SPL3FA06LGGF",
     "skills": [],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/deeplearning-ai.jpg"
   },
   {
     "title": "Data Pipelines with TensorFlow Data Services",
     "issuer": "DeepLearning.AI",
     "date": "2024-11",
     "credential_id": "HUF3VAYZ3D8I",
-    "skills": ["Machine Learning"],
+    "skills": [
+      "Machine Learning"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/deeplearning-ai.jpg"
   },
   {
     "title": "Device-based Models with TensorFlow Lite",
@@ -186,7 +222,7 @@
     "credential_id": "HV5V7Q95IH2J",
     "skills": [],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/deeplearning-ai.jpg"
   },
   {
     "title": "Browser-based Models with TensorFlow.js",
@@ -195,16 +231,18 @@
     "credential_id": "4V44LYGDT2H5",
     "skills": [],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/deeplearning-ai.jpg"
   },
   {
     "title": "Structuring Machine Learning Projects",
     "issuer": "DeepLearning.AI",
     "date": "2024-11",
     "credential_id": "YXVHA4N40O1L",
-    "skills": ["Machine Learning"],
+    "skills": [
+      "Machine Learning"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/deeplearning-ai.jpg"
   },
   {
     "title": "DeepLearning.AI TensorFlow Developer Specialization",
@@ -213,106 +251,134 @@
     "credential_id": "9ZOQP7T9N5VJ",
     "skills": [],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/deeplearning-ai.jpg"
   },
   {
     "title": "Sequences, Time Series and Prediction",
     "issuer": "DeepLearning.AI",
     "date": "2024-11",
     "credential_id": "101UFY6VP8W8",
-    "skills": ["Machine Learning", "Artificial Intelligence (AI)"],
+    "skills": [
+      "Machine Learning",
+      "Artificial Intelligence (AI)"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/deeplearning-ai.jpg"
   },
   {
     "title": "Natural Language Processing in TensorFlow",
     "issuer": "DeepLearning.AI",
     "date": "2024-11",
     "credential_id": "T2Z5HXSVD44Y",
-    "skills": ["Machine Learning", "Artificial Intelligence (AI)"],
+    "skills": [
+      "Machine Learning",
+      "Artificial Intelligence (AI)"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/deeplearning-ai.jpg"
   },
   {
     "title": "Convolutional Neural Networks in TensorFlow",
     "issuer": "DeepLearning.AI",
     "date": "2024-10",
     "credential_id": "8G2F09C22NHY",
-    "skills": ["Machine Learning", "Artificial Intelligence (AI)"],
+    "skills": [
+      "Machine Learning",
+      "Artificial Intelligence (AI)"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/deeplearning-ai.jpg"
   },
   {
     "title": "Introduction to TensorFlow for Artificial Intelligence, Machine Learning, and Deep Learning",
     "issuer": "DeepLearning.AI",
     "date": "2024-10",
     "credential_id": "8TY6VWVSDK80",
-    "skills": ["Machine Learning", "Artificial Intelligence (AI)"],
+    "skills": [
+      "Machine Learning",
+      "Artificial Intelligence (AI)"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/deeplearning-ai.jpg"
   },
   {
     "title": "Machine Learning Specialization",
     "issuer": "DeepLearning.AI",
     "date": "2024-10",
     "credential_id": "6J1DXGOAZ1EZ",
-    "skills": ["Machine Learning"],
+    "skills": [
+      "Machine Learning"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/deeplearning-ai.jpg"
   },
   {
     "title": "Unsupervised Learning, Recommenders, Reinforcement Learning",
     "issuer": "DeepLearning.AI",
     "date": "2024-10",
     "credential_id": "U8PT5G10L9B1",
-    "skills": ["Machine Learning"],
+    "skills": [
+      "Machine Learning"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/deeplearning-ai.jpg"
   },
   {
     "title": "Advanced Learning Algorithms",
     "issuer": "DeepLearning.AI",
     "date": "2024-10",
     "credential_id": "6NIGRVU17ELC",
-    "skills": ["Machine Learning"],
+    "skills": [
+      "Machine Learning"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/deeplearning-ai.jpg"
   },
   {
     "title": "Supervised Machine Learning: Regression and Classification",
     "issuer": "DeepLearning.AI",
     "date": "2024-10",
     "credential_id": "3Y4BNC1PV6VY",
-    "skills": ["Machine Learning"],
+    "skills": [
+      "Machine Learning"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/deeplearning-ai.jpg"
   },
   {
     "title": "Linear Algebra for Machine Learning and Data Science",
     "issuer": "DeepLearning.AI",
     "date": "2024-10",
     "credential_id": "8VZAR6KT11D2",
-    "skills": ["Machine Learning", "Data Science"],
+    "skills": [
+      "Machine Learning",
+      "Data Science"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/deeplearning-ai.jpg"
   },
   {
     "title": "Using Python to Interact with the Operating System",
     "issuer": "Google",
     "date": "2024-09",
     "credential_id": "SQN7F4F2VYPX",
-    "skills": ["Python (Programming Language)", "Bash"],
+    "skills": [
+      "Python (Programming Language)",
+      "Bash"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/google.jpg"
   },
   {
     "title": "Crash Course on Python",
     "issuer": "Google",
     "date": "2024-09",
     "credential_id": "YUF9TT7IKZTT",
-    "skills": ["Python (Programming Language)"],
+    "skills": [
+      "Python (Programming Language)"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/google.jpg"
   },
   {
     "title": "Belajar Dasar Git dengan GitHub",
@@ -321,97 +387,122 @@
     "credential_id": "L4PQ1D2YVXO1",
     "skills": [],
     "url": "https://www.dicoding.com/certificates/L4PQ1D2YVXO1",
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/dicoding.jpg"
   },
   {
     "title": "Internet of Things (IoT) - Hardware (Gold)",
     "issuer": "Skilvul",
     "date": "2024-07",
     "credential_id": "nbpdDJSeSCiZ2w0xMP6fAg",
-    "skills": ["Internet of Things (IoT)", "Raspberry Pi"],
+    "skills": [
+      "Internet of Things (IoT)",
+      "Raspberry Pi"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/skilvul.jpg"
   },
   {
     "title": "Belajar Penerapan Data Science",
     "issuer": "Dicoding Indonesia",
     "date": "2024-06",
     "credential_id": "53XEO1ORYZRN",
-    "skills": ["Data Science", "Machine Learning"],
+    "skills": [
+      "Data Science",
+      "Machine Learning"
+    ],
     "url": "https://www.dicoding.com/certificates/53XEO1ORYZRN",
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/dicoding.jpg"
   },
   {
     "title": "Belajar Membuat Front-End Web untuk Pemula",
     "issuer": "Dicoding Indonesia",
     "date": "2024-06",
     "credential_id": "L4PQ19RLOXO1",
-    "skills": ["JavaScript"],
+    "skills": [
+      "JavaScript"
+    ],
     "url": "https://www.dicoding.com/certificates/L4PQ19RLOXO1",
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/dicoding.jpg"
   },
   {
     "title": "Internet of Things (IoT) - Software and Platforms (Gold)",
     "issuer": "Skilvul",
     "date": "2024-06",
     "credential_id": "m_TRSOQPT46p0-CJVE0mgw",
-    "skills": ["Internet of Things (IoT)"],
+    "skills": [
+      "Internet of Things (IoT)"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/skilvul.jpg"
   },
   {
     "title": "IoT Development with ESP32 (Gold)",
     "issuer": "Skilvul",
     "date": "2024-06",
     "credential_id": "duXt_9keQomerf5R_wdwoQ",
-    "skills": ["Internet of Things (IoT)", "ESP32 Microcontrollers"],
+    "skills": [
+      "Internet of Things (IoT)",
+      "ESP32 Microcontrollers"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/skilvul.jpg"
   },
   {
     "title": "Internet of Things (IoT) - Fundamentals (Gold)",
     "issuer": "Skilvul",
     "date": "2024-04",
     "credential_id": "4bQuh9yOQ72Y08YJxF26MA",
-    "skills": ["Internet of Things (IoT)"],
+    "skills": [
+      "Internet of Things (IoT)"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/skilvul.jpg"
   },
   {
     "title": "Algorithm & Data Structures with Python (Gold)",
     "issuer": "Skilvul",
     "date": "2024-03",
     "credential_id": "DwfVW4LCRDacft3l0R3-Hw",
-    "skills": ["Data Structures", "Python (Programming Language)"],
+    "skills": [
+      "Data Structures",
+      "Python (Programming Language)"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/skilvul.jpg"
   },
   {
     "title": "Python Lanjutan (Gold)",
     "issuer": "Skilvul",
     "date": "2024-03",
     "credential_id": "67_uTSO_QjaVwUGAuhW8Zw",
-    "skills": ["Python (Programming Language)"],
+    "skills": [
+      "Python (Programming Language)"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/skilvul.jpg"
   },
   {
     "title": "Networking Devices and Initial Configuration",
     "issuer": "Cisco",
     "date": "2024-03",
     "credential_id": null,
-    "skills": ["Cisco Certified", "Cisco Networking"],
+    "skills": [
+      "Cisco Certified",
+      "Cisco Networking"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/cisco.jpg"
   },
   {
     "title": "Python Dasar (Gold)",
     "issuer": "Skilvul",
     "date": "2024-03",
     "credential_id": "3_sm0P1xQLCvq3MCiuPhgQ",
-    "skills": ["Python (Programming Language)"],
+    "skills": [
+      "Python (Programming Language)"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/skilvul.jpg"
   },
   {
     "title": "Belajar Dasar Pemrograman Web",
@@ -420,88 +511,113 @@
     "credential_id": "98XW27R74PM3",
     "skills": [],
     "url": "https://www.dicoding.com/certificates/98XW27R74PM3",
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/dicoding.jpg"
   },
   {
     "title": "Networking Basics",
     "issuer": "Cisco",
     "date": "2024-02",
     "credential_id": null,
-    "skills": ["Cisco Networking", "Cisco Certified"],
+    "skills": [
+      "Cisco Networking",
+      "Cisco Certified"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/cisco.jpg"
   },
   {
     "title": "Introduction to Cybersecurity",
     "issuer": "Cisco",
     "date": "2024-02",
     "credential_id": null,
-    "skills": ["Cybersecurity", "Cisco Certified"],
+    "skills": [
+      "Cybersecurity",
+      "Cisco Certified"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/cisco.jpg"
   },
   {
     "title": "CCNA: Introduction to Networks",
     "issuer": "Cisco",
     "date": "2024-01",
     "credential_id": null,
-    "skills": ["Cisco Networking", "Cisco Certified"],
+    "skills": [
+      "Cisco Networking",
+      "Cisco Certified"
+    ],
     "url": null,
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/cisco.jpg"
   },
   {
     "title": "Belajar Pengembangan Machine Learning",
     "issuer": "Dicoding Indonesia",
     "date": "2023-12",
     "credential_id": "L4PQQ8N82PO1",
-    "skills": ["Machine Learning", "Python (Programming Language)"],
+    "skills": [
+      "Machine Learning",
+      "Python (Programming Language)"
+    ],
     "url": "https://www.dicoding.com/certificates/L4PQQ8N82PO1",
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/dicoding.jpg"
   },
   {
     "title": "Belajar Machine Learning untuk Pemula",
     "issuer": "Dicoding Indonesia",
     "date": "2023-11",
     "credential_id": "KEXL8E86MZG2",
-    "skills": ["Machine Learning", "Python (Programming Language)"],
+    "skills": [
+      "Machine Learning",
+      "Python (Programming Language)"
+    ],
     "url": "https://www.dicoding.com/certificates/KEXL8E86MZG2",
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/dicoding.jpg"
   },
   {
     "title": "Belajar Analisis Data dengan Python",
     "issuer": "Dicoding Indonesia",
     "date": "2023-11",
     "credential_id": "JMZV1YVJRXN9",
-    "skills": ["Data Analysis", "Python (Programming Language)"],
+    "skills": [
+      "Data Analysis",
+      "Python (Programming Language)"
+    ],
     "url": "https://www.dicoding.com/certificates/JMZV1YVJRXN9",
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/dicoding.jpg"
   },
   {
     "title": "Memulai Pemrograman dengan Python",
     "issuer": "Dicoding Indonesia",
     "date": "2023-11",
     "credential_id": "KEXLLKJK4XG2",
-    "skills": ["Python (Programming Language)", "Data Science"],
+    "skills": [
+      "Python (Programming Language)",
+      "Data Science"
+    ],
     "url": "https://www.dicoding.com/certificates/KEXLLKJK4XG2",
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/dicoding.jpg"
   },
   {
     "title": "Belajar Dasar Data Science",
     "issuer": "Dicoding Indonesia",
     "date": "2023-11",
     "credential_id": "2VX363KOQXYQ",
-    "skills": ["Data Science"],
+    "skills": [
+      "Data Science"
+    ],
     "url": "https://www.dicoding.com/certificates/2VX363KOQXYQ",
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/dicoding.jpg"
   },
   {
     "title": "Belajar Dasar Structured Query Language (SQL)",
     "issuer": "Dicoding Indonesia",
     "date": "2023-09",
     "credential_id": "2VX36JDW3XYQ",
-    "skills": ["SQL"],
+    "skills": [
+      "SQL"
+    ],
     "url": "https://www.dicoding.com/certificates/2VX36JDW3XYQ",
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/dicoding.jpg"
   },
   {
     "title": "Memulai Dasar Pemrograman untuk Menjadi Pengembang Software",
@@ -510,7 +626,7 @@
     "credential_id": "2VX3JGEOQPYQ",
     "skills": [],
     "url": "https://www.dicoding.com/certificates/2VX3JGEOQPYQ",
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/dicoding.jpg"
   },
   {
     "title": "Belajar Dasar Manajemen Proyek",
@@ -519,25 +635,29 @@
     "credential_id": "MRZMQJE40PYQ",
     "skills": [],
     "url": "https://www.dicoding.com/certificates/MRZMQJE40PYQ",
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/dicoding.jpg"
   },
   {
     "title": "Belajar Dasar Pemrograman JavaScript",
     "issuer": "Dicoding Indonesia",
     "date": "2023-07",
     "credential_id": "1OP80MOM8XQK",
-    "skills": ["JavaScript"],
+    "skills": [
+      "JavaScript"
+    ],
     "url": "https://www.dicoding.com/certificates/1OP80MOM8XQK",
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/dicoding.jpg"
   },
   {
     "title": "Belajar Membuat Aplikasi Back-End untuk Pemula",
     "issuer": "Dicoding Indonesia",
     "date": "2023-07",
     "credential_id": "ERZRGJ9JWPYV",
-    "skills": ["JavaScript"],
+    "skills": [
+      "JavaScript"
+    ],
     "url": "https://www.dicoding.com/certificates/ERZRGJ9JWPYV",
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/dicoding.jpg"
   },
   {
     "title": "Cloud Practitioner Essentials (Belajar Dasar AWS Cloud)",
@@ -546,15 +666,17 @@
     "credential_id": "1OP85EJJQPQK",
     "skills": [],
     "url": "https://www.dicoding.com/certificates/1OP85EJJQPQK",
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/dicoding.jpg"
   },
   {
     "title": "Belajar Dasar Visualisasi Data",
     "issuer": "Dicoding Indonesia",
     "date": "2023-01",
     "credential_id": "81P28L63OPOY",
-    "skills": ["Data Science"],
+    "skills": [
+      "Data Science"
+    ],
     "url": "https://www.dicoding.com/certificates/81P28L63OPOY",
-    "badge": "/images/placeholder/badge.svg"
+    "badge": "/images/logos/dicoding.jpg"
   }
 ]

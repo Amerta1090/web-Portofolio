@@ -9,8 +9,6 @@ export default function ProjectThumbnail({ src, alt, className = "" }: ProjectTh
 
   return (
     <div className={`relative overflow-hidden aspect-video bg-surface-tertiary rounded-t-lg ${className}`}>
-      <picture>
-        <source type="image/webp" srcSet={imageSrc.replace(/\.(jpg|png)$/, ".webp")} />
         <img
           src={imageSrc}
           alt={alt}
@@ -21,7 +19,6 @@ export default function ProjectThumbnail({ src, alt, className = "" }: ProjectTh
             (e.target as HTMLImageElement).src = "/images/placeholder/project.svg";
           }}
         />
-      </picture>
       {!src && (
         <div className="absolute inset-0 flex items-center justify-center">
           <span className="text-xs text-text-secondary/40">{/* ASSET NEEDED */}</span>

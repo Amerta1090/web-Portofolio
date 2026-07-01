@@ -17,8 +17,8 @@
         }
       ],
       "skills": ["Web Development"],
-      "image": "/images/placeholder/project.svg",
-      "images": ["/images/placeholder/project.svg"]
+      "image": "/images/projects/retro-game-portfolio.png",
+      "images": ["/images/projects/retro-game-portfolio.png"]
     },
     {
       "title": "NyatetDuwit — Offline-First Personal Finance PWA",
@@ -37,8 +37,8 @@
         }
       ],
       "skills": ["Progressive Web Applications (PWAs)", "IndexedDB"],
-      "image": "/images/placeholder/project.svg",
-      "images": ["/images/placeholder/project.svg"]
+      "image": "/images/projects/nyatet-duwit.png",
+      "images": ["/images/projects/nyatet-duwit.png", "/images/projects/nyatet-duwit-ui.jpg"]
     },
     {
       "title": "IJO PLIS — IHSG & USD/IDR Forecasting Platform",
@@ -58,8 +58,8 @@
       ],
       "skills": ["Python (Programming Language)", "Machine Learning"],
       "media": ["IHSG Predictor", "IDR Predictor"],
-      "image": "/images/placeholder/project.svg",
-      "images": ["/images/placeholder/project.svg"]
+      "image": "/images/projects/ijo-plis.png",
+      "images": ["/images/projects/ijo-plis.png", "/images/projects/ijo-plis-usdidr.png"]
     },
     {
       "title": "Premium Sudoku: Overengineered Puzzle Experience",
@@ -73,8 +73,8 @@
         }
       ],
       "skills": ["Linux", "Linux Desktop"],
-      "image": "/images/placeholder/project.svg",
-      "images": ["/images/placeholder/project.svg"]
+      "image": "/images/projects/sudoku-premium.png",
+      "images": ["/images/projects/sudoku-premium.png"]
     },
     {
       "title": "Red Devil Dynamics — AI Goal Timing Predictor for Manchester United",
@@ -93,8 +93,8 @@
         }
       ],
       "skills": ["Python (Programming Language)", "FastAPI"],
-      "image": "/images/placeholder/project.svg",
-      "images": ["/images/placeholder/project.svg"]
+      "image": "/images/projects/red-devil-dynamics.jpg",
+      "images": ["/images/projects/red-devil-dynamics.jpg"]
     },
     {
       "title": "TreeMake: CLI Project Scaffolding Tool",

@@ -45,12 +45,11 @@ const typeColors: Record<string, string> = {
           .sort((a, b) => b.start_date.localeCompare(a.start_date))
           .map((exp) => (
             <div class="relative pl-14">
-              <div class={`absolute left-[10px] top-2 w-[20px] h-[20px] rounded-full border-2 border-bg-primary ${typeColors[exp.type] || "bg-brand"} z-10`} />
-              <div class="absolute left-[-17px] top-[-4px] w-12 h-12 z-20 hidden md:flex items-center justify-center">
+              <div class="absolute left-[-1px] top-[2px] w-10 h-10 z-10 hidden md:flex items-center justify-center rounded-full bg-bg-primary border-2 border-border overflow-hidden">
                 <img
                   src={exp.logo || "/images/placeholder/company.svg"}
                   alt={exp.company}
-                  class="w-10 h-10 rounded-full object-contain bg-bg-primary border-2 border-border"
+                  class="w-full h-full object-cover"
                   loading="lazy"
                   onerror="this.src='/images/placeholder/company.svg'"
                 />
