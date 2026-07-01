@@ -77,13 +77,13 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl }: Pr
         className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8 relative z-20 flex-1 flex items-center"
         style={prefersReduced ? {} : { y: scrollY * -0.02, willChange: "transform" }}
       >
-        <div className="flex flex-col items-start gap-8 md:gap-10">
+        <div className="flex flex-col items-start gap-6 md:gap-8">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={loaded ? { opacity: 1, scale: 1 } : {}}
             transition={{ ...easing["ease-spring-gentle"], delay: duration.fast }}
           >
-            <HeroAvatar animate={false} />
+            <HeroAvatar />
           </motion.div>
 
           <div className="flex flex-col gap-6">
