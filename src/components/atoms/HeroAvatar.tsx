@@ -3,25 +3,26 @@ import { duration, easing } from "../../lib/motion";
 
 interface HeroAvatarProps {
   className?: string;
+  animate?: boolean;
 }
 
-export default function HeroAvatar({ className = "" }: HeroAvatarProps) {
+export default function HeroAvatar({ className = "", animate = true }: HeroAvatarProps) {
   const prefersReduced = useReducedMotion();
 
   return (
     <motion.div
       className={`relative flex-shrink-0 ${className}`}
       initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
+      animate={animate ? { opacity: 1, scale: 1 } : { opacity: 1, scale: 1 }}
       transition={{ ...easing["ease-spring-gentle"], stiffness: 100, damping: 15, delay: duration.slow }}
     >
-      <svg viewBox="0 0 200 200" className="w-48 h-48 md:w-56 md:h-56 lg:w-64 lg:h-64">
+      <svg viewBox="0 0 200 200" className="w-40 h-40 md:w-48 md:h-48 lg:w-56 lg:h-56">
         <defs>
           <clipPath id="avatar-clip">
             <polygon points="100,5 185,50 185,150 100,195 15,150 15,50" />
           </clipPath>
         </defs>
-        {!prefersReduced && (
+        {animate && !prefersReduced && (
           <motion.polygon
             points="100,5 185,50 185,150 100,195 15,150 15,50"
             fill="none"
