@@ -2,6 +2,7 @@
 import { ArrowLeft } from "lucide-react";
 import { getCollection } from "astro:content";
 import { Tag } from "../../../components/atoms/Tag.tsx";
+import Section from "../../../components/molecules/Section.astro";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 
 export async function getStaticPaths() {
@@ -42,39 +43,52 @@ function readingTime(body: string): number {
   description={'Posts tagged with "' + actualTag + '"'}
   canonicalUrl={"https://abdulmajidr708.dev/blog/tag/" + slugifyTag(actualTag)}
 >
-  <div class="py-12 md:py-24">
-    <div class="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
-      <div class="mb-8">
-        <a href="/blog" class="text-sm text-text-secondary hover:text-brand transition-colors"><ArrowLeft class="w-4 h-4 inline" aria-hidden="true" /> Back to Blog</a>
-      </div>
+  <Section title={'Posts tagged: "' + actualTag + '"'} subtitle={posts.length + " post" + (posts.length !== 1 ? "s" : "")}>
+    <div class="mb-8" data-reveal>
+      <a href="/blog" class="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-brand transition-colors">
+        <ArrowLeft class="w-4 h-4" aria-hidden="true" /> Back to all posts
+      </a>
+    </div>
 
-      <h1 class="text-3xl md:text-4xl font-bold text-text-primary mb-2">
-        {"Posts tagged: " + actualTag}
-      </h1>
-      <p class="text-text-secondary mb-10">{posts.length + " post" + (posts.length !== 1 ? "s" : "")}</p>
-
-      <div class="space-y-8">
-        {posts.map((post) => (
-          <a
-            href={"/blog/" + post.id}
-            class="block group bg-bg-secondary border border-border rounded-xl p-6 hover:border-brand/30 transition-all duration-200"
-          >
+    <div class="grid md:grid-cols-2 gap-6" data-reveal>
+      {posts.map((post) => (
+        <a
+          href={"/blog/" + post.id}
+          class="group bg-bg-secondary border border-border rounded-xl overflow-hidden hover:border-brand/30 hover:-translate-y-0.5 transition-all duration-200"
+        >
+          {post.data.image && (
+            <div class="overflow-hidden">
+              <img
+                src={post.data.image}
+                alt={post.data.imageAlt ?? post.data.title}
+                class="w-full h-48 object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                loading="lazy"
+              />
+            </div>
+          )}
+          <div class="p-6">
             <div class="flex flex-wrap items-center gap-3 text-xs text-text-secondary mb-3">
               <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
-              <span>{readingTime(post.body) + " min read"}</span>
+              <span>{readingTime(post.body)} min read</span>
             </div>
-            <h2 class="text-xl font-semibold text-text-primary group-hover:text-brand transition-colors mb-2">
+            <h2 class="text-lg font-semibold text-text-primary group-hover:text-brand transition-colors duration-200 mb-2">
               {post.data.title}
             </h2>
-            <p class="text-text-secondary text-sm leading-relaxed mb-4">{post.data.description}</p>
+            <p class="text-text-secondary text-sm leading-relaxed mb-4 line-clamp-2">{post.data.description}</p>
             <div class="flex flex-wrap gap-2">
               {post.data.tags.map((t: string) => (
-                <Tag>{t}</Tag>
+                <Tag variant="outline">{t}</Tag>
               ))}
             </div>
-          </a>
-        ))}
-      </div>
+          </div>
+        </a>
+      ))}
     </div>
-  </div>
+
+    {posts.length === 0 && (
+      <div class="text-center py-16" data-reveal>
+        <p class="text-text-secondary text-lg">No posts found with this tag.</p>
+      </div>
+    )}
+  </Section>
 </BaseLayout>
