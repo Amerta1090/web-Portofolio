@@ -58,11 +58,11 @@ export default function TestimonialCarousel({
                 </p>
               </div>
               {testimonials[active].company_logo && (
-                <div className="ml-auto w-8 h-8">
+                <div className="ml-auto w-10 h-10 rounded-lg bg-[#EDEFEA] flex items-center justify-center p-1.5">
                   <img
                     src={testimonials[active].company_logo}
                     alt={testimonials[active].company}
-                    className="w-full h-full object-contain opacity-40"
+                    className="max-w-full max-h-full object-contain opacity-60"
                     loading="lazy"
                   />
                 </div>

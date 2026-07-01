@@ -7,23 +7,17 @@ import {
   ChevronRight,
   Code2,
   Columns3,
-  ExternalLink,
   FileText,
   FolderKanban,
-  Gamepad2,
-  GitFork,
+
   Globe,
   History,
   House,
   Images,
-  Info,
   LayoutGrid,
   Mail,
-  Monitor,
-  Settings,
   Star,
   User,
-  Volume2,
 } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -34,6 +28,8 @@ import experienceData from "../../../data/experience.json";
 import profileData from "../../../data/profile.json";
 import projectsData from "../../../data/projects.json";
 import { useHaptics } from "../../lib/useHaptics";
+import IconGitHub from "../atoms/IconGitHub";
+import IconLinkedIn from "../atoms/IconLinkedIn";
 import { SubMenuPanel } from "./SubMenuPanel";
 import { ExperienceScreen } from "./screens/ExperienceScreen";
 import { HomeScreen } from "./screens/HomeScreen";
@@ -44,7 +40,6 @@ type MenuState =
   | { type: "main_menu" }
   | { type: "sub_menu"; parentId: string; parentLabel: string }
   | { type: "screen"; screenId: string }
-  | { type: "settings" }
   | { type: "exit" };
 
 interface HistoryEntry {
@@ -128,7 +123,7 @@ const MENU_TREE: MenuItem[] = [
   {
     id: "github",
     label: "GitHub",
-    icon: <GitFork className="w-6 h-6" aria-hidden="true" />,
+    icon: <IconGitHub size={24} className="text-text-secondary" />,
     children: [
       {
         id: "pinned-repos",
@@ -182,33 +177,6 @@ const MENU_TREE: MenuItem[] = [
     ],
   },
   {
-    id: "settings",
-    label: "Settings",
-    icon: <Settings size={MAIN_ICON_SIZE} />,
-    children: [
-      {
-        id: "display-settings",
-        label: "Display",
-        icon: <Monitor size={SUB_ICON_SIZE} />,
-      },
-      {
-        id: "audio-settings",
-        label: "Audio",
-        icon: <Volume2 size={SUB_ICON_SIZE} />,
-      },
-      {
-        id: "controls-settings",
-        label: "Controls",
-        icon: <Gamepad2 size={SUB_ICON_SIZE} />,
-      },
-      {
-        id: "about-credits",
-        label: "About / Credits",
-        icon: <Info size={SUB_ICON_SIZE} />,
-      },
-    ],
-  },
-  {
     id: "contact",
     label: "Contact",
     screen: "contact",
@@ -221,8 +189,6 @@ const getDepth = (state: MenuState): number => {
     case "main_menu":
       return 0;
     case "sub_menu":
-      return 1;
-    case "settings":
       return 1;
     case "screen":
       return 1;
@@ -443,7 +409,7 @@ const ContactScreen: React.FC = () => {
           rel="noopener noreferrer"
           className="flex items-center gap-4 px-5 py-4 border border-border hover:border-brand/40 rounded-lg transition-colors group"
         >
-          <ExternalLink className="w-5 h-5 text-text-secondary shrink-0" aria-hidden="true" />
+          <IconLinkedIn size={20} className="text-text-secondary shrink-0" />
           <span className="text-sm text-text-primary group-hover:text-brand transition-colors">
             LinkedIn
           </span>
@@ -454,7 +420,7 @@ const ContactScreen: React.FC = () => {
           rel="noopener noreferrer"
           className="flex items-center gap-4 px-5 py-4 border border-border hover:border-brand/40 rounded-lg transition-colors group"
         >
-          <GitFork className="w-5 h-5 text-text-secondary shrink-0" aria-hidden="true" />
+          <IconGitHub size={20} className="text-text-secondary shrink-0" />
           <span className="text-sm text-text-primary group-hover:text-brand transition-colors">
             GitHub
           </span>
@@ -493,7 +459,6 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
 
       if (
         newState.type === "sub_menu" ||
-        newState.type === "settings" ||
         newState.type === "screen"
       ) {
         setHistory((prev) => [...prev, { state: menuState, label, id }]);
@@ -587,8 +552,6 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
         return menuState.parentLabel;
       case "screen":
         return menuState.screenId;
-      case "settings":
-        return "Settings";
       default:
         return "";
     }

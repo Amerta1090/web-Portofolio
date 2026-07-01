@@ -1,7 +1,9 @@
 ---
-import { ExternalLink, GitFork, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import { FOOTER_LINKS, SITE } from "../../lib/constants";
 import Container from "../atoms/Container.astro";
+import IconGitHub from "../atoms/IconGitHub.astro";
+import IconLinkedIn from "../atoms/IconLinkedIn.astro";
 ---
 
 <footer class="border-t border-border bg-bg-secondary/80" role="contentinfo">
@@ -32,14 +34,14 @@ import Container from "../atoms/Container.astro";
         <ul class="space-y-2">
           <li>
             <a href={SITE.github} class="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-brand transition-colors" target="_blank" rel="noopener noreferrer">
-              <GitFork class="w-4 h-4" aria-hidden="true" />
+              <IconGitHub size={16} class="text-text-secondary" />
               GitHub
               <span class="sr-only">(opens in new tab)</span>
             </a>
           </li>
           <li>
             <a href={SITE.linkedin} class="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-brand transition-colors" target="_blank" rel="noopener noreferrer">
-              <ExternalLink class="w-4 h-4" aria-hidden="true" />
+              <IconLinkedIn size={16} class="text-text-secondary" />
               LinkedIn
               <span class="sr-only">(opens in new tab)</span>
             </a>

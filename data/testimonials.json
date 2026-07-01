@@ -1,29 +1,29 @@
 [
   {
-    "id": "testimonial-1",
-    "name": "Nama Klien 1",
-    "role": "Posisi",
-    "company": "Perusahaan",
-    "text": "Testimonial placeholder — ganti dengan kutipan asli dari klien atau rekan kerja.",
-    "avatar": "/images/placeholder/avatar.svg",
-    "company_logo": "/images/placeholder/company.svg"
+    "id": "testimonial-trump",
+    "name": "Donald J. Trump",
+    "role": "45th President",
+    "company": "United States of America",
+    "text": "Nobody knows machine learning better than me. I've looked at a lot of portfolios — tremendous portfolios, believe me — and this one? This is the best portfolio. The code? Beautiful. The models? YUGE accuracy. We're going to predict so much, you'll get tired of predicting. I said to my team: hire this guy before China does. And folks, we have the best AI. By far.",
+    "avatar": "/images/testimonials/trump.jpg",
+    "company_logo": "/images/logos/google.jpg"
   },
   {
-    "id": "testimonial-2",
-    "name": "Nama Klien 2",
-    "role": "Posisi",
-    "company": "Perusahaan",
-    "text": "Testimonial placeholder — ganti dengan kutipan asli dari klien atau rekan kerja.",
-    "avatar": "/images/placeholder/avatar.svg",
-    "company_logo": "/images/placeholder/company.svg"
+    "id": "testimonial-prabowo",
+    "name": "Prabowo Subianto",
+    "role": "Minister of Defense",
+    "company": "Republic of Indonesia",
+    "text": "Hey antek-antek asing! Lihat ini! Portofolio level internasional buatan anak bangsa. Saya sudah cek modelnya — deep learning, computer vision, semuanya working. Gemoy banget! Ini yang disebut Indonesia Emas 2045. Saya bilang ke tim saya: gut gut, ini yang kita cari-cari selama ini. Gitu loh. Pokoknya kalian yang ragu-ragu, sorry aja. Ini nyata, ini keren, ini Indonesia!",
+    "avatar": "/images/testimonials/prabowo.jpg",
+    "company_logo": "/images/logos/google.jpg"
   },
   {
-    "id": "testimonial-3",
-    "name": "Nama Klien 3",
-    "role": "Posisi",
-    "company": "Perusahaan",
-    "text": "Testimonial placeholder — ganti dengan kutipan asli dari klien atau rekan kerja.",
-    "avatar": "/images/placeholder/avatar.svg",
-    "company_logo": "/images/placeholder/company.svg"
+    "id": "testimonial-jokowi",
+    "name": "Joko Widodo",
+    "role": "7th President",
+    "company": "Republic of Indonesia",
+    "text": "Saya sudah keliling Indonesia, naik sepeda, blusukan ke pasar, lihat UMKM go digital. Tapi baru kali ini saya lihat anak muda bikin aplikasi nyatet duit sendiri, bikin AI prediksi IHSG, bikin game sudoku — kerja, kerja, kerja! Saya titip pesan: jangan lupa budayamu, teruslah coding, dan kalau ada masalah... ya dicari solusinya, jangan dikomen doang. Iri saya sama generasi muda kayak gini.",
+    "avatar": "/images/testimonials/jokowi.jpg",
+    "company_logo": "/images/logos/google.jpg"
   }
 ]

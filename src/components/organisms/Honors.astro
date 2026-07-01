@@ -14,11 +14,11 @@ const { honors } = Astro.props;
     honors.map((honor) => (
       <div class="card rounded-lg border border-border bg-surface-primary text-text-primary shadow-md p-6">
         {honor.image && (
-          <div class="w-full aspect-square max-w-[120px] mx-auto mb-4 overflow-hidden rounded-lg bg-surface-tertiary">
+          <div class="w-full max-w-[120px] h-[80px] mx-auto mb-4 rounded-xl bg-white shadow-sm border border-border/30 flex items-center justify-center p-3">
             <img
               src={honor.image}
               alt={honor.title}
-              class="w-full h-full object-contain p-2"
+              class="max-w-full max-h-full object-contain"
               loading="lazy"
               onerror="this.style.display='none'"
             />
