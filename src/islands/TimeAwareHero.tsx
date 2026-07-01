@@ -1,7 +1,6 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
-import HeroAvatar from "../components/atoms/HeroAvatar";
 import RevealText from "../components/atoms/RevealText";
 import { duration, easing } from "../lib/motion";
 import { useScrollProgress } from "../lib/useScrollProgress";
@@ -77,7 +76,7 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl }: Pr
         className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8 relative z-20 flex-1 flex items-center"
         style={prefersReduced ? {} : { y: scrollY * -0.02, willChange: "transform" }}
       >
-        <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="max-w-3xl">
           <div className="flex flex-col gap-6">
             <motion.div
               initial={{ opacity: 0, y: 8 }}
@@ -131,15 +130,6 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl }: Pr
               </a>
             </motion.div>
           </div>
-
-          <motion.div
-            className="flex justify-center lg:justify-end"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={loaded ? { opacity: 1, scale: 1 } : {}}
-            transition={{ ...easing["ease-spring-gentle"], delay: duration.normal }}
-          >
-            <HeroAvatar />
-          </motion.div>
         </div>
       </motion.div>
 

@@ -1,6 +1,7 @@
 ---
 import ImpactMetrics from "../../islands/ImpactMetrics";
 import type { Profile } from "../../types/profile";
+import HeroAvatar from "../atoms/HeroAvatar";
 
 export interface Props {
   profile: Profile;
@@ -38,7 +39,7 @@ const metricItems = [
 ---
 
 <div class="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
-  <div>
+  <div class="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
     <div>
       <p class="text-text-primary leading-relaxed text-lg">
         {profile.summary}
@@ -48,9 +49,12 @@ const metricItems = [
         <span class="text-text-secondary/30">·</span>
         <span class="text-sm text-text-secondary">{profile.timezone}</span>
       </div>
+      <div class="mt-8">
+        <ImpactMetrics client:idle metrics={metricItems} />
+      </div>
     </div>
-    <div class="mt-8">
-      <ImpactMetrics client:idle metrics={metricItems} />
+    <div class="flex justify-center md:justify-end">
+      <HeroAvatar client:idle />
     </div>
   </div>
 </div>
