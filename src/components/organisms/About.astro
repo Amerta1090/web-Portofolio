@@ -1,6 +1,5 @@
 ---
 import ImpactMetrics from "../../islands/ImpactMetrics";
-import ProfileImage from "../atoms/ProfileImage.astro";
 import type { Profile } from "../../types/profile";
 
 export interface Props {
@@ -39,31 +38,19 @@ const metricItems = [
 ---
 
 <div class="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
-  <div class="grid md:grid-cols-5 gap-8 md:gap-12 items-start">
-    <div class="md:col-span-3 order-2 md:order-1">
-      <div>
-        <p class="text-text-primary leading-relaxed text-lg">
-          {profile.summary}
-        </p>
-        <div class="flex items-center gap-3 mt-4">
-          <span class="text-sm text-text-secondary">{profile.location}</span>
-          <span class="text-text-secondary/30">·</span>
-          <span class="text-sm text-text-secondary">{profile.timezone}</span>
-        </div>
-      </div>
-      <div class="mt-8">
-        <ImpactMetrics client:idle metrics={metricItems} />
+  <div>
+    <div>
+      <p class="text-text-primary leading-relaxed text-lg">
+        {profile.summary}
+      </p>
+      <div class="flex items-center gap-3 mt-4">
+        <span class="text-sm text-text-secondary">{profile.location}</span>
+        <span class="text-text-secondary/30">·</span>
+        <span class="text-sm text-text-secondary">{profile.timezone}</span>
       </div>
     </div>
-    <div class="md:col-span-2 order-1 md:order-2 flex justify-center md:justify-end">
-      <div class="relative w-48 h-60 md:w-56 md:h-72 rounded-xl overflow-hidden border-2 border-brand/20 shadow-lg">
-        <ProfileImage
-          alt={`Portrait of ${profile.name}`}
-          width={400}
-          height={500}
-          priority
-        />
-      </div>
+    <div class="mt-8">
+      <ImpactMetrics client:idle metrics={metricItems} />
     </div>
   </div>
 </div>
