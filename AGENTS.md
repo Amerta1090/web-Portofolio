@@ -6,8 +6,8 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 
 ## Sprint State
 - Epic 1 (Data Layer): ✅ COMPLETE
-- Epic 2 (Boot Sequence): ⏳ NEXT
-- Epic 3 (CodeDNA Helix): pending
+- Epic 2 (Boot Sequence): ✅ COMPLETE
+- Epic 3 (CodeDNA Helix): ✅ COMPLETE
 - Epic 4 (Command Center): pending
 - Epic 5 (Repository Galaxy): pending
 - Epic 6 (Language Nebula): pending
@@ -57,6 +57,7 @@ pinned-repos.json, all-repos.json, languages.json, commit-activity.json, contrib
 | ProjectCardGrid.tsx | `client:load` | |
 | SkillsExplorer.tsx | `client:load` | |
 | JourneyTimeline.tsx | `client:visible` | |
+| CodeDNAHelix.tsx | `client:visible` | SVG/GSAP DNA helix, scroll-driven rotation, hover tooltip |
 | ContributionGraph.tsx | `client:visible` | Marked for replacement in Epic 4 |
 | CommitHeatmap.tsx | `client:visible` | Marked for replacement in Epic 4 |
 | LanguageDonut.tsx | `client:load` | Marked for replacement in Epic 4 |
@@ -89,13 +90,6 @@ Badge.astro, Button.astro, Card.astro, Container.astro, Section.astro, Tag.astro
 index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skills.astro, certifications.astro, github.astro, contact.astro, rss.xml.js
 
 ## Sprint Plan (to-be-created files)
-
-### Epic 2 (Boot Sequence)
-- `src/components/atoms/TypewriterText.tsx` — character-by-character text animation
-- `src/islands/BootSequence.tsx` — terminal welcome with typewriter, glitch effect, skip button, localStorage skip
-
-### Epic 3 (CodeDNA Helix)
-- `src/islands/CodeDNAHelix.tsx` — SVG/GSAP animated DNA helix, scroll-driven rotation, hover tooltip
 
 ### Epic 4 (Command Center)
 - `src/islands/MetricCounter.tsx` — animated number counter (Framer Motion spring)
