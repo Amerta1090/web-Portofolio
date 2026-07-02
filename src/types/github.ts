@@ -7,6 +7,11 @@ export interface GitHubRepo {
   language: string | null;
   topics: string[];
   updated_at: string;
+  created_at: string;
+  pushed_at: string;
+  is_fork: boolean;
+  size: number;
+  age_days: number;
 }
 
 export interface GitHubLangStats {
@@ -50,6 +55,24 @@ export interface GitHubReadme {
   fetched_at: string;
 }
 
+export type StarHistory = Array<{ date: string; count: number }>;
+
+export interface WeeklyPattern {
+  mon: number;
+  tue: number;
+  wed: number;
+  thu: number;
+  fri: number;
+  sat: number;
+  sun: number;
+}
+
+export interface DerivedGitHubMetrics {
+  longest_streak: number;
+  busiest_month: string;
+  most_active_day: string;
+}
+
 export interface GitHubData {
   pinned_repos: GitHubRepo[];
   total_stars: number;
@@ -61,4 +84,7 @@ export interface GitHubData {
   contributions: ContributionCalendar;
   top_repos: GitHubRepo[];
   repo_activity: GitHubRepoActivity[];
+  weekly_pattern: WeeklyPattern;
+  derived_metrics: DerivedGitHubMetrics;
+  star_history: Record<string, StarHistory>;
 }

@@ -2,12 +2,15 @@ import fs from "node:fs";
 import path from "node:path";
 import type {
   ContributionCalendar,
+  DerivedGitHubMetrics,
   GitHubCommitActivity,
   GitHubData,
   GitHubLangStats,
   GitHubReadme,
   GitHubRepo,
   GitHubRepoActivity,
+  StarHistory,
+  WeeklyPattern,
 } from "../types/github";
 
 const USERNAME = "Amerta1090";
@@ -84,6 +87,10 @@ export async function fetchPinnedRepos(): Promise<GitHubRepo[]> {
               nodes { topic { name } }
             }
             updatedAt
+            createdAt
+            pushedAt
+            isFork
+            diskUsage
           }
         }
       }
@@ -104,22 +111,35 @@ export async function fetchPinnedRepos(): Promise<GitHubRepo[]> {
               primaryLanguage: { name: string } | null;
               repositoryTopics: { nodes: Array<{ topic: { name: string } }> };
               updatedAt: string;
+              createdAt: string;
+              pushedAt: string;
+              isFork: boolean;
+              diskUsage: number;
             }>;
           };
         };
       };
     }>(query);
 
-    const repos = result.data.user.pinnedItems.nodes.map((n) => ({
-      name: n.name,
-      description: n.description,
-      url: n.url,
-      stars: n.stargazerCount,
-      forks: n.forkCount,
-      language: n.primaryLanguage?.name ?? null,
-      topics: n.repositoryTopics.nodes.map((t) => t.topic.name),
-      updated_at: n.updatedAt,
-    }));
+    const now = Date.now();
+    const repos = result.data.user.pinnedItems.nodes.map((n) => {
+      const created = new Date(n.createdAt).getTime();
+      return {
+        name: n.name,
+        description: n.description,
+        url: n.url,
+        stars: n.stargazerCount,
+        forks: n.forkCount,
+        language: n.primaryLanguage?.name ?? null,
+        topics: n.repositoryTopics.nodes.map((t) => t.topic.name),
+        updated_at: n.updatedAt,
+        created_at: n.createdAt,
+        pushed_at: n.pushedAt,
+        is_fork: n.isFork,
+        size: n.diskUsage,
+        age_days: Math.floor((now - created) / 86400000),
+      };
+    });
 
     writeCache("pinned-repos.json", repos);
     return repos;
@@ -146,19 +166,32 @@ export async function fetchAllRepos(): Promise<GitHubRepo[]> {
         language: string | null;
         topics: string[];
         updated_at: string;
+        created_at: string;
+        pushed_at: string;
+        fork: boolean;
+        size: number;
       }>
     >(`/users/${USERNAME}/repos?per_page=100&sort=updated&direction=desc`);
 
-    const mapped = repos.map((r) => ({
-      name: r.name,
-      description: r.description,
-      url: r.html_url,
-      stars: r.stargazers_count,
-      forks: r.forks_count,
-      language: r.language,
-      topics: r.topics ?? [],
-      updated_at: r.updated_at,
-    }));
+    const now = Date.now();
+    const mapped = repos.map((r) => {
+      const created = new Date(r.created_at).getTime();
+      return {
+        name: r.name,
+        description: r.description,
+        url: r.html_url,
+        stars: r.stargazers_count,
+        forks: r.forks_count,
+        language: r.language,
+        topics: r.topics ?? [],
+        updated_at: r.updated_at,
+        created_at: r.created_at,
+        pushed_at: r.pushed_at,
+        is_fork: r.fork,
+        size: r.size,
+        age_days: Math.floor((now - created) / 86400000),
+      };
+    });
 
     writeCache("all-repos.json", mapped);
     return mapped;
@@ -401,6 +434,131 @@ export async function fetchRepoActivity(): Promise<GitHubRepoActivity[]> {
   }
 }
 
+export async function fetchStarHistory(
+  owner: string,
+  repo: string,
+): Promise<StarHistory> {
+  const cacheKey = `star-history-${repo}.json`;
+  const cached = readCache<StarHistory>(cacheKey);
+  if (cached && cached.length > 0) return cached;
+
+  try {
+    const stars: StarHistory = [];
+    let page = 1;
+    const perPage = 100;
+
+    while (page <= 10) {
+      const data = await rest<
+        Array<{
+          starred_at: string;
+        }>
+      >(
+        `/repos/${owner}/${repo}/stargazers?per_page=${perPage}&page=${page}`,
+      );
+
+      if (!Array.isArray(data) || data.length === 0) break;
+
+      for (const s of data) {
+        const month = s.starred_at.slice(0, 7);
+        const existing = stars.find((e) => e.date === month);
+        if (existing) {
+          existing.count += 1;
+        } else {
+          stars.push({ date: month, count: 1 });
+        }
+      }
+
+      if (data.length < perPage) break;
+      page++;
+    }
+
+    stars.sort((a, b) => a.date.localeCompare(b.date));
+
+    writeCache(cacheKey, stars);
+    return stars;
+  } catch (err) {
+    console.warn(`[github] Star history fetch failed for ${repo}: ${err}`);
+    const fallback = readCache<StarHistory>(cacheKey);
+    if (fallback) return fallback;
+    return [];
+  }
+}
+
+export function deriveWeeklyPattern(
+  commitActivity: GitHubCommitActivity[],
+): WeeklyPattern {
+  const dayTotals = [0, 0, 0, 0, 0, 0, 0];
+
+  for (const week of commitActivity) {
+    if (week.days.length === 7) {
+      for (let d = 0; d < 7; d++) {
+        dayTotals[d] += week.days[d];
+      }
+    }
+  }
+
+  return {
+    mon: dayTotals[0],
+    tue: dayTotals[1],
+    wed: dayTotals[2],
+    thu: dayTotals[3],
+    fri: dayTotals[4],
+    sat: dayTotals[5],
+    sun: dayTotals[6],
+  };
+}
+
+export function deriveMetrics(
+  contributions: ContributionCalendar,
+): DerivedGitHubMetrics {
+  const dayNames = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
+  ];
+
+  const dayCounts: Record<string, number> = { sun: 0, mon: 0, tue: 0, wed: 0, thu: 0, fri: 0, sat: 0 };
+  const monthCounts: Record<string, number> = {};
+
+  let longestStreak = 0;
+  let currentStreak = 0;
+
+  for (const week of contributions.weeks) {
+    for (const day of week.days) {
+      if (day.count > 0) {
+        currentStreak++;
+        longestStreak = Math.max(longestStreak, currentStreak);
+      } else {
+        currentStreak = 0;
+      }
+
+      const date = new Date(day.date);
+      const dayName = dayNames[date.getDay()];
+      dayCounts[dayName] = (dayCounts[dayName] ?? 0) + day.count;
+
+      const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
+      monthCounts[monthKey] = (monthCounts[monthKey] ?? 0) + day.count;
+    }
+  }
+
+  const busiestMonthKey = Object.entries(monthCounts).sort(
+    (a, b) => b[1] - a[1],
+  )[0]?.[0];
+  const busiestMonth = busiestMonthKey
+    ? monthNames[Number.parseInt(busiestMonthKey.split("-")[1])]
+    : "Unknown";
+
+  const mostActiveDay = Object.entries(dayCounts).sort(
+    (a, b) => b[1] - a[1],
+  )[0]?.[0] ?? "mon";
+
+  return {
+    longest_streak: longestStreak,
+    busiest_month: busiestMonth,
+    most_active_day: mostActiveDay,
+  };
+}
+
 export async function fetchAllGitHubData(): Promise<GitHubData> {
   const [
     pinned_repos,
@@ -423,6 +581,25 @@ export async function fetchAllGitHubData(): Promise<GitHubData> {
   const total_stars = allRepos.reduce((s, r) => s + r.stars, 0);
   const total_forks = allRepos.reduce((s, r) => s + r.forks, 0);
 
+  const weekly_pattern = deriveWeeklyPattern(commit_activity);
+  const derived_metrics = deriveMetrics(contributions);
+
+  const top5 = [...allRepos]
+    .sort((a, b) => b.stars - a.stars)
+    .slice(0, 5);
+
+  const starHistoryResults = await Promise.allSettled(
+    top5.map((r) => fetchStarHistory(USERNAME, r.name)),
+  );
+
+  const star_history: Record<string, StarHistory> = {};
+  for (let i = 0; i < top5.length; i++) {
+    const result = starHistoryResults[i];
+    if (result.status === "fulfilled" && result.value.length > 0) {
+      star_history[top5[i].name] = result.value;
+    }
+  }
+
   return {
     pinned_repos,
     total_stars,
@@ -434,6 +611,9 @@ export async function fetchAllGitHubData(): Promise<GitHubData> {
     contributions,
     top_repos,
     repo_activity,
+    weekly_pattern,
+    derived_metrics,
+    star_history,
   };
 }
 
@@ -452,6 +632,9 @@ export function getCachedGitHubData(): GitHubData | null {
     const total_stars = allRepos.reduce((s, r) => s + r.stars, 0);
     const total_forks = allRepos.reduce((s, r) => s + r.forks, 0);
 
+    const weekly_pattern = deriveWeeklyPattern(commits);
+    const derived_metrics = deriveMetrics(contribs);
+
     return {
       pinned_repos: pinned,
       total_stars,
@@ -463,6 +646,9 @@ export function getCachedGitHubData(): GitHubData | null {
       contributions: contribs,
       top_repos: topRepos ?? [],
       repo_activity: repoActivity ?? [],
+      weekly_pattern,
+      derived_metrics,
+      star_history: {},
     };
   } catch {
     return null;

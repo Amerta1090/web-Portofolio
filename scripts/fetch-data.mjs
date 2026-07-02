@@ -79,7 +79,7 @@ const pinnedQuery = `{
           stargazerCount; forkCount
           primaryLanguage { name }
           repositoryTopics(first: 10) { nodes { topic { name } } }
-          updatedAt
+          updatedAt; createdAt; pushedAt; isFork; diskUsage
         }
       }
     }
@@ -109,16 +109,25 @@ try {
   const rawPath = resolve(cacheDir, "pinned-repos-raw.json");
   const rawData = JSON.parse(readFileSync(rawPath, "utf-8"));
   const nodes = rawData.data?.user?.pinnedItems?.nodes ?? [];
-  const mapped = nodes.map((n) => ({
-    name: n.name,
-    description: n.description,
-    url: n.url,
-    stars: n.stargazerCount,
-    forks: n.forkCount,
-    language: n.primaryLanguage?.name ?? null,
-    topics: n.repositoryTopics?.nodes?.map((t) => t.topic.name) ?? [],
-    updated_at: n.updatedAt,
-  }));
+  const now = Date.now();
+  const mapped = nodes.map((n) => {
+    const created = new Date(n.createdAt).getTime();
+    return {
+      name: n.name,
+      description: n.description,
+      url: n.url,
+      stars: n.stargazerCount,
+      forks: n.forkCount,
+      language: n.primaryLanguage?.name ?? null,
+      topics: n.repositoryTopics?.nodes?.map((t) => t.topic.name) ?? [],
+      updated_at: n.updatedAt,
+      created_at: n.createdAt,
+      pushed_at: n.pushedAt,
+      is_fork: n.isFork,
+      size: n.diskUsage,
+      age_days: Math.floor((now - created) / 86400000),
+    };
+  });
   writeFileSync(resolve(cacheDir, "pinned-repos.json"), JSON.stringify(mapped, null, 2));
   results.success.push("pinned-repos");
   console.log("  ✓ pinned-repos (transformed)");
@@ -170,16 +179,25 @@ await fetchJSON(
 try {
   const rawPath = resolve(cacheDir, "all-repos-raw.json");
   const rawData = JSON.parse(readFileSync(rawPath, "utf-8"));
-  const mapped = (Array.isArray(rawData) ? rawData : []).map((r) => ({
-    name: r.name,
-    description: r.description,
-    url: r.html_url,
-    stars: r.stargazers_count ?? 0,
-    forks: r.forks_count ?? 0,
-    language: r.language ?? null,
-    topics: r.topics ?? [],
-    updated_at: r.updated_at,
-  }));
+  const now = Date.now();
+  const mapped = (Array.isArray(rawData) ? rawData : []).map((r) => {
+    const created = new Date(r.created_at).getTime();
+    return {
+      name: r.name,
+      description: r.description,
+      url: r.html_url,
+      stars: r.stargazers_count ?? 0,
+      forks: r.forks_count ?? 0,
+      language: r.language ?? null,
+      topics: r.topics ?? [],
+      updated_at: r.updated_at,
+      created_at: r.created_at,
+      pushed_at: r.pushed_at,
+      is_fork: r.fork ?? false,
+      size: r.size ?? 0,
+      age_days: Math.floor((now - created) / 86400000),
+    };
+  });
   writeFileSync(resolve(cacheDir, "all-repos.json"), JSON.stringify(mapped, null, 2));
   results.success.push("all-repos");
   console.log("  ✓ all-repos (transformed)");
@@ -196,6 +214,52 @@ try {
   results.success.push("data-validation");
 } catch {
   results.failed.push("data-validation");
+}
+
+console.log("\n  Star history (top 5 repos):");
+try {
+  const allReposPath = resolve(cacheDir, "all-repos.json");
+  const allRepos = JSON.parse(readFileSync(allReposPath, "utf-8"));
+  const top5 = (Array.isArray(allRepos) ? allRepos : [])
+    .sort((a, b) => (b.stars ?? 0) - (a.stars ?? 0))
+    .slice(0, 5);
+
+  for (const repo of top5) {
+    const name = `star-history-${repo.name}`;
+    try {
+      const stars = [];
+      let page = 1;
+      const perPage = 100;
+      while (page <= 10) {
+        const headers = { "User-Agent": "portfolio-builder", Accept: "application/vnd.github.v3.star+json" };
+        if (GITHUB_TOKEN) headers.Authorization = `Bearer ${GITHUB_TOKEN}`;
+        const res = await fetch(
+          `https://api.github.com/repos/${USERNAME}/${repo.name}/stargazers?per_page=${perPage}&page=${page}`,
+          { headers },
+        );
+        if (!res.ok) break;
+        const data = await res.json();
+        if (!Array.isArray(data) || data.length === 0) break;
+        for (const s of data) {
+          const month = s.starred_at.slice(0, 7);
+          const existing = stars.find((e) => e.date === month);
+          if (existing) existing.count += 1;
+          else stars.push({ date: month, count: 1 });
+        }
+        if (data.length < perPage) break;
+        page++;
+      }
+      stars.sort((a, b) => a.date.localeCompare(b.date));
+      writeFileSync(resolve(cacheDir, `${name}.json`), JSON.stringify(stars, null, 2));
+      results.success.push(name);
+      console.log(`  ✓ ${name}`);
+    } catch (err) {
+      results.failed.push(name);
+      console.error(`  ✗ ${name}: ${err.message}`);
+    }
+  }
+} catch (err) {
+  console.error(`  ✗ star-history: ${err.message}`);
 }
 
 console.log("\nWriting build info...");
