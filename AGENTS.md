@@ -8,7 +8,7 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 - Epic 1 (Data Layer): ✅ COMPLETE
 - Epic 2 (Boot Sequence): ✅ COMPLETE
 - Epic 3 (CodeDNA Helix): ✅ COMPLETE
-- Epic 4 (Command Center): pending
+- Epic 4 (Command Center): ✅ COMPLETE
 - Epic 5 (Repository Galaxy): pending
 - Epic 6 (Language Nebula): pending
 - Epic 7 (Top Repos): pending
@@ -58,9 +58,9 @@ pinned-repos.json, all-repos.json, languages.json, commit-activity.json, contrib
 | SkillsExplorer.tsx | `client:load` | |
 | JourneyTimeline.tsx | `client:visible` | |
 | CodeDNAHelix.tsx | `client:visible` | SVG/GSAP DNA helix, scroll-driven rotation, hover tooltip |
-| ContributionGraph.tsx | `client:visible` | Marked for replacement in Epic 4 |
-| CommitHeatmap.tsx | `client:visible` | Marked for replacement in Epic 4 |
-| LanguageDonut.tsx | `client:load` | Marked for replacement in Epic 4 |
+| ContributionGraph.tsx | `client:visible` | Legacy — kept for reference |
+| CommitHeatmap.tsx | `client:visible` | Legacy — kept for reference |
+| LanguageDonut.tsx | `client:load` | Legacy — kept for reference |
 | TiltCard.tsx | `client:visible` | |
 | MagneticButton.tsx | `client:visible` | |
 | ContactForm.tsx | `client:load` | |
@@ -79,6 +79,11 @@ pinned-repos.json, all-repos.json, languages.json, commit-activity.json, contrib
 | CustomCursor.tsx | `client:load` | |
 | AmbientScene.tsx | `client:visible` | |
 | SceneContent.tsx | `client:visible` | |
+| MetricCounter.tsx | — | Atom — animated number counter (Framer Motion spring) |
+| MetricCard.tsx | `client:load` | Premium metric card with glass border, glow, icon |
+| LanguageRadial.tsx | `client:load` | Enhanced donut with glow, breathing animation |
+| ActivityWave.tsx | `client:load` | Animated wave chart for weekly pattern |
+| ContributionHeatmap.tsx | `client:load` | Animated contribution grid with tooltips |
 
 ### Astro Sections (under `src/components/sections/`)
 Hero.astro, About.astro, Experience.astro, Projects.astro, Certifications.astro, Skills.astro, GitHubShowcase.astro, Contact.astro, Honors.astro, Volunteering.astro
@@ -90,13 +95,6 @@ Badge.astro, Button.astro, Card.astro, Container.astro, Section.astro, Tag.astro
 index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skills.astro, certifications.astro, github.astro, contact.astro, rss.xml.js
 
 ## Sprint Plan (to-be-created files)
-
-### Epic 4 (Command Center)
-- `src/islands/MetricCounter.tsx` — animated number counter (Framer Motion spring)
-- `src/islands/MetricCard.tsx` — premium metric card with glass border, glow, icon
-- `src/islands/LanguageRadial.tsx` — enhanced donut with glow, breathing animation
-- `src/islands/ActivityWave.tsx` — animated wave chart for weekly pattern
-- `src/islands/ContributionHeatmap.tsx` — animated contribution grid
 
 ### Epic 5 (Repository Galaxy)
 - `src/islands/RepositoryGalaxy.tsx` — R3F/Three.js 3D galaxy
@@ -111,7 +109,7 @@ index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skil
 ### Epic 8 (Integration)
 - `src/components/organisms/GitHubUniverse.astro` — orchestrator for all phases
 
-## Removal candidates (Epic 4-8)
+## Removal candidates (Epic 5-8)
 - `src/components/organisms/GitHubShowcase.astro`
 - `src/islands/LanguageDonut.tsx`
 - `src/islands/CommitHeatmap.tsx`

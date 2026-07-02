@@ -1,11 +1,13 @@
 ---
-import { GitCommit, GitFork, Star } from "lucide-react";
+import { Activity, GitCommit, GitFork, GitForkIcon, Star } from "lucide-react";
 import Container from "../components/atoms/Container.astro";
 import DataFreshness from "../components/atoms/DataFreshness.astro";
 import { Tag } from "../components/atoms/Tag.tsx";
 import Section from "../components/molecules/Section.astro";
-import CommitHeatmap from "../islands/CommitHeatmap";
-import LanguageDonut from "../islands/LanguageDonut";
+import ActivityWave from "../islands/ActivityWave";
+import ContributionHeatmap from "../islands/ContributionHeatmap";
+import LanguageRadial from "../islands/LanguageRadial";
+import MetricCard from "../islands/MetricCard";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { fetchAllGitHubData } from "../lib/github";
 import type { GitHubData } from "../types/github";
@@ -35,22 +37,10 @@ const buildTime = new Date().toISOString();
               <DataFreshness fetchedAt={buildTime} label="Built" />
             </div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-              <div class="bg-bg-secondary border border-border rounded-xl p-6 text-center">
-                <p class="text-3xl font-bold text-text-primary">{data.total_repos}</p>
-                <p class="text-sm text-text-secondary mt-1">Repositories</p>
-              </div>
-              <div class="bg-bg-secondary border border-border rounded-xl p-6 text-center">
-                <p class="text-3xl font-bold text-brand">{data.total_stars}</p>
-                <p class="text-sm text-text-secondary mt-1">Total Stars</p>
-              </div>
-              <div class="bg-bg-secondary border border-border rounded-xl p-6 text-center">
-                <p class="text-3xl font-bold text-text-primary">{data.total_forks}</p>
-                <p class="text-sm text-text-secondary mt-1">Total Forks</p>
-              </div>
-              <div class="bg-bg-secondary border border-border rounded-xl p-6 text-center">
-                <p class="text-3xl font-bold text-brand">{data.contribution_count}</p>
-                <p class="text-sm text-text-secondary mt-1">Contributions</p>
-              </div>
+              <MetricCard client:load icon={GitForkIcon} value={data.total_repos} label="Repositories" index={0} />
+              <MetricCard client:load icon={Star} value={data.total_stars} label="Total Stars" index={1} />
+              <MetricCard client:load icon={GitFork} value={data.total_forks} label="Total Forks" index={2} />
+              <MetricCard client:load icon={Activity} value={data.contribution_count} label="Contributions" index={3} />
             </div>
           </Container>
         </Section>
@@ -105,15 +95,15 @@ const buildTime = new Date().toISOString();
         <Section title="Languages" subtitle="Hover for details" ariaLabel="Languages breakdown">
           <Container>
             <div class="bg-bg-secondary border border-border rounded-xl p-6">
-              <LanguageDonut client:load languages={data.languages} />
+              <LanguageRadial client:load languages={data.languages} />
             </div>
           </Container>
         </Section>
 
-        <Section title="Commit Activity" subtitle="Weekly commit intensity (last 12 weeks)" variant="alt" ariaLabel="Commit activity">
+        <Section title="Weekly Activity" subtitle="Commits by day of the week" variant="alt" ariaLabel="Weekly commit activity">
           <Container>
             <div class="bg-bg-secondary border border-border rounded-xl p-6">
-              <CommitHeatmap client:load data={data.commit_activity} />
+              <ActivityWave client:load data={data.weekly_pattern} />
             </div>
           </Container>
         </Section>
@@ -200,42 +190,33 @@ const buildTime = new Date().toISOString();
           </Section>
         )}
 
-        <Section title="Contribution Graph" ariaLabel="Contribution graph">
+        <Section title="Contribution Heatmap" subtitle="Daily contributions over the last year" ariaLabel="Contribution heatmap">
           <Container>
-            <div class="bg-bg-secondary border border-border rounded-xl p-6 overflow-x-auto">
-              <p class="text-sm text-text-secondary mb-4">
-                {data.contribution_count} contributions in the last year
-              </p>
-              <div class="flex gap-0.5">
-                <div class="flex flex-col gap-0.5 pr-1 pt-2">
-                  {["", "Mon", "", "Wed", "", "Fri", ""].map((day) => (
-                    <div class="h-3 text-[10px] text-text-secondary leading-3">{day}</div>
-                  ))}
-                </div>
-                <div class="flex gap-0.5" style={`width: ${data.contributions.weeks.length * 14}px`}>
-                  {data.contributions.weeks.map((week) => (
-                    <div class="flex flex-col gap-0.5">
-                      {week.days.map((day) => (
-                        <div
-                          class="h-3 w-3 rounded-[2px]"
-                                          title={`${day.count} contributions on ${day.date}`}
-                          style={`background-color: ${day.count === 0 ? 'var(--bg-tertiary)' : day.count <= 3 ? 'rgba(122,140,111,0.4)' : day.count <= 6 ? 'rgba(122,140,111,0.6)' : day.count <= 9 ? 'rgba(122,140,111,0.8)' : '#7A8C6F'}`}
-                        />
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div class="flex items-center justify-end gap-1 mt-3">
-                <span class="text-[10px] text-text-secondary">Less</span>
-                {[0, 1, 2, 3, 4].map((level) => (
-                  <div
-                    class="w-3 h-3 rounded-[2px]"
-                    style={`background-color: ${level === 0 ? 'var(--bg-tertiary)' : level === 1 ? 'rgba(122,140,111,0.4)' : level === 2 ? 'rgba(122,140,111,0.6)' : level === 3 ? 'rgba(122,140,111,0.8)' : '#7A8C6F'}`}
-                  />
-                ))}
-                <span class="text-[10px] text-text-secondary">More</span>
-              </div>
+            <div class="bg-bg-secondary border border-border rounded-xl p-6">
+              <ContributionHeatmap
+                client:load
+                data={data.contributions}
+                longestStreak={data.derived_metrics.longest_streak}
+              />
+            </div>
+          </Container>
+        </Section>
+
+        <Section variant="alt" ariaLabel="Derived insights">
+          <Container>
+            <div class="flex flex-wrap items-center gap-4 justify-center text-sm">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-bg-tertiary/50 border border-border/30 text-text-secondary/80">
+                <span aria-hidden="true">🔥</span>
+                {data.derived_metrics.longest_streak}-day longest streak
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-bg-tertiary/50 border border-border/30 text-text-secondary/80">
+                <span aria-hidden="true">⚡</span>
+                Most commits on {data.derived_metrics.most_active_day}
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-bg-tertiary/50 border border-border/30 text-text-secondary/80">
+                <span aria-hidden="true">📅</span>
+                Busiest month: {data.derived_metrics.busiest_month}
+              </span>
             </div>
           </Container>
         </Section>
