@@ -10,7 +10,7 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 - Epic 3 (CodeDNA Helix): ✅ COMPLETE
 - Epic 4 (Command Center): ✅ COMPLETE
 - Epic 5 (Repository Galaxy): ✅ COMPLETE
-- Epic 6 (Language Nebula): pending
+- Epic 6 (Language Nebula): ✅ COMPLETE
 - Epic 7 (Top Repos): pending
 - Epic 8 (Integration): pending
 - Epic 9 (Polish/QA): pending
@@ -82,6 +82,7 @@ pinned-repos.json, all-repos.json, languages.json, commit-activity.json, contrib
 | MetricCounter.tsx | — | Atom — animated number counter (Framer Motion spring) |
 | MetricCard.tsx | `client:load` | Premium metric card with glass border, glow, icon |
 | LanguageRadial.tsx | `client:load` | Enhanced donut with glow, breathing animation |
+| LanguageNebula.tsx | `client:visible` | Flowing aurora ribbon with particles, tooltip |
 | ActivityWave.tsx | `client:load` | Animated wave chart for weekly pattern |
 | ContributionHeatmap.tsx | `client:load` | Animated contribution grid with tooltips |
 
@@ -102,8 +103,8 @@ index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skil
 - `src/components/atoms/RepoPlanet.tsx` — individual 3D repo planet with hover/click, glow ring, sprite aura
 - Tier system: `NetworkGraph.tsx` reused for tier-2 D3 fallback; tier-1 renders accessible static card grid
 
-### Epic 6 (Language Nebula)
-- `src/islands/LanguageNebula.tsx` — flowing aurora ribbon with particles
+### Epic 6 (Language Nebula) ✅
+- `src/islands/LanguageNebula.tsx` — flowing aurora ribbon with particles, animated SVG, tooltip, responsive fallback
 
 ### Epic 7 (Top Repos)
 - `src/components/atoms/RepoGlowCard.tsx` — premium interactive card with tilt, glow

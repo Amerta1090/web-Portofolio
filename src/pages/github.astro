@@ -16,6 +16,7 @@ import ActivityWave from "../islands/ActivityWave";
 import BootSequence from "../islands/BootSequence";
 import CodeDNAHelix from "../islands/CodeDNAHelix";
 import ContributionHeatmap from "../islands/ContributionHeatmap";
+import LanguageNebula from "../islands/LanguageNebula";
 import LanguageRadial from "../islands/LanguageRadial";
 import MetricCard from "../islands/MetricCard";
 import RepositoryGalaxy from "../islands/RepositoryGalaxy";
@@ -129,6 +130,14 @@ const buildTime = new Date().toISOString();
           <Container>
             <div class="bg-bg-secondary border border-border rounded-xl p-6">
               <LanguageRadial client:load languages={data.languages} />
+            </div>
+          </Container>
+        </Section>
+
+        <Section title="Language Nebula" subtitle="Flowing spectrum of your ecosystem" ariaLabel="Language nebula">
+          <Container>
+            <div class="bg-bg-secondary border border-border rounded-xl p-6">
+              <LanguageNebula client:visible languages={data.languages} allRepos={data.pinned_repos.length ? data.pinned_repos : data.top_repos} />
             </div>
           </Container>
         </Section>
