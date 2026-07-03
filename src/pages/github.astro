@@ -1,17 +1,30 @@
 ---
-import { Activity, GitCommit, GitFork, GitForkIcon, Star } from "lucide-react";
+import {
+  Activity,
+  Calendar,
+  Flame,
+  GitCommit,
+  GitFork,
+  GitForkIcon,
+  Star,
+} from "lucide-react";
 import Container from "../components/atoms/Container.astro";
 import DataFreshness from "../components/atoms/DataFreshness.astro";
 import { Tag } from "../components/atoms/Tag.tsx";
 import Section from "../components/molecules/Section.astro";
 import ActivityWave from "../islands/ActivityWave";
+import BootSequence from "../islands/BootSequence";
+import CodeDNAHelix from "../islands/CodeDNAHelix";
 import ContributionHeatmap from "../islands/ContributionHeatmap";
 import LanguageRadial from "../islands/LanguageRadial";
 import MetricCard from "../islands/MetricCard";
+import RepositoryGalaxy from "../islands/RepositoryGalaxy";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { getProfile } from "../lib/data";
 import { fetchAllGitHubData } from "../lib/github";
 import type { GitHubData } from "../types/github";
 
+const profile = getProfile();
 const data: GitHubData | null = await fetchAllGitHubData();
 const repos = data?.pinned_repos.length ? data.pinned_repos : (data?.top_repos ?? []);
 const buildTime = new Date().toISOString();
@@ -30,6 +43,12 @@ const buildTime = new Date().toISOString();
       </Section>
     ) : (
       <>
+        <BootSequence
+          client:visible
+          gitHubData={data}
+          profileName={profile.name}
+        />
+
         <Section title="GitHub Overview" ariaLabel="GitHub overview">
           <Container>
             <div class="flex items-center justify-between mb-6">
@@ -42,6 +61,20 @@ const buildTime = new Date().toISOString();
               <MetricCard client:load icon={GitFork} value={data.total_forks} label="Total Forks" index={2} />
               <MetricCard client:load icon={Activity} value={data.contribution_count} label="Contributions" index={3} />
             </div>
+          </Container>
+        </Section>
+
+        <Section title="Repository Galaxy" subtitle="Explore repos as orbiting planets in a 3D galaxy" ariaLabel="Repository galaxy">
+          <Container>
+            <div class="rounded-xl overflow-hidden">
+              <RepositoryGalaxy client:load repos={data.pinned_repos.length ? data.pinned_repos : data.top_repos} gitHubData={data} />
+            </div>
+          </Container>
+        </Section>
+
+        <Section title="CodeDNA Helix" subtitle="Your coding identity mapped to a genetic sequence" variant="alt" ariaLabel="Code DNA helix">
+          <Container>
+            <CodeDNAHelix client:visible gitHubData={data} />
           </Container>
         </Section>
 
@@ -204,19 +237,43 @@ const buildTime = new Date().toISOString();
 
         <Section variant="alt" ariaLabel="Derived insights">
           <Container>
-            <div class="flex flex-wrap items-center gap-4 justify-center text-sm">
-              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-bg-tertiary/50 border border-border/30 text-text-secondary/80">
-                <span aria-hidden="true">🔥</span>
-                {data.derived_metrics.longest_streak}-day longest streak
-              </span>
-              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-bg-tertiary/50 border border-border/30 text-text-secondary/80">
-                <span aria-hidden="true">⚡</span>
-                Most commits on {data.derived_metrics.most_active_day}
-              </span>
-              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-bg-tertiary/50 border border-border/30 text-text-secondary/80">
-                <span aria-hidden="true">📅</span>
-                Busiest month: {data.derived_metrics.busiest_month}
-              </span>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="group relative overflow-hidden rounded-xl border border-border/40 bg-gradient-to-br from-bg-secondary/80 to-bg-secondary/40 p-5 transition-all duration-300 hover:border-brand/30 hover:shadow-lg hover:shadow-brand/5">
+                <div class="flex items-start gap-4">
+                  <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand/10">
+                    <Flame class="h-5 w-5 text-brand" />
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-2xl font-bold text-text-primary tabular-nums tracking-tight">{data.derived_metrics.longest_streak}<span class="text-base font-normal text-text-secondary ml-1">days</span></p>
+                    <p class="mt-0.5 text-xs text-text-secondary/60">Longest streak</p>
+                  </div>
+                </div>
+                <div class="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/5 pointer-events-none" />
+              </div>
+              <div class="group relative overflow-hidden rounded-xl border border-border/40 bg-gradient-to-br from-bg-secondary/80 to-bg-secondary/40 p-5 transition-all duration-300 hover:border-brand/30 hover:shadow-lg hover:shadow-brand/5">
+                <div class="flex items-start gap-4">
+                  <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand/10">
+                    <Activity class="h-5 w-5 text-brand" />
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-2xl font-bold text-text-primary capitalize tabular-nums tracking-tight">{data.derived_metrics.most_active_day}</p>
+                    <p class="mt-0.5 text-xs text-text-secondary/60">Most active day</p>
+                  </div>
+                </div>
+                <div class="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/5 pointer-events-none" />
+              </div>
+              <div class="group relative overflow-hidden rounded-xl border border-border/40 bg-gradient-to-br from-bg-secondary/80 to-bg-secondary/40 p-5 transition-all duration-300 hover:border-brand/30 hover:shadow-lg hover:shadow-brand/5">
+                <div class="flex items-start gap-4">
+                  <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand/10">
+                    <Calendar class="h-5 w-5 text-brand" />
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-2xl font-bold text-text-primary tabular-nums tracking-tight">{data.derived_metrics.busiest_month}</p>
+                    <p class="mt-0.5 text-xs text-text-secondary/60">Busiest month</p>
+                  </div>
+                </div>
+                <div class="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/5 pointer-events-none" />
+              </div>
             </div>
           </Container>
         </Section>

@@ -145,16 +145,15 @@ export default function ActivityWave({ data }: Props) {
               {isInView && (
                 <motion.rect
                   x={barX}
-                  y={barY}
                   width={barWidth}
                   height={barH}
                   rx={3}
                   fill={COLORS[i]}
                   opacity={isHovered ? 1 : 0.5}
-                  initial={{ scaleY: 0, y: PADDING.top + CHART_H }}
+                  initial={{ y: PADDING.top + CHART_H, height: 0 }}
                   animate={{
-                    scaleY: 1,
                     y: barY,
+                    height: barH,
                     opacity: isHovered ? 1 : 0.5,
                   }}
                   transition={{
@@ -162,7 +161,6 @@ export default function ActivityWave({ data }: Props) {
                     delay: 0.3 + i * 0.06,
                     ease: [0.16, 1, 0.3, 1],
                   }}
-                  style={{ transformOrigin: `${barX + barWidth / 2}px ${PADDING.top + CHART_H}px` }}
                   onMouseEnter={() => setHoveredBar(i)}
                   onMouseLeave={() => setHoveredBar(null)}
                   className="cursor-pointer"

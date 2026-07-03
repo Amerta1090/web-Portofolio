@@ -9,7 +9,7 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 - Epic 2 (Boot Sequence): ✅ COMPLETE
 - Epic 3 (CodeDNA Helix): ✅ COMPLETE
 - Epic 4 (Command Center): ✅ COMPLETE
-- Epic 5 (Repository Galaxy): pending
+- Epic 5 (Repository Galaxy): ✅ COMPLETE
 - Epic 6 (Language Nebula): pending
 - Epic 7 (Top Repos): pending
 - Epic 8 (Integration): pending
@@ -96,9 +96,11 @@ index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skil
 
 ## Sprint Plan (to-be-created files)
 
-### Epic 5 (Repository Galaxy)
-- `src/islands/RepositoryGalaxy.tsx` — R3F/Three.js 3D galaxy
-- `src/components/atoms/RepoPlanet.tsx` — individual 3D repo planet
+### Epic 5 (Repository Galaxy) ✅
+- `src/islands/RepositoryGalaxy.tsx` — wrapper island with tier detection (tier-1: static grid, tier-2: D3 force graph, tier-3: R3F 3D galaxy)
+- `src/islands/RepositoryGalaxy3D.tsx` — R3F scene with spiral layout, orbit animation, star dust, connection lines, camera fly-through
+- `src/components/atoms/RepoPlanet.tsx` — individual 3D repo planet with hover/click, glow ring, sprite aura
+- Tier system: `NetworkGraph.tsx` reused for tier-2 D3 fallback; tier-1 renders accessible static card grid
 
 ### Epic 6 (Language Nebula)
 - `src/islands/LanguageNebula.tsx` — flowing aurora ribbon with particles

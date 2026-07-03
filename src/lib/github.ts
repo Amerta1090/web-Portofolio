@@ -247,11 +247,11 @@ export async function fetchLanguages(): Promise<GitHubLangStats[]> {
 
 export async function fetchCommitActivity(): Promise<GitHubCommitActivity[]> {
   const cached = readCache<GitHubCommitActivity[]>("commit-activity.json");
-  if (cached && cached.length > 0) return cached;
+  if (cached && cached.length > 0 && cached[0]?.days?.length === 7) return cached;
 
   try {
     const repos = await fetchAllRepos();
-    const weeklyMap = new Map<number, number>();
+    const weeklyMap = new Map<number, number[]>();
 
     await Promise.all(
       repos.slice(0, 10).map(async (repo) => {
@@ -262,7 +262,13 @@ export async function fetchCommitActivity(): Promise<GitHubCommitActivity[]> {
 
           if (Array.isArray(activity)) {
             for (const w of activity) {
-              weeklyMap.set(w.week, (weeklyMap.get(w.week) ?? 0) + w.total);
+              if (!weeklyMap.has(w.week)) {
+                weeklyMap.set(w.week, [0, 0, 0, 0, 0, 0, 0]);
+              }
+              const acc = weeklyMap.get(w.week)!;
+              for (let d = 0; d < 7 && d < w.days.length; d++) {
+                acc[d] += w.days[d];
+              }
             }
           }
         } catch {
@@ -272,7 +278,11 @@ export async function fetchCommitActivity(): Promise<GitHubCommitActivity[]> {
     );
 
     const entries = [...weeklyMap.entries()]
-      .map(([week, total]) => ({ week, total, days: [] }))
+      .map(([week, days]) => ({
+        week,
+        total: days.reduce((a, b) => a + b, 0),
+        days,
+      }))
       .sort((a, b) => a.week - b.week)
       .slice(-12);
 

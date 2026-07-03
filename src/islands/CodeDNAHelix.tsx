@@ -56,10 +56,10 @@ function getSignatureLabel(data: GitHubData): string {
 export default function CodeDNAHelix({ gitHubData }: Props) {
   const prefersReduced = useReducedMotion();
   const sectionRef = useRef<HTMLDivElement>(null);
-  const helixGroupRef = useRef<SVGGElement>(null);
   const dotsGroupRef = useRef<SVGGElement>(null);
   const [visible, setVisible] = useState(false);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const [phaseOffset, setPhaseOffset] = useState(0);
   const [tooltip, setTooltip] = useState<{
     lang: string;
     pct: number;
@@ -90,23 +90,16 @@ export default function CodeDNAHelix({ gitHubData }: Props) {
 
   useEffect(() => {
     if (prefersReduced || !sectionRef.current) return;
-
     const ctx = gsap.context(() => {
       ScrollTrigger.create({
         trigger: sectionRef.current,
         start: "top bottom",
         end: "bottom top",
         onUpdate: (self) => {
-          if (helixGroupRef.current) {
-            gsap.set(helixGroupRef.current, {
-              rotate: self.progress * 360,
-              transformOrigin: "500px 400px",
-            });
-          }
+          setPhaseOffset(self.progress * Math.PI * 2);
         },
       });
     }, sectionRef);
-
     return () => ctx.revert();
   }, [prefersReduced]);
 
@@ -174,7 +167,7 @@ export default function CodeDNAHelix({ gitHubData }: Props) {
   for (let i = 0; i < NUM_RUNGS; i++) {
     const t = i / NUM_RUNGS;
     const y = startY + t * height;
-    const angle = t * turns * Math.PI * 2;
+    const angle = t * turns * Math.PI * 2 + phaseOffset;
     const x1 = centerX - amp * Math.sin(angle);
     const x2 = centerX + amp * Math.sin(angle);
     const langIdx = i % topLangs.length;
@@ -201,7 +194,7 @@ export default function CodeDNAHelix({ gitHubData }: Props) {
     for (let i = 0; i <= steps; i++) {
       const t = i / steps;
       const y = startY + t * height;
-      const angle = t * turns * Math.PI * 2;
+      const angle = t * turns * Math.PI * 2 + phaseOffset;
       const x = centerX + sign * amp * Math.sin(angle);
       d += i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`;
     }
@@ -216,7 +209,7 @@ export default function CodeDNAHelix({ gitHubData }: Props) {
   for (let i = 0; i < numDots; i++) {
     const t = i / numDots;
     const y = startY + t * height;
-    const angle = t * turns * Math.PI * 2;
+    const angle = t * turns * Math.PI * 2 + phaseOffset;
     dots.push({ x: centerX - amp * Math.sin(angle), y });
   }
 
@@ -305,7 +298,7 @@ export default function CodeDNAHelix({ gitHubData }: Props) {
               </filter>
             </defs>
 
-            <g ref={helixGroupRef}>
+            <>
               <path
                 d={leftPath}
                 fill="none"
@@ -321,7 +314,6 @@ export default function CodeDNAHelix({ gitHubData }: Props) {
 
               {rungs.map((rung, i) => {
                 const isHovered = hoveredIdx === i;
-                const inverted = i % 2 === 0;
 
                 return (
                   <line
@@ -367,7 +359,7 @@ export default function CodeDNAHelix({ gitHubData }: Props) {
                   />
                 ))}
               </g>
-            </g>
+            </>
           </svg>
 
           {tooltip && (
