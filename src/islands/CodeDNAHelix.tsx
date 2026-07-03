@@ -1,5 +1,6 @@
 import { useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import ErrorBoundary from "../components/atoms/ErrorBoundary";
 import { gsap, ScrollTrigger } from "../lib/gsap";
 import type { GitHubData } from "../types/github";
 
@@ -268,6 +269,7 @@ export default function CodeDNAHelix({ gitHubData }: Props) {
   }
 
   return (
+    <ErrorBoundary name="CodeDNAHelix">
     <div
       ref={sectionRef}
       className="w-full py-8 md:py-12 relative select-none"
@@ -388,5 +390,6 @@ export default function CodeDNAHelix({ gitHubData }: Props) {
         </p>
       </div>
     </div>
+    </ErrorBoundary>
   );
 }

@@ -2,6 +2,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, GitCommit } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import RepoGlowCard from "../components/atoms/RepoGlowCard";
+import MagneticButton from "./MagneticButton";
 import { duration, easing, stagger } from "../lib/motion";
 import type { GitHubData } from "../types/github";
 
@@ -152,13 +153,15 @@ export default function TopReposLeaderboard({ topRepos, repoActivity }: Props) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8, duration: duration.deliberate, ease: easing["ease-out-expo"] }}
       >
-        <a
-          href="/github"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand/10 border border-brand/20 text-brand text-sm font-medium hover:bg-brand/20 transition-all duration-300 group"
-        >
-          Explore Full Universe
-          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
-        </a>
+        <MagneticButton>
+          <a
+            href="/github"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand/10 border border-brand/20 text-brand text-sm font-medium hover:bg-brand/20 transition-all duration-300 group"
+          >
+            Explore Full Universe
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+          </a>
+        </MagneticButton>
       </motion.div>
     </div>
   );

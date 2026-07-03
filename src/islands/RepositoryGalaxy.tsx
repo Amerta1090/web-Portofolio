@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useReducedMotion, motion } from "framer-motion";
 import { Star } from "lucide-react";
+import ErrorBoundary from "../components/atoms/ErrorBoundary";
 import { useCapabilityStore } from "../lib/useCapabilityStore";
 import { useExperienceTier, getEffectiveTier } from "../lib/useExperienceTier";
 import NetworkGraph from "../components/atoms/NetworkGraph";
@@ -143,24 +144,24 @@ export default function RepositoryGalaxy({ repos, gitHubData, className = "" }: 
 
   if (repos.length === 0) return <GalaxyEmpty />;
 
-  if (effectiveTier === "tier-1" || prefersReduced) {
-    return <GalaxyTier1 repos={repos} />;
-  }
-
-  if (effectiveTier === "tier-2") {
-    return <GalaxyTier2 repos={repos} planets={planets} />;
-  }
-
   return (
-    <div className={`relative w-full h-[400px] md:h-[500px] lg:h-[600px] rounded-xl overflow-hidden bg-[#06070a] border border-white/5 ${className}`}>
-      <Suspense fallback={<GalaxyLoading />}>
-        <LazyGalaxy3D
-          planets={planets}
-          repos={repos}
-          gitHubData={gitHubData}
-        />
-      </Suspense>
-    </div>
+    <ErrorBoundary name="RepositoryGalaxy">
+      {effectiveTier === "tier-1" || prefersReduced ? (
+        <GalaxyTier1 repos={repos} />
+      ) : effectiveTier === "tier-2" ? (
+        <GalaxyTier2 repos={repos} planets={planets} />
+      ) : (
+        <div className={`relative w-full h-[400px] md:h-[500px] lg:h-[600px] rounded-xl overflow-hidden bg-[#06070a] border border-white/5 ${className}`}>
+          <Suspense fallback={<GalaxyLoading />}>
+            <LazyGalaxy3D
+              planets={planets}
+              repos={repos}
+              gitHubData={gitHubData}
+            />
+          </Suspense>
+        </div>
+      )}
+    </ErrorBoundary>
   );
 }
 

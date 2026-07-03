@@ -13,7 +13,12 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 - Epic 6 (Language Nebula): ✅ COMPLETE
 - Epic 7 (Top Repos): ✅ COMPLETE
 - Epic 8 (Integration): ✅ COMPLETE
-- Epic 9 (Polish/QA): pending
+- Epic 9 (Polish/QA): ✅ COMPLETE
+
+### Epic 9 (Polish/QA) ✅
+- **Integration audit**: 6 orphaned islands identified; `MagneticButton` integrated into `TopReposLeaderboard.tsx` CTA, `SkillConstellation` into `pages/skills.astro`
+- **Error boundaries**: `ErrorBoundary.tsx` (class component) created; wrapped around `CodeDNAHelix.tsx` and `RepositoryGalaxy.tsx`
+- **Build verified**: `bun run build` succeeds
 
 ## Architecture
 - **Rendering**: SSG. No runtime API calls. GitHub data fetched at build time.
@@ -61,7 +66,7 @@ pinned-repos.json, all-repos.json, languages.json, commit-activity.json, contrib
 | TiltCard.tsx | `client:visible` | |
 | MagneticButton.tsx | `client:visible` | |
 | ContactForm.tsx | `client:load` | |
-| CertFilter.tsx | `client:idle` | |
+
 | SectionCounter.tsx | `client:load` | |
 | ScrollAnimator.astro | — | Astro island (no hydration) |
 | ScrollReveal.tsx | `client:visible` | |
@@ -84,6 +89,16 @@ pinned-repos.json, all-repos.json, languages.json, commit-activity.json, contrib
 | ContributionHeatmap.tsx | `client:load` | Animated contribution grid with tooltips |
 | TopReposLeaderboard.tsx | `client:visible` | RepoGlowCard grid + animated commits feed + CTA |
 | PhaseIndicator.tsx | `client:load` | Scroll phase indicator dots for GitHub Universe navigation |
+
+### Key Atoms (under `src/components/atoms/`)
+| File | Type | Notes |
+|------|------|-------|
+| `ErrorBoundary.tsx` | React class | Error boundary for island resilience |
+| `RepoGlowCard.tsx` | React | Premium repo card with tilt/glow |
+| `RepoPlanet.tsx` | React (R3F) | Individual 3D repo planet |
+| `TypewriterText.tsx` | React | Character-by-character animation |
+| `NetworkGraph.tsx` | React (D3) | Force-directed graph for repos |
+| `InteractionCard.tsx` | React | Tilt hover card |
 
 ### Astro Organisms (under `src/components/organisms/`)
 Hero.astro, About.astro, Experience.astro, Projects.astro, Certifications.astro, Skills.astro, GitHubUniverse.astro, Contact.astro, Honors.astro, Volunteering.astro
