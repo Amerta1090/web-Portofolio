@@ -4,7 +4,7 @@ import About from "../components/organisms/About.astro";
 import Certifications from "../components/organisms/Certifications.astro";
 import Contact from "../components/organisms/Contact.astro";
 import Experience from "../components/organisms/Experience.astro";
-import GitHubShowcase from "../components/organisms/GitHubShowcase.astro";
+import TopReposLeaderboard from "../islands/TopReposLeaderboard";
 import Honors from "../components/organisms/Honors.astro";
 import Volunteering from "../components/organisms/Volunteering.astro";
 import ImpactMetrics from "../islands/ImpactMetrics";
@@ -102,8 +102,12 @@ const gitHubData = await fetchAllGitHubData();
 
   {
     (gitHubData.pinned_repos.length > 0 || gitHubData.top_repos.length > 0) && (
-      <Section data-reveal id="github" title="GitHub" subtitle="Recent activity and repositories" variant="alt" ariaLabel="GitHub activity">
-        <GitHubShowcase data={gitHubData} />
+      <Section data-reveal id="github" title="Top Repositories" subtitle="Premium leaderboard by stars" variant="alt" ariaLabel="Top repositories">
+        <TopReposLeaderboard
+          client:visible
+          topRepos={gitHubData.top_repos}
+          repoActivity={gitHubData.repo_activity}
+        />
       </Section>
     )
   }

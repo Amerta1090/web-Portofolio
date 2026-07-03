@@ -11,7 +11,7 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 - Epic 4 (Command Center): ✅ COMPLETE
 - Epic 5 (Repository Galaxy): ✅ COMPLETE
 - Epic 6 (Language Nebula): ✅ COMPLETE
-- Epic 7 (Top Repos): pending
+- Epic 7 (Top Repos): ✅ COMPLETE
 - Epic 8 (Integration): pending
 - Epic 9 (Polish/QA): pending
 
@@ -85,6 +85,7 @@ pinned-repos.json, all-repos.json, languages.json, commit-activity.json, contrib
 | LanguageNebula.tsx | `client:visible` | Flowing aurora ribbon with particles, tooltip |
 | ActivityWave.tsx | `client:load` | Animated wave chart for weekly pattern |
 | ContributionHeatmap.tsx | `client:load` | Animated contribution grid with tooltips |
+| TopReposLeaderboard.tsx | `client:visible` | RepoGlowCard grid + animated commits feed + CTA |
 
 ### Astro Sections (under `src/components/sections/`)
 Hero.astro, About.astro, Experience.astro, Projects.astro, Certifications.astro, Skills.astro, GitHubShowcase.astro, Contact.astro, Honors.astro, Volunteering.astro
@@ -95,7 +96,7 @@ Badge.astro, Button.astro, Card.astro, Container.astro, Section.astro, Tag.astro
 ### Pages
 index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skills.astro, certifications.astro, github.astro, contact.astro, rss.xml.js
 
-## Sprint Plan (to-be-created files)
+## Sprint Plan
 
 ### Epic 5 (Repository Galaxy) ✅
 - `src/islands/RepositoryGalaxy.tsx` — wrapper island with tier detection (tier-1: static grid, tier-2: D3 force graph, tier-3: R3F 3D galaxy)
@@ -106,8 +107,9 @@ index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skil
 ### Epic 6 (Language Nebula) ✅
 - `src/islands/LanguageNebula.tsx` — flowing aurora ribbon with particles, animated SVG, tooltip, responsive fallback
 
-### Epic 7 (Top Repos)
-- `src/components/atoms/RepoGlowCard.tsx` — premium interactive card with tilt, glow
+### Epic 7 (Top Repos) ✅
+- `src/components/atoms/RepoGlowCard.tsx` — premium interactive card with tilt, glow, rank badges, last active, animated star counter
+- `src/islands/TopReposLeaderboard.tsx` — leaderboard grid wrapping RepoGlowCards + animated commits feed + CTA
 
 ### Epic 8 (Integration)
 - `src/components/organisms/GitHubUniverse.astro` — orchestrator for all phases

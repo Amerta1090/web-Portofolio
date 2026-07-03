@@ -3,7 +3,6 @@ import {
   Activity,
   Calendar,
   Flame,
-  GitCommit,
   GitFork,
   GitForkIcon,
   Star,
@@ -20,6 +19,7 @@ import LanguageNebula from "../islands/LanguageNebula";
 import LanguageRadial from "../islands/LanguageRadial";
 import MetricCard from "../islands/MetricCard";
 import RepositoryGalaxy from "../islands/RepositoryGalaxy";
+import TopReposLeaderboard from "../islands/TopReposLeaderboard";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getProfile } from "../lib/data";
 import { fetchAllGitHubData } from "../lib/github";
@@ -151,83 +151,13 @@ const buildTime = new Date().toISOString();
         </Section>
 
         {data.top_repos.length > 0 && (
-          <Section title="Top Repositories by Stars" ariaLabel="Top repositories">
+          <Section title="Top Repositories" subtitle="Premium leaderboard by stars" ariaLabel="Top repositories">
             <Container>
-              <div class="bg-bg-secondary border border-border rounded-xl p-6">
-                <div class="space-y-3">
-                  {data.top_repos.map((repo, i) => {
-                    const maxStars = data.top_repos[0]?.stars ?? 1;
-                    const barWidth = Math.max((repo.stars / maxStars) * 100, 2);
-                    return (
-                      <a
-                        href={repo.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="flex items-center gap-4 group hover:bg-bg-tertiary rounded-lg px-3 py-2 transition-colors"
-                      >
-                        <span class="text-sm text-text-secondary w-6 shrink-0 text-right">{i + 1}</span>
-                        <div class="flex-1 min-w-0">
-                          <div class="flex items-center justify-between gap-2 mb-1">
-                            <span class="text-sm font-medium text-text-primary truncate group-hover:text-brand transition-colors">{repo.name}</span>
-                            <span class="text-sm text-text-secondary shrink-0 flex items-center gap-1">
-                              <Star class="w-3.5 h-3.5" aria-hidden="true" />
-                              {repo.stars}
-                            </span>
-                          </div>
-                          <div class="h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
-                            <div
-                              class="h-full bg-brand rounded-full transition-all duration-500"
-                              style={`width: ${barWidth}%`}
-                            />
-                          </div>
-                        </div>
-                      </a>
-                    );
-                  })}
-                </div>
-              </div>
-            </Container>
-          </Section>
-        )}
-
-        {data.repo_activity.length > 0 && (
-          <Section title="Repository Activity" subtitle="Recent commits on key repositories" variant="alt" ariaLabel="Repository activity">
-            <Container>
-              <div class="space-y-6">
-                {
-                  data.repo_activity.map((repo) => (
-                    <div class="bg-bg-secondary border border-border rounded-xl p-5">
-                      <a
-                        href={repo.repo_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="text-sm font-semibold text-text-primary hover:text-brand transition-colors mb-3 inline-block"
-                      >
-                        {repo.repo_name}
-                      </a>
-                      {repo.commits.length > 0 ? (
-                        <ul class="space-y-2 mt-3">
-                          {repo.commits.map((commit) => (
-                            <li>
-                              <a
-                                href={commit.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="flex items-start gap-2 text-sm text-text-secondary hover:text-brand transition-colors group"
-                              >
-                                <GitCommit class="w-4 h-4 mt-0.5 shrink-0 text-text-secondary" aria-hidden="true" />
-                                <span class="group-hover:text-text-primary transition-colors line-clamp-1">{commit.message}</span>
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p class="text-xs text-text-secondary mt-2">No recent commits</p>
-                      )}
-                    </div>
-                  ))
-                }
-              </div>
+              <TopReposLeaderboard
+                client:visible
+                topRepos={data.top_repos}
+                repoActivity={data.repo_activity}
+              />
             </Container>
           </Section>
         )}
