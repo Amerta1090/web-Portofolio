@@ -12,7 +12,7 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 - Epic 5 (Repository Galaxy): ✅ COMPLETE
 - Epic 6 (Language Nebula): ✅ COMPLETE
 - Epic 7 (Top Repos): ✅ COMPLETE
-- Epic 8 (Integration): pending
+- Epic 8 (Integration): ✅ COMPLETE
 - Epic 9 (Polish/QA): pending
 
 ## Architecture
@@ -58,9 +58,6 @@ pinned-repos.json, all-repos.json, languages.json, commit-activity.json, contrib
 | SkillsExplorer.tsx | `client:load` | |
 | JourneyTimeline.tsx | `client:visible` | |
 | CodeDNAHelix.tsx | `client:visible` | SVG/GSAP DNA helix, scroll-driven rotation, hover tooltip |
-| ContributionGraph.tsx | `client:visible` | Legacy — kept for reference |
-| CommitHeatmap.tsx | `client:visible` | Legacy — kept for reference |
-| LanguageDonut.tsx | `client:load` | Legacy — kept for reference |
 | TiltCard.tsx | `client:visible` | |
 | MagneticButton.tsx | `client:visible` | |
 | ContactForm.tsx | `client:load` | |
@@ -86,9 +83,10 @@ pinned-repos.json, all-repos.json, languages.json, commit-activity.json, contrib
 | ActivityWave.tsx | `client:load` | Animated wave chart for weekly pattern |
 | ContributionHeatmap.tsx | `client:load` | Animated contribution grid with tooltips |
 | TopReposLeaderboard.tsx | `client:visible` | RepoGlowCard grid + animated commits feed + CTA |
+| PhaseIndicator.tsx | `client:load` | Scroll phase indicator dots for GitHub Universe navigation |
 
-### Astro Sections (under `src/components/sections/`)
-Hero.astro, About.astro, Experience.astro, Projects.astro, Certifications.astro, Skills.astro, GitHubShowcase.astro, Contact.astro, Honors.astro, Volunteering.astro
+### Astro Organisms (under `src/components/organisms/`)
+Hero.astro, About.astro, Experience.astro, Projects.astro, Certifications.astro, Skills.astro, GitHubUniverse.astro, Contact.astro, Honors.astro, Volunteering.astro
 
 ### Astro UI (under `src/components/ui/`)
 Badge.astro, Button.astro, Card.astro, Container.astro, Section.astro, Tag.astro, ThemeToggle.astro
@@ -111,11 +109,9 @@ index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skil
 - `src/components/atoms/RepoGlowCard.tsx` — premium interactive card with tilt, glow, rank badges, last active, animated star counter
 - `src/islands/TopReposLeaderboard.tsx` — leaderboard grid wrapping RepoGlowCards + animated commits feed + CTA
 
-### Epic 8 (Integration)
-- `src/components/organisms/GitHubUniverse.astro` — orchestrator for all phases
-
-## Removal candidates (Epic 5-8)
-- `src/components/organisms/GitHubShowcase.astro`
-- `src/islands/LanguageDonut.tsx`
-- `src/islands/CommitHeatmap.tsx`
-- `src/islands/ContributionGraph.tsx`
+### Epic 8 (Integration) ✅
+- `src/components/organisms/GitHubUniverse.astro` — orchestrator wrapping all phases with scroll narrative
+- `src/islands/PhaseIndicator.tsx` — scroll progress dots for phase navigation
+- `src/pages/index.astro` — GitHub section now uses GitHubUniverse (full phased experience)
+- `src/pages/github.astro` — redesigned as expanded full-page GitHub Universe
+- Deleted removal candidates: `GitHubShowcase.astro`, `LanguageDonut.tsx`, `CommitHeatmap.tsx`, `ContributionGraph.tsx`

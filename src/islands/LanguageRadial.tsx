@@ -19,10 +19,10 @@ const COLORS = [
   "#14b8a6",
 ];
 
-const CX = 120;
-const CY = 120;
-const R = 90;
-const INNER_R = 58;
+const CX = 175;
+const CY = 175;
+const R = 130;
+const INNER_R = 85;
 
 function polarToCartesian(cx: number, cy: number, r: number, angleDeg: number) {
   const rad = ((angleDeg - 90) * Math.PI) / 180;
@@ -100,11 +100,15 @@ export default function LanguageRadial({ languages }: Props) {
     }
   };
 
-  const size = 280;
+  const size = 400;
 
   if (prefersReduced || !isInView) {
     return (
-      <div ref={ref} className="flex flex-col md:flex-row items-center gap-6">
+      <div ref={ref} className="flex flex-col">
+        <h3 className="text-sm text-text-secondary font-medium mb-4">Language Breakdown</h3>
+        <div className="flex flex-col md:flex-row items-center">
+        <div className="w-3/4 flex justify-center">
+          <div className="relative">
         <svg
           width={size}
           height={size}
@@ -122,30 +126,36 @@ export default function LanguageRadial({ languages }: Props) {
           ))}
           <circle cx={CX} cy={CY} r={INNER_R} fill="var(--bg-secondary, #18181b)" />
         </svg>
-        <div className="flex-1 space-y-2 w-full max-w-xs">
+      </div>
+      </div>
+        <div className="w-1/4 space-y-2 text-right">
           {slices.map((slice) => (
             <div
               key={slice.lang.language}
-              className="flex items-center gap-3 px-3 py-1.5 rounded-lg"
+              className="flex items-center gap-3 px-3 py-1.5 rounded-lg justify-end"
             >
+              <span className="text-sm text-text-secondary font-medium tabular-nums">
+                {slice.lang.percentage}%
+              </span>
+              <span className="text-sm text-text-primary">{slice.lang.language}</span>
               <span
                 className="w-3 h-3 rounded-sm shrink-0"
                 style={{ backgroundColor: slice.color }}
               />
-              <span className="flex-1 text-sm text-text-primary">{slice.lang.language}</span>
-              <span className="text-sm text-text-secondary font-medium">
-                {slice.lang.percentage}%
-              </span>
             </div>
           ))}
         </div>
       </div>
+    </div>
     );
   }
 
   return (
-    <div ref={ref} className="flex flex-col md:flex-row items-center gap-6">
-      <div className="relative shrink-0">
+    <div ref={ref} className="flex flex-col">
+      <h3 className="text-sm text-text-secondary font-medium mb-4">Language Breakdown</h3>
+      <div className="flex flex-col md:flex-row items-center">
+      <div className="w-3/4 flex justify-center">
+        <div className="relative">
         <svg
           width={size}
           height={size}
@@ -227,31 +237,33 @@ export default function LanguageRadial({ languages }: Props) {
           </motion.text>
         </svg>
       </div>
-      <div className="flex-1 space-y-2 w-full max-w-xs">
-        {slices.map((slice) => (
-          <motion.div
-            key={slice.lang.language}
-            className="flex items-center gap-3 px-3 py-1.5 rounded-lg cursor-pointer"
-            animate={{
-              backgroundColor:
-                hoveredIdx === slice.index
-                  ? "var(--bg-tertiary, #27272a)"
-                  : "transparent",
-            }}
-            onMouseEnter={() => handleHover(slice.index)}
-            onMouseLeave={() => handleHover(null)}
-          >
-            <span
-              className="w-3 h-3 rounded-sm shrink-0"
-              style={{ backgroundColor: slice.color }}
-            />
-            <span className="flex-1 text-sm text-text-primary">{slice.lang.language}</span>
-            <span className="text-sm text-text-secondary font-medium tabular-nums">
-              {slice.lang.percentage}%
-            </span>
-          </motion.div>
-        ))}
       </div>
+      <div className="w-1/4 space-y-2 text-right">
+          {slices.map((slice) => (
+            <motion.div
+              key={slice.lang.language}
+              className="flex items-center gap-3 px-3 py-1.5 rounded-lg cursor-pointer justify-end"
+              animate={{
+                backgroundColor:
+                  hoveredIdx === slice.index
+                    ? "var(--bg-tertiary, #27272a)"
+                    : "transparent",
+              }}
+              onMouseEnter={() => handleHover(slice.index)}
+              onMouseLeave={() => handleHover(null)}
+            >
+              <span className="text-sm text-text-secondary font-medium tabular-nums">
+                {slice.lang.percentage}%
+              </span>
+              <span className="text-sm text-text-primary">{slice.lang.language}</span>
+              <span
+                className="w-3 h-3 rounded-sm shrink-0"
+                style={{ backgroundColor: slice.color }}
+              />
+            </motion.div>
+          ))}
+        </div>
+    </div>
     </div>
   );
 }

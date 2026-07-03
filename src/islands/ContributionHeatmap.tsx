@@ -30,8 +30,11 @@ export default function ContributionHeatmap({ data, longestStreak = 0 }: Props) 
 
   if (!data.weeks.length) {
     return (
-      <div className="text-center py-8 text-text-secondary text-sm" role="status">
-        No contribution data available.
+      <div className="flex flex-col">
+        <h3 className="text-sm text-text-secondary font-medium mb-4">Contribution Activity</h3>
+        <div className="text-center py-8 text-text-secondary text-sm" role="status">
+          No contribution data available.
+        </div>
       </div>
     );
   }
@@ -55,9 +58,11 @@ export default function ContributionHeatmap({ data, longestStreak = 0 }: Props) 
   };
 
   return (
-    <div ref={ref} className="relative">
+    <div className="relative">
+      <h3 className="text-sm text-text-secondary font-medium mb-4">Contribution Activity</h3>
+    <div ref={ref}>
       <div className="overflow-x-auto pb-2">
-        <div className="flex gap-0.5" style={{ minWidth: `${data.weeks.length * (CELL_SIZE + CELL_GAP)}px` }}>
+        <div className="flex gap-0.5 mx-auto" style={{ width: `${data.weeks.length * (CELL_SIZE + CELL_GAP)}px` }}>
           <div className="flex flex-col gap-0.5 pr-1 pt-2 shrink-0">
             {DAY_LABELS.map((day) => (
               <div
@@ -171,6 +176,7 @@ export default function ContributionHeatmap({ data, longestStreak = 0 }: Props) 
           <span>More</span>
         </div>
       </div>
+    </div>
     </div>
   );
 }

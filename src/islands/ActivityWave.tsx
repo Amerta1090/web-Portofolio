@@ -56,6 +56,8 @@ export default function ActivityWave({ data }: Props) {
 
   if (prefersReduced) {
     return (
+      <div className="flex flex-col">
+        <h3 className="text-sm text-text-secondary font-medium mb-4">Weekly Activity</h3>
       <div ref={ref} className="w-full">
         <svg
           viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
@@ -92,10 +94,13 @@ export default function ActivityWave({ data }: Props) {
           })}
         </svg>
       </div>
+      </div>
     );
   }
 
   return (
+    <div className="flex flex-col">
+      <h3 className="text-sm text-text-secondary font-medium mb-4">Weekly Activity</h3>
     <div ref={ref} className="w-full relative">
       <svg
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
@@ -194,6 +199,7 @@ export default function ActivityWave({ data }: Props) {
           );
         })}
       </svg>
+    </div>
     </div>
   );
 }
