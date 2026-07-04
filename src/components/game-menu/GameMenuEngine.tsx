@@ -170,7 +170,7 @@ const MENU_TREE: MenuItem[] = [
       {
         id: "gallery",
         label: "Gallery",
-        href: "/projects",
+        href: "/gallery",
         icon: <Images size={SUB_ICON_SIZE} />,
       },
     ],

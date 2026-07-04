@@ -14,11 +14,7 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 - Epic 7 (Top Repos): ✅ COMPLETE
 - Epic 8 (Integration): ✅ COMPLETE
 - Epic 9 (Polish/QA): ✅ COMPLETE
-
-### Epic 9 (Polish/QA) ✅
-- **Integration audit**: 6 orphaned islands identified; `MagneticButton` integrated into `TopReposLeaderboard.tsx` CTA, `SkillConstellation` into `pages/skills.astro`
-- **Error boundaries**: `ErrorBoundary.tsx` (class component) created; wrapped around `CodeDNAHelix.tsx` and `RepositoryGalaxy.tsx`
-- **Build verified**: `bun run build` succeeds
+- Epic 10 (Creative Lab): 🔄 IN PROGRESS
 
 ## Architecture
 - **Rendering**: SSG. No runtime API calls. GitHub data fetched at build time.
@@ -89,6 +85,11 @@ pinned-repos.json, all-repos.json, languages.json, commit-activity.json, contrib
 | ContributionHeatmap.tsx | `client:load` | Animated contribution grid with tooltips |
 | TopReposLeaderboard.tsx | `client:visible` | RepoGlowCard grid + animated commits feed + CTA |
 | PhaseIndicator.tsx | `client:load` | Scroll phase indicator dots for GitHub Universe navigation |
+| GalleryGrid.tsx | `client:load` | Tilt-card grid + full-screen modal orchestrator for experiments |
+| ImageSequenceScroll.tsx | — | Procedural canvas frame sequence, wheel-driven |
+| ParticleGalaxy.tsx | — | Interactive particle system with mouse gravity |
+| TextScramble.tsx | — | Kinetic typography, multi-phrase scramble/glitch |
+| VideoSequenceScroll.tsx | — | Real image sequence scroll (Samsung 4K demo) |
 
 ### Key Atoms (under `src/components/atoms/`)
 | File | Type | Notes |
@@ -107,7 +108,7 @@ Hero.astro, About.astro, Experience.astro, Projects.astro, Certifications.astro,
 Badge.astro, Button.astro, Card.astro, Container.astro, Section.astro, Tag.astro, ThemeToggle.astro
 
 ### Pages
-index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skills.astro, certifications.astro, github.astro, contact.astro, rss.xml.js
+index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skills.astro, certifications.astro, github.astro, contact.astro, gallery.astro, resume.astro, timeline.astro, rss.xml.ts
 
 ## Sprint Plan
 
@@ -130,3 +131,19 @@ index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skil
 - `src/pages/index.astro` — GitHub section now uses GitHubUniverse (full phased experience)
 - `src/pages/github.astro` — redesigned as expanded full-page GitHub Universe
 - Deleted removal candidates: `GitHubShowcase.astro`, `LanguageDonut.tsx`, `CommitHeatmap.tsx`, `ContributionGraph.tsx`
+
+### Epic 10 (Creative Lab) 🔄
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md` — 10 epics, ~60 stories (Liquid Distortion, Audio Viz, Fractal Explorer, etc.)
+- **Gallery page**: `src/pages/gallery.astro` — experimental UI playground at `/gallery`
+- **Game menu**: Gallery link updated from `/projects` → `/gallery`
+- **GalleryGrid**: `src/islands/GalleryGrid.tsx` — tilt-card grid + full-screen modal orchestrator
+- **ImageSequenceScroll**: `src/islands/experiments/ImageSequenceScroll.tsx` — procedural canvas frames, wheel-driven (native passive listener, accumulator threshold)
+- **ParticleGalaxy**: `src/islands/experiments/ParticleGalaxy.tsx` — 180-particle system with mouse gravity, constellation lines
+- **TextScramble**: `src/islands/experiments/TextScramble.tsx` — kinetic typography, multi-phrase scramble/glitch
+- **VideoSequenceScroll**: `src/islands/experiments/VideoSequenceScroll.tsx` — real image sequence (296 frames from Samsung 4K demo), wheel-driven scrub
+- **Frames**: `public/images/sequence/samsung-demo/` — 296 JPEG frames (5.2MB, 854×480)
+- **Blog thumbnails**: `public/images/blog/` — 3 premium SVG thumbnails per post
+- **Resume redesign**: `src/pages/resume.astro` — premium 2-column layout with sidebar
+- **Timeline redesign**: `src/pages/timeline.astro` — glass-morphism cards, gradient line, premium badges
+- **All experiments use native wheel events** (not synthetic React events) with `{ passive: false }` for reliable scrolling inside modals
+- **Build verified**: `bun run build` succeeds (45 pages)

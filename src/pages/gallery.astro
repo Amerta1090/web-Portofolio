@@ -1,0 +1,31 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import GalleryGrid from "../islands/GalleryGrid";
+---
+
+<BaseLayout
+  title="Gallery — Experimental UI Playground"
+  description="A playground of experimental UI/UX concepts, creative interactions, and visual explorations."
+  canonicalUrl="https://abdulmajidr708.dev/gallery"
+>
+  <div class="min-h-screen pt-24 pb-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header class="mb-16 text-center">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium mb-6">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+          Experimental
+        </div>
+        <h1 class="text-5xl md:text-7xl font-black text-text-primary mb-4 tracking-tight">
+          <span class="bg-gradient-to-r from-amber-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+            Creative Lab
+          </span>
+        </h1>
+        <p class="text-text-secondary text-lg max-w-2xl mx-auto">
+          A curated collection of experimental UI/UX concepts — where creative code meets interactive design. Click any experiment to launch it.
+        </p>
+      </header>
+
+      <GalleryGrid client:load />
+    </div>
+  </div>
+</BaseLayout>
