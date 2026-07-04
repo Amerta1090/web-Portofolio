@@ -8,3 +8,5 @@ public/github/
 .astro/
 .cache/
 prompt.txt
+*.mp4
+*.tex
