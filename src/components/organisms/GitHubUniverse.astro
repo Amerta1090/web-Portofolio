@@ -41,7 +41,7 @@ const buildTime = new Date().toISOString();
     </Section>
   ) : (
     <div class="github-universe relative">
-      <PhaseIndicator client:load />
+      {fullPage && <PhaseIndicator client:load />}
 
       <!-- Phase 0: Boot Sequence -->
       <div data-phase="boot">

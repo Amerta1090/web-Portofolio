@@ -10,6 +10,8 @@ import Volunteering from "../components/organisms/Volunteering.astro";
 import ImpactMetrics from "../islands/ImpactMetrics";
 import JourneyTimeline from "../islands/JourneyTimeline";
 import ProjectCardGrid from "../islands/ProjectCardGrid";
+import CreativeLabTeaser from "../islands/CreativeLabTeaser";
+import CreativeLabPill from "../islands/CreativeLabPill";
 import ScrollAnimator from "../islands/ScrollAnimator.astro";
 import SectionCounter from "../islands/SectionCounter";
 import SkillsExplorer from "../islands/SkillsExplorer";
@@ -72,6 +74,10 @@ const gitHubData = await fetchAllGitHubData();
     <ProjectCardGrid client:load projects={featuredProjects} />
   </Section>
 
+  <Section data-reveal id="creative-lab" title="Creative Lab" subtitle="Experimental playground — interactive visualizations and creative coding experiments" ariaLabel="Creative Lab experiments">
+    <CreativeLabTeaser client:visible />
+  </Section>
+
   <Section data-reveal id="skills" title="Skills" variant="alt" ariaLabel="Skills and technologies">
     <SkillsExplorer client:load skills={skills} />
   </Section>
@@ -118,4 +124,5 @@ const gitHubData = await fetchAllGitHubData();
 
   <ScrollAnimator />
   <SectionCounter client:load />
+  <CreativeLabPill client:visible />
 </BaseLayout>
