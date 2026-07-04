@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, forwardRef } from "react";
 import {
   X,
   Image,
@@ -13,6 +13,7 @@ import ImageSequenceScroll from "./experiments/ImageSequenceScroll";
 import ParticleGalaxy from "./experiments/ParticleGalaxy";
 import TextScramble from "./experiments/TextScramble";
 import VideoSequenceScroll from "./experiments/VideoSequenceScroll";
+import AmbientSound from "../components/atoms/AmbientSound";
 
 interface Experiment {
   id: string;
@@ -60,15 +61,15 @@ const experiments: Experiment[] = [
     thumbnail: "/images/experiments/text-scramble.svg",
   },
   {
-    id: "samsung-demo",
-    title: "4K UHD Demo — Samsung LED TV",
-    description: "Scroll through 296 frames extracted from a 4K UHD Samsung demo video.",
+    id: "watch-demo",
+    title: "Cinematic Watch Product Demo",
+    description: "Scroll through 302 frames from a cinematic watch product commercial.",
     longDescription:
-      "A real video-to-frame-sequence showcase. 296 frames from a Samsung 4K UHD LED TV demo.",
-    tags: ["4K", "Image Sequence", "Video", "Samsung"],
+      "A real video-to-frame-sequence showcase. 302 frames from a cinematic watch product commercial featuring Rolex, Omega, and more.",
+    tags: ["4K", "Image Sequence", "Video", "Cinematic"],
     icon: <Monitor className="w-5 h-5" />,
     gradient: "from-sky-500 to-indigo-600",
-    thumbnail: "/images/experiments/samsung-demo.svg",
+    thumbnail: "/images/experiments/watch-demo.svg",
   },
 ];
 
@@ -78,20 +79,26 @@ function LivePreview({ id }: { id: string }) {
       {id === "image-sequence" && <ImageSequenceScroll compact />}
       {id === "particle-galaxy" && <ParticleGalaxy compact />}
       {id === "text-scramble" && <TextScramble compact />}
-      {id === "samsung-demo" && <VideoSequenceScroll compact />}
+      {id === "watch-demo" && <VideoSequenceScroll compact />}
     </>
   );
 }
 
-function ExperimentCard({
-  exp,
-  index,
-  onLaunch,
-}: {
+const ExperimentCard = forwardRef<HTMLDivElement, {
   exp: Experiment;
   index: number;
   onLaunch: (id: string) => void;
-}) {
+  isFocused?: boolean;
+  onFocus?: () => void;
+  cursorStyle?: string;
+}>(function ExperimentCard({
+  exp,
+  index,
+  onLaunch,
+  isFocused,
+  onFocus,
+  cursorStyle,
+}, ref) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [hovered, setHovered] = useState(false);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
@@ -115,17 +122,29 @@ function ExperimentCard({
 
   return (
     <motion.div
-      ref={cardRef}
+      ref={(node) => {
+        cardRef.current = node;
+        if (typeof ref === "function") ref(node);
+        else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+      }}
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1, duration: 0.5 }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onMouseEnter={() => setHovered(true)}
+      onFocus={onFocus}
+      tabIndex={0}
+      role="listitem"
       style={{
         transform: `perspective(1000px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`,
+        cursor: cursorStyle || "pointer",
       }}
-      className="group relative bg-bg-secondary/50 backdrop-blur-sm border border-border/60 rounded-2xl overflow-hidden hover:border-amber-500/30 transition-all duration-300 cursor-pointer"
+      className={`group relative bg-bg-secondary/50 backdrop-blur-sm border rounded-2xl overflow-hidden transition-all duration-300 outline-none ${
+        isFocused
+          ? "border-amber-400/60 ring-2 ring-amber-400/20 shadow-lg shadow-amber-500/10"
+          : "border-border/60 hover:border-amber-500/30"
+      }`}
       onClick={() => onLaunch(exp.id)}
       data-exp-id={exp.id}
     >
@@ -171,7 +190,7 @@ function ExperimentCard({
       </div>
     </motion.div>
   );
-}
+});
 
 function ExperimentModal({
   experiment,
@@ -254,7 +273,7 @@ function ExperimentModal({
               {experiment.id === "image-sequence" && <ImageSequenceScroll />}
               {experiment.id === "particle-galaxy" && <ParticleGalaxy />}
               {experiment.id === "text-scramble" && <TextScramble />}
-              {experiment.id === "samsung-demo" && <VideoSequenceScroll />}
+              {experiment.id === "watch-demo" && <VideoSequenceScroll />}
             </div>
           </motion.div>
         </motion.div>
@@ -263,10 +282,46 @@ function ExperimentModal({
   );
 }
 
+function experimentCursor(id: string): string {
+  const cursors: Record<string, string> = {
+    "image-sequence": "crosshair",
+    "particle-galaxy": "grab",
+    "text-scramble": "text",
+    "watch-demo": "zoom-in",
+  };
+  return cursors[id] || "pointer";
+}
+
 export default function GalleryGrid() {
   const [activeExperiment, setActiveExperiment] = useState<string | null>(null);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const activeExp = experiments.find((e) => e.id === activeExperiment) || null;
+
+  // Deep link: auto-launch experiment from URL hash
+  useEffect(() => {
+    const hash = window.location.hash.replace("#", "");
+    if (hash) {
+      const match = experiments.find((e) => e.id === hash);
+      if (match) {
+        // Small delay to let the page render first
+        setTimeout(() => setActiveExperiment(match.id), 300);
+      }
+    }
+  }, []);
+
+  // Update hash when experiment opens/closes
+  useEffect(() => {
+    if (activeExperiment) {
+      window.location.hash = activeExperiment;
+    } else {
+      const hash = window.location.hash;
+      if (hash && experiments.some((e) => e.id === hash.replace("#", ""))) {
+        history.replaceState(null, "", window.location.pathname);
+      }
+    }
+  }, [activeExperiment]);
 
   const handleLaunch = useCallback((id: string) => {
     setActiveExperiment(id);
@@ -274,17 +329,81 @@ export default function GalleryGrid() {
 
   const handleClose = useCallback(() => {
     setActiveExperiment(null);
+    setFocusedIndex(-1);
   }, []);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      // If modal is open, only Esc is handled (already in ExperimentModal)
+      if (activeExperiment) return;
+
+      const count = experiments.length;
+
+      switch (e.key) {
+        case "ArrowRight":
+        case "ArrowDown":
+          e.preventDefault();
+          setFocusedIndex((prev) => {
+            const next = Math.min(count - 1, prev + 1);
+            cardRefs.current[next]?.focus();
+            return next;
+          });
+          break;
+        case "ArrowLeft":
+        case "ArrowUp":
+          e.preventDefault();
+          setFocusedIndex((prev) => {
+            const next = Math.max(0, prev - 1);
+            cardRefs.current[next]?.focus();
+            return next;
+          });
+          break;
+        case "Enter":
+        case " ":
+          if (focusedIndex >= 0 && focusedIndex < count) {
+            e.preventDefault();
+            setActiveExperiment(experiments[focusedIndex].id);
+          }
+          break;
+        default:
+          // Number shortcuts: 1-4 launch experiments
+          const num = parseInt(e.key);
+          if (num >= 1 && num <= count) {
+            e.preventDefault();
+            setActiveExperiment(experiments[num - 1].id);
+          }
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [activeExperiment, focusedIndex]);
+
+  const expHarmony = activeExperiment === "particle-galaxy" ? "purple"
+    : activeExperiment === "text-scramble" ? "pink"
+    : activeExperiment === "samsung-demo" ? "cyan"
+    : "amber";
 
   return (
     <>
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <AmbientSound harmony={expHarmony} />
+      <div
+        className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+        role="list"
+        aria-label="Experiments"
+      >
         {experiments.map((exp, i) => (
           <ExperimentCard
             key={exp.id}
             exp={exp}
             index={i}
             onLaunch={handleLaunch}
+            isFocused={focusedIndex === i}
+            onFocus={() => setFocusedIndex(i)}
+            ref={(el) => { cardRefs.current[i] = el; }}
+            cursorStyle={experimentCursor(exp.id)}
           />
         ))}
       </div>
@@ -304,6 +423,15 @@ export default function GalleryGrid() {
               </span>
             ),
           )}
+        </div>
+        <div className="mt-6 flex justify-center gap-4 text-[11px] text-text-secondary/40 font-mono">
+          <span>← → navigate</span>
+          <span className="w-px h-3 bg-border/40" />
+          <span>Enter to launch</span>
+          <span className="w-px h-3 bg-border/40" />
+          <span>1–{experiments.length} shortcut</span>
+          <span className="w-px h-3 bg-border/40" />
+          <span>#hash deep link</span>
         </div>
       </div>
 

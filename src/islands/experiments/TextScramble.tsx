@@ -26,6 +26,7 @@ export default function TextScramble({ compact }: { compact?: boolean }) {
   const intervalRef = useRef<ReturnType<typeof setInterval>>();
   const containerRef = useRef<HTMLDivElement>(null);
   const mountedRef = useRef(true);
+  const phraseRef = useRef(0);
 
   const scramble = useCallback((target: string) => {
     setIsGlitching(true);
@@ -60,26 +61,32 @@ export default function TextScramble({ compact }: { compact?: boolean }) {
   }, [compact]);
 
   const nextPhrase = useCallback(() => {
-    const next = (currentPhrase + 1) % PHRASES.length;
+    const next = (phraseRef.current + 1) % PHRASES.length;
+    phraseRef.current = next;
     setCurrentPhrase(next);
     scramble(PHRASES[next]);
-  }, [currentPhrase, scramble]);
+  }, [scramble]);
 
   useEffect(() => {
     mountedRef.current = true;
     return () => { mountedRef.current = false; };
   }, []);
 
+  // Store latest nextPhrase in ref to avoid useEffect re-running
+  const nextRef = useRef(nextPhrase);
+  nextRef.current = nextPhrase;
+
   useEffect(() => {
     if (!compact) return;
 
-    nextPhrase();
-    const autoTimer = setInterval(nextPhrase, 3000);
+    phraseRef.current = 0;
+    setCurrentPhrase(0);
+    scramble(PHRASES[0]);
+    const autoTimer = setInterval(() => nextRef.current(), 3000);
     return () => {
       clearInterval(autoTimer);
-      clearInterval(intervalRef.current);
     };
-  }, [nextPhrase, compact]);
+  }, [compact, scramble]);
 
   useEffect(() => {
     if (compact) return;
@@ -87,15 +94,14 @@ export default function TextScramble({ compact }: { compact?: boolean }) {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === " " || e.key === "Enter") {
         e.preventDefault();
-        nextPhrase();
+        nextRef.current();
       }
     };
     window.addEventListener("keydown", handleKey);
     return () => {
       window.removeEventListener("keydown", handleKey);
-      clearInterval(intervalRef.current);
     };
-  }, [nextPhrase, compact]);
+  }, [compact]);
 
   if (compact) {
     return (
@@ -132,7 +138,7 @@ export default function TextScramble({ compact }: { compact?: boolean }) {
     <div
       ref={containerRef}
       className="w-full h-full bg-[#0a0a0c] flex flex-col items-center justify-center select-none relative overflow-hidden"
-      onClick={nextPhrase}
+      onClick={() => nextRef.current()}
     >
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
         <div

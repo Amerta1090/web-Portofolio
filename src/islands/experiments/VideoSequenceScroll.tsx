@@ -1,13 +1,12 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from "react";
 
-const TOTAL_FRAMES = 296;
-const FRAME_BASE = "/images/sequence/samsung-demo/frame-";
+const TOTAL_FRAMES = 302;
+const FRAME_BASE = "/images/sequence/watch-demo/frame-";
 const FRAME_PAD = 4;
 const FRAME_EXT = ".jpg";
 
 function framePath(n: number): string {
-  const num = n * 3 + 1;
-  const padded = String(num).padStart(FRAME_PAD, "0");
+  const padded = String(n + 1).padStart(FRAME_PAD, "0");
   return `${FRAME_BASE}${padded}${FRAME_EXT}`;
 }
 

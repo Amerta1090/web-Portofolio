@@ -281,6 +281,44 @@ Gallery Page (Astro static shell)
 
 ---
 
+### Epic 11: Mathematical Deep Dive — Pure Math × Interactive Visuals
+
+> *"Math is not about numbers, equations, computations, or algorithms: it is about understanding." — William Paul Thurston*
+
+| Story | Points | Description |
+|-------|--------|-------------|
+| **Strange Attractor Galaxy** | 8 | Real-time 3D render of Lorenz/Rössler/Aizawa attractors — particle trails trace the butterfly-shaped strange attractor; camera orbits as the system evolves. Toggle between attractor types, adjust parameters (σ, ρ, β), watch sensitivity to initial conditions split two nearly-identical trajectories into divergent paths |
+| **Fourier Epicycles** | 8 | Any 2D shape decomposed into rotating epicycles (Fourier series). Draw any closed shape with mouse — see it approximated by N circles of decreasing radius. Increase N from 1→100 and watch the reconstruction converge from a blurry blob to perfect outline. Σ circles animates clockwise/counterclockwise |
+| **Gradient Descent Terrain** | 8 | 3D loss landscape visualization (color-coded heightmap). Animate SGD/Adam/Momentum optimizers traversing the terrain from random start points. Click to place a starting point; watch the optimizer descend. Show contour lines, saddle points, local minima, and the optimization path trail |
+| **Bayesian Inference Engine** | 8 | Prior distribution → likelihood function → posterior distribution animated in real-time. Drag sliders to adjust prior parameters (mean, variance); data points appear via Poisson process; posterior updates continuously via Bayes' theorem. Show conjugate families, credible intervals, MCMC samples |
+| **Eigenvector Flow Field** | 5 | 2D vector field visualization where eigenvectors define flow lines. Drag a point to see it trace along eigenvector directions. Animate PCA on randomly generated clusters — watch the principal components rotate to capture maximum variance. Show covariance ellipse, eigenvalue magnitude as axis length |
+| **Monte Carlo π** | 5 | d3/Canvas: randomly thrown dots inside a square with inscribed circle. Watch π converge from random to 3.14159... as N grows from 0 → 10,000+. Show error bar converging to zero. Toggle between uniform, stratified, and importance sampling — visualize variance reduction |
+| **Chaos Game / IFS Fractals** | 5 | Barnsley Fern, Sierpinski Triangle, custom IFS rules. Each point plotted in real-time with color mapped to iteration depth. Drag control points to design your own IFS fractal. Show transformation matrices, contraction factors, and the attractor emerging from pure randomness |
+| **Double Pendulum Chaos** | 5 | Two linked pendulums with nearly identical initial conditions diverge in real-time. Side-by-side comparison: θ₁ = θ₂ vs. θ₁ = θ₂ + 0.0001°. Show phase-space portrait (θ vs. ω) as a continuous trail. Toggle energy conservation display, adjust mass/length/damping |
+| **Wave Equation PDE Solver** | 8 | 2D wave simulation on a grid — click to create ripples that propagate via numerical PDE solving (finite difference method). Show the wave equation ∂²u/∂t² = c²∇²u as an overlay. Adjust wave speed, damping, and boundary conditions (reflective/absorbing). Multiple simultaneous wave sources create interference patterns |
+| **Flocking Boids** | 5 | Three simple rules (separation, alignment, cohesion) produce complex emergent flocking behavior. Visualize force vectors per boid as colored arrows. Add obstacles, predators, and food sources. Show the velocity field as a heatmap overlay. Toggle each rule on/off to see its effect |
+| **Voronoi / Delaunay Ecosystem** | 5 | Interactive Voronoi diagram and its dual Delaunay triangulation. Drag generator points and watch cells morph in real-time. Animate Lloyd's relaxation algorithm. Click to insert new points. Show area/perimeter of each cell, color by centroid distance |
+| **Spherical Harmonics** | 8 | 3D real-time visualization of atomic orbital-like shapes (Y_l^m). Rotate, zoom, adjust l and m quantum numbers. Show the mathematical formula, node surfaces, and probability density cross-section. Animate superposition of multiple harmonics |
+| **Hamiltonian Monte Carlo** | 8 | Physical simulation of MCMC sampling — a frictionless puck glides across the energy landscape, collecting samples. Visualize leapfrog integration steps, momentum updates, and sample rejection. Compare with random-walk Metropolis-Hastings on the same target distribution |
+| **Noise Topography** | 5 | Layered Perlin/Simplex noise generates infinite 3D terrain. Scroll to zoom, drag to rotate. Adjust octaves, persistence, lacunarity, and seed in real-time. Show the noise function graph overlay. Export terrain as STL/OBJ for 3D printing |
+| **IFS Flame Fractals** | 8 | Iterated Function System with color gradients and non-linear transformations (variations: spherical, swirl, horseshoe, heart). GPU-accelerated with WebGL for millions of iterations/second. Scroll through preset flames, tweak variation weights, watch the fractal evolve from chaos |
+| **Spring Physics Sandbox** | 5 | Verlet integration physics: create mass-spring networks by clicking. Cloth simulation, ragdoll chains, jelly physics. Adjust stiffness, damping, rest length, gravity. Show constraint forces as colored lines. Pin/unpin points by double-clicking |
+| **Bézier Curve Playground** | 5 | Interactive N-degree Bézier, B-spline, and Catmull-Rom curves. Drag control points; watch de Casteljau's algorithm animate (linear interpolations chained recursively). Show basis function plots (Bernstein polynomials). Compare curve types on the same set of points |
+| **Conformal Mapping** | 8 | See complex functions transform the plane in real-time: f(z) = z², 1/z, e^z, sin(z). Show a regular grid being warped — watch angles preserve under conformal maps. Animate parameter sweeps. Show Riemann sphere projection. Highlight singularities and branch cuts |
+| **Diffusion-Limited Aggregation** | 5 | Random walkers stick to a growing cluster, producing organic fractal shapes (DLA). Watch the Hausdorff dimension converge. Toggle between 2D (classic) and 3D (Three.js). Adjust particle count, sticking radius, and bias direction |
+| **Bifurcation Diagram** | 5 | Logistic map xₙ₊₁ = rxₙ(1−xₙ): sweep r from 2 to 4 and watch period-doubling cascade to chaos. Click any r value to see the cobweb plot overlay. Show Feigenbaum constant δ ≈ 4.669 convergence. Animate the bifurcation diagram building point by point |
+| **Tensor Field / Ricci Flow** | 8 | 2D manifold visualization with curvature mapping (Gaussian curvature K = κ₁·κ₂). Animate Ricci flow smoothing: high-curvature regions flatten over time. Color by curvature sign (positive = blue, negative = red). Place mass points and watch the metric deform |
+
+**Design Principles specific to Math Epics:**
+- Every experiment must show the **underlying formula/equation** as a live overlay (LaTeX-rendered or cleanly typeset)
+- **Parameter sliders** for all key variables — every knob changes something visible
+- **Side-by-side comparison** mode: "same math, different parameters" or "same visual, different math"
+- **Educational tooltip**: hover any element to see the mathematical explanation
+- **"Chaos mode"**: auto-randomize parameters to explore the space
+- **Export math state**: copy current parameters as a shareable equation/URL
+
+---
+
 ## Future Experiments (Backlog)
 
 1. **WebGL Shader Sandbox** — Live GLSL editor with real-time compilation
@@ -308,11 +346,17 @@ Gallery Page (Astro static shell)
 | Sprint 1 | **Foundation** | Gallery grid + modal + first 3 experiments |
 | Sprint 2 | **Visual Depth** | Liquid Distortion + 3D Parallax |
 | Sprint 3 | **Audio** | Audio Visualizer + Audio-reactive variants |
-| Sprint 4 | **Math & Nature** | Fractal Explorer + Cellular Automata |
-| Sprint 5 | **Creative Tools** | Infinite Canvas + Typography Playground |
-| Sprint 6 | **Interaction Library** | Micro-interactions + shared primitives extraction |
-| Sprint 7 | **Collaboration** | WebRTC multi-user experiments |
-| Sprint 8 | **Polish** | Performance optimization, export features, documentation |
+| Sprint 4 | **Geometry & Chaos** | Strange Attractor Galaxy + Double Pendulum + Voronoi |
+| Sprint 5 | **Fourier & Transform** | Fourier Epicycles + Conformal Mapping + Eigenvector Flow |
+| Sprint 6 | **Optimization & Inference** | Gradient Descent Terrain + Bayesian Engine + HMC |
+| Sprint 7 | **Fractal Universe** | IFS Flame + DLA + Chaos Game + Mandelbrot Deep Zoom |
+| Sprint 8 | **Physics & PDE** | Wave Equation + Spring Physics + Flocking Boids |
+| Sprint 9 | **Pure Math Gallery** | Spherical Harmonics + Bézier Curves + Bifurcation + Ricci Flow |
+| Sprint 10 | **Probability & Statistics** | Monte Carlo π + Noise Topography + Statistical Distributions |
+| Sprint 11 | **Interaction Library** | Micro-interactions + shared primitives extraction |
+| Sprint 12 | **Creative Tools** | Infinite Canvas + Typography Playground |
+| Sprint 13 | **Collaboration** | WebRTC multi-user experiments |
+| Sprint 14 | **Polish** | Performance optimization, export features, documentation |
 
 ---
 

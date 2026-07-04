@@ -14,7 +14,8 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 - Epic 7 (Top Repos): ✅ COMPLETE
 - Epic 8 (Integration): ✅ COMPLETE
 - Epic 9 (Polish/QA): ✅ COMPLETE
-- Sprint 1 (Creative Lab Foundation): 🔄 IN PROGRESS
+- Sprint 1 (Creative Lab Foundation): ✅ COMPLETE
+- Sprint 2 (Visual Depth): 🔄 IN PROGRESS
 
 ## Architecture
 - **Rendering**: SSG. No runtime API calls. GitHub data fetched at build time.
@@ -132,19 +133,32 @@ index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skil
 - `src/pages/github.astro` — redesigned as expanded full-page GitHub Universe
 - Deleted removal candidates: `GitHubShowcase.astro`, `LanguageDonut.tsx`, `CommitHeatmap.tsx`, `ContributionGraph.tsx`
 
-### Sprint 1 (Creative Lab Foundation) 🔄
+### Sprint 1 (Creative Lab Foundation) ✅
 - **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md` — 10 epics, ~60 stories (Liquid Distortion, Audio Viz, Fractal Explorer, etc.)
-- **Current focus**: Epic 1 (Foundation Shell) + Epic 2 (Image Sequence Scroll Engine)
+- **Epic 1 (Foundation Shell)**: ✅ COMPLETE
+  - Keyboard navigation: Arrow keys browse cards, Enter/Space launches, 1-4 number shortcuts
+  - Deep linking: `/gallery#experiment-id` auto-launches experiment on page load
+  - Mouse-reactive cursor: Per-experiment cursor morphing (crosshair, grab, text, zoom-in)
+  - Ambient sound: `src/components/atoms/AmbientSound.tsx` — Web Audio API ambient drone with harmony shifting per experiment (LFO breathing, auto-start on first interaction)
+- **Epic 2 (Image Sequence Scroll Engine)**: ✅ COMPLETE
+  - Reverse playback: Direction toggle button with RotateCcw/Cw icon
+  - Scroll momentum: Velocity-based decay after wheel release
+  - Frame bookmarking: B key to bookmark, amber markers on scrub bar, expandable contact sheet grid, clear all
+  - Export frame: E key or download button → PNG export via canvas.toDataURL
+  - Frame interpolation: Smooth tweening between non-adjacent frames (120ms ease-out curve)
+  - Audio-reactive mode: ⏳ deferred (complex — needs mic permission flow)
 - **Gallery page**: `src/pages/gallery.astro` — experimental UI playground at `/gallery`
-- **Game menu**: Gallery link updated from `/projects` → `/gallery`
-- **GalleryGrid**: `src/islands/GalleryGrid.tsx` — tilt-card grid + full-screen modal orchestrator
-- **ImageSequenceScroll**: `src/islands/experiments/ImageSequenceScroll.tsx` — procedural canvas frames, wheel-driven (native passive listener, accumulator threshold)
+- **GalleryGrid**: `src/islands/GalleryGrid.tsx` — tilt-card grid + full-screen modal orchestrator + keyboard nav + deep links + cursor morphing
+- **ImageSequenceScroll**: `src/islands/experiments/ImageSequenceScroll.tsx` — procedural canvas frames, wheel-driven, scrub bar, reverse toggle, bookmarks, export, interpolation
 - **ParticleGalaxy**: `src/islands/experiments/ParticleGalaxy.tsx` — 180-particle system with mouse gravity, constellation lines
 - **TextScramble**: `src/islands/experiments/TextScramble.tsx` — kinetic typography, multi-phrase scramble/glitch
 - **VideoSequenceScroll**: `src/islands/experiments/VideoSequenceScroll.tsx` — real image sequence (296 frames from Samsung 4K demo), wheel-driven scrub
 - **Frames**: `public/images/sequence/samsung-demo/` — 296 JPEG frames (5.2MB, 854×480)
-- **Blog thumbnails**: `public/images/blog/` — 3 premium SVG thumbnails per post
-- **Resume redesign**: `src/pages/resume.astro` — premium 2-column layout with sidebar
-- **Timeline redesign**: `src/pages/timeline.astro` — glass-morphism cards, gradient line, premium badges
 - **All experiments use native wheel events** (not synthetic React events) with `{ passive: false }` for reliable scrolling inside modals
 - **Build verified**: `bun run build` succeeds (45 pages)
+
+### Sprint 2 (Visual Depth) 🔄
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Current focus**: Epic 3 (Particle Galaxy) + Epic 5 (Liquid Distortion) + Epic 6 (3D Parallax)
+- **To do**: See sprint planning doc Epics 3, 5, 6
+- **New**: Epic 11 (Mathematical Deep Dive) added — 21 experiments spanning strange attractors, Fourier transforms, Bayesian inference, PDE solvers, stochastic processes, conformal mapping, spherical harmonics, and more

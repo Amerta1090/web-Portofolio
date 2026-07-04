@@ -17,6 +17,7 @@ const MOUSE_RADIUS = 180;
 
 export default function ParticleGalaxy({ compact }: { compact?: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const mouseRef = useRef({ x: -9999, y: -9999 });
   const particlesRef = useRef<Particle[]>([]);
   const rafRef = useRef<number>(0);
@@ -25,27 +26,23 @@ export default function ParticleGalaxy({ compact }: { compact?: boolean }) {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
     const ctx = canvas.getContext("2d")!;
     if (!ctx) return;
 
     const count = compact ? 15 : 180;
 
     const getSize = () => {
-      if (!compact) {
-        return { w: window.innerWidth, h: window.innerHeight };
-      }
-      const parent = canvas.parentElement;
-      if (!parent) return { w: 400, h: 192 };
-      const rect = parent.getBoundingClientRect();
-      return { w: rect.width, h: rect.height };
+      const rect = container.getBoundingClientRect();
+      return { w: rect.width || 400, h: rect.height || (compact ? 192 : 600) };
     };
 
     const resize = () => {
       const { w, h } = getSize();
       const dpr = compact ? 1 : (window.devicePixelRatio || 1);
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
+      canvas.width = Math.max(1, w * dpr);
+      canvas.height = Math.max(1, h * dpr);
       canvas.style.width = `${w}px`;
       canvas.style.height = `${h}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -64,30 +61,36 @@ export default function ParticleGalaxy({ compact }: { compact?: boolean }) {
     };
 
     resize();
-    window.addEventListener("resize", resize);
+
+    const ro = new ResizeObserver(resize);
+    ro.observe(container);
 
     if (!compact) {
       const handleMouse = (e: MouseEvent) => {
-        mouseRef.current = { x: e.clientX, y: e.clientY };
+        const rect = container.getBoundingClientRect();
+        mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
       };
       const handleTouch = (e: TouchEvent) => {
         const t = e.touches[0];
-        if (t) mouseRef.current = { x: t.clientX, y: t.clientY };
+        if (t) {
+          const rect = container.getBoundingClientRect();
+          mouseRef.current = { x: t.clientX - rect.left, y: t.clientY - rect.top };
+        }
       };
       const handleMouseLeave = () => {
         mouseRef.current = { x: -9999, y: -9999 };
       };
-      window.addEventListener("mousemove", handleMouse);
-      window.addEventListener("touchmove", handleTouch);
-      window.addEventListener("mouseleave", handleMouseLeave);
+      container.addEventListener("mousemove", handleMouse);
+      container.addEventListener("touchmove", handleTouch);
+      container.addEventListener("mouseleave", handleMouseLeave);
 
-      return () => {
-        window.removeEventListener("resize", resize);
-        window.removeEventListener("mousemove", handleMouse);
-        window.removeEventListener("touchmove", handleTouch);
-        window.removeEventListener("mouseleave", handleMouseLeave);
-        cancelAnimationFrame(rafRef.current);
+      const cleanup = () => {
+        container.removeEventListener("mousemove", handleMouse);
+        container.removeEventListener("touchmove", handleTouch);
+        container.removeEventListener("mouseleave", handleMouseLeave);
       };
+      // Store cleanup for the return
+      (container as any).__pgCleanup = cleanup;
     }
 
     let skipCounter = 0;
@@ -194,21 +197,23 @@ export default function ParticleGalaxy({ compact }: { compact?: boolean }) {
 
     return () => {
       runningRef.current = false;
-      window.removeEventListener("resize", resize);
+      ro.disconnect();
       cancelAnimationFrame(rafRef.current);
+      const cleanup = (container as any).__pgCleanup;
+      if (cleanup) cleanup();
     };
   }, [compact]);
 
   if (compact) {
     return (
-      <div className="w-full h-full bg-[#0a0a0c] overflow-hidden">
+      <div ref={containerRef} className="w-full h-full bg-[#0a0a0c] overflow-hidden">
         <canvas ref={canvasRef} className="w-full h-full" />
       </div>
     );
   }
 
   return (
-    <div className="w-full h-full bg-[#0a0a0c] relative overflow-hidden">
+    <div ref={containerRef} className="w-full h-full bg-[#0a0a0c] relative overflow-hidden">
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-4 px-4 py-2 rounded-full bg-black/40 backdrop-blur-sm border border-white/5">
         <span className="text-[10px] text-text-secondary/60">
