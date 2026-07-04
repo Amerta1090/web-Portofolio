@@ -29,48 +29,59 @@ const experiments: Experiment[] = [
   {
     id: "image-sequence",
     title: "Image Sequence Scroll",
-    description: "Procedural frame-by-frame animation driven by scroll position. Each scroll tick generates a unique abstract frame.",
+    description: "Procedural frame-by-frame animation driven by scroll position.",
     longDescription:
-      "A scroll-driven animation engine that generates unique procedural art frames in real-time. Move through hundreds of frames by scrolling — each one mathematically distinct, creating a seamless video-like experience from pure code. No assets, all generative.",
+      "A scroll-driven animation engine that generates unique procedural art frames in real-time. Move through hundreds of frames by scrolling.",
     tags: ["Canvas", "Scroll-Driven", "Generative", "Procedural"],
     icon: <Image className="w-5 h-5" />,
     gradient: "from-amber-500 to-orange-600",
-    thumbnail: "/images/experiments/image-sequence.png",
+    thumbnail: "/images/experiments/image-sequence.svg",
   },
   {
     id: "particle-galaxy",
     title: "Particle Galaxy",
-    description: "Interactive particle system with gravitational attraction, constellation connections, and real-time mouse interaction.",
+    description: "Interactive particle system with gravitational attraction and constellation connections.",
     longDescription:
-      "A living galaxy of thousands of particles connected by glowing filaments. Move your mouse to bend the gravitational field, creating orbits and clusters. Particles pulse, fade, and reconnect in an eternal cosmic dance.",
+      "A living galaxy of thousands of particles connected by glowing filaments. Move your mouse to bend the gravitational field.",
     tags: ["Canvas", "Particles", "Interactive", "WebGL-like"],
     icon: <Sparkles className="w-5 h-5" />,
     gradient: "from-purple-500 to-cyan-500",
-    thumbnail: "/images/experiments/particle-galaxy.png",
+    thumbnail: "/images/experiments/particle-galaxy.svg",
   },
   {
     id: "text-scramble",
     title: "Text Scramble / Glitch",
-    description: "Cyberpunk text scrambler with multi-phrase cycling, glitch transitions, and retro terminal aesthetics.",
+    description: "Cyberpunk text scrambler with multi-phrase cycling and glitch transitions.",
     longDescription:
-      "A kinetic typography engine that scrambles and decodes text with authentic glitch artifacts. Cycle through profound quotes, watch characters cascade into place, and experience text as a living, unstable medium.",
+      "A kinetic typography engine that scrambles and decodes text with authentic glitch artifacts.",
     tags: ["Typography", "Glitch", "Cyberpunk", "Kinetic"],
     icon: <Zap className="w-5 h-5" />,
     gradient: "from-pink-500 to-violet-500",
-    thumbnail: "/images/experiments/text-scramble.png",
+    thumbnail: "/images/experiments/text-scramble.svg",
   },
   {
     id: "samsung-demo",
     title: "4K UHD Demo — Samsung LED TV",
-    description: "Scroll through 296 frames extracted from a 4K UHD Samsung demo video. Frame-by-frame playback with scrub control.",
+    description: "Scroll through 296 frames extracted from a 4K UHD Samsung demo video.",
     longDescription:
-      "A real video-to-frame-sequence showcase. 296 frames extracted from a Samsung 4K UHD LED TV demo video. Scroll or scrub through every frame with pixel-perfect precision. Pure image sequence — no video element, just sequential frames loaded as images.",
+      "A real video-to-frame-sequence showcase. 296 frames from a Samsung 4K UHD LED TV demo.",
     tags: ["4K", "Image Sequence", "Video", "Samsung"],
     icon: <Monitor className="w-5 h-5" />,
     gradient: "from-sky-500 to-indigo-600",
-    thumbnail: "/images/experiments/samsung-demo.png",
+    thumbnail: "/images/experiments/samsung-demo.svg",
   },
 ];
+
+function LivePreview({ id }: { id: string }) {
+  return (
+    <>
+      {id === "image-sequence" && <ImageSequenceScroll compact />}
+      {id === "particle-galaxy" && <ParticleGalaxy compact />}
+      {id === "text-scramble" && <TextScramble compact />}
+      {id === "samsung-demo" && <VideoSequenceScroll compact />}
+    </>
+  );
+}
 
 function ExperimentCard({
   exp,
@@ -82,6 +93,7 @@ function ExperimentCard({
   onLaunch: (id: string) => void;
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const [hovered, setHovered] = useState(false);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
   const handleMouseMove = useCallback(
@@ -96,7 +108,10 @@ function ExperimentCard({
     [],
   );
 
-  const handleMouseLeave = () => setTilt({ x: 0, y: 0 });
+  const handleMouseLeave = () => {
+    setTilt({ x: 0, y: 0 });
+    setHovered(false);
+  };
 
   return (
     <motion.div
@@ -106,6 +121,7 @@ function ExperimentCard({
       transition={{ delay: index * 0.1, duration: 0.5 }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onMouseEnter={() => setHovered(true)}
       style={{
         transform: `perspective(1000px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`,
       }}
@@ -114,16 +130,22 @@ function ExperimentCard({
       data-exp-id={exp.id}
     >
       <div className="h-48 bg-bg-tertiary overflow-hidden relative">
-        <img
-          src={exp.thumbnail}
-          alt={exp.title}
-          className="w-full h-full object-cover opacity-60 group-hover:opacity-90 transition-opacity duration-500"
-          loading="lazy"
-        />
+        {hovered ? (
+          <div className="absolute inset-0">
+            <LivePreview id={exp.id} />
+          </div>
+        ) : (
+          <img
+            src={exp.thumbnail}
+            alt={exp.title}
+            className="w-full h-full object-cover opacity-60 group-hover:opacity-0 transition-opacity duration-300"
+            loading="lazy"
+          />
+        )}
         <div
-          className={`absolute inset-0 bg-gradient-to-br ${exp.gradient} opacity-10 group-hover:opacity-0 transition-opacity duration-500`}
+          className={`absolute inset-0 bg-gradient-to-br ${exp.gradient} opacity-10 group-hover:opacity-0 transition-opacity duration-500 pointer-events-none`}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-bg-secondary/60 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-bg-secondary/60 via-transparent to-transparent pointer-events-none" />
       </div>
       <div className="p-6">
         <div className="flex flex-wrap gap-1.5 mb-3">

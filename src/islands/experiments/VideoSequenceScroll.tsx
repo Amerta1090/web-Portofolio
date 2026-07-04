@@ -11,12 +11,13 @@ function framePath(n: number): string {
   return `${FRAME_BASE}${padded}${FRAME_EXT}`;
 }
 
-export default function VideoSequenceScroll() {
+export default function VideoSequenceScroll({ compact }: { compact?: boolean }) {
   const [frame, setFrame] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [progress, setProgress] = useState(0);
   const imagesRef = useRef<HTMLImageElement[]>([]);
   const wheelAccumRef = useRef(0);
+  const preloadedRef = useRef(false);
 
   const frameIndexes = useMemo(
     () => Array.from({ length: TOTAL_FRAMES }, (_, i) => i),
@@ -37,6 +38,17 @@ export default function VideoSequenceScroll() {
   );
 
   useEffect(() => {
+    if (compact) {
+      const img = new Image();
+      img.onload = () => setLoaded(true);
+      img.onerror = () => setLoaded(true);
+      img.src = framePath(0);
+      return () => { img.src = ""; };
+    }
+
+    if (preloadedRef.current) return;
+    preloadedRef.current = true;
+
     let loadedCount = 0;
     const imgs: HTMLImageElement[] = [];
 
@@ -57,11 +69,9 @@ export default function VideoSequenceScroll() {
     imagesRef.current = imgs;
 
     return () => {
-      imgs.forEach((img) => {
-        img.src = "";
-      });
+      imgs.forEach((img) => { img.src = ""; });
     };
-  }, [frameIndexes]);
+  }, [frameIndexes, compact]);
 
   const wheelHandlerRef = useRef<(e: WheelEvent) => void>();
 
@@ -84,12 +94,13 @@ export default function VideoSequenceScroll() {
   );
 
   useEffect(() => {
+    if (compact) return;
     const handler = (e: WheelEvent) => wheelHandlerRef.current?.(e);
     const container = document.querySelector('[data-seq-container]');
     if (!container) return;
     container.addEventListener("wheel", handler, { passive: false });
     return () => container.removeEventListener("wheel", handler);
-  }, []);
+  }, [compact]);
 
   const handleScrub = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -107,6 +118,26 @@ export default function VideoSequenceScroll() {
     },
     [handleScrub],
   );
+
+  if (compact) {
+    return (
+      <div className="w-full h-full bg-black overflow-hidden flex items-center justify-center relative">
+        {loaded ? (
+          <img
+            src={framePath(0)}
+            alt="Preview"
+            className="w-full h-full object-cover"
+            draggable={false}
+          />
+        ) : (
+          <div className="w-full h-full bg-bg-tertiary flex items-center justify-center">
+            <div className="w-5 h-5 border-2 border-amber-500/50 border-t-transparent rounded-full animate-spin" />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-full flex flex-col bg-black select-none">

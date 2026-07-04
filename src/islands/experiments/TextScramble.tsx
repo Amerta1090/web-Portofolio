@@ -19,21 +19,23 @@ function randomChar() {
   return CHARS[Math.floor(Math.random() * CHARS.length)];
 }
 
-export default function TextScramble() {
+export default function TextScramble({ compact }: { compact?: boolean }) {
   const [currentPhrase, setCurrentPhrase] = useState(0);
   const [displayText, setDisplayText] = useState(PHRASES[0]);
   const [isGlitching, setIsGlitching] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval>>();
   const containerRef = useRef<HTMLDivElement>(null);
+  const mountedRef = useRef(true);
 
   const scramble = useCallback((target: string) => {
     setIsGlitching(true);
     const length = target.length;
     let frame = 0;
-    const totalFrames = 40;
+    const totalFrames = compact ? 16 : 40;
 
     clearInterval(intervalRef.current);
     intervalRef.current = setInterval(() => {
+      if (!mountedRef.current) return;
       frame++;
       const progress = frame / totalFrames;
       const revealCount = Math.floor(progress * length);
@@ -54,8 +56,8 @@ export default function TextScramble() {
       } else {
         setDisplayText(result);
       }
-    }, 40);
-  }, []);
+    }, compact ? 80 : 40);
+  }, [compact]);
 
   const nextPhrase = useCallback(() => {
     const next = (currentPhrase + 1) % PHRASES.length;
@@ -64,6 +66,24 @@ export default function TextScramble() {
   }, [currentPhrase, scramble]);
 
   useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
+
+  useEffect(() => {
+    if (!compact) return;
+
+    nextPhrase();
+    const autoTimer = setInterval(nextPhrase, 3000);
+    return () => {
+      clearInterval(autoTimer);
+      clearInterval(intervalRef.current);
+    };
+  }, [nextPhrase, compact]);
+
+  useEffect(() => {
+    if (compact) return;
+
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === " " || e.key === "Enter") {
         e.preventDefault();
@@ -71,12 +91,42 @@ export default function TextScramble() {
       }
     };
     window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, [nextPhrase]);
+    return () => {
+      window.removeEventListener("keydown", handleKey);
+      clearInterval(intervalRef.current);
+    };
+  }, [nextPhrase, compact]);
 
-  useEffect(() => {
-    return () => clearInterval(intervalRef.current);
-  }, []);
+  if (compact) {
+    return (
+      <div
+        ref={containerRef}
+        className="w-full h-full bg-[#0a0a0c] flex items-center justify-center select-none overflow-hidden"
+      >
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
+          <div
+            className="w-full h-full"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 3px)",
+            }}
+          />
+        </div>
+        <span
+          className={`text-lg font-black tracking-tight leading-none font-mono text-center px-4 ${
+            isGlitching
+              ? "text-amber-400 [text-shadow:1px_0_#ff0080,-1px_0_#00e5ff,0_0_10px_rgba(245,158,11,0.3)]"
+              : "text-text-primary"
+          }`}
+          style={{
+            fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+          }}
+        >
+          {displayText}
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div

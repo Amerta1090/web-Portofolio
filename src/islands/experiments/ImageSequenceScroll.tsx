@@ -15,9 +15,11 @@ function drawFrame(
   height: number,
   frame: number,
   time: number,
+  compact?: boolean,
 ) {
   const palette = PALETTES[Math.floor(frame / (TOTAL_FRAMES / PALETTES.length)) % PALETTES.length];
   const progress = frame / TOTAL_FRAMES;
+  const count = compact ? 24 : 80;
 
   ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = "#0a0a0c";
@@ -27,8 +29,8 @@ function drawFrame(
   const cy = height / 2;
   const maxR = Math.min(width, height) * 0.45;
 
-  for (let i = 0; i < 80; i++) {
-    const angle = (i / 80) * Math.PI * 2 + progress * Math.PI * 4 + time * 0.3;
+  for (let i = 0; i < count; i++) {
+    const angle = (i / count) * Math.PI * 2 + progress * Math.PI * 4 + time * 0.3;
     const radius =
       maxR * (0.2 + 0.8 * Math.sin(i * 0.5 + progress * Math.PI * 3 + time));
     const x = cx + Math.cos(angle) * radius;
@@ -45,35 +47,40 @@ function drawFrame(
     ctx.fill();
   }
 
-  for (let r = 0; r < 8; r++) {
-    const ringProgress = (r / 8 + progress) % 1;
-    const ringRadius = maxR * (0.1 + 0.9 * ringProgress);
-    const alpha = 0.05 + 0.2 * Math.sin(ringProgress * Math.PI);
-    const hue = (frame * 1.5 + r * 45) % 360;
+  if (!compact) {
+    for (let r = 0; r < 8; r++) {
+      const ringProgress = (r / 8 + progress) % 1;
+      const ringRadius = maxR * (0.1 + 0.9 * ringProgress);
+      const alpha = 0.05 + 0.2 * Math.sin(ringProgress * Math.PI);
+      const hue = (frame * 1.5 + r * 45) % 360;
 
-    ctx.beginPath();
-    ctx.arc(cx, cy, ringRadius, 0, Math.PI * 2);
-    ctx.strokeStyle = `hsla(${hue}, 80%, 60%, ${alpha})`;
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(cx, cy, ringRadius, 0, Math.PI * 2);
+      ctx.strokeStyle = `hsla(${hue}, 80%, 60%, ${alpha})`;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+
+    const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR * 0.6);
+    glow.addColorStop(0, `hsla(${frame * 2 % 360}, 80%, 60%, 0.04)`);
+    glow.addColorStop(1, `hsla(${frame * 2 % 360}, 80%, 60%, 0)`);
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, width, height);
   }
-
-  const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR * 0.6);
-  glow.addColorStop(0, `hsla(${frame * 2 % 360}, 80%, 60%, 0.04)`);
-  glow.addColorStop(1, `hsla(${frame * 2 % 360}, 80%, 60%, 0)`);
-  ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, width, height);
 }
 
-export default function ImageSequenceScroll() {
+export default function ImageSequenceScroll({ compact }: { compact?: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [frame, setFrame] = useState(0);
   const [progress, setProgress] = useState(0);
   const rafRef = useRef<number>(0);
   const timeRef = useRef(0);
+  const frameRef = useRef(0);
   const wheelAccumRef = useRef(0);
   const wheelHandlerRef = useRef<(e: WheelEvent) => void>();
+  const autoRef = useRef<ReturnType<typeof setInterval>>();
+  const runningRef = useRef(true);
 
   wheelHandlerRef.current = (e: WheelEvent) => {
     e.preventDefault();
@@ -97,7 +104,7 @@ export default function ImageSequenceScroll() {
 
     const resize = () => {
       const rect = container.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = compact ? 1 : (window.devicePixelRatio || 1);
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
       canvas.style.width = `${rect.width}px`;
@@ -109,29 +116,60 @@ export default function ImageSequenceScroll() {
     resize();
     window.addEventListener("resize", resize);
 
-    const handler = (e: WheelEvent) => wheelHandlerRef.current?.(e);
-    container.addEventListener("wheel", handler, { passive: false });
+    if (!compact) {
+      const handler = (e: WheelEvent) => wheelHandlerRef.current?.(e);
+      container.addEventListener("wheel", handler, { passive: false });
+      const cleanup = () => {
+        container.removeEventListener("wheel", handler);
+      };
+      return () => {
+        cleanup();
+        window.removeEventListener("resize", resize);
+        cancelAnimationFrame(rafRef.current);
+      };
+    } else {
+      frameRef.current = 0;
+      autoRef.current = setInterval(() => {
+        if (!runningRef.current) return;
+        setFrame((prev) => {
+          const next = (prev + 1) % TOTAL_FRAMES;
+          frameRef.current = next;
+          setProgress(next / (TOTAL_FRAMES - 1));
+          return next;
+        });
+      }, 100);
+    }
 
+    let skipCounter = 0;
     const loop = () => {
+      if (!runningRef.current) {
+        rafRef.current = requestAnimationFrame(loop);
+        return;
+      }
       timeRef.current += 0.016;
-      const ctx = canvas.getContext("2d")!;
-      const rect = container.getBoundingClientRect();
-      drawFrame(ctx, rect.width, rect.height, frame, timeRef.current);
+      skipCounter++;
+      if (!compact || skipCounter % 3 === 0) {
+        const ctx = canvas.getContext("2d")!;
+        const rect = container.getBoundingClientRect();
+        drawFrame(ctx, rect.width, rect.height, frameRef.current, timeRef.current, compact);
+      }
       rafRef.current = requestAnimationFrame(loop);
     };
 
     rafRef.current = requestAnimationFrame(loop);
 
     return () => {
+      runningRef.current = false;
       window.removeEventListener("resize", resize);
-      container.removeEventListener("wheel", handler);
       cancelAnimationFrame(rafRef.current);
+      if (autoRef.current) clearInterval(autoRef.current);
     };
-  }, [frame]);
+  }, [compact]);
 
   const goToFrame = useCallback((f: number) => {
     const clamped = Math.max(0, Math.min(TOTAL_FRAMES - 1, f));
     setFrame(clamped);
+    frameRef.current = clamped;
     setProgress(clamped / (TOTAL_FRAMES - 1));
   }, []);
 
@@ -149,16 +187,18 @@ export default function ImageSequenceScroll() {
     [goToFrame],
   );
 
+  if (compact) {
+    return (
+      <div ref={containerRef} className="w-full h-full bg-[#0a0a0c] overflow-hidden">
+        <canvas ref={canvasRef} className="w-full h-full" />
+      </div>
+    );
+  }
+
   return (
     <div className="w-full h-full flex flex-col bg-[#0a0a0c] select-none">
-      <div
-        ref={containerRef}
-        className="flex-1 relative overflow-hidden"
-      >
-        <canvas
-          ref={canvasRef}
-          className="absolute inset-0 w-full h-full"
-        />
+      <div ref={containerRef} className="flex-1 relative overflow-hidden">
+        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
         <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
       </div>
 
