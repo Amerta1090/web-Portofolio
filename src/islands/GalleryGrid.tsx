@@ -22,6 +22,7 @@ interface Experiment {
   tags: string[];
   icon: React.ReactNode;
   gradient: string;
+  thumbnail: string;
 }
 
 const experiments: Experiment[] = [
@@ -34,6 +35,7 @@ const experiments: Experiment[] = [
     tags: ["Canvas", "Scroll-Driven", "Generative", "Procedural"],
     icon: <Image className="w-5 h-5" />,
     gradient: "from-amber-500 to-orange-600",
+    thumbnail: "/images/experiments/image-sequence.png",
   },
   {
     id: "particle-galaxy",
@@ -44,6 +46,7 @@ const experiments: Experiment[] = [
     tags: ["Canvas", "Particles", "Interactive", "WebGL-like"],
     icon: <Sparkles className="w-5 h-5" />,
     gradient: "from-purple-500 to-cyan-500",
+    thumbnail: "/images/experiments/particle-galaxy.png",
   },
   {
     id: "text-scramble",
@@ -54,6 +57,7 @@ const experiments: Experiment[] = [
     tags: ["Typography", "Glitch", "Cyberpunk", "Kinetic"],
     icon: <Zap className="w-5 h-5" />,
     gradient: "from-pink-500 to-violet-500",
+    thumbnail: "/images/experiments/text-scramble.png",
   },
   {
     id: "samsung-demo",
@@ -64,6 +68,7 @@ const experiments: Experiment[] = [
     tags: ["4K", "Image Sequence", "Video", "Samsung"],
     icon: <Monitor className="w-5 h-5" />,
     gradient: "from-sky-500 to-indigo-600",
+    thumbnail: "/images/experiments/samsung-demo.png",
   },
 ];
 
@@ -106,15 +111,19 @@ function ExperimentCard({
       }}
       className="group relative bg-bg-secondary/50 backdrop-blur-sm border border-border/60 rounded-2xl overflow-hidden hover:border-amber-500/30 transition-all duration-300 cursor-pointer"
       onClick={() => onLaunch(exp.id)}
+      data-exp-id={exp.id}
     >
-      <div
-        className={`h-48 bg-gradient-to-br ${exp.gradient} opacity-20 group-hover:opacity-30 transition-opacity duration-500 flex items-center justify-center overflow-hidden`}
-      >
+      <div className="h-48 bg-bg-tertiary overflow-hidden relative">
+        <img
+          src={exp.thumbnail}
+          alt={exp.title}
+          className="w-full h-full object-cover opacity-60 group-hover:opacity-90 transition-opacity duration-500"
+          loading="lazy"
+        />
         <div
-          className={`w-24 h-24 rounded-2xl bg-gradient-to-br ${exp.gradient} flex items-center justify-center text-white opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500`}
-        >
-          {exp.icon}
-        </div>
+          className={`absolute inset-0 bg-gradient-to-br ${exp.gradient} opacity-10 group-hover:opacity-0 transition-opacity duration-500`}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-bg-secondary/60 via-transparent to-transparent" />
       </div>
       <div className="p-6">
         <div className="flex flex-wrap gap-1.5 mb-3">
@@ -219,7 +228,7 @@ function ExperimentModal({
               </button>
             </div>
 
-            <div className="relative w-full" style={{ height: "calc(90vh - 73px)" }}>
+            <div className="relative w-full" style={{ height: "calc(90vh - 73px)" }} data-modal-content>
               {experiment.id === "image-sequence" && <ImageSequenceScroll />}
               {experiment.id === "particle-galaxy" && <ParticleGalaxy />}
               {experiment.id === "text-scramble" && <TextScramble />}

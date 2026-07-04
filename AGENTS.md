@@ -14,7 +14,7 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 - Epic 7 (Top Repos): ✅ COMPLETE
 - Epic 8 (Integration): ✅ COMPLETE
 - Epic 9 (Polish/QA): ✅ COMPLETE
-- Epic 10 (Creative Lab): 🔄 IN PROGRESS
+- Sprint 1 (Creative Lab Foundation): 🔄 IN PROGRESS
 
 ## Architecture
 - **Rendering**: SSG. No runtime API calls. GitHub data fetched at build time.
@@ -132,8 +132,9 @@ index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skil
 - `src/pages/github.astro` — redesigned as expanded full-page GitHub Universe
 - Deleted removal candidates: `GitHubShowcase.astro`, `LanguageDonut.tsx`, `CommitHeatmap.tsx`, `ContributionGraph.tsx`
 
-### Epic 10 (Creative Lab) 🔄
+### Sprint 1 (Creative Lab Foundation) 🔄
 - **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md` — 10 epics, ~60 stories (Liquid Distortion, Audio Viz, Fractal Explorer, etc.)
+- **Current focus**: Epic 1 (Foundation Shell) + Epic 2 (Image Sequence Scroll Engine)
 - **Gallery page**: `src/pages/gallery.astro` — experimental UI playground at `/gallery`
 - **Game menu**: Gallery link updated from `/projects` → `/gallery`
 - **GalleryGrid**: `src/islands/GalleryGrid.tsx` — tilt-card grid + full-screen modal orchestrator
