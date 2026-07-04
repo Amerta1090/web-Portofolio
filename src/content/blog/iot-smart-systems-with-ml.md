@@ -3,7 +3,7 @@ title: "Building Intelligent IoT Systems with Edge Machine Learning"
 description: "How to combine IoT sensor networks with edge ML inference for real-time, low-latency intelligent systems. Covers architecture patterns and practical implementation."
 date: 2026-04-20
 tags: ["IoT", "Edge AI", "Embedded Systems", "Python"]
-image: "/og-image.png"
+image: "/images/blog/iot-edge-ml.svg"
 imageAlt: "IoT Edge ML Architecture"
 ---
 

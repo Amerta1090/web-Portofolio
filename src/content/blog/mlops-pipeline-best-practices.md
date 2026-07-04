@@ -3,7 +3,7 @@ title: "MLOps Pipeline Best Practices: A Practical Guide"
 description: "Practical guidelines for building maintainable MLOps pipelines, from CI/CD for ML models to automated retraining workflows."
 date: 2026-06-01
 tags: ["MLOps", "DevOps", "Automation", "CI/CD"]
-image: "/og-image.png"
+image: "/images/blog/mlops-pipeline.svg"
 imageAlt: "MLOps Pipeline Workflow"
 series: "Production ML"
 seriesOrder: 2

@@ -3,7 +3,7 @@ title: "Building Production ML Systems: From Sensor to Deployment"
 description: "A deep dive into the architecture and decisions behind deploying machine learning models in production environments, covering the full pipeline from data collection to monitoring."
 date: 2026-05-15
 tags: ["MLOps", "Machine Learning", "DevOps", "Python"]
-image: "/og-image.png"
+image: "/images/blog/production-ml.svg"
 imageAlt: "ML Pipeline Architecture Diagram"
 series: "Production ML"
 seriesOrder: 1

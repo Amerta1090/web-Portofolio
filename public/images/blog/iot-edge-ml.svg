@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="accent1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="accent2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <linearGradient id="grid" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.03"/>
+      <stop offset="50%" stop-color="#f59e0b" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.03"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="600" fill="url(#bg)"/>
+  <g opacity="0.03">
+    <pattern id="dots" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#f59e0b"/>
+    </pattern>
+    <rect width="1200" height="600" fill="url(#dots)"/>
+  </g>
+  <rect x="0" y="0" width="1200" height="4" fill="url(#accent1)"/>
+  <rect x="0" y="596" width="1200" height="4" fill="url(#accent1)"/>
+  <g transform="translate(80, 60)">
+    <rect x="0" y="0" width="480" height="480" rx="16" fill="rgba(245,158,11,0.04)" stroke="rgba(245,158,11,0.08)" stroke-width="1"/>
+    <g transform="translate(40, 40)">
+      <circle cx="200" cy="200" r="120" fill="none" stroke="rgba(245,158,11,0.1)" stroke-width="2"/>
+      <circle cx="200" cy="200" r="80" fill="none" stroke="rgba(245,158,11,0.15)" stroke-width="1.5"/>
+      <circle cx="200" cy="200" r="40" fill="rgba(245,158,11,0.1)"/>
+      <circle cx="200" cy="200" r="8" fill="#f59e0b"/>
+      <g stroke="rgba(245,158,11,0.2)" stroke-width="1.5" fill="none">
+        <circle cx="320" cy="120" r="12" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)"/>
+        <circle cx="80" cy="120" r="12" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)"/>
+        <circle cx="80" cy="340" r="12" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)"/>
+        <circle cx="320" cy="340" r="12" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)"/>
+        <circle cx="360" cy="240" r="10" fill="rgba(16,185,129,0.15)" stroke="rgba(16,185,129,0.3)"/>
+        <circle cx="40" cy="240" r="10" fill="rgba(16,185,129,0.15)" stroke="rgba(16,185,129,0.3)"/>
+        <circle cx="240" cy="60" r="10" fill="rgba(16,185,129,0.15)" stroke="rgba(16,185,129,0.3)"/>
+        <circle cx="240" cy="380" r="10" fill="rgba(16,185,129,0.15)" stroke="rgba(16,185,129,0.3)"/>
+      </g>
+      <g stroke="rgba(245,158,11,0.15)" stroke-width="1">
+        <line x1="200" y1="80" x2="200" y2="60"/>
+        <line x1="200" y1="320" x2="200" y2="380"/>
+        <line x1="80" y1="200" x2="40" y2="200"/>
+        <line x1="320" y1="200" x2="360" y2="200"/>
+        <line x1="115" y1="115" x2="80" y2="80"/>
+        <line x1="285" y1="115" x2="320" y2="80"/>
+        <line x1="115" y1="285" x2="80" y2="340"/>
+        <line x1="285" y1="285" x2="320" y2="340"/>
+      </g>
+      <g fill="#f59e0b" opacity="0.4">
+        <circle cx="215" cy="95" r="2"/>
+        <circle cx="180" cy="85" r="1.5"/>
+        <circle cx="95" cy="215" r="2"/>
+        <circle cx="85" cy="180" r="1.5"/>
+        <circle cx="305" cy="185" r="2"/>
+        <circle cx="315" cy="215" r="1.5"/>
+        <circle cx="185" cy="315" r="2"/>
+        <circle cx="215" cy="305" r="1.5"/>
+      </g>
+    </g>
+  </g>
+  <g transform="translate(600, 60)">
+    <span class="px-3 py-1 text-xs font-medium rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 inline-block" style="margin-bottom: 16px;">IoT · Edge AI · Embedded Systems</span>
+    <text y="60" font-size="36" font-family="Inter, system-ui, sans-serif" font-weight="700" fill="#f1f5f9">
+      Building Intelligent
+    </text>
+    <text y="108" font-size="36" font-family="Inter, system-ui, sans-serif" font-weight="700" fill="#f1f5f9">
+      IoT Systems with
+    </text>
+    <text y="156" font-size="36" font-family="Inter, system-ui, sans-serif" font-weight="700" fill="#f59e0b">
+      Edge Machine Learning
+    </text>
+    <text y="200" font-size="16" font-family="Inter, system-ui, sans-serif" fill="#94a3b8">
+      How to combine IoT sensor networks with edge ML inference
+    </text>
+    <text y="224" font-size="16" font-family="Inter, system-ui, sans-serif" fill="#94a3b8">
+      for real-time, low-latency intelligent systems.
+    </text>
+    <g transform="translate(0, 260)">
+      <rect x="0" y="0" width="460" height="1" fill="rgba(245,158,11,0.1)"/>
+      <text y="28" font-size="13" font-family="Inter, system-ui, sans-serif" fill="#64748b">
+        <tspan fill="#f59e0b">●</tspan>  Abdul Majid Ridwan T.  <tspan fill="#475569">|</tspan>  April 20, 2026  <tspan fill="#475569">|</tspan>  5 min read
+      </text>
+    </g>
+  </g>
+</svg>

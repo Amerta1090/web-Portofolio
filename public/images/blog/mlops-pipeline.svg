@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="accent1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="stage" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(245,158,11,0.12)"/>
+      <stop offset="100%" stop-color="rgba(245,158,11,0.04)"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="600" fill="url(#bg)"/>
+  <g opacity="0.03">
+    <pattern id="dots" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#f59e0b"/>
+    </pattern>
+    <rect width="1200" height="600" fill="url(#dots)"/>
+  </g>
+  <rect x="0" y="0" width="1200" height="4" fill="url(#accent1)"/>
+  <rect x="0" y="596" width="1200" height="4" fill="url(#accent1)"/>
+  <g transform="translate(80, 60)">
+    <rect x="0" y="0" width="480" height="480" rx="16" fill="rgba(16,185,129,0.04)" stroke="rgba(16,185,129,0.08)" stroke-width="1"/>
+    <g transform="translate(30, 30)">
+      <rect x="0" y="0" width="420" height="420" rx="12" fill="rgba(15,23,42,0.5)"/>
+      <g stroke-width="1" fill="none">
+        <rect x="10" y="10" width="90" height="60" rx="6" fill="rgba(59,130,246,0.08)" stroke="rgba(59,130,246,0.2)"/>
+        <text x="22" y="45" font-size="8" font-family="Inter, sans-serif" fill="#60a5fa" font-weight="600">VALIDATE</text>
+        <rect x="115" y="10" width="90" height="60" rx="6" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.2)"/>
+        <text x="128" y="45" font-size="8" font-family="Inter, sans-serif" fill="#a78bfa" font-weight="600">TRAIN</text>
+        <rect x="220" y="10" width="90" height="60" rx="6" fill="rgba(245,158,11,0.08)" stroke="rgba(245,158,11,0.2)"/>
+        <text x="236" y="45" font-size="8" font-family="Inter, sans-serif" fill="#fbbf24" font-weight="600">EVALUATE</text>
+        <rect x="325" y="10" width="85" height="60" rx="6" fill="rgba(236,72,153,0.08)" stroke="rgba(236,72,153,0.2)"/>
+        <text x="336" y="45" font-size="8" font-family="Inter, sans-serif" fill="#f472b6" font-weight="600">PACKAGE</text>
+
+        <rect x="115" y="90" width="200" height="50" rx="6" fill="rgba(16,185,129,0.08)" stroke="rgba(16,185,129,0.2)"/>
+        <text x="190" y="120" font-size="8" font-family="Inter, sans-serif" fill="#34d399" font-weight="600" text-anchor="middle">DEPLOY</text>
+
+        <rect x="10" y="170" width="400" height="40" rx="6" fill="rgba(245,158,11,0.03)" stroke="rgba(245,158,11,0.06)" stroke-dasharray="4,3"/>
+        <text x="210" y="194" font-size="8" font-family="Inter, sans-serif" fill="#64748b" text-anchor="middle">CI/CD Pipeline (Automated)</text>
+      </g>
+      <g stroke="rgba(245,158,11,0.12)" stroke-width="1">
+        <line x1="100" y1="40" x2="115" y2="40"/>
+        <line x1="205" y1="40" x2="220" y2="40"/>
+        <line x1="310" y1="40" x2="325" y2="40"/>
+        <line x1="215" y1="70" x2="215" y2="90"/>
+      </g>
+      <g fill="rgba(245,158,11,0.3)">
+        <polygon points="100,43 97,37 103,37"/>
+        <polygon points="205,43 202,37 208,37"/>
+        <polygon points="310,43 307,37 313,37"/>
+        <polygon points="215,93 212,87 218,87"/>
+      </g>
+      <g transform="translate(0, 240)">
+        <rect x="0" y="0" width="420" height="160" rx="8" fill="rgba(30,41,59,0.5)"/>
+        <rect x="0" y="0" width="420" height="28" rx="8" fill="rgba(245,158,11,0.06)"/>
+        <text x="12" y="19" font-size="10" font-family="Inter, sans-serif" fill="#f59e0b" font-weight="600">MONITORING &amp; OBSERVABILITY</text>
+        <text x="12" y="54" font-size="9" font-family="Inter, sans-serif" fill="#94a3b8">• Data drift detection</text>
+        <text x="12" y="74" font-size="9" font-family="Inter, sans-serif" fill="#94a3b8">• Model performance tracking</text>
+        <text x="12" y="94" font-size="9" font-family="Inter, sans-serif" fill="#94a3b8">• Automated retraining triggers</text>
+        <text x="12" y="114" font-size="9" font-family="Inter, sans-serif" fill="#94a3b8">• Alert &amp; incident response</text>
+        <line x1="12" y1="130" x2="408" y2="130" stroke="rgba(245,158,11,0.06)" stroke-width="1"/>
+        <text x="12" y="148" font-size="9" font-family="Inter, sans-serif" fill="#64748b">Loop → Retrain on drift</text>
+        <path d="M380 148 Q390 136 400 148" fill="none" stroke="rgba(245,158,11,0.2)" stroke-width="1"/>
+      </g>
+    </g>
+  </g>
+  <g transform="translate(600, 60)">
+    <span class="px-3 py-1 text-xs font-medium rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 inline-block" style="margin-bottom: 16px;">MLOps · DevOps · Automation · CI/CD</span>
+    <text y="60" font-size="36" font-family="Inter, system-ui, sans-serif" font-weight="700" fill="#f1f5f9">
+      MLOps Pipeline
+    </text>
+    <text y="108" font-size="36" font-family="Inter, system-ui, sans-serif" font-weight="700" fill="#34d399">
+      Best Practices:
+    </text>
+    <text y="156" font-size="36" font-family="Inter, system-ui, sans-serif" font-weight="700" fill="#f1f5f9">
+      A Practical Guide
+    </text>
+    <text y="200" font-size="16" font-family="Inter, system-ui, sans-serif" fill="#94a3b8">
+      Practical guidelines for building maintainable MLOps
+    </text>
+    <text y="224" font-size="16" font-family="Inter, system-ui, sans-serif" fill="#94a3b8">
+      pipelines, from CI/CD to automated retraining workflows.
+    </text>
+    <g transform="translate(0, 260)">
+      <rect x="0" y="0" width="460" height="1" fill="rgba(16,185,129,0.1)"/>
+      <text y="28" font-size="13" font-family="Inter, system-ui, sans-serif" fill="#64748b">
+        <tspan fill="#34d399">●</tspan>  Abdul Majid Ridwan T.  <tspan fill="#475569">|</tspan>  June 1, 2026  <tspan fill="#475569">|</tspan>  7 min read
+      </text>
+    </g>
+  </g>
+</svg>
