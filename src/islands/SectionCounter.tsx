@@ -3,6 +3,7 @@ import { useSectionInView } from "../lib/useSectionInView";
 const SECTION_IDS = [
   "about",
   "experience",
+  "journey",
   "projects",
   "creative-lab",
   "skills",
