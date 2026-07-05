@@ -40,4 +40,20 @@ export const experiments: ExperimentMeta[] = [
     gradient: "from-sky-500 to-indigo-600",
     thumbnail: "/images/experiments/watch-demo.svg",
   },
+  {
+    id: "liquid-distortion",
+    title: "Liquid Distortion",
+    description: "Real-time fluid simulation with mouse-driven distortion, vortices, and color dye injection.",
+    tags: ["Canvas", "Fluid Simulation", "Interactive", "Physics"],
+    gradient: "from-cyan-500 to-teal-500",
+    thumbnail: "/images/experiments/liquid-distortion.svg",
+  },
+  {
+    id: "depth-playground",
+    title: "3D Parallax Depth Playground",
+    description: "Multi-layer parallax scene with depth-of-field, focus controls, and device orientation support.",
+    tags: ["Canvas", "Parallax", "Depth", "Interactive"],
+    gradient: "from-amber-500 to-rose-500",
+    thumbnail: "/images/experiments/depth-playground.svg",
+  },
 ];

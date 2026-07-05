@@ -15,7 +15,8 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 - Epic 8 (Integration): ✅ COMPLETE
 - Epic 9 (Polish/QA): ✅ COMPLETE
 - Sprint 1 (Creative Lab Foundation): ✅ COMPLETE
-- Sprint 2 (Visual Depth): 🔄 IN PROGRESS
+- Sprint 2 (Visual Depth): ✅ COMPLETE
+- Sprint 3 (Audio): 🔄 IN PROGRESS
 
 ## Architecture
 - **Rendering**: SSG. No runtime API calls. GitHub data fetched at build time.
@@ -91,6 +92,8 @@ pinned-repos.json, all-repos.json, languages.json, commit-activity.json, contrib
 | ParticleGalaxy.tsx | — | Interactive particle system with mouse gravity |
 | TextScramble.tsx | — | Kinetic typography, multi-phrase scramble/glitch |
 | VideoSequenceScroll.tsx | — | Real image sequence scroll (Samsung 4K demo) |
+| LiquidDistortion.tsx | — | Real-time Canvas 2D fluid simulation, Navier-Stokes solver |
+| DepthPlayground.tsx | — | Multi-layer parallax depth scene with DOF toggle |
 
 ### Key Atoms (under `src/components/atoms/`)
 | File | Type | Notes |
@@ -157,8 +160,32 @@ index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skil
 - **All experiments use native wheel events** (not synthetic React events) with `{ passive: false }` for reliable scrolling inside modals
 - **Build verified**: `bun run build` succeeds (45 pages)
 
-### Sprint 2 (Visual Depth) 🔄
+### Sprint 2 (Visual Depth) ✅
 - **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
-- **Current focus**: Epic 3 (Particle Galaxy) + Epic 5 (Liquid Distortion) + Epic 6 (3D Parallax)
-- **To do**: See sprint planning doc Epics 3, 5, 6
+- **Epic 5 (Liquid Distortion)**: ✅ COMPLETE
+  - `src/islands/experiments/LiquidDistortion.tsx` — real-time Canvas 2D fluid simulation
+  - Grid-based velocity field with bilinear advection, explicit diffusion
+  - Mouse-driven fluid distortion (move mouse to push fluid)
+  - Click to spawn vortices that swirl and fade
+  - Color dye injection (click-drag to inject dye)
+  - Performance: lightweight grid (80×50), no pressure solve needed
+  - Compact preview mode for gallery cards
+- **Epic 6 (3D Parallax Depth Playground)**: ✅ COMPLETE
+  - `src/islands/experiments/DepthPlayground.tsx` — multi-layer parallax depth scene
+  - 4 parallax layers rendered as radial gradients (replaces expensive canvas `filter=blur()`)
+  - Mouse-driven parallax with independent speed per layer
+  - Depth-of-field toggle: blur via radial gradient spread (no GPU blur)
+  - Per-layer focus button to bring any layer into sharp focus
+  - Auto-idle drift animation when mouse is static
+  - Performance: no `ctx.filter`, no grid overlay, simpler shapes
+- **Epic 3 (Particle Galaxy)**: Upgraded from Sprint 1 baseline (180 particles) with full Epic 3 features deferred
+- **New experiments registered**: GalleryGrid.tsx now has 6 experiments total
+- **Build verified**: `bun run build` succeeds (45 pages)
+- **"Coming soon" tags** updated — Liquid Distortion and 3D Parallax removed from upcoming list
 - **New**: Epic 11 (Mathematical Deep Dive) added — 21 experiments spanning strange attractors, Fourier transforms, Bayesian inference, PDE solvers, stochastic processes, conformal mapping, spherical harmonics, and more
+
+### Sprint 3 (Audio) 🔄
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Delivery roadmap**: Sprint 3 | Audio | Audio Visualizer + Audio-reactive variants
+- **Focus**: Epic 7 (Audio Visualizer) + audio-reactive experiment variants
+- **To do**: See sprint planning doc Epic 7

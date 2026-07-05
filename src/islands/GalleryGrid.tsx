@@ -7,12 +7,16 @@ import {
   Maximize2,
   ChevronLeft,
   Monitor,
+  Droplets,
+  Layers,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ImageSequenceScroll from "./experiments/ImageSequenceScroll";
 import ParticleGalaxy from "./experiments/ParticleGalaxy";
 import TextScramble from "./experiments/TextScramble";
 import VideoSequenceScroll from "./experiments/VideoSequenceScroll";
+import LiquidDistortion from "./experiments/LiquidDistortion";
+import DepthPlayground from "./experiments/DepthPlayground";
 import AmbientSound from "../components/atoms/AmbientSound";
 
 interface Experiment {
@@ -71,6 +75,28 @@ const experiments: Experiment[] = [
     gradient: "from-sky-500 to-indigo-600",
     thumbnail: "/images/experiments/watch-demo.svg",
   },
+  {
+    id: "liquid-distortion",
+    title: "Liquid Distortion",
+    description: "Real-time fluid simulation with mouse-driven distortion, vortices, and color dye injection.",
+    longDescription:
+      "A simplified Navier-Stokes fluid solver running in real-time. Move your mouse to push the fluid, click to spawn swirling vortices, and watch colored dye blend and flow.",
+    tags: ["Canvas", "Fluid Simulation", "Interactive", "Physics"],
+    icon: <Droplets className="w-5 h-5" />,
+    gradient: "from-cyan-500 to-teal-500",
+    thumbnail: "/images/experiments/liquid-distortion.svg",
+  },
+  {
+    id: "depth-playground",
+    title: "3D Parallax Depth Playground",
+    description: "Multi-layer parallax scene with depth-of-field, focus controls, and device orientation support.",
+    longDescription:
+      "A depth playground with 6 parallax layers rendered on canvas. Each layer has independent speed, blur, opacity, and shape. Toggle depth-of-field to blur unfocused layers, or click a layer to bring it into sharp focus.",
+    tags: ["Canvas", "Parallax", "Depth", "Interactive"],
+    icon: <Layers className="w-5 h-5" />,
+    gradient: "from-amber-500 to-rose-500",
+    thumbnail: "/images/experiments/depth-playground.svg",
+  },
 ];
 
 function LivePreview({ id }: { id: string }) {
@@ -80,6 +106,8 @@ function LivePreview({ id }: { id: string }) {
       {id === "particle-galaxy" && <ParticleGalaxy compact />}
       {id === "text-scramble" && <TextScramble compact />}
       {id === "watch-demo" && <VideoSequenceScroll compact />}
+      {id === "liquid-distortion" && <LiquidDistortion compact />}
+      {id === "depth-playground" && <DepthPlayground compact />}
     </>
   );
 }
@@ -274,6 +302,8 @@ function ExperimentModal({
               {experiment.id === "particle-galaxy" && <ParticleGalaxy />}
               {experiment.id === "text-scramble" && <TextScramble />}
               {experiment.id === "watch-demo" && <VideoSequenceScroll />}
+              {experiment.id === "liquid-distortion" && <LiquidDistortion />}
+              {experiment.id === "depth-playground" && <DepthPlayground />}
             </div>
           </motion.div>
         </motion.div>
@@ -288,6 +318,8 @@ function experimentCursor(id: string): string {
     "particle-galaxy": "grab",
     "text-scramble": "text",
     "watch-demo": "zoom-in",
+    "liquid-distortion": "crosshair",
+    "depth-playground": "grab",
   };
   return cursors[id] || "pointer";
 }
@@ -383,7 +415,8 @@ export default function GalleryGrid() {
 
   const expHarmony = activeExperiment === "particle-galaxy" ? "purple"
     : activeExperiment === "text-scramble" ? "pink"
-    : activeExperiment === "samsung-demo" ? "cyan"
+    : activeExperiment === "liquid-distortion" ? "cyan"
+    : activeExperiment === "depth-playground" ? "green"
     : "amber";
 
   return (
@@ -413,7 +446,7 @@ export default function GalleryGrid() {
           More experiments coming soon&hellip;
         </p>
         <div className="flex justify-center gap-1.5 mt-2">
-          {["Liquid Distortion", "3D Parallax", "Audio Visualizer", "Fractal Explorer"].map(
+          {["Audio Visualizer", "Fractal Explorer", "Particle Sky", "Morph Grid"].map(
             (name) => (
               <span
                 key={name}
