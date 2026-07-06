@@ -16,7 +16,7 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 - Epic 9 (Polish/QA): ✅ COMPLETE
 - Sprint 1 (Creative Lab Foundation): ✅ COMPLETE
 - Sprint 2 (Visual Depth): ✅ COMPLETE
-- Sprint 3 (Audio): 🔄 IN PROGRESS
+- Sprint 3 (Audio): ✅ COMPLETE
 
 ## Architecture
 - **Rendering**: SSG. No runtime API calls. GitHub data fetched at build time.
@@ -94,6 +94,7 @@ pinned-repos.json, all-repos.json, languages.json, commit-activity.json, contrib
 | VideoSequenceScroll.tsx | — | Real image sequence scroll (Samsung 4K demo) |
 | LiquidDistortion.tsx | — | Real-time Canvas 2D fluid simulation, Navier-Stokes solver |
 | DepthPlayground.tsx | — | Multi-layer parallax depth scene with DOF toggle |
+| AudioVisualizer.tsx | — | Real-time FFT audio visualizer with 5 modes, mic/file input, recording export |
 
 ### Key Atoms (under `src/components/atoms/`)
 | File | Type | Notes |
@@ -184,8 +185,57 @@ index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skil
 - **"Coming soon" tags** updated — Liquid Distortion and 3D Parallax removed from upcoming list
 - **New**: Epic 11 (Mathematical Deep Dive) added — 21 experiments spanning strange attractors, Fourier transforms, Bayesian inference, PDE solvers, stochastic processes, conformal mapping, spherical harmonics, and more
 
-### Sprint 3 (Audio) 🔄
+### Sprint 3 (Audio) ✅
 - **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
 - **Delivery roadmap**: Sprint 3 | Audio | Audio Visualizer + Audio-reactive variants
-- **Focus**: Epic 7 (Audio Visualizer) + audio-reactive experiment variants
-- **To do**: See sprint planning doc Epic 7
+- **Epic 7 (Audio Visualizer)**: ✅ COMPLETE
+  - `src/islands/experiments/AudioVisualizer.tsx` — real-time FFT audio visualizer
+  - 5 visualization modes: bar, ring, wave, particle, hex grid — switchable via mode buttons
+  - Microphone input: `getUserMedia` → `MediaStreamSource` → live FFT analysis
+  - Audio file upload: drag/file pick MP3/WAV → `decodeAudioData` → looped playback
+  - Frequency-reactive particles: 120 particles burst from center based on frequency band energy, with damping and respawn
+  - Export recording: `canvas.captureStream(30)` + `MediaRecorder` → WebM video download
+  - Controls overlay: mode switcher, mic/file/stop buttons, record button with recording indicator
+  - Compact preview mode for gallery card hover
+- **Registered in**: GalleryGrid.tsx — 7th experiment with green/emerald gradient and Music icon
+- **Thumbnail**: `public/images/experiments/audio-visualizer.svg`
+- **"Audio Visualizer" removed from "Coming soon" tags**
+- **Build verified**: `bun run build` succeeds (46 pages)
+
+### Sprint 4 (Fractal Explorer) 🔄
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 8 (Fractal Explorer)**: 🔄 IN PROGRESS
+  - Mandelbrot/Julia WebGL shader renderer with infinite zoom
+  - Drag-to-zoom with smooth interpolation
+  - Color palette editor (gradient, iteration, orbit traps)
+  - Julia set morphing (animated parameter sweep)
+  - Bookmark locations as shareable URLs
+  - Resolution scaling / auto-LOD during animation
+
+### Sprint 5 (Interactive Canvas) 🔄
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 9 (Interactive Canvas / Infinite Whiteboard)**: 🔄 NOT STARTED
+  - Infinite pan/zoom canvas with transform matrix
+  - Node graph editor with connected ports, mini-map
+  - Hand-drawing tools with Pointer Events pressure sensitivity
+  - Particle brush
+  - Undo/redo timeline
+  - Export as PNG/SVG
+
+### Sprint 6 (Micro-interactions) 🔄
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 10 (UI/UX Micro-interactions Library)**: 🔄 NOT STARTED
+  - Magnetic buttons with cursor attraction radius
+  - Morphing navigation (dots → text → full menu)
+  - Organic loading states (breathing, pulsing)
+  - Context-aware tooltips
+  - Scroll-triggered entropy (component degradation/glitch)
+  - Easter egg system (Konami code, hidden click zones)
+
+### Sprint 7 (Chaos & Attractors) 🔄
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 11 (Chaos & Dynamical Systems)**: 🔄 NOT STARTED
+  - Strange Attractor Zoo (Lorenz/Rössler/Aizawa/Thomas/Chen)
+  - Double Pendulum Chaos with Lyapunov exponent
+  - Logistic Map / Bifurcation Diagram
+  - Butterfly Effect Sandbox

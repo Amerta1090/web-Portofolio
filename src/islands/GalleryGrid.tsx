@@ -9,6 +9,7 @@ import {
   Monitor,
   Droplets,
   Layers,
+  Music,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ImageSequenceScroll from "./experiments/ImageSequenceScroll";
@@ -17,6 +18,7 @@ import TextScramble from "./experiments/TextScramble";
 import VideoSequenceScroll from "./experiments/VideoSequenceScroll";
 import LiquidDistortion from "./experiments/LiquidDistortion";
 import DepthPlayground from "./experiments/DepthPlayground";
+import AudioVisualizer from "./experiments/AudioVisualizer";
 import AmbientSound from "../components/atoms/AmbientSound";
 
 interface Experiment {
@@ -97,6 +99,17 @@ const experiments: Experiment[] = [
     gradient: "from-amber-500 to-rose-500",
     thumbnail: "/images/experiments/depth-playground.svg",
   },
+  {
+    id: "audio-visualizer",
+    title: "Audio Visualizer",
+    description: "Real-time FFT audio visualization with 5 modes — mic input or file upload.",
+    longDescription:
+      "A Web Audio API-powered audio visualizer with 5 visualization modes: frequency bars, circular ring, time-domain waveform, frequency-reactive particles, and hex grid. Supports live microphone input and MP3/WAV file upload. Export recordings as WebM video.",
+    tags: ["Audio", "Web Audio API", "FFT", "Canvas"],
+    icon: <Music className="w-5 h-5" />,
+    gradient: "from-green-500 to-emerald-500",
+    thumbnail: "/images/experiments/audio-visualizer.svg",
+  },
 ];
 
 function LivePreview({ id }: { id: string }) {
@@ -108,6 +121,7 @@ function LivePreview({ id }: { id: string }) {
       {id === "watch-demo" && <VideoSequenceScroll compact />}
       {id === "liquid-distortion" && <LiquidDistortion compact />}
       {id === "depth-playground" && <DepthPlayground compact />}
+      {id === "audio-visualizer" && <AudioVisualizer compact />}
     </>
   );
 }
@@ -304,6 +318,7 @@ function ExperimentModal({
               {experiment.id === "watch-demo" && <VideoSequenceScroll />}
               {experiment.id === "liquid-distortion" && <LiquidDistortion />}
               {experiment.id === "depth-playground" && <DepthPlayground />}
+              {experiment.id === "audio-visualizer" && <AudioVisualizer />}
             </div>
           </motion.div>
         </motion.div>
@@ -320,6 +335,7 @@ function experimentCursor(id: string): string {
     "watch-demo": "zoom-in",
     "liquid-distortion": "crosshair",
     "depth-playground": "grab",
+    "audio-visualizer": "crosshair",
   };
   return cursors[id] || "pointer";
 }
@@ -417,6 +433,7 @@ export default function GalleryGrid() {
     : activeExperiment === "text-scramble" ? "pink"
     : activeExperiment === "liquid-distortion" ? "cyan"
     : activeExperiment === "depth-playground" ? "green"
+    : activeExperiment === "audio-visualizer" ? "cyan"
     : "amber";
 
   return (
@@ -446,7 +463,7 @@ export default function GalleryGrid() {
           More experiments coming soon&hellip;
         </p>
         <div className="flex justify-center gap-1.5 mt-2">
-          {["Audio Visualizer", "Fractal Explorer", "Particle Sky", "Morph Grid"].map(
+          {["Fractal Explorer", "Particle Sky", "Morph Grid"].map(
             (name) => (
               <span
                 key={name}
