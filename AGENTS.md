@@ -228,15 +228,21 @@ index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skil
   - Run: `bun run test:e2e` — auto builds + serves via astro preview on port 4321
   - Visual/interaction tests in real browser with full canvas/WebGL support
 
-### Sprint 5 (Interactive Canvas) 🔄
+### Sprint 5 (Interactive Canvas) ✅
 - **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
-- **Epic 9 (Interactive Canvas / Infinite Whiteboard)**: 🔄 NOT STARTED
-  - Infinite pan/zoom canvas with transform matrix
-  - Node graph editor with connected ports, mini-map
-  - Hand-drawing tools with Pointer Events pressure sensitivity
-  - Particle brush
-  - Undo/redo timeline
-  - Export as PNG/SVG
+- **Epic 9 (Interactive Canvas / Infinite Whiteboard)**: ✅ COMPLETE
+  - **File**: `src/islands/experiments/InteractiveCanvas.tsx` — Canvas 2D infinite whiteboard with transform matrix, scroll-wheel zoom, pan
+  - **Infinite pan/zoom canvas**: DOMMatrix-based transform, clamp 0.1x–10x zoom, scroll-wheel zoom centers on cursor
+  - **Node graph editor**: Click to create nodes, drag output port → input port to connect edges, drag nodes to reposition, mini-map in corner
+  - **Hand-drawing tools**: Pen (pressure-sensitive via Pointer Events), marker (3x size), spray (random dots in radius), eraser (destination-out composite)
+  - **Particle brush**: Emits settling particles on mouse move, continuous RAF update with gravity/viscosity damping
+  - **Undo/redo timeline**: Snapshot-based history (max 50), Ctrl+Z/Y shortcuts, visual timeline scrubber bar with clickable snapshots
+  - **Export as PNG/SVG**: Canvas.toDataURL for PNG, path-to-SVG conversion for SVG, both trigger download
+  - **Toolbar**: 7 tool buttons with emoji icons, 8-color palette, size/opacity sliders, keyboard shortcuts (V/P/M/S/E/B/N)
+  - **Thumbnail**: `public/images/experiments/interactive-canvas.svg`
+  - **Registered in**: GalleryGrid.tsx — 9th experiment with purple/cyan gradient and Paintbrush icon
+  - **Build verified**: `bun run build` succeeds (45 pages)
+  - **Tests**: 13 unit tests, 5 E2E tests (16 total for this component)
 
 ### Sprint 6 (Micro-interactions) 🔄
 - **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`

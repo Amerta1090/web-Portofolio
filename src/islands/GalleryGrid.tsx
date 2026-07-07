@@ -11,6 +11,7 @@ import {
   Layers,
   Music,
   Hexagon,
+  Paintbrush,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ImageSequenceScroll from "./experiments/ImageSequenceScroll";
@@ -21,6 +22,7 @@ import LiquidDistortion from "./experiments/LiquidDistortion";
 import DepthPlayground from "./experiments/DepthPlayground";
 import AudioVisualizer from "./experiments/AudioVisualizer";
 import FractalExplorer from "./experiments/FractalExplorer";
+import InteractiveCanvas from "./experiments/InteractiveCanvas";
 import AmbientSound from "../components/atoms/AmbientSound";
 
 interface Experiment {
@@ -123,6 +125,17 @@ const experiments: Experiment[] = [
     gradient: "from-amber-500 to-yellow-500",
     thumbnail: "/images/experiments/fractal-explorer.svg",
   },
+  {
+    id: "interactive-canvas",
+    title: "Interactive Canvas",
+    description: "Infinite whiteboard with drawing tools, particle brush, node graph editor, undo/redo timeline, and export.",
+    longDescription:
+      "A full-featured infinite canvas whiteboard. Pan/zoom infinitely, draw with pressure-sensitive pen/marker/spray/eraser tools, paint with settling particles, build connected node graphs with draggable edges, undo/redo through history with a visual timeline scrubber, and export your creation as PNG or SVG.",
+    tags: ["Canvas", "Whiteboard", "Drawing", "Node Graph", "Tools"],
+    icon: <Paintbrush className="w-5 h-5" />,
+    gradient: "from-purple-500 to-cyan-500",
+    thumbnail: "/images/experiments/interactive-canvas.svg",
+  },
 ];
 
 function LivePreview({ id }: { id: string }) {
@@ -136,6 +149,7 @@ function LivePreview({ id }: { id: string }) {
       {id === "depth-playground" && <DepthPlayground compact />}
       {id === "audio-visualizer" && <AudioVisualizer compact />}
       {id === "fractal-explorer" && <FractalExplorer compact />}
+      {id === "interactive-canvas" && <InteractiveCanvas compact />}
     </>
   );
 }
@@ -334,6 +348,7 @@ function ExperimentModal({
               {experiment.id === "depth-playground" && <DepthPlayground />}
               {experiment.id === "audio-visualizer" && <AudioVisualizer />}
               {experiment.id === "fractal-explorer" && <FractalExplorer />}
+              {experiment.id === "interactive-canvas" && <InteractiveCanvas />}
             </div>
           </motion.div>
         </motion.div>
@@ -352,6 +367,7 @@ function experimentCursor(id: string): string {
     "depth-playground": "grab",
     "audio-visualizer": "crosshair",
     "fractal-explorer": "zoom-in",
+    "interactive-canvas": "crosshair",
   };
   return cursors[id] || "pointer";
 }
@@ -451,6 +467,7 @@ export default function GalleryGrid() {
     : activeExperiment === "depth-playground" ? "green"
     : activeExperiment === "audio-visualizer" ? "cyan"
     : activeExperiment === "fractal-explorer" ? "amber"
+    : activeExperiment === "interactive-canvas" ? "purple"
     : "amber";
 
   return (
