@@ -14,7 +14,11 @@
     "typecheck": "tsc --noEmit",
     "validate-data": "node scripts/validate-data.mjs",
     "fetch-data": "bun scripts/fetch-data.mjs",
-    "check-budget": "bun run build && node scripts/check-performance-budget.mjs"
+    "check-budget": "bun run build && node scripts/check-performance-budget.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@astrojs/mdx": "^6.0.3",
@@ -55,11 +59,17 @@
     "@astrojs/react": "^5.0.0",
     "@astrojs/tailwind": "^6.0.0",
     "@biomejs/biome": "^1.9.0",
+    "@playwright/test": "^1.61.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/d3": "^7.4.3",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@types/three": "^0.184.1",
+    "jsdom": "^29.1.1",
     "tailwindcss": "^3.4.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.10"
   }
 }

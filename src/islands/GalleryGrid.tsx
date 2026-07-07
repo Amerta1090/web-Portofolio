@@ -10,6 +10,7 @@ import {
   Droplets,
   Layers,
   Music,
+  Hexagon,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ImageSequenceScroll from "./experiments/ImageSequenceScroll";
@@ -19,6 +20,7 @@ import VideoSequenceScroll from "./experiments/VideoSequenceScroll";
 import LiquidDistortion from "./experiments/LiquidDistortion";
 import DepthPlayground from "./experiments/DepthPlayground";
 import AudioVisualizer from "./experiments/AudioVisualizer";
+import FractalExplorer from "./experiments/FractalExplorer";
 import AmbientSound from "../components/atoms/AmbientSound";
 
 interface Experiment {
@@ -110,6 +112,17 @@ const experiments: Experiment[] = [
     gradient: "from-green-500 to-emerald-500",
     thumbnail: "/images/experiments/audio-visualizer.svg",
   },
+  {
+    id: "fractal-explorer",
+    title: "Fractal Explorer",
+    description: "WebGL shader-based Mandelbrot/Julia renderer with infinite zoom, palette editor, and Julia morphing.",
+    longDescription:
+      "A WebGL 2.0-powered fractal explorer featuring Mandelbrot and Julia sets with infinite zoom capability. Drag to zoom into any region, tweak color palettes, morph Julia parameters in real-time, and bookmark your favorite fractal coordinates as shareable URLs.",
+    tags: ["WebGL", "Fractal", "GLSL", "Interactive"],
+    icon: <Hexagon className="w-5 h-5" />,
+    gradient: "from-amber-500 to-yellow-500",
+    thumbnail: "/images/experiments/fractal-explorer.svg",
+  },
 ];
 
 function LivePreview({ id }: { id: string }) {
@@ -122,6 +135,7 @@ function LivePreview({ id }: { id: string }) {
       {id === "liquid-distortion" && <LiquidDistortion compact />}
       {id === "depth-playground" && <DepthPlayground compact />}
       {id === "audio-visualizer" && <AudioVisualizer compact />}
+      {id === "fractal-explorer" && <FractalExplorer compact />}
     </>
   );
 }
@@ -319,6 +333,7 @@ function ExperimentModal({
               {experiment.id === "liquid-distortion" && <LiquidDistortion />}
               {experiment.id === "depth-playground" && <DepthPlayground />}
               {experiment.id === "audio-visualizer" && <AudioVisualizer />}
+              {experiment.id === "fractal-explorer" && <FractalExplorer />}
             </div>
           </motion.div>
         </motion.div>
@@ -336,6 +351,7 @@ function experimentCursor(id: string): string {
     "liquid-distortion": "crosshair",
     "depth-playground": "grab",
     "audio-visualizer": "crosshair",
+    "fractal-explorer": "zoom-in",
   };
   return cursors[id] || "pointer";
 }
@@ -434,6 +450,7 @@ export default function GalleryGrid() {
     : activeExperiment === "liquid-distortion" ? "cyan"
     : activeExperiment === "depth-playground" ? "green"
     : activeExperiment === "audio-visualizer" ? "cyan"
+    : activeExperiment === "fractal-explorer" ? "amber"
     : "amber";
 
   return (
@@ -463,7 +480,7 @@ export default function GalleryGrid() {
           More experiments coming soon&hellip;
         </p>
         <div className="flex justify-center gap-1.5 mt-2">
-          {["Fractal Explorer", "Particle Sky", "Morph Grid"].map(
+          {["Particle Sky", "Morph Grid"].map(
             (name) => (
               <span
                 key={name}

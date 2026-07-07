@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#0a0a0c"/>
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="200" cy="150" rx="80" ry="60" fill="none" stroke="url(#g)" stroke-width="1.5" opacity="0.3"/>
+  <ellipse cx="200" cy="150" rx="100" ry="75" fill="none" stroke="url(#g)" stroke-width="1" opacity="0.2"/>
+  <ellipse cx="200" cy="150" rx="50" ry="37" fill="none" stroke="url(#g)" stroke-width="0.8" opacity="0.25"/>
+  <ellipse cx="200" cy="150" rx="25" ry="18" fill="none" stroke="url(#g)" stroke-width="0.5" opacity="0.2"/>
+  <circle cx="200" cy="150" r="3" fill="#f59e0b" opacity="0.6"/>
+  <circle cx="160" cy="130" r="1.5" fill="#f59e0b" opacity="0.4"/>
+  <circle cx="230" cy="170" r="2" fill="#f59e0b" opacity="0.35"/>
+  <circle cx="175" cy="175" r="1" fill="#f59e0b" opacity="0.3"/>
+  <circle cx="220" cy="125" r="1.5" fill="#f59e0b" opacity="0.3"/>
+  <path d="M30 80 Q100 40 200 60 T370 90" fill="none" stroke="url(#g)" stroke-width="0.5" opacity="0.12"/>
+  <path d="M30 220 Q100 250 200 240 T370 210" fill="none" stroke="url(#g)" stroke-width="0.5" opacity="0.12"/>
+  <circle cx="200" cy="150" r="120" fill="none" stroke="#f59e0b" stroke-width="0.3" opacity="0.08"/>
+  <circle cx="200" cy="150" r="140" fill="none" stroke="#f59e0b" stroke-width="0.2" opacity="0.05"/>
+</svg>

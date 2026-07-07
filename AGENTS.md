@@ -202,15 +202,31 @@ index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skil
 - **"Audio Visualizer" removed from "Coming soon" tags**
 - **Build verified**: `bun run build` succeeds (46 pages)
 
-### Sprint 4 (Fractal Explorer) 🔄
+### Sprint 4 (Fractal Explorer) ✅
 - **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
-- **Epic 8 (Fractal Explorer)**: 🔄 IN PROGRESS
-  - Mandelbrot/Julia WebGL shader renderer with infinite zoom
-  - Drag-to-zoom with smooth interpolation
-  - Color palette editor (gradient, iteration, orbit traps)
-  - Julia set morphing (animated parameter sweep)
-  - Bookmark locations as shareable URLs
-  - Resolution scaling / auto-LOD during animation
+- **Epic 8 (Fractal Explorer)**: ✅ COMPLETE
+  - **File**: `src/islands/experiments/FractalExplorer.tsx` — WebGL 2.0 GLSL shader-based Mandelbrot/Julia renderer
+  - **Mandelbrot/Julia renderer**: Full-screen quad WebGL2 fragment shader with smooth iteration counting, configurable max iterations (32–1024)
+  - **Drag-to-zoom**: Mouse mode toggle (Pan/Zoom). In Zoom mode, click-drag to select region → smooth cubic ease-out interpolation to new view
+  - **Color palette editor**: 6 preset palettes (Amber, Fire, Ice, Plasma, Forest, Ocean) via Inigo Quilez cos palette, plus hue shift slider
+  - **Julia set morphing**: Toggle morph mode — Julia c parameter follows circular path (radius 0.6) at configurable speed; real-time parameter display
+  - **Bookmark locations**: Encode full state (center, zoom, iter, type, Julia c, palette) as base64 URL param; "Bookmark" button copies shareable URL
+  - **Resolution scaling**: During zoom animation, iter count reduced by up to 40% (min 32), restored on animation completion
+  - **Thumbnail**: `public/images/experiments/fractal-explorer.svg`
+  - **Registered in**: GalleryGrid.tsx — 8th experiment with amber/yellow gradient and Hexagon icon
+  - **"Fractal Explorer" removed from "Coming soon" tags**
+  - **Build verified**: `bun run build` succeeds (45 pages)
+
+## Testing
+- **Unit**: Vitest + React Testing Library + jsdom
+  - Config: `vitest.config.ts` with path aliases matching `tsconfig.json`
+  - Setup: `src/test/setup.ts` — jest-dom matchers, ResizeObserver polyfill
+  - Run: `bun run test` (CI) or `bun run test:watch`
+  - WebGL2: mock `HTMLCanvasElement.prototype.getContext` returning mock GL context; 2D canvas returns mock CanvasRenderingContext2D
+- **E2E**: Playwright (Chromium)
+  - Config: `playwright.config.ts`, tests in `e2e/`
+  - Run: `bun run test:e2e` — auto builds + serves via astro preview on port 4321
+  - Visual/interaction tests in real browser with full canvas/WebGL support
 
 ### Sprint 5 (Interactive Canvas) 🔄
 - **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
