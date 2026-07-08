@@ -12,6 +12,10 @@ import JourneyTimeline from "../islands/JourneyTimeline";
 import ProjectCardGrid from "../islands/ProjectCardGrid";
 import CreativeLabTeaser from "../islands/CreativeLabTeaser";
 import CreativeLabPill from "../islands/CreativeLabPill";
+import MorphingNavigation from "../islands/MorphingNavigation";
+import ScrollEntropy from "../islands/ScrollEntropy";
+import EasterEgg from "../islands/EasterEgg";
+import MicroInteractionsDemo from "../islands/MicroInteractionsDemo";
 import ScrollAnimator from "../islands/ScrollAnimator.astro";
 import SectionCounter from "../islands/SectionCounter";
 import SkillsExplorer from "../islands/SkillsExplorer";
@@ -118,10 +122,16 @@ const gitHubData = await fetchAllGitHubData();
     )
   }
 
+  <Section data-reveal id="micro-interactions" title="Micro-Interactions" subtitle="UI/UX micro-interaction library — magnetic buttons, organic loading, and smart tooltips" variant="alt" ariaLabel="Micro-interactions">
+    <MicroInteractionsDemo client:load />
+  </Section>
+
   <Section data-reveal id="contact" title="Contact" subtitle="Have a question or want to work together?" ariaLabel="Contact">
     <Contact profile={profile} />
   </Section>
 
+  <MorphingNavigation client:load />
+  <EasterEgg client:load />
   <ScrollAnimator />
   <SectionCounter client:load />
   <CreativeLabPill client:visible />

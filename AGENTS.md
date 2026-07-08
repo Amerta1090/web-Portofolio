@@ -1,5 +1,7 @@
 # Codebase Snapshot
 
+> **Usage note**: Gunakan sub-agents (Task tool) sebisa mungkin untuk setiap sub-task agar hemat context window. Pecah task besar menjadi beberapa sub-agent yang jalan paralel (riset, baca file, generate test, dll).
+
 ## Project
 Astro SSG portfolio for **Abdul Majid Ridwan Tyastonoatmaja** (AI/ML Engineer & Systems Builder).
 Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.js/R3F + TypeScript + Bun.
@@ -95,6 +97,10 @@ pinned-repos.json, all-repos.json, languages.json, commit-activity.json, contrib
 | LiquidDistortion.tsx | — | Real-time Canvas 2D fluid simulation, Navier-Stokes solver |
 | DepthPlayground.tsx | — | Multi-layer parallax depth scene with DOF toggle |
 | AudioVisualizer.tsx | — | Real-time FFT audio visualizer with 5 modes, mic/file input, recording export |
+| MorphingNavigation.tsx | `client:load` | Dots → text → hamburger morphing nav on scroll |
+| ScrollEntropy.tsx | — | Scroll-triggered component degradation/glitch |
+| EasterEgg.tsx | `client:load` | Konami code, hidden click zones, console secrets |
+| MicroInteractionsDemo.tsx | `client:load` | Showcase island for magnetic buttons, tooltips, loaders |
 
 ### Key Atoms (under `src/components/atoms/`)
 | File | Type | Notes |
@@ -105,6 +111,9 @@ pinned-repos.json, all-repos.json, languages.json, commit-activity.json, contrib
 | `TypewriterText.tsx` | React | Character-by-character animation |
 | `NetworkGraph.tsx` | React (D3) | Force-directed graph for repos |
 | `InteractionCard.tsx` | React | Tilt hover card |
+| `MagneticButtons.tsx` | React | Enhanced magnetic buttons with attraction radius, snap, spring scale |
+| `OrganicLoader.tsx` | React | Organic loading bars: breathing, pulsing, growing variants with ARIA |
+| `ContextTooltip.tsx` | React | Smart tooltips with viewport-aware positioning, Framer Motion |
 
 ### Astro Organisms (under `src/components/organisms/`)
 Hero.astro, About.astro, Experience.astro, Projects.astro, Certifications.astro, Skills.astro, GitHubUniverse.astro, Contact.astro, Honors.astro, Volunteering.astro
@@ -244,15 +253,21 @@ index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skil
   - **Build verified**: `bun run build` succeeds (45 pages)
   - **Tests**: 13 unit tests, 5 E2E tests (16 total for this component)
 
-### Sprint 6 (Micro-interactions) 🔄
+### Sprint 6 (Micro-interactions) ✅
 - **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
-- **Epic 10 (UI/UX Micro-interactions Library)**: 🔄 NOT STARTED
-  - Magnetic buttons with cursor attraction radius
-  - Morphing navigation (dots → text → full menu)
-  - Organic loading states (breathing, pulsing)
-  - Context-aware tooltips
-  - Scroll-triggered entropy (component degradation/glitch)
-  - Easter egg system (Konami code, hidden click zones)
+- **Epic 10 (UI/UX Micro-interactions Library)**: ✅ COMPLETE
+  - **MagneticButtons** (`src/components/atoms/MagneticButtons.tsx`): Enhanced magnetic buttons with configurable attraction radius (default 150px), snap distance (default 40px), strength, spring-scale on hover. 11 unit tests, 1 E2E test
+  - **MorphingNavigation** (`src/islands/MorphingNavigation.tsx`): Navigation morphs from dots → text labels → hamburger menu based on scroll thresholds (default 100/300/600px). Framer Motion animated phase transitions, active section detection via IntersectionObserver. 11 unit tests, 1 E2E test
+  - **OrganicLoader** (`src/components/atoms/OrganicLoader.tsx`): Three loading variants — breathing (sine-wave scale/opacity), pulsing (glow pulse), growing (indeterminate roaming bar or determinate progress). ARIA progressbar role. 13 unit tests, 2 E2E tests
+  - **ContextTooltip** (`src/components/atoms/ContextTooltip.tsx`): Smart tooltips with viewport-aware position auto-adjustment, configurable side/delay, icon/shortcut/description support, Framer Motion AnimatePresence. 10 unit tests, 1 E2E test
+  - **ScrollEntropy** (`src/islands/ScrollEntropy.tsx`): Scroll-triggered component degradation with configurable zones (start/end threshold, intensity). Applies CSS glitch transforms (skew, clip, hue-rotate, opacity) reversibly. Uses passive scroll listener. 10 unit tests, 1 E2E test
+  - **EasterEgg** (`src/islands/EasterEgg.tsx`): Konami code detection (↑↑↓↓←→←→BA), hidden click zones, console command secrets (`opencode`, `portfolio()`, `help`, `konami`, `version`, `secret`). Generates toast notifications. 11 unit tests, 2 E2E tests
+  - **MicroInteractionsDemo** (`src/islands/MicroInteractionsDemo.tsx`): Demo showcase island mounting all 6 components on the index page. 7 unit tests
+  - **Mounting**: All components registered on index.astro (`#micro-interactions` section)
+  - **Tests**: 73 new unit tests (total 104 across 9 files), 9 new E2E tests (total 26 across 2 files)
+  - **Build verified**: `bun run build` succeeds (45 pages)
+  - **Unit tests**: `bun run test` — 104 passed
+  - **E2E tests**: `bun run test:e2e` — 26 passed
 
 ### Sprint 7 (Chaos & Attractors) 🔄
 - **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
