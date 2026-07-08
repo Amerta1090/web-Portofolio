@@ -12,6 +12,10 @@ import {
   Music,
   Hexagon,
   Paintbrush,
+  CircuitBoard,
+  GitFork,
+  Activity,
+  Target,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ImageSequenceScroll from "./experiments/ImageSequenceScroll";
@@ -23,6 +27,10 @@ import DepthPlayground from "./experiments/DepthPlayground";
 import AudioVisualizer from "./experiments/AudioVisualizer";
 import FractalExplorer from "./experiments/FractalExplorer";
 import InteractiveCanvas from "./experiments/InteractiveCanvas";
+import StrangeAttractorZoo from "./experiments/StrangeAttractorZoo";
+import DoublePendulumChaos from "./experiments/DoublePendulumChaos";
+import LogisticMap from "./experiments/LogisticMap";
+import ButterflyEffect from "./experiments/ButterflyEffect";
 import AmbientSound from "../components/atoms/AmbientSound";
 
 interface Experiment {
@@ -136,6 +144,50 @@ const experiments: Experiment[] = [
     gradient: "from-purple-500 to-cyan-500",
     thumbnail: "/images/experiments/interactive-canvas.svg",
   },
+  {
+    id: "strange-attractor",
+    title: "Strange Attractor Zoo",
+    description: "Real-time 3D Lorenz, Rössler, Aizawa, and Thomas attractors with particle trails and parameter sliders.",
+    longDescription:
+      "Explore four strange attractors — Lorenz, Rössler, Aizawa, and Thomas — rendered as 3D particle trails projected onto 2D canvas. Toggle between attractors, adjust parameters (σ, ρ, β), and watch how tiny differences in initial conditions produce wildly divergent butterfly-wing patterns.",
+    tags: ["Canvas", "Chaos", "3D", "Dynamical Systems"],
+    icon: <CircuitBoard className="w-5 h-5" />,
+    gradient: "from-amber-500 to-red-500",
+    thumbnail: "/images/experiments/strange-attractor.svg",
+  },
+  {
+    id: "double-pendulum",
+    title: "Double Pendulum Chaos",
+    description: "Two linked pendulums with near-identical initial conditions diverge — Lyapunov exponent computed live.",
+    longDescription:
+      "A double pendulum simulation showing chaotic divergence. Two pendulums start with nearly identical θ₁ values (difference as small as 0.0001°). Watch them diverge in real-time as the Lyapunov exponent is computed. Toggle phase-space portrait, adjust mass/length/damping, and observe the butterfly effect in action.",
+    tags: ["Canvas", "Physics", "Chaos", "Pendulum"],
+    icon: <GitFork className="w-5 h-5" />,
+    gradient: "from-purple-500 to-pink-500",
+    thumbnail: "/images/experiments/double-pendulum.svg",
+  },
+  {
+    id: "logistic-map",
+    title: "Logistic Map / Bifurcation",
+    description: "Bifurcation diagram of xₙ₊₁ = rxₙ(1−xₙ), sweep r from 2→4, watch period-doubling cascade to chaos.",
+    longDescription:
+      "The logistic map — the classic route to chaos. A bifurcation diagram builds point-by-point as r sweeps from 2 to 4. Click any r for a cobweb plot overlay showing the orbit. The Feigenbaum constant δ ≈ 4.669 emerges from the period-doubling cascade. Adjust r and initial x₀ in real-time.",
+    tags: ["Canvas", "Chaos", "Bifurcation", "Mathematical"],
+    icon: <Activity className="w-5 h-5" />,
+    gradient: "from-amber-500 to-yellow-500",
+    thumbnail: "/images/experiments/logistic-map.svg",
+  },
+  {
+    id: "butterfly-effect",
+    title: "Butterfly Effect Sandbox",
+    description: "Interactive chaos playground — drag initial points, colored trails, Lyapunov exponent gauge.",
+    longDescription:
+      "An interactive chaos sandbox where you can explore the butterfly effect. Multiple trajectories start from nearly identical initial conditions and diverge in real-time. Click to set new initial conditions, adjust spread between paths, toggle between Lorenz and Rössler systems, and watch the Lyapunov exponent gauge measure chaos in action.",
+    tags: ["Canvas", "Chaos", "Interactive", "Butterfly Effect"],
+    icon: <Target className="w-5 h-5" />,
+    gradient: "from-cyan-500 to-teal-500",
+    thumbnail: "/images/experiments/butterfly-effect.svg",
+  },
 ];
 
 function LivePreview({ id }: { id: string }) {
@@ -150,6 +202,10 @@ function LivePreview({ id }: { id: string }) {
       {id === "audio-visualizer" && <AudioVisualizer compact />}
       {id === "fractal-explorer" && <FractalExplorer compact />}
       {id === "interactive-canvas" && <InteractiveCanvas compact />}
+      {id === "strange-attractor" && <StrangeAttractorZoo compact />}
+      {id === "double-pendulum" && <DoublePendulumChaos compact />}
+      {id === "logistic-map" && <LogisticMap compact />}
+      {id === "butterfly-effect" && <ButterflyEffect compact />}
     </>
   );
 }
@@ -349,6 +405,10 @@ function ExperimentModal({
               {experiment.id === "audio-visualizer" && <AudioVisualizer />}
               {experiment.id === "fractal-explorer" && <FractalExplorer />}
               {experiment.id === "interactive-canvas" && <InteractiveCanvas />}
+              {experiment.id === "strange-attractor" && <StrangeAttractorZoo />}
+              {experiment.id === "double-pendulum" && <DoublePendulumChaos />}
+              {experiment.id === "logistic-map" && <LogisticMap />}
+              {experiment.id === "butterfly-effect" && <ButterflyEffect />}
             </div>
           </motion.div>
         </motion.div>
@@ -368,6 +428,10 @@ function experimentCursor(id: string): string {
     "audio-visualizer": "crosshair",
     "fractal-explorer": "zoom-in",
     "interactive-canvas": "crosshair",
+    "strange-attractor": "crosshair",
+    "double-pendulum": "grab",
+    "logistic-map": "zoom-in",
+    "butterfly-effect": "crosshair",
   };
   return cursors[id] || "pointer";
 }
@@ -468,6 +532,10 @@ export default function GalleryGrid() {
     : activeExperiment === "audio-visualizer" ? "cyan"
     : activeExperiment === "fractal-explorer" ? "amber"
     : activeExperiment === "interactive-canvas" ? "purple"
+    : activeExperiment === "strange-attractor" ? "amber"
+    : activeExperiment === "double-pendulum" ? "purple"
+    : activeExperiment === "logistic-map" ? "amber"
+    : activeExperiment === "butterfly-effect" ? "cyan"
     : "amber";
 
   return (

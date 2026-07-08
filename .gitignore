@@ -11,3 +11,4 @@ prompt.txt
 *.mp4
 *.tex
 love.*.mp3
+test-results/

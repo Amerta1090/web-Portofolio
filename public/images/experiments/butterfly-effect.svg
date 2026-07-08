@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#0f0f11"/>
+  <g transform="translate(200,140)">
+    <path d="M0,0 C-30,-50 -10,-90 20,-80 C50,-70 60,-30 40,0 C20,30 -10,40 -20,20 C-30,0 -20,-30 0,-15 C20,0 30,15 15,25 C0,35 -20,20 -15,5" fill="none" stroke="rgba(245,158,11,0.6)" stroke-width="1.5"/>
+    <path d="M3,3 C-27,-47 -7,-87 23,-77 C53,-67 63,-27 43,3 C23,33 -7,43 -17,23 C-27,3 -17,-27 3,-12 C23,3 33,18 18,28 C3,38 -17,23 -12,8" fill="none" stroke="rgba(139,92,246,0.5)" stroke-width="1.2"/>
+    <path d="M-3,-3 C-33,-53 -13,-93 17,-83 C47,-73 57,-33 37,-3 C17,27 -13,37 -23,17 C-33,-3 -23,-33 -3,-18 C17,-3 27,12 12,22 C-3,32 -23,17 -18,2" fill="none" stroke="rgba(6,182,212,0.4)" stroke-width="1"/>
+    <path d="M6,6 C-24,-44 -4,-84 26,-74 C56,-64 66,-24 46,6 C26,36 -4,46 -14,26 C-24,6 -14,-24 6,-9 C26,6 36,21 21,31 C6,41 -14,26 -9,11" fill="none" stroke="rgba(236,72,153,0.4)" stroke-width="0.8"/>
+  </g>
+  <text x="200" y="270" text-anchor="middle" fill="rgba(245,158,11,0.6)" font-family="monospace" font-size="10">Butterfly Effect</text>
+</svg>

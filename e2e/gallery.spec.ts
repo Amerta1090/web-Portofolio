@@ -5,7 +5,7 @@ test.describe("Gallery page", () => {
     await page.goto("/gallery");
     await expect(page.getByRole("heading", { name: "Creative Lab" })).toBeVisible();
     const cards = page.locator('[role="list"] > [role="listitem"]');
-    await expect(cards).toHaveCount(9);
+    await expect(cards).toHaveCount(13);
   });
 
   test("Fractal Explorer card is present", async ({ page }) => {
@@ -137,5 +137,114 @@ test.describe("Gallery page", () => {
   test("Interactive Canvas deep link opens via URL hash", async ({ page }) => {
     await page.goto("/gallery#interactive-canvas");
     await expect(page.getByTitle("Pen (P)")).toBeVisible({ timeout: 5000 });
+  });
+
+  test("Strange Attractor Zoo card is present", async ({ page }) => {
+    await page.goto("/gallery");
+    const card = page.locator('[role="listitem"]').filter({ hasText: "Strange Attractor Zoo" });
+    await expect(card).toBeVisible();
+    await expect(card.getByText("Chaos", { exact: true })).toBeVisible();
+  });
+
+  test("Strange Attractor Zoo modal shows attractor toggles", async ({ page }) => {
+    await page.goto("/gallery");
+    await page.getByText("Strange Attractor Zoo").first().click();
+    await expect(page.getByRole("button", { name: "Lorenz" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Rössler" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Chaos Mode" })).toBeVisible();
+  });
+
+  test("Strange Attractor switches attractor on click", async ({ page }) => {
+    await page.goto("/gallery");
+    await page.getByText("Strange Attractor Zoo").first().click();
+    await page.getByRole("button", { name: "Rössler" }).click();
+    await expect(page.getByRole("button", { name: "Rössler" })).toBeVisible();
+  });
+
+  test("Double Pendulum Chaos card is present", async ({ page }) => {
+    await page.goto("/gallery");
+    await expect(page.getByText("Double Pendulum Chaos")).toBeVisible();
+    const card = page.locator('[role="listitem"]').filter({ hasText: "Double Pendulum Chaos" });
+    await expect(card).toBeVisible();
+  });
+
+  test("Double Pendulum Chaos modal shows controls", async ({ page }) => {
+    await page.goto("/gallery");
+    await page.getByText("Double Pendulum Chaos").first().click();
+    await expect(page.getByRole("button", { name: "Phase Space" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
+    await expect(page.getByText(/λ/)).toBeVisible();
+  });
+
+  test("Double Pendulum Chaos toggles phase space", async ({ page }) => {
+    await page.goto("/gallery");
+    await page.getByText("Double Pendulum Chaos").first().click();
+    await page.getByRole("button", { name: "Phase Space" }).click();
+    await expect(page.getByRole("button", { name: "Phase Space" })).toBeVisible();
+  });
+
+  test("Logistic Map card is present", async ({ page }) => {
+    await page.goto("/gallery");
+    await expect(page.getByText("Logistic Map")).toBeVisible();
+    const card = page.locator('[role="listitem"]').filter({ hasText: "Logistic Map" });
+    await expect(card).toBeVisible();
+  });
+
+  test("Logistic Map modal shows controls", async ({ page }) => {
+    await page.goto("/gallery");
+    await page.getByText("Logistic Map").first().click();
+    await expect(page.getByRole("button", { name: "Cobweb" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Auto Sweep" })).toBeVisible();
+  });
+
+  test("Logistic Map cobweb toggle works", async ({ page }) => {
+    await page.goto("/gallery");
+    await page.getByText("Logistic Map").first().click();
+    await page.getByRole("button", { name: "Cobweb" }).click();
+    await expect(page.getByRole("button", { name: "Cobweb" })).toBeVisible();
+  });
+
+  test("Logistic Map r slider is adjustable", async ({ page }) => {
+    await page.goto("/gallery");
+    await page.getByText("Logistic Map").first().click();
+    const slider = page.locator('label:has-text("r") input[type="range"]');
+    await expect(slider).toBeVisible();
+    await slider.fill("3.8");
+    expect(Number(await slider.inputValue())).toBe(3.8);
+  });
+
+  test("Butterfly Effect card is present", async ({ page }) => {
+    await page.goto("/gallery");
+    const card = page.locator('[role="listitem"]').filter({ hasText: "Butterfly Effect Sandbox" });
+    await expect(card).toBeVisible();
+    await expect(card.getByText("Canvas", { exact: true })).toBeVisible();
+  });
+
+  test("Butterfly Effect modal shows system and chaos controls", async ({ page }) => {
+    await page.goto("/gallery");
+    await page.getByText("Butterfly Effect Sandbox").first().click();
+    await expect(page.getByRole("button", { name: "Chaos" })).toBeVisible();
+    await expect(page.getByText(/λ/)).toBeVisible();
+    await expect(page.getByText("Click canvas to set")).toBeVisible();
+  });
+
+  test("Butterfly Effect Lorenz/Rössler toggle works", async ({ page }) => {
+    await page.goto("/gallery");
+    await page.getByText("Butterfly Effect Sandbox").first().click();
+    const lorenzBtn = page.getByRole("button", { name: "Lorenz" });
+    await expect(lorenzBtn).toBeVisible();
+    await lorenzBtn.click();
+    await expect(page.getByRole("button", { name: "Rössler" })).toBeVisible();
+  });
+
+  test("deep link for strange-attractor opens via URL hash", async ({ page }) => {
+    await page.goto("/gallery#strange-attractor");
+    await expect(page.getByRole("button", { name: "Lorenz" })).toBeVisible({ timeout: 5000 });
+  });
+
+  test("deep link for logistic-map opens via URL hash", async ({ page }) => {
+    await page.goto("/gallery#logistic-map");
+    await expect(page.getByRole("button", { name: "Cobweb" })).toBeVisible({ timeout: 5000 });
   });
 });
