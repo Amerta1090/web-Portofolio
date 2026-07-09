@@ -275,8 +275,21 @@ index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skil
 
 ### Sprint 7 (Chaos & Attractors) ✅
 - **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
-- **Epic 11 (Chaos & Dynamical Systems)**: 🔄 NOT STARTED
-  - Strange Attractor Zoo (Lorenz/Rössler/Aizawa/Thomas/Chen)
-  - Double Pendulum Chaos with Lyapunov exponent
-  - Logistic Map / Bifurcation Diagram
-  - Butterfly Effect Sandbox
+- **Epic 11 (Chaos & Dynamical Systems)**: ✅ COMPLETE
+  - Strange Attractor Zoo (Lorenz/Rössler/Aizawa/Thomas/Chen) — 3D particle trails, 4 attractors, parameter sliders, compact mode
+  - Double Pendulum Chaos — side-by-side pendulums, phase-space portrait, Lyapunov exponent, compact mode
+  - Logistic Map / Bifurcation Diagram — cobweb plot, auto-sweep, r/x₀ sliders, compact mode
+  - Butterfly Effect Sandbox — multi-trajectory divergence, Lorenz/Rössler toggle, Lyapunov gauge, compact mode
+
+### Sprint 8 (Fourier, Series & Transforms) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 12 (Fourier, Series & Transforms)**: ✅ COMPLETE
+  - **FourierEpicycles** (`src/islands/experiments/FourierEpicycles.tsx`): Draw a closed shape → DFT decomposes into N rotating epicycles. Mode toggle (Draw/Epicycles), N slider (1-100), Speed slider, Show/Hide Circles, Clear, formula overlay with reconstruction error. 12 unit tests, 3 E2E tests
+  - **TaylorSeries** (`src/islands/experiments/TaylorSeries.tsx`): Approximate eˣ, sin(x), cos(x), ln(1+x) by N terms (0-20). Each term as colored curve, residual error graph, auto-animate N, formula overlay. 11 unit tests, 5 E2E tests
+  - **RiemannSum** (`src/islands/experiments/RiemannSum.tsx`): Riemann sum → definite integral. 4 methods (Left/Right/Midpoint/Trapezoidal), 3 presets (x²/sin/1/x), custom draw, animate N from 2→100, Σ→∫ notation morph. 12 unit tests, 5 E2E tests
+  - **NoiseTopography** (`src/islands/experiments/NoiseTopography.tsx`): Layered Perlin noise → pseudo-3D terrain. Octaves/Persistence/Lacunarity/Seed/Height sliders, auto-rotate, mouse drag pan, STL export, noise profile overlay. 9 unit tests, 5 E2E tests
+  - **GalleryGrid registration**: 17 experiments total (4 new), with cursor/harmony mappings
+  - **Thumbnails**: `public/images/experiments/fourier-epicycles.svg`, `taylor-series.svg`, `riemann-sum.svg`
+  - **Build verified**: `bun run build` succeeds (45 pages)
+  - **Unit tests**: `bun run test` — 198 passed (17 files, +44 new tests)
+  - **E2E tests**: `bun run test:e2e` — 61 passed (+16 new tests)

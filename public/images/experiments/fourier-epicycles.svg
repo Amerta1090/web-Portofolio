@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#0f0f11"/>
+  <g transform="translate(200,150)" stroke="#f59e0b" fill="none" opacity="0.3">
+    <circle r="80"/>
+    <circle r="50"/>
+    <circle r="25"/>
+    <circle r="10"/>
+  </g>
+  <line x1="200" y1="70" x2="200" y2="230" stroke="#f59e0b" opacity="0.15"/>
+  <line x1="120" y1="150" x2="280" y2="150" stroke="#f59e0b" opacity="0.15"/>
+  <line x1="280" y1="150" x2="260" y2="130" stroke="#f59e0b" stroke-width="2" opacity="0.6"/>
+  <line x1="260" y1="130" x2="240" y2="110" stroke="#8b5cf6" stroke-width="1.5" opacity="0.5"/>
+  <line x1="240" y1="110" x2="230" y2="100" stroke="#06b6d4" stroke-width="1" opacity="0.4"/>
+  <circle cx="280" cy="150" r="3" fill="#f59e0b"/>
+  <circle cx="260" cy="130" r="2.5" fill="#8b5cf6"/>
+  <circle cx="240" cy="110" r="2" fill="#06b6d4"/>
+  <circle cx="230" cy="100" r="1.5" fill="#10b981"/>
+  <path d="M120 200 Q180 180 280 150 Q250 120 230 100" stroke="#22c55e" stroke-width="2" fill="none" opacity="0.8"/>
+  <text x="200" y="280" fill="#f59e0b" font-size="12" text-anchor="middle" font-family="monospace" opacity="0.6">N=12  ε=0.04</text>
+</svg>

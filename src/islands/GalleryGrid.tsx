@@ -31,6 +31,10 @@ import StrangeAttractorZoo from "./experiments/StrangeAttractorZoo";
 import DoublePendulumChaos from "./experiments/DoublePendulumChaos";
 import LogisticMap from "./experiments/LogisticMap";
 import ButterflyEffect from "./experiments/ButterflyEffect";
+import NoiseTopography from "./experiments/NoiseTopography";
+import FourierEpicycles from "./experiments/FourierEpicycles";
+import TaylorSeries from "./experiments/TaylorSeries";
+import RiemannSum from "./experiments/RiemannSum";
 import AmbientSound from "../components/atoms/AmbientSound";
 
 interface Experiment {
@@ -188,6 +192,50 @@ const experiments: Experiment[] = [
     gradient: "from-cyan-500 to-teal-500",
     thumbnail: "/images/experiments/butterfly-effect.svg",
   },
+  {
+    id: "noise-topography",
+    title: "Noise Topography",
+    description: "Layered Perlin noise → infinite 3D terrain with real-time octave, persistence, lacunarity, and seed controls.",
+    longDescription:
+      "Fractal noise terrain generator using layered Perlin noise. Explore how octaves, persistence, lacunarity, and seed shape the landscape. Adjust height multiplier, drag to pan, toggle auto-scroll for a flying-over effect, export the terrain as an STL file for 3D printing.",
+    tags: ["Canvas", "Noise", "Terrain", "3D", "Procedural"],
+    icon: <Activity className="w-5 h-5" />,
+    gradient: "from-cyan-500 to-amber-500",
+    thumbnail: "/images/experiments/noise-topography.svg",
+  },
+  {
+    id: "fourier-epicycles",
+    title: "Fourier Epicycles",
+    description: "Draw any closed shape — see it decomposed into rotating epicycles as N goes from 1 to 100.",
+    longDescription:
+      "The Fourier series tells us any closed shape is just a sum of rotating circles. Draw any closed shape with your mouse, watch a DFT decompose it into rotating epicycles (circles), and see the reconstruction converge from a blurry blob to a perfect outline as N increases.",
+    tags: ["Canvas", "Fourier", "Epicycles", "DFT"],
+    icon: <Activity className="w-5 h-5" />,
+    gradient: "from-amber-500 to-purple-500",
+    thumbnail: "/images/experiments/fourier-epicycles.svg",
+  },
+  {
+    id: "taylor-series",
+    title: "Taylor Series Approximation",
+    description: "Approximate eˣ, sin(x), cos(x), ln(1+x) by N terms. Watch each term added as a colored curve.",
+    longDescription:
+      "Taylor series let you approximate any function as a sum of polynomial terms. Watch eˣ, sin(x), cos(x), and ln(1+x) get approximated term-by-term from N=0 to N=20, with each new term shown as a colored curve and the residual error graph shrinking as the approximation tightens.",
+    tags: ["Canvas", "Calculus", "Taylor Series", "Approximation"],
+    icon: <Activity className="w-5 h-5" />,
+    gradient: "from-purple-500 to-pink-500",
+    thumbnail: "/images/experiments/taylor-series.svg",
+  },
+  {
+    id: "riemann-sum",
+    title: "Riemann Sum → Integral",
+    description: "Animate the transition from discrete rectangles to continuous area under the curve.",
+    longDescription:
+      "The Riemann sum is the foundation of integral calculus. Watch discrete rectangles (left, right, midpoint, trapezoidal) smoothly transition into the continuous area under any curve. Draw your own f(x), change the number of partitions, and see Σ notation morph into ∫ notation.",
+    tags: ["Canvas", "Calculus", "Riemann Sum", "Integral"],
+    icon: <Activity className="w-5 h-5" />,
+    gradient: "from-cyan-500 to-green-500",
+    thumbnail: "/images/experiments/riemann-sum.svg",
+  },
 ];
 
 function LivePreview({ id }: { id: string }) {
@@ -206,6 +254,10 @@ function LivePreview({ id }: { id: string }) {
       {id === "double-pendulum" && <DoublePendulumChaos compact />}
       {id === "logistic-map" && <LogisticMap compact />}
       {id === "butterfly-effect" && <ButterflyEffect compact />}
+      {id === "noise-topography" && <NoiseTopography compact />}
+      {id === "fourier-epicycles" && <FourierEpicycles compact />}
+      {id === "taylor-series" && <TaylorSeries compact />}
+      {id === "riemann-sum" && <RiemannSum compact />}
     </>
   );
 }
@@ -409,6 +461,10 @@ function ExperimentModal({
               {experiment.id === "double-pendulum" && <DoublePendulumChaos />}
               {experiment.id === "logistic-map" && <LogisticMap />}
               {experiment.id === "butterfly-effect" && <ButterflyEffect />}
+              {experiment.id === "noise-topography" && <NoiseTopography />}
+              {experiment.id === "fourier-epicycles" && <FourierEpicycles />}
+              {experiment.id === "taylor-series" && <TaylorSeries />}
+              {experiment.id === "riemann-sum" && <RiemannSum />}
             </div>
           </motion.div>
         </motion.div>
@@ -432,6 +488,10 @@ function experimentCursor(id: string): string {
     "double-pendulum": "grab",
     "logistic-map": "zoom-in",
     "butterfly-effect": "crosshair",
+    "noise-topography": "grab",
+    "fourier-epicycles": "crosshair",
+    "taylor-series": "crosshair",
+    "riemann-sum": "crosshair",
   };
   return cursors[id] || "pointer";
 }
@@ -536,6 +596,10 @@ export default function GalleryGrid() {
     : activeExperiment === "double-pendulum" ? "purple"
     : activeExperiment === "logistic-map" ? "amber"
     : activeExperiment === "butterfly-effect" ? "cyan"
+    : activeExperiment === "noise-topography" ? "cyan"
+    : activeExperiment === "fourier-epicycles" ? "amber"
+    : activeExperiment === "taylor-series" ? "purple"
+    : activeExperiment === "riemann-sum" ? "green"
     : "amber";
 
   return (
