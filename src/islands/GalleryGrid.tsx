@@ -40,6 +40,10 @@ import EigenvectorFlowField from "./experiments/EigenvectorFlowField";
 import MatrixMultiplication from "./experiments/MatrixMultiplication";
 import SVDImageCompression from "./experiments/SVDImageCompression";
 import PCATSNEViz from "./experiments/PCATSNEViz";
+import VonKarmannVortex from "./experiments/VonKarmannVortex";
+import SpringPhysics from "./experiments/SpringPhysics";
+import SandpileModel from "./experiments/SandpileModel";
+import RayleighBenard from "./experiments/RayleighBenard";
 import AmbientSound from "../components/atoms/AmbientSound";
 
 interface Experiment {
@@ -296,6 +300,50 @@ const experiments: Experiment[] = [
     gradient: "from-green-500 to-teal-500",
     thumbnail: "/images/experiments/pca-tsne-viz.svg",
   },
+  {
+    id: "von-karmann-vortex",
+    title: "Von Kármán Vortex Street",
+    description: "Fluid flow past a cylinder with alternating vortex shedding, streamlines, and Reynolds number control.",
+    longDescription:
+      "Watch fluid flow past a circular cylinder and witness the birth of the Von Kármán vortex street — alternating vortices that shed from the cylinder above a critical Reynolds number. Adjust flow speed, Reynolds number, and cylinder size in real-time.",
+    tags: ["Canvas", "Fluid Dynamics", "PDE", "Vortex"],
+    icon: <Droplets className="w-5 h-5" />,
+    gradient: "from-cyan-500 to-blue-500",
+    thumbnail: "/images/experiments/von-karmann-vortex.svg",
+  },
+  {
+    id: "spring-physics",
+    title: "Spring Physics Sandbox",
+    description: "Interactive Verlet integration mass-spring system — click to create nodes, drag to connect, watch cloth and jelly come alive.",
+    longDescription:
+      "A full-featured spring physics sandbox using Verlet integration. Click to place nodes, drag between nodes to connect springs, double-click to pin. Watch cloth drape, chains swing, and jelly wobble under gravity with real-time tension visualization.",
+    tags: ["Canvas", "Physics", "Verlet", "Interactive", "Springs"],
+    icon: <GitFork className="w-5 h-5" />,
+    gradient: "from-purple-500 to-pink-500",
+    thumbnail: "/images/experiments/spring-physics.svg",
+  },
+  {
+    id: "sandpile-model",
+    title: "Sandpile Model (SOC)",
+    description: "Abelian sandpile — drop grains, watch avalanches follow a power law. Self-organized criticality in action.",
+    longDescription:
+      "The Abelian sandpile model demonstrates self-organized criticality. Drop grains onto a grid, and when any cell reaches 4 grains it topples, triggering chain-reaction avalanches. Over time, the system naturally evolves to a critical state where avalanche sizes follow a power law distribution.",
+    tags: ["Canvas", "Cellular Automata", "SOC", "Power Law"],
+    icon: <Activity className="w-5 h-5" />,
+    gradient: "from-amber-500 to-orange-500",
+    thumbnail: "/images/experiments/sandpile-model.svg",
+  },
+  {
+    id: "rayleigh-benard",
+    title: "Rayleigh-Bénard Convection",
+    description: "Fluid heated from below — watch convection cells emerge as the Rayleigh number crosses the critical threshold.",
+    longDescription:
+      "Simulate Rayleigh-Bénard convection: a fluid layer heated from below and cooled from above. Below the critical Rayleigh number, heat transfers by conduction. Above it, beautiful convection cells form as hot fluid rises and cool fluid sinks in rolling patterns.",
+    tags: ["Canvas", "PDE", "Convection", "Fluid Dynamics", "Thermal"],
+    icon: <Layers className="w-5 h-5" />,
+    gradient: "from-red-500 to-blue-500",
+    thumbnail: "/images/experiments/rayleigh-benard.svg",
+  },
 ];
 
 function LivePreview({ id }: { id: string }) {
@@ -323,6 +371,10 @@ function LivePreview({ id }: { id: string }) {
       {id === "matrix-multiplication" && <MatrixMultiplication compact />}
       {id === "svd-compression" && <SVDImageCompression compact />}
       {id === "pca-tsne-viz" && <PCATSNEViz compact />}
+      {id === "von-karmann-vortex" && <VonKarmannVortex compact />}
+      {id === "spring-physics" && <SpringPhysics compact />}
+      {id === "sandpile-model" && <SandpileModel compact />}
+      {id === "rayleigh-benard" && <RayleighBenard compact />}
     </>
   );
 }
@@ -535,6 +587,10 @@ function ExperimentModal({
               {experiment.id === "matrix-multiplication" && <MatrixMultiplication />}
               {experiment.id === "svd-compression" && <SVDImageCompression />}
               {experiment.id === "pca-tsne-viz" && <PCATSNEViz />}
+              {experiment.id === "von-karmann-vortex" && <VonKarmannVortex />}
+              {experiment.id === "spring-physics" && <SpringPhysics />}
+              {experiment.id === "sandpile-model" && <SandpileModel />}
+              {experiment.id === "rayleigh-benard" && <RayleighBenard />}
             </div>
           </motion.div>
         </motion.div>
@@ -567,6 +623,10 @@ function experimentCursor(id: string): string {
     "matrix-multiplication": "crosshair",
     "svd-compression": "crosshair",
     "pca-tsne-viz": "crosshair",
+    "von-karmann-vortex": "crosshair",
+    "spring-physics": "crosshair",
+    "sandpile-model": "crosshair",
+    "rayleigh-benard": "crosshair",
   };
   return cursors[id] || "pointer";
 }
@@ -680,6 +740,10 @@ export default function GalleryGrid() {
     : activeExperiment === "matrix-multiplication" ? "purple"
     : activeExperiment === "svd-compression" ? "purple"
     : activeExperiment === "pca-tsne-viz" ? "green"
+    : activeExperiment === "von-karmann-vortex" ? "cyan"
+    : activeExperiment === "spring-physics" ? "purple"
+    : activeExperiment === "sandpile-model" ? "amber"
+    : activeExperiment === "rayleigh-benard" ? "purple"
     : "amber";
 
   return (
@@ -709,7 +773,7 @@ export default function GalleryGrid() {
           More experiments coming soon&hellip;
         </p>
         <div className="flex justify-center gap-1.5 mt-2">
-          {["Particle Sky", "Morph Grid"].map(
+          {["Particle Sky", "Wave Equation", "Ising Model", "Lattice Boltzmann"].map(
             (name) => (
               <span
                 key={name}

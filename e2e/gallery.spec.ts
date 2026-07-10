@@ -5,7 +5,7 @@ test.describe("Gallery page", () => {
     await page.goto("/gallery");
     await expect(page.getByRole("heading", { name: "Creative Lab" })).toBeVisible();
     const cards = page.locator('[role="list"] > [role="listitem"]');
-    await expect(cards).toHaveCount(22);
+    await expect(cards).toHaveCount(26);
   });
 
   test("Fractal Explorer card is present", async ({ page }) => {
@@ -511,5 +511,95 @@ test.describe("Gallery page", () => {
   test("deep link for pca-tsne-viz opens via URL hash", async ({ page }) => {
     await page.goto("/gallery#pca-tsne-viz");
     await expect(page.getByText("Generate New Data")).toBeVisible({ timeout: 5000 });
+  });
+
+  // ═══════════════════════════════════════════
+  // Sprint 10 — PDEs, Physics & Emergence
+  // ═══════════════════════════════════════════
+
+  test("Von Kármán Vortex Street card is present", async ({ page }) => {
+    await page.goto("/gallery");
+    await expect(page.getByText("Von Kármán Vortex Street")).toBeVisible();
+    const card = page.locator('[role="listitem"]').filter({ hasText: "Von Kármán Vortex Street" });
+    await expect(card).toBeVisible();
+    await expect(card.getByText("Fluid Dynamics", { exact: true })).toBeVisible();
+    await expect(card.getByText("Vortex", { exact: true })).toBeVisible();
+  });
+
+  test("Von Kármán Vortex Street modal shows controls", async ({ page }) => {
+    await page.goto("/gallery");
+    await page.getByText("Von Kármán Vortex Street").first().click();
+    await expect(page.locator('label:has-text("Re:") input[type="range"]')).toBeVisible();
+    await expect(page.getByRole("button", { name: "Pause" })).toBeVisible();
+  });
+
+  test("Von Kármán Vortex Street deep link opens via URL hash", async ({ page }) => {
+    await page.goto("/gallery#von-karmann-vortex");
+    await expect(page.locator('label:has-text("Re:") input[type="range"]')).toBeVisible({ timeout: 5000 });
+  });
+
+  test("Spring Physics Sandbox card is present", async ({ page }) => {
+    await page.goto("/gallery");
+    await expect(page.getByText("Spring Physics Sandbox")).toBeVisible();
+    const card = page.locator('[role="listitem"]').filter({ hasText: "Spring Physics Sandbox" });
+    await expect(card).toBeVisible();
+    await expect(card.getByText("Verlet", { exact: true })).toBeVisible();
+  });
+
+  test("Spring Physics Sandbox modal shows preset buttons", async ({ page }) => {
+    await page.goto("/gallery");
+    await page.getByText("Spring Physics Sandbox").first().click();
+    await expect(page.getByRole("button", { name: "Cloth" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Chain" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Jelly" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Ragdoll" })).toBeVisible();
+  });
+
+  test("Spring Physics Sandbox deep link opens via URL hash", async ({ page }) => {
+    await page.goto("/gallery#spring-physics");
+    await expect(page.getByRole("button", { name: "Cloth" })).toBeVisible({ timeout: 5000 });
+  });
+
+  test("Sandpile Model card is present", async ({ page }) => {
+    await page.goto("/gallery");
+    await expect(page.getByText("Sandpile Model (SOC)")).toBeVisible();
+    const card = page.locator('[role="listitem"]').filter({ hasText: "Sandpile Model" });
+    await expect(card).toBeVisible();
+    await expect(card.getByText("Cellular Automata", { exact: true })).toBeVisible();
+  });
+
+  test("Sandpile Model modal shows Rain and Reset buttons", async ({ page }) => {
+    await page.goto("/gallery");
+    await page.getByText("Sandpile Model (SOC)").first().click();
+    await expect(page.getByRole("button", { name: /Rain/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Single/ })).toBeVisible();
+  });
+
+  test("Sandpile Model deep link opens via URL hash", async ({ page }) => {
+    await page.goto("/gallery#sandpile-model");
+    await expect(page.getByRole("button", { name: /Rain/ })).toBeVisible({ timeout: 5000 });
+  });
+
+  test("Rayleigh-Bénard Convection card is present", async ({ page }) => {
+    await page.goto("/gallery");
+    await expect(page.getByText("Rayleigh-Bénard Convection")).toBeVisible();
+    const card = page.locator('[role="listitem"]').filter({ hasText: "Rayleigh-Bénard Convection" });
+    await expect(card).toBeVisible();
+    await expect(card.getByText("PDE", { exact: true })).toBeVisible();
+  });
+
+  test("Rayleigh-Bénard Convection modal shows Ra slider and controls", async ({ page }) => {
+    await page.goto("/gallery");
+    await page.getByText("Rayleigh-Bénard Convection").first().click();
+    await expect(page.locator('label:has-text("Ra:") input[type="range"]')).toBeVisible();
+    await expect(page.getByRole("button", { name: "Arrows" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Pause" })).toBeVisible();
+  });
+
+  test("Rayleigh-Bénard Convection deep link opens via URL hash", async ({ page }) => {
+    await page.goto("/gallery#rayleigh-benard");
+    await expect(page.locator('label:has-text("Ra:") input[type="range"]')).toBeVisible({ timeout: 5000 });
   });
 });

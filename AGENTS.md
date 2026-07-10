@@ -25,6 +25,7 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 - Sprint 7 (Chaos & Attractors): ✅ COMPLETE
 - Sprint 8 (Fourier, Series & Transforms): ✅ COMPLETE
 - Sprint 9 (Linear Algebra & Dimensionality): ✅ COMPLETE
+- Sprint 10 (PDEs, Physics & Emergence): ✅ COMPLETE
 
 ## Architecture
 - **Rendering**: SSG. No runtime API calls. GitHub data fetched at build time.
@@ -304,8 +305,21 @@ index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skil
   - **SVDImageCompression** (`src/islands/experiments/SVDImageCompression.tsx`): Image upload → SVD decomposition UΣVᵀ. Rank-k reconstruction slider (1→100). Σ diagonal display with kept/discarded highlighting. Compression ratio real-time display. Side-by-side original vs reconstructed. Built-in test pattern. 20 unit tests
   - **TesseractProjection** (`src/islands/experiments/TesseractProjection.tsx`): 4D hypercube (16 vertices, 32 edges) projected to 3D→2D. 6 independent 4D rotation planes (XY, XZ, XW, YZ, YW, ZW). Perspective projection with adjustable 4D camera distance. Wireframe + semi-transparent faces. Drag to rotate 4D view. 15 unit tests
   - **PCATSNEViz** (`src/islands/experiments/PCATSNEViz.tsx`): Generate high-dimensional clusters → PCA projection to 2D with explained variance. t-SNE with adjustable perplexity. Side-by-side PCA vs t-SNE on same data. Interactive data generation.
-  - **GalleryGrid registration**: 22 experiments total (5 new), with cursor/harmony mappings
+  - **GalleryGrid registration**: 26 experiments total (was 22; 4 new in Sprint 10), with cursor/harmony mappings
   - **Thumbnails**: `public/images/experiments/eigenvector-flow.svg`, `matrix-multiplication.svg`, `svd-compression.svg`, `tesseract-projection.svg`, `pca-tsne-viz.svg`
   - **Build verified**: `bun run build` succeeds (45 pages)
-  - **Unit tests**: `bun run test` — 285 passed (22 files, +87 new tests)
-  - **E2E tests**: `bun run test:e2e` — 75 passed (+14 new tests)
+  - **Unit tests**: `bun run test` — 347 passed (26 files, +62 new tests in Sprint 10)
+  - **E2E tests**: `bun run test:e2e` — 87 passed (+12 new tests in Sprint 10)
+
+### Sprint 10 (PDEs, Physics & Emergence) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 14 (PDEs, Physics & Emergence)**: ✅ COMPLETE
+  - **VonKarmannVortex** (`src/islands/experiments/VonKarmannVortex.tsx`): Lightweight grid-based fluid flow simulation past a circular cylinder. Semi-Lagrangian advection, explicit diffusion, periodic vorticity injection at Strouhal frequency. Velocity/vorticity color modes, 500 streamline particles. Reynolds number / flow speed / cylinder radius sliders. Pause/Resume. 14 unit tests
+  - **SpringPhysics** (`src/islands/experiments/SpringPhysics.tsx`): Interactive Verlet integration mass-spring sandbox. Click to create nodes, drag to connect springs, double-click to pin. Tension-colored springs (blue=compressed, white=neutral, red=stretched). 4 presets (Cloth, Chain, Jelly, Ragdoll). Gravity/damping/stiffness sliders. Clear All / Pause. 16 unit tests
+  - **SandpileModel** (`src/islands/experiments/SandpileModel.tsx`): Abelian sandpile model demonstrating self-organized criticality. Queue-based toppling with absorbing/periodic boundary. 5-color grain visualization, avalanche flash effect, log₂ histogram overlay. Drop rate / grid size sliders, boundary toggle, Rain/Single Drop/Reset. Stats display. 15 unit tests
+  - **RayleighBenard** (`src/islands/experiments/RayleighBenard.tsx`): Streamfunction-vorticity simulation of Rayleigh-Bénard convection. 2D grid with Jacobi iteration for Poisson solve. Temperature field rendering (cold→dark→hot), velocity arrow overlay. Ra (500–10000) / Pr (0.1–10) / grid resolution sliders. Arrows toggle, overlay toggle, Reset, Pause/Resume. 17 unit tests
+  - **GalleryGrid registration**: 26 experiments total (4 new), with cursor/harmony mappings
+  - **Thumbnails**: `public/images/experiments/von-karmann-vortex.svg`, `spring-physics.svg`, `sandpile-model.svg`, `rayleigh-benard.svg`
+  - **Build verified**: `bun run build` succeeds (45 pages)
+  - **Unit tests**: `bun run test` — 347 passed (26 files, +62 new tests)
+  - **E2E tests**: `bun run test:e2e` — 87 passed (+12 new tests)
