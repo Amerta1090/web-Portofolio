@@ -5,7 +5,7 @@ test.describe("Gallery page", () => {
     await page.goto("/gallery");
     await expect(page.getByRole("heading", { name: "Creative Lab" })).toBeVisible();
     const cards = page.locator('[role="list"] > [role="listitem"]');
-    await expect(cards).toHaveCount(17);
+    await expect(cards).toHaveCount(22);
   });
 
   test("Fractal Explorer card is present", async ({ page }) => {
@@ -405,5 +405,111 @@ test.describe("Gallery page", () => {
   test("Riemann Sum deep link opens via URL hash", async ({ page }) => {
     await page.goto("/gallery#riemann-sum");
     await expect(page.getByRole("button", { name: "Left" })).toBeVisible({ timeout: 5000 });
+  });
+
+  // ═══════════════════════════════════════════
+  // Sprint 9 — Linear Algebra & Dimensionality
+  // ═══════════════════════════════════════════
+
+  test("Eigenvector Flow Field card is present", async ({ page }) => {
+    await page.goto("/gallery");
+    await expect(page.getByText("Eigenvector Flow Field")).toBeVisible();
+    const card = page.locator('[role="listitem"]').filter({ hasText: "Eigenvector Flow Field" });
+    await expect(card).toBeVisible();
+    await expect(card.getByText("Linear Algebra", { exact: true })).toBeVisible();
+    await expect(card.getByText("PCA", { exact: true })).toBeVisible();
+  });
+
+  test("Eigenvector Flow Field modal shows matrix preset and PCA controls", async ({ page }) => {
+    await page.goto("/gallery");
+    await page.getByText("Eigenvector Flow Field").first().click();
+    await expect(page.locator("select")).toBeVisible();
+    await expect(page.getByRole("button", { name: "▶ Animate PCA", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "PCA", exact: true })).toBeVisible();
+  });
+
+  test("Matrix Multiplication card is present", async ({ page }) => {
+    await page.goto("/gallery");
+    await expect(page.getByText("Matrix Multiplication Visual")).toBeVisible();
+    const card = page.locator('[role="listitem"]').filter({ hasText: "Matrix Multiplication Visual" });
+    await expect(card).toBeVisible();
+    await expect(card.getByText("Matrices", { exact: true })).toBeVisible();
+  });
+
+  test("Matrix Multiplication modal shows matrix presets and play controls", async ({ page }) => {
+    await page.goto("/gallery");
+    await page.getByText("Matrix Multiplication Visual").first().click();
+    await expect(page.locator("select")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Play" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Step" })).toBeVisible();
+  });
+
+  test("SVD Image Compression card is present", async ({ page }) => {
+    await page.goto("/gallery");
+    await expect(page.getByText("SVD Image Compression")).toBeVisible();
+    const card = page.locator('[role="listitem"]').filter({ hasText: "SVD Image Compression" });
+    await expect(card).toBeVisible();
+    await expect(card.getByText("SVD", { exact: true })).toBeVisible();
+    await expect(card.getByText("Compression", { exact: true })).toBeVisible();
+  });
+
+  test("SVD Image Compression modal shows rank slider and file upload", async ({ page }) => {
+    await page.goto("/gallery");
+    await page.getByText("SVD Image Compression").first().click();
+    await expect(page.getByText("Upload Image")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
+  });
+
+  test("Tesseract Projection card is present", async ({ page }) => {
+    await page.goto("/gallery");
+    await expect(page.getByText("Tesseract Hypercube Projection")).toBeVisible();
+    const card = page.locator('[role="listitem"]').filter({ hasText: "Tesseract Hypercube Projection" });
+    await expect(card).toBeVisible();
+    await expect(card.getByText("4D", { exact: true })).toBeVisible();
+    await expect(card.getByText("Geometry", { exact: true })).toBeVisible();
+  });
+
+  test("Tesseract Projection modal shows rotation plane controls", async ({ page }) => {
+    await page.goto("/gallery");
+    await page.getByText("Tesseract Hypercube Projection").first().click();
+    await expect(page.getByText("Auto", { exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Wireframe" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Faces" })).toBeVisible();
+  });
+
+  test("PCA / t-SNE card is present", async ({ page }) => {
+    await page.goto("/gallery");
+    await expect(page.getByText("PCA / t-SNE Visualization")).toBeVisible();
+    const card = page.locator('[role="listitem"]').filter({ hasText: "PCA / t-SNE Visualization" });
+    await expect(card).toBeVisible();
+    await expect(card.getByText("PCA", { exact: true })).toBeVisible();
+    await expect(card.getByText("Dimensionality Reduction", { exact: true })).toBeVisible();
+  });
+
+  test("PCA / t-SNE modal shows projection controls", async ({ page }) => {
+    await page.goto("/gallery");
+    await page.getByText("PCA / t-SNE Visualization").first().click();
+    await expect(page.getByText("Generate New Data")).toBeVisible();
+    await expect(page.getByText("Perplexity:")).toBeVisible();
+  });
+
+  test("deep link for eigenvector-flow opens via URL hash", async ({ page }) => {
+    await page.goto("/gallery#eigenvector-flow");
+    await expect(page.getByRole("button", { name: "▶ Animate PCA", exact: true })).toBeVisible({ timeout: 5000 });
+  });
+
+  test("deep link for svd-compression opens via URL hash", async ({ page }) => {
+    await page.goto("/gallery#svd-compression");
+    await expect(page.getByText("Upload Image")).toBeVisible({ timeout: 5000 });
+  });
+
+  test("deep link for tesseract-projection opens via URL hash", async ({ page }) => {
+    await page.goto("/gallery#tesseract-projection");
+    await expect(page.getByText("Auto", { exact: true })).toBeVisible({ timeout: 5000 });
+  });
+
+  test("deep link for pca-tsne-viz opens via URL hash", async ({ page }) => {
+    await page.goto("/gallery#pca-tsne-viz");
+    await expect(page.getByText("Generate New Data")).toBeVisible({ timeout: 5000 });
   });
 });

@@ -35,6 +35,11 @@ import NoiseTopography from "./experiments/NoiseTopography";
 import FourierEpicycles from "./experiments/FourierEpicycles";
 import TaylorSeries from "./experiments/TaylorSeries";
 import RiemannSum from "./experiments/RiemannSum";
+import TesseractProjection from "./experiments/TesseractProjection";
+import EigenvectorFlowField from "./experiments/EigenvectorFlowField";
+import MatrixMultiplication from "./experiments/MatrixMultiplication";
+import SVDImageCompression from "./experiments/SVDImageCompression";
+import PCATSNEViz from "./experiments/PCATSNEViz";
 import AmbientSound from "../components/atoms/AmbientSound";
 
 interface Experiment {
@@ -236,6 +241,61 @@ const experiments: Experiment[] = [
     gradient: "from-cyan-500 to-green-500",
     thumbnail: "/images/experiments/riemann-sum.svg",
   },
+  {
+    id: "eigenvector-flow",
+    title: "Eigenvector Flow Field",
+    description: "2D vector field where eigenvectors define flow lines. Drag a point to trace eigenvector directions. Animate PCA on random clusters with covariance ellipse.",
+    longDescription:
+      "A visual exploration of eigendecomposition and PCA. Drag a point through the vector field to trace eigenvector directions, watch PCA rotate principal components to capture maximum variance, and see the covariance ellipse whose axis lengths equal eigenvalue magnitudes.",
+    tags: ["Canvas", "Linear Algebra", "PCA", "Eigenvectors", "Interactive"],
+    icon: <GitFork className="w-5 h-5" />,
+    gradient: "from-teal-500 to-cyan-500",
+    thumbnail: "/images/experiments/eigenvector-flow.svg",
+  },
+  {
+    id: "matrix-multiplication",
+    title: "Matrix Multiplication Visual",
+    description: "Animated dot product row×column with synchronized highlighting. 3D grid transformation by 2×2 matrix.",
+    longDescription:
+      "Watch matrix multiplication come alive. Each dot product animates step-by-step as matching row and column cells highlight in sync. See the result matrix build cell-by-cell, then visualize the same matrix as a linear transformation stretching and rotating a unit grid in 3D.",
+    tags: ["Canvas", "Linear Algebra", "Matrices", "3D Transform", "Interactive"],
+    icon: <CircuitBoard className="w-5 h-5" />,
+    gradient: "from-amber-500 to-purple-500",
+    thumbnail: "/images/experiments/matrix-multiplication.svg",
+  },
+  {
+    id: "svd-compression",
+    title: "SVD Image Compression",
+    description: "Upload an image → SVD decomposition UΣV^T. Slide rank k from 1→100, watch image reconstruct from k singular values.",
+    longDescription:
+      "The Singular Value Decomposition (SVD) is the mathematical foundation of lossy compression. Upload any image, watch SVD decompose it into U, Σ, V^T, then use the rank slider to reconstruct from k singular values. See compression ratio update in real-time, the Σ diagonal with kept values highlighted, and a side-by-side comparison of original versus SVD reconstruction.",
+    tags: ["Canvas", "SVD", "Compression", "Linear Algebra", "Image Processing"],
+    icon: <Layers className="w-5 h-5" />,
+    gradient: "from-purple-500 to-pink-500",
+    thumbnail: "/images/experiments/svd-compression.svg",
+  },
+  {
+    id: "tesseract-projection",
+    title: "Tesseract Hypercube Projection",
+    description: "Interactive 4D hypercube (tesseract) projected to 3D and then to 2D screen with full 4D rotation controls.",
+    longDescription:
+      "A 4D hypercube (tesseract) with 16 vertices and 32 edges, projected first from 4D to 3D via perspective projection, then to 2D. Rotate in all six 4D rotation planes (XY, XZ, XW, YZ, YW, ZW), toggle auto-rotation, adjust camera distance, and drag to explore the fourth dimension.",
+    tags: ["Canvas", "4D", "Geometry", "Hypercube", "Visualization"],
+    icon: <Hexagon className="w-5 h-5" />,
+    gradient: "from-amber-500 to-purple-500",
+    thumbnail: "/images/experiments/tesseract-projection.svg",
+  },
+  {
+    id: "pca-tsne-viz",
+    title: "PCA / t-SNE Visualization",
+    description: "Generate high-dimensional clusters → animate PCA projection to 2D. Then t-SNE with adjustable perplexity — side-by-side comparison.",
+    longDescription:
+      "Compare two dimensionality reduction techniques side-by-side. First, PCA projects high-dimensional clusters (5D–10D) to 2D, showing the covariance matrix and explained variance ratio. Then t-SNE separates clusters with adjustable perplexity, revealing how neighbor preservation differs from variance maximization.",
+    tags: ["Canvas", "PCA", "t-SNE", "Dimensionality Reduction", "ML"],
+    icon: <Activity className="w-5 h-5" />,
+    gradient: "from-green-500 to-teal-500",
+    thumbnail: "/images/experiments/pca-tsne-viz.svg",
+  },
 ];
 
 function LivePreview({ id }: { id: string }) {
@@ -258,6 +318,11 @@ function LivePreview({ id }: { id: string }) {
       {id === "fourier-epicycles" && <FourierEpicycles compact />}
       {id === "taylor-series" && <TaylorSeries compact />}
       {id === "riemann-sum" && <RiemannSum compact />}
+      {id === "tesseract-projection" && <TesseractProjection compact />}
+      {id === "eigenvector-flow" && <EigenvectorFlowField compact />}
+      {id === "matrix-multiplication" && <MatrixMultiplication compact />}
+      {id === "svd-compression" && <SVDImageCompression compact />}
+      {id === "pca-tsne-viz" && <PCATSNEViz compact />}
     </>
   );
 }
@@ -465,6 +530,11 @@ function ExperimentModal({
               {experiment.id === "fourier-epicycles" && <FourierEpicycles />}
               {experiment.id === "taylor-series" && <TaylorSeries />}
               {experiment.id === "riemann-sum" && <RiemannSum />}
+              {experiment.id === "tesseract-projection" && <TesseractProjection />}
+              {experiment.id === "eigenvector-flow" && <EigenvectorFlowField />}
+              {experiment.id === "matrix-multiplication" && <MatrixMultiplication />}
+              {experiment.id === "svd-compression" && <SVDImageCompression />}
+              {experiment.id === "pca-tsne-viz" && <PCATSNEViz />}
             </div>
           </motion.div>
         </motion.div>
@@ -492,6 +562,11 @@ function experimentCursor(id: string): string {
     "fourier-epicycles": "crosshair",
     "taylor-series": "crosshair",
     "riemann-sum": "crosshair",
+    "tesseract-projection": "crosshair",
+    "eigenvector-flow": "crosshair",
+    "matrix-multiplication": "crosshair",
+    "svd-compression": "crosshair",
+    "pca-tsne-viz": "crosshair",
   };
   return cursors[id] || "pointer";
 }
@@ -600,6 +675,11 @@ export default function GalleryGrid() {
     : activeExperiment === "fourier-epicycles" ? "amber"
     : activeExperiment === "taylor-series" ? "purple"
     : activeExperiment === "riemann-sum" ? "green"
+    : activeExperiment === "tesseract-projection" ? "amber"
+    : activeExperiment === "eigenvector-flow" ? "cyan"
+    : activeExperiment === "matrix-multiplication" ? "purple"
+    : activeExperiment === "svd-compression" ? "purple"
+    : activeExperiment === "pca-tsne-viz" ? "green"
     : "amber";
 
   return (

@@ -23,6 +23,8 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 - Sprint 5 (Interactive Canvas): ✅ COMPLETE
 - Sprint 6 (Micro-interactions): ✅ COMPLETE
 - Sprint 7 (Chaos & Attractors): ✅ COMPLETE
+- Sprint 8 (Fourier, Series & Transforms): ✅ COMPLETE
+- Sprint 9 (Linear Algebra & Dimensionality): ✅ COMPLETE
 
 ## Architecture
 - **Rendering**: SSG. No runtime API calls. GitHub data fetched at build time.
@@ -293,3 +295,17 @@ index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skil
   - **Build verified**: `bun run build` succeeds (45 pages)
   - **Unit tests**: `bun run test` — 198 passed (17 files, +44 new tests)
   - **E2E tests**: `bun run test:e2e` — 61 passed (+16 new tests)
+
+### Sprint 9 (Linear Algebra & Dimensionality) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 13 (Linear Algebra & Dimensionality)**: ✅ COMPLETE
+  - **EigenvectorFlowField** (`src/islands/experiments/EigenvectorFlowField.tsx`): 2D vector field where eigenvectors define flow lines. Drag a point to trace along eigenvector directions. PCA animation on random clusters with rotating principal components. Covariance ellipse with eigenvalue axis lengths. 15 unit tests
+  - **MatrixMultiplication** (`src/islands/experiments/MatrixMultiplication.tsx`): Animated dot product row×column with pulsing glow. Result matrix builds cell-by-cell with scale-in animation. Grid transformation view with basis vectors î/ĵ. Matrix presets (Identity, Rotation, Shear, Reflection, Scale). Play/Pause/Step controls. 18 unit tests
+  - **SVDImageCompression** (`src/islands/experiments/SVDImageCompression.tsx`): Image upload → SVD decomposition UΣVᵀ. Rank-k reconstruction slider (1→100). Σ diagonal display with kept/discarded highlighting. Compression ratio real-time display. Side-by-side original vs reconstructed. Built-in test pattern. 20 unit tests
+  - **TesseractProjection** (`src/islands/experiments/TesseractProjection.tsx`): 4D hypercube (16 vertices, 32 edges) projected to 3D→2D. 6 independent 4D rotation planes (XY, XZ, XW, YZ, YW, ZW). Perspective projection with adjustable 4D camera distance. Wireframe + semi-transparent faces. Drag to rotate 4D view. 15 unit tests
+  - **PCATSNEViz** (`src/islands/experiments/PCATSNEViz.tsx`): Generate high-dimensional clusters → PCA projection to 2D with explained variance. t-SNE with adjustable perplexity. Side-by-side PCA vs t-SNE on same data. Interactive data generation.
+  - **GalleryGrid registration**: 22 experiments total (5 new), with cursor/harmony mappings
+  - **Thumbnails**: `public/images/experiments/eigenvector-flow.svg`, `matrix-multiplication.svg`, `svd-compression.svg`, `tesseract-projection.svg`, `pca-tsne-viz.svg`
+  - **Build verified**: `bun run build` succeeds (45 pages)
+  - **Unit tests**: `bun run test` — 285 passed (22 files, +87 new tests)
+  - **E2E tests**: `bun run test:e2e` — 75 passed (+14 new tests)

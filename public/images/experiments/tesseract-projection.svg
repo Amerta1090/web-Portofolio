@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#0f0f11"/>
+  <g transform="translate(200,150)">
+    <animateTransform attributeName="transform" type="rotate" from="0 200 150" to="360 200 150" dur="20s" repeatCount="indefinite"/>
+    <g stroke="#f59e0b" fill="none" stroke-width="1" opacity="0.6">
+      <rect x="-60" y="-60" width="120" height="120" stroke-opacity="0.8"/>
+      <rect x="-30" y="-30" width="60" height="60" stroke-opacity="0.8"/>
+      <line x1="-60" y1="-60" x2="-30" y2="-30"/>
+      <line x1="60" y1="-60" x2="30" y2="-30"/>
+      <line x1="-60" y1="60" x2="-30" y2="30"/>
+      <line x1="60" y1="60" x2="30" y2="30"/>
+      <line x1="-60" y1="-60" x2="-50" y2="-50" stroke="#06b6d4" stroke-width="1.5"/>
+      <line x1="60" y1="-60" x2="50" y2="-50" stroke="#06b6d4" stroke-width="1.5"/>
+      <line x1="-60" y1="60" x2="-50" y2="50" stroke="#06b6d4" stroke-width="1.5"/>
+      <line x1="60" y1="60" x2="50" y2="50" stroke="#06b6d4" stroke-width="1.5"/>
+    </g>
+    <g fill="none" stroke="#06b6d4" stroke-width="0.5" opacity="0.15">
+      <polygon points="-60,-60 -30,-30 30,-30 60,-60"/>
+      <polygon points="-60,60 -30,30 30,30 60,60"/>
+      <polygon points="-60,-60 -30,-30 -30,30 -60,60"/>
+      <polygon points="60,-60 30,-30 30,30 60,60"/>
+    </g>
+    <circle cx="-60" cy="-60" r="2.5" fill="#8b5cf6"/>
+    <circle cx="60" cy="-60" r="2.5" fill="#8b5cf6"/>
+    <circle cx="-60" cy="60" r="2.5" fill="#8b5cf6"/>
+    <circle cx="60" cy="60" r="2.5" fill="#8b5cf6"/>
+    <circle cx="-30" cy="-30" r="2" fill="#8b5cf6"/>
+    <circle cx="30" cy="-30" r="2" fill="#8b5cf6"/>
+    <circle cx="-30" cy="30" r="2" fill="#8b5cf6"/>
+    <circle cx="30" cy="30" r="2" fill="#8b5cf6"/>
+  </g>
+  <text x="200" y="270" fill="#8b5cf6" font-size="9" text-anchor="middle" font-family="monospace" opacity="0.5">V:16  E:32  4D→3D→2D</text>
+</svg>
