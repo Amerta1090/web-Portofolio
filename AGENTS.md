@@ -26,6 +26,7 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 - Sprint 8 (Fourier, Series & Transforms): ✅ COMPLETE
 - Sprint 9 (Linear Algebra & Dimensionality): ✅ COMPLETE
 - Sprint 10 (PDEs, Physics & Emergence): ✅ COMPLETE
+- Sprint 11 (Number Theory): ✅ COMPLETE
 
 ## Architecture
 - **Rendering**: SSG. No runtime API calls. GitHub data fetched at build time.
@@ -108,6 +109,11 @@ pinned-repos.json, all-repos.json, languages.json, commit-activity.json, contrib
 | ScrollEntropy.tsx | — | Scroll-triggered component degradation/glitch |
 | EasterEgg.tsx | `client:load` | Konami code, hidden click zones, console secrets |
 | MicroInteractionsDemo.tsx | `client:load` | Showcase island for magnetic buttons, tooltips, loaders |
+| UlamSpiral.tsx | — | Primes on square spiral with zoom, pan, highlight modes |
+| CollatzTree.tsx | — | 3n+1 conjecture as interactive BFS tree |
+| HyperbolicGoL.tsx | — | Conway's GoL on Poincaré disk, {7,3} heptagonal tiling |
+| WaveFunctionCollapse.tsx | — | Constraint-based procedural generation with entropy |
+| CellularAutomata.tsx | — | Unified 1D/2D CA gallery with rule presets |
 
 ### Key Atoms (under `src/components/atoms/`)
 | File | Type | Notes |
@@ -323,3 +329,17 @@ index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skil
   - **Build verified**: `bun run build` succeeds (45 pages)
   - **Unit tests**: `bun run test` — 347 passed (26 files, +62 new tests)
   - **E2E tests**: `bun run test:e2e` — 87 passed (+12 new tests)
+
+### Sprint 11 (Number Theory) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 15 (Number Theory & Discrete Structures)**: ✅ COMPLETE
+  - **UlamSpiral** (`src/islands/experiments/UlamSpiral.tsx`): Primes on a square spiral with zoom, pan, Spiral/Rectangular mode toggle. Highlight modes: Primes, Twin Primes, Mersenne Primes, Prime Gaps. Center-on-number input, legend overlay, Sieve of Eratosthenes precomputed up to 200K. 12 unit tests
+  - **CollatzTree** (`src/islands/experiments/CollatzTree.tsx`): 3n+1 conjecture as interactive BFS tree. Click nodes to explore, Auto Explore random numbers, orbit display panel, path highlight on hover, stopping time histogram, zoom/pan. 12 unit tests
+  - **HyperbolicGoL** (`src/islands/experiments/HyperbolicGoL.tsx`): Conway's Game of Life on Poincaré disk with {7,3} heptagonal tiling (197 cells in 8 rings). 3 rules (Conway/Seeds/HighLife), 4 patterns (Random/Center/Ring/Custom), click to toggle cells, play/pause/step, generation/population counters. 15 unit tests
+  - **WaveFunctionCollapse** (`src/islands/experiments/WaveFunctionCollapse.tsx`): Constraint-based procedural generation. 4-tile set (Grass/Dirt/Water/Stone) with adjacency rules. Min-entropy cell selection, BFS constraint propagation. Step/Auto/Pause/Reset, entropy heatmap toggle, grid size/speed sliders, 3 presets (Checkerboard/River/Random), propagation flash visualization. 12 unit tests
+  - **CellularAutomata** (`src/islands/experiments/CellularAutomata.tsx`): Unified 1D/2D gallery. 1D: Rule 30/90/110/184/54/11 with space-time diagrams. 2D: Life/Seeds/HighLife/Day&Night/Anneal with Moore neighborhood and toroidal wrapping. 1D/2D mode toggle, rule presets, play/pause/reset/clear, speed slider, pattern classification (stable/periodic/chaotic/complex). 12 unit tests
+  - **GalleryGrid registration**: 31 experiments total (5 new), with cursor/harmony mappings
+  - **Thumbnails**: `public/images/experiments/ulam-spiral.svg`, `collatz-tree.svg`, `hyperbolic-gol.svg`, `wave-function-collapse.svg`, `cellular-automata.svg`
+  - **Build verified**: `bun run build` succeeds (45 pages)
+  - **Unit tests**: `bun run test` — 410 passed (31 files, +63 new tests)
+  - **E2E tests**: `bun run test:e2e` — 98 passed (+11 new tests)

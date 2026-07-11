@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect width="200" height="200" fill="#0f0f11"/>
+  <circle cx="100" cy="100" r="88" fill="none" stroke="white" stroke-width="1.5" opacity="0.6"/>
+  <clipPath id="disk"><circle cx="100" cy="100" r="86"/></clipPath>
+  <g clip-path="url(#disk)">
+    <polygon points="100,56 126,68 126,92 100,104 74,92 74,68" fill="#06b6d4" opacity="0.9" stroke="#0e7490" stroke-width="0.8"/>
+    <polygon points="100,104 126,92 140,106 126,120 100,128 86,120 74,106 74,92" fill="none" stroke="#164e63" stroke-width="0.8"/>
+    <polygon points="126,68 148,50 168,62 168,86 148,98 126,92" fill="#06b6d4" opacity="0.5" stroke="#0e7490" stroke-width="0.8"/>
+    <polygon points="74,68 52,50 32,62 32,86 52,98 74,92" fill="none" stroke="#164e63" stroke-width="0.8"/>
+    <polygon points="100,128 126,120 140,134 126,148 100,156 74,148 60,134 74,120" fill="#06b6d4" opacity="0.7" stroke="#0e7490" stroke-width="0.8"/>
+    <polygon points="148,98 168,86 182,98 182,122 168,134 148,120" fill="none" stroke="#164e63" stroke-width="0.8"/>
+    <polygon points="52,98 32,86 18,98 18,122 32,134 52,120" fill="#06b6d4" opacity="0.4" stroke="#0e7490" stroke-width="0.8"/>
+    <polygon points="126,120 148,120 156,136 148,152 126,152 114,136" fill="none" stroke="#164e63" stroke-width="0.8"/>
+    <polygon points="74,120 52,120 44,136 52,152 74,152 86,136" fill="#06b6d4" opacity="0.3" stroke="#0e7490" stroke-width="0.8"/>
+    <polygon points="100,156 126,148 130,168 100,176 70,168 74,148" fill="#06b6d4" opacity="0.6" stroke="#0e7490" stroke-width="0.8"/>
+    <polygon points="168,122 180,130 176,152 156,158 148,134" fill="#06b6d4" opacity="0.45" stroke="#0e7490" stroke-width="0.8"/>
+    <polygon points="32,122 20,130 24,152 44,158 52,134" fill="none" stroke="#164e63" stroke-width="0.8"/>
+  </g>
+  <circle cx="100" cy="100" r="88" fill="none" stroke="white" stroke-width="1" opacity="0.3"/>
+</svg>

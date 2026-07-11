@@ -16,6 +16,11 @@ import {
   GitFork,
   Activity,
   Target,
+  Atom,
+  GitBranch,
+  Globe,
+  Wand2,
+  LayoutGrid,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ImageSequenceScroll from "./experiments/ImageSequenceScroll";
@@ -44,6 +49,11 @@ import VonKarmannVortex from "./experiments/VonKarmannVortex";
 import SpringPhysics from "./experiments/SpringPhysics";
 import SandpileModel from "./experiments/SandpileModel";
 import RayleighBenard from "./experiments/RayleighBenard";
+import UlamSpiral from "./experiments/UlamSpiral";
+import CollatzTree from "./experiments/CollatzTree";
+import HyperbolicGoL from "./experiments/HyperbolicGoL";
+import WaveFunctionCollapse from "./experiments/WaveFunctionCollapse";
+import CellularAutomata from "./experiments/CellularAutomata";
 import AmbientSound from "../components/atoms/AmbientSound";
 
 interface Experiment {
@@ -344,6 +354,56 @@ const experiments: Experiment[] = [
     gradient: "from-red-500 to-blue-500",
     thumbnail: "/images/experiments/rayleigh-benard.svg",
   },
+  {
+    id: "ulam-spiral",
+    title: "Ulam Spiral",
+    description: "Primes on a square spiral reveal unexpected diagonal patterns. Zoom, pan, and highlight twin primes, Mersenne primes, and prime gaps.",
+    longDescription: "The Ulam Spiral arranges natural numbers in a square spiral and highlights primes, revealing striking diagonal patterns that hint at deep number-theoretic structure.",
+    tags: ["Number Theory", "Primes", "Spiral", "Visualization"],
+    icon: <Atom className="w-5 h-5" />,
+    gradient: "from-violet-500 to-purple-600",
+    thumbnail: "/images/experiments/ulam-spiral.svg",
+  },
+  {
+    id: "collatz-tree",
+    title: "Collatz Tree",
+    description: "Explore the 3n+1 conjecture as an interactive growing tree. Click any number to watch its orbit to 1.",
+    longDescription: "The Collatz conjecture — one of mathematics' simplest unsolved problems. Start with any positive integer, apply one simple rule, and always reach 1. Watch the tree of all explored numbers grow.",
+    tags: ["Number Theory", "Conjecture", "Tree", "Interactive"],
+    icon: <GitBranch className="w-5 h-5" />,
+    gradient: "from-emerald-500 to-teal-600",
+    thumbnail: "/images/experiments/collatz-tree.svg",
+  },
+  {
+    id: "hyperbolic-gol",
+    title: "Hyperbolic Game of Life",
+    description: "Conway's Game of Life on the Poincaré disk — infinite cells in finite space with hyperbolic geometry.",
+    longDescription: "Conway's Game of Life rendered on the Poincaré disk model of the hyperbolic plane. The {7,3} heptagonal tiling packs infinite cells into a finite circle, creating mesmerizing patterns.",
+    tags: ["Cellular Automata", "Hyperbolic", "Poincaré", "Emergence"],
+    icon: <Globe className="w-5 h-5" />,
+    gradient: "from-cyan-500 to-blue-600",
+    thumbnail: "/images/experiments/hyperbolic-gol.svg",
+  },
+  {
+    id: "wave-function-collapse",
+    title: "Wave Function Collapse",
+    description: "Constraint-based procedural generation — watch entropy decrease as cells resolve into valid patterns.",
+    longDescription: "The Wave Function Collapse algorithm generates procedural terrain by observing cells with minimum entropy and propagating constraints. Watch the grid resolve from chaos into coherent patterns.",
+    tags: ["Algorithm", "Procedural", "Constraints", "Generation"],
+    icon: <Wand2 className="w-5 h-5" />,
+    gradient: "from-rose-500 to-pink-600",
+    thumbnail: "/images/experiments/wave-function-collapse.svg",
+  },
+  {
+    id: "cellular-automata",
+    title: "Cellular Automata Gallery",
+    description: "1D and 2D cellular automata — from Rule 30 to Conway's Life. Space-time diagrams and pattern classification.",
+    longDescription: "A unified gallery of classical cellular automata. Explore 1D rules like Rule 30 and Rule 90 with space-time diagrams, and 2D rules like Conway's Life with automatic pattern classification.",
+    tags: ["Cellular Automata", "1D", "2D", "Complexity"],
+    icon: <LayoutGrid className="w-5 h-5" />,
+    gradient: "from-orange-500 to-amber-600",
+    thumbnail: "/images/experiments/cellular-automata.svg",
+  },
 ];
 
 function LivePreview({ id }: { id: string }) {
@@ -375,6 +435,11 @@ function LivePreview({ id }: { id: string }) {
       {id === "spring-physics" && <SpringPhysics compact />}
       {id === "sandpile-model" && <SandpileModel compact />}
       {id === "rayleigh-benard" && <RayleighBenard compact />}
+      {id === "ulam-spiral" && <UlamSpiral compact />}
+      {id === "collatz-tree" && <CollatzTree compact />}
+      {id === "hyperbolic-gol" && <HyperbolicGoL compact />}
+      {id === "wave-function-collapse" && <WaveFunctionCollapse compact />}
+      {id === "cellular-automata" && <CellularAutomata compact />}
     </>
   );
 }
@@ -591,6 +656,11 @@ function ExperimentModal({
               {experiment.id === "spring-physics" && <SpringPhysics />}
               {experiment.id === "sandpile-model" && <SandpileModel />}
               {experiment.id === "rayleigh-benard" && <RayleighBenard />}
+              {experiment.id === "ulam-spiral" && <UlamSpiral />}
+              {experiment.id === "collatz-tree" && <CollatzTree />}
+              {experiment.id === "hyperbolic-gol" && <HyperbolicGoL />}
+              {experiment.id === "wave-function-collapse" && <WaveFunctionCollapse />}
+              {experiment.id === "cellular-automata" && <CellularAutomata />}
             </div>
           </motion.div>
         </motion.div>
@@ -627,6 +697,11 @@ function experimentCursor(id: string): string {
     "spring-physics": "crosshair",
     "sandpile-model": "crosshair",
     "rayleigh-benard": "crosshair",
+    "ulam-spiral": "zoom-in",
+    "collatz-tree": "crosshair",
+    "hyperbolic-gol": "crosshair",
+    "wave-function-collapse": "crosshair",
+    "cellular-automata": "crosshair",
   };
   return cursors[id] || "pointer";
 }
@@ -744,6 +819,11 @@ export default function GalleryGrid() {
     : activeExperiment === "spring-physics" ? "purple"
     : activeExperiment === "sandpile-model" ? "amber"
     : activeExperiment === "rayleigh-benard" ? "purple"
+    : activeExperiment === "ulam-spiral" ? "purple"
+    : activeExperiment === "collatz-tree" ? "green"
+    : activeExperiment === "hyperbolic-gol" ? "cyan"
+    : activeExperiment === "wave-function-collapse" ? "pink"
+    : activeExperiment === "cellular-automata" ? "amber"
     : "amber";
 
   return (
@@ -773,7 +853,7 @@ export default function GalleryGrid() {
           More experiments coming soon&hellip;
         </p>
         <div className="flex justify-center gap-1.5 mt-2">
-          {["Particle Sky", "Wave Equation", "Ising Model", "Lattice Boltzmann"].map(
+          {["Conformal Mapping", "Domain Coloring", "Gradient Descent", "Reaction-Diffusion"].map(
             (name) => (
               <span
                 key={name}

@@ -5,7 +5,7 @@ test.describe("Gallery page", () => {
     await page.goto("/gallery");
     await expect(page.getByRole("heading", { name: "Creative Lab" })).toBeVisible();
     const cards = page.locator('[role="list"] > [role="listitem"]');
-    await expect(cards).toHaveCount(26);
+    await expect(cards).toHaveCount(31);
   });
 
   test("Fractal Explorer card is present", async ({ page }) => {
@@ -601,5 +601,130 @@ test.describe("Gallery page", () => {
   test("Rayleigh-Bénard Convection deep link opens via URL hash", async ({ page }) => {
     await page.goto("/gallery#rayleigh-benard");
     await expect(page.locator('label:has-text("Ra:") input[type="range"]')).toBeVisible({ timeout: 5000 });
+  });
+
+  // ═══════════════════════════════════════════
+  // Sprint 11 — Number Theory & Cellular Automata
+  // ═══════════════════════════════════════════
+
+  test.describe("Ulam Spiral", () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto("/gallery#ulam-spiral");
+      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+    });
+
+    test.afterEach(async ({ page }) => {
+      await page.keyboard.press("Escape");
+    });
+
+    test("deep link opens modal with zoom slider and mode buttons", async ({ page }) => {
+      const modal = page.locator("[data-modal-content]");
+      await expect(modal.locator('label:has-text("Zoom") input[type="range"]')).toBeVisible();
+      await expect(page.getByRole("button", { name: "Spiral" })).toBeVisible();
+    });
+
+    test("layout toggle switches between Spiral and Rectangular", async ({ page }) => {
+      await page.getByRole("button", { name: "Spiral" }).click();
+      await expect(page.getByRole("button", { name: "Rectangular" })).toBeVisible();
+      await page.getByRole("button", { name: "Rectangular" }).click();
+      await expect(page.getByRole("button", { name: "Spiral" })).toBeVisible();
+    });
+  });
+
+  test.describe("Collatz Tree", () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto("/gallery#collatz-tree");
+      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+    });
+
+    test.afterEach(async ({ page }) => {
+      await page.keyboard.press("Escape");
+    });
+
+    test("deep link opens modal with Auto Explore and Reset buttons", async ({ page }) => {
+      await expect(page.getByRole("button", { name: "Auto Explore" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
+    });
+
+    test("Auto Explore button is clickable", async ({ page }) => {
+      await page.getByRole("button", { name: "Auto Explore" }).click();
+      await expect(page.getByRole("button", { name: /Stop|Pause/ })).toBeVisible({ timeout: 3000 });
+    });
+  });
+
+  test.describe("Hyperbolic Game of Life", () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto("/gallery#hyperbolic-gol");
+      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+    });
+
+    test.afterEach(async ({ page }) => {
+      await page.keyboard.press("Escape");
+    });
+
+    test("deep link opens modal with Play/Pause, Step, and rule button", async ({ page }) => {
+      await expect(page.getByRole("button", { name: /Play|Pause/ })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Step" })).toBeVisible();
+      await expect(page.getByRole("button", { name: /Conway|Rule/ })).toBeVisible();
+    });
+
+    test("Play/Pause toggle changes text", async ({ page }) => {
+      const playPause = page.getByRole("button", { name: /Play|Pause/ });
+      await playPause.click();
+      await expect(playPause).toBeVisible();
+    });
+
+    test("rule button cycles through Conway/Seeds/HighLife", async ({ page }) => {
+      const ruleBtn = page.getByRole("button", { name: /Conway|Seeds|HighLife|Rule/ });
+      await expect(ruleBtn).toBeVisible();
+      await ruleBtn.click();
+      await expect(ruleBtn).toBeVisible();
+    });
+  });
+
+  test.describe("Wave Function Collapse", () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto("/gallery#wave-function-collapse");
+      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+    });
+
+    test.afterEach(async ({ page }) => {
+      await page.keyboard.press("Escape");
+    });
+
+    test("deep link opens modal with Step, Auto, and Reset buttons", async ({ page }) => {
+      await expect(page.getByRole("button", { name: "Step" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Auto" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
+    });
+
+    test("Step button is clickable", async ({ page }) => {
+      await page.getByRole("button", { name: "Step" }).click();
+      await expect(page.getByRole("button", { name: "Step" })).toBeVisible();
+    });
+  });
+
+  test.describe("Cellular Automata", () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto("/gallery#cellular-automata");
+      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+    });
+
+    test.afterEach(async ({ page }) => {
+      await page.keyboard.press("Escape");
+    });
+
+    test("deep link opens modal with 1D/2D mode buttons and rule buttons", async ({ page }) => {
+      await expect(page.getByRole("button", { name: "1D" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "2D" })).toBeVisible();
+    });
+
+    test("mode toggle between 1D and 2D changes rule options", async ({ page }) => {
+      await expect(page.getByRole("button", { name: "1D" })).toBeVisible();
+      await page.getByRole("button", { name: "2D" }).click();
+      await expect(page.getByRole("button", { name: "2D" })).toBeVisible();
+      await page.getByRole("button", { name: "1D" }).click();
+      await expect(page.getByRole("button", { name: "1D" })).toBeVisible();
+    });
   });
 });
