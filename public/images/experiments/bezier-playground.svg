@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#0f0f11"/>
+  <!-- Construction lines (control polygon) -->
+  <line x1="40" y1="220" x2="120" y2="60" stroke="#f59e0b" stroke-width="0.6" stroke-dasharray="4,3" opacity="0.35"/>
+  <line x1="120" y1="60" x2="280" y2="240" stroke="#f59e0b" stroke-width="0.6" stroke-dasharray="4,3" opacity="0.35"/>
+  <line x1="280" y1="240" x2="360" y2="80" stroke="#f59e0b" stroke-width="0.6" stroke-dasharray="4,3" opacity="0.35"/>
+  <!-- Tangent construction lines at endpoints -->
+  <line x1="40" y1="220" x2="60" y2="190" stroke="#f59e0b" stroke-width="0.4" stroke-dasharray="2,2" opacity="0.2"/>
+  <line x1="360" y1="80" x2="340" y2="110" stroke="#f59e0b" stroke-width="0.4" stroke-dasharray="2,2" opacity="0.2"/>
+  <!-- The Bézier curve -->
+  <path d="M40,220 C120,60 280,240 360,80" stroke="#f59e0b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- Subtle glow on curve -->
+  <path d="M40,220 C120,60 280,240 360,80" stroke="#f59e0b" stroke-width="6" fill="none" opacity="0.1" stroke-linecap="round"/>
+  <!-- Control points -->
+  <circle cx="40" cy="220" r="5" fill="#f59e0b" opacity="0.9"/>
+  <circle cx="40" cy="220" r="2" fill="#fff"/>
+  <circle cx="120" cy="60" r="5" fill="#f59e0b" opacity="0.7"/>
+  <circle cx="120" cy="60" r="2" fill="#fff"/>
+  <circle cx="280" cy="240" r="5" fill="#f59e0b" opacity="0.7"/>
+  <circle cx="280" cy="240" r="2" fill="#fff"/>
+  <circle cx="360" cy="80" r="5" fill="#f59e0b" opacity="0.9"/>
+  <circle cx="360" cy="80" r="2" fill="#fff"/>
+  <!-- Point labels -->
+  <text x="28" y="240" fill="#f59e0b" font-family="monospace" font-size="8" opacity="0.5">P₀</text>
+  <text x="122" y="50" fill="#f59e0b" font-family="monospace" font-size="8" opacity="0.5">P₁</text>
+  <text x="282" y="258" fill="#f59e0b" font-family="monospace" font-size="8" opacity="0.5">P₂</text>
+  <text x="365" y="75" fill="#f59e0b" font-family="monospace" font-size="8" opacity="0.5">P₃</text>
+</svg>

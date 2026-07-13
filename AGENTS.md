@@ -27,6 +27,7 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 - Sprint 9 (Linear Algebra & Dimensionality): ✅ COMPLETE
 - Sprint 10 (PDEs, Physics & Emergence): ✅ COMPLETE
 - Sprint 11 (Number Theory): ✅ COMPLETE
+- Sprint 12 (Complex Analysis): ✅ COMPLETE
 
 ## Architecture
 - **Rendering**: SSG. No runtime API calls. GitHub data fetched at build time.
@@ -114,6 +115,10 @@ pinned-repos.json, all-repos.json, languages.json, commit-activity.json, contrib
 | HyperbolicGoL.tsx | — | Conway's GoL on Poincaré disk, {7,3} heptagonal tiling |
 | WaveFunctionCollapse.tsx | — | Constraint-based procedural generation with entropy |
 | CellularAutomata.tsx | — | Unified 1D/2D CA gallery with rule presets |
+| ConformalMapping.tsx | — | Complex function grid transformation (z², 1/z, e^z, sin(z), z³, √z) with angle preservation |
+| DomainColoring.tsx | — | Complex function as color map (hue=arg, brightness=|f(z)|) with zoom/pan |
+| BezierPlayground.tsx | — | Interactive N-degree Bézier, B-spline, Catmull-Rom with de Casteljau animation |
+| MoirePatterns.tsx | — | Multi-layer overlapping grids with blend modes, rotation, and presets |
 
 ### Key Atoms (under `src/components/atoms/`)
 | File | Type | Notes |
@@ -343,3 +348,16 @@ index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skil
   - **Build verified**: `bun run build` succeeds (45 pages)
   - **Unit tests**: `bun run test` — 410 passed (31 files, +63 new tests)
   - **E2E tests**: `bun run test:e2e` — 98 passed (+11 new tests)
+
+### Sprint 12 (Complex Analysis) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 16 (Complex Analysis & Pure Visual Math)**: ✅ COMPLETE
+  - **ConformalMapping** (`src/islands/experiments/ConformalMapping.tsx`): Complex function grid transformation (z², 1/z, e^z, sin(z), z³, √z). Cyan Re-lines + amber Im-lines with glow. Angle preservation markers at intersections. Smooth morph animation between functions. Zoom/pan, pole/zero markers (× and ●). Formula overlay. 13 unit tests
+  - **DomainColoring** (`src/islands/experiments/DomainColoring.tsx`): Complex functions as HSL color maps — hue = arg(f(z)), brightness = 2/(1+|w|^0.3). 7 functions (z², z³, 1/z, e^z, sin(z), cos(z), tanh(z)). ImageData pixel rendering, grid overlay toggle, auto-rotate, zoom/pan, HSL color legend wheel. 15 unit tests
+  - **BezierPlayground** (`src/islands/experiments/BezierPlayground.tsx`): Interactive N-degree Bézier/B-spline/Catmull-Rom curve editor. Click to add control points (up to 10), drag to move. De Casteljau construction animation with color-coded levels. Bernstein basis function chart. 4 presets (S-Curve, Loop, Star, Spiral). 16 unit tests
+  - **MoirePatterns** (`src/islands/experiments/MoirePatterns.tsx`): Multi-layer overlapping grid system (3 layers). 5 grid types (circles, lines, radial, checker, dots). Per-layer rotation/frequency/offset/color. 3 blend modes (multiply, screen, additive). 5 presets (Classic, Radial, Typography, Spiral, Zoom). Mouse drag rotation, auto-animate. 19 unit tests
+  - **GalleryGrid registration**: 35 experiments total (4 new), with cursor/harmony mappings
+  - **Thumbnails**: `public/images/experiments/conformal-mapping.svg`, `domain-coloring.svg`, `bezier-playground.svg`, `moire-patterns.svg`
+  - **Build verified**: `bun run build` succeeds (45 pages)
+  - **Unit tests**: `bun run test` — 473 passed (35 files, +63 new tests)
+  - **E2E tests**: `bun run test:e2e` — 108 passed (+10 new tests)

@@ -54,6 +54,10 @@ import CollatzTree from "./experiments/CollatzTree";
 import HyperbolicGoL from "./experiments/HyperbolicGoL";
 import WaveFunctionCollapse from "./experiments/WaveFunctionCollapse";
 import CellularAutomata from "./experiments/CellularAutomata";
+import ConformalMapping from "./experiments/ConformalMapping";
+import DomainColoring from "./experiments/DomainColoring";
+import BezierPlayground from "./experiments/BezierPlayground";
+import MoirePatterns from "./experiments/MoirePatterns";
 import AmbientSound from "../components/atoms/AmbientSound";
 
 interface Experiment {
@@ -404,6 +408,46 @@ const experiments: Experiment[] = [
     gradient: "from-orange-500 to-amber-600",
     thumbnail: "/images/experiments/cellular-automata.svg",
   },
+  {
+    id: "conformal-mapping",
+    title: "Conformal Mapping Gallery",
+    description: "Complex functions transform grids while preserving angles — see z², 1/z, e^z, sin(z) warp the plane.",
+    longDescription: "Explore conformal mappings — complex functions that preserve angles locally. Watch a regular grid transform under z², 1/z, e^z, sin(z), z³, and √z while the angle markers at intersections stay constant, proving conformality.",
+    tags: ["Complex Analysis", "Conformal", "Grid", "Interactive"],
+    icon: <Globe className="w-5 h-5" />,
+    gradient: "from-cyan-500 to-blue-500",
+    thumbnail: "/images/experiments/conformal-mapping.svg",
+  },
+  {
+    id: "domain-coloring",
+    title: "Domain Coloring",
+    description: "Complex functions as color maps — hue = arg(f(z)), brightness = |f(z)|. See poles, zeros, branch cuts.",
+    longDescription: "Domain coloring maps complex functions to vivid colors: hue encodes the argument (phase angle) of f(z), while brightness encodes the magnitude. Zeros appear as bright spots, poles as dark regions, and branch cuts as discontinuities in color.",
+    tags: ["Complex Analysis", "Color Map", "Poles", "Zeros"],
+    icon: <Atom className="w-5 h-5" />,
+    gradient: "from-violet-500 to-fuchsia-500",
+    thumbnail: "/images/experiments/domain-coloring.svg",
+  },
+  {
+    id: "bezier-playground",
+    title: "Bézier Curve Playground",
+    description: "Interactive N-degree Bézier, B-spline, Catmull-Rom. Drag control points, watch de Casteljau's algorithm animate.",
+    longDescription: "A full-featured curve editor. Click to add control points, drag to reshape, toggle between Bézier (de Casteljau), B-spline, and Catmull-Rom interpolation. Animate the construction process and visualize Bernstein basis functions in real-time.",
+    tags: ["Bézier", "Curves", "de Casteljau", "Interactive"],
+    icon: <Wand2 className="w-5 h-5" />,
+    gradient: "from-amber-500 to-orange-500",
+    thumbnail: "/images/experiments/bezier-playground.svg",
+  },
+  {
+    id: "moire-patterns",
+    title: "Moiré Patterns / Interference",
+    description: "Overlapping periodic grids produce emergent interference patterns. Rotate, translate, blend layers.",
+    longDescription: "Moiré patterns emerge when two periodic structures overlap. Configure concentric circles, parallel lines, radial grids, and dot patterns across multiple layers. Adjust rotation, scale, and blend modes to discover mesmerizing interference phenomena.",
+    tags: ["Interference", "Patterns", "Blending", "Optics"],
+    icon: <Layers className="w-5 h-5" />,
+    gradient: "from-emerald-500 to-teal-500",
+    thumbnail: "/images/experiments/moire-patterns.svg",
+  },
 ];
 
 function LivePreview({ id }: { id: string }) {
@@ -440,6 +484,10 @@ function LivePreview({ id }: { id: string }) {
       {id === "hyperbolic-gol" && <HyperbolicGoL compact />}
       {id === "wave-function-collapse" && <WaveFunctionCollapse compact />}
       {id === "cellular-automata" && <CellularAutomata compact />}
+      {id === "conformal-mapping" && <ConformalMapping compact />}
+      {id === "domain-coloring" && <DomainColoring compact />}
+      {id === "bezier-playground" && <BezierPlayground compact />}
+      {id === "moire-patterns" && <MoirePatterns compact />}
     </>
   );
 }
@@ -661,6 +709,10 @@ function ExperimentModal({
               {experiment.id === "hyperbolic-gol" && <HyperbolicGoL />}
               {experiment.id === "wave-function-collapse" && <WaveFunctionCollapse />}
               {experiment.id === "cellular-automata" && <CellularAutomata />}
+              {experiment.id === "conformal-mapping" && <ConformalMapping />}
+              {experiment.id === "domain-coloring" && <DomainColoring />}
+              {experiment.id === "bezier-playground" && <BezierPlayground />}
+              {experiment.id === "moire-patterns" && <MoirePatterns />}
             </div>
           </motion.div>
         </motion.div>
@@ -702,6 +754,10 @@ function experimentCursor(id: string): string {
     "hyperbolic-gol": "crosshair",
     "wave-function-collapse": "crosshair",
     "cellular-automata": "crosshair",
+    "conformal-mapping": "crosshair",
+    "domain-coloring": "zoom-in",
+    "bezier-playground": "crosshair",
+    "moire-patterns": "grab",
   };
   return cursors[id] || "pointer";
 }
@@ -824,6 +880,10 @@ export default function GalleryGrid() {
     : activeExperiment === "hyperbolic-gol" ? "cyan"
     : activeExperiment === "wave-function-collapse" ? "pink"
     : activeExperiment === "cellular-automata" ? "amber"
+    : activeExperiment === "conformal-mapping" ? "cyan"
+    : activeExperiment === "domain-coloring" ? "purple"
+    : activeExperiment === "bezier-playground" ? "amber"
+    : activeExperiment === "moire-patterns" ? "green"
     : "amber";
 
   return (
@@ -853,7 +913,7 @@ export default function GalleryGrid() {
           More experiments coming soon&hellip;
         </p>
         <div className="flex justify-center gap-1.5 mt-2">
-          {["Conformal Mapping", "Domain Coloring", "Gradient Descent", "Reaction-Diffusion"].map(
+          {["Gradient Descent", "Reaction-Diffusion", "Quantum Circuit", "RSA Visualization"].map(
             (name) => (
               <span
                 key={name}

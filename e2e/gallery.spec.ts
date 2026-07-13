@@ -5,7 +5,7 @@ test.describe("Gallery page", () => {
     await page.goto("/gallery");
     await expect(page.getByRole("heading", { name: "Creative Lab" })).toBeVisible();
     const cards = page.locator('[role="list"] > [role="listitem"]');
-    await expect(cards).toHaveCount(31);
+    await expect(cards).toHaveCount(35);
   });
 
   test("Fractal Explorer card is present", async ({ page }) => {
@@ -725,6 +725,141 @@ test.describe("Gallery page", () => {
       await expect(page.getByRole("button", { name: "2D" })).toBeVisible();
       await page.getByRole("button", { name: "1D" }).click();
       await expect(page.getByRole("button", { name: "1D" })).toBeVisible();
+    });
+  });
+
+  test.describe("Conformal Mapping", () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto("/gallery#conformal-mapping");
+      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+    });
+
+    test.afterEach(async ({ page }) => {
+      await page.keyboard.press("Escape");
+    });
+
+    test("deep link opens modal with function buttons", async ({ page }) => {
+      await expect(page.getByRole("button", { name: "z²" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "1/z" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "eˣ" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "sin(z)" })).toBeVisible();
+    });
+
+    test("shows formula display", async ({ page }) => {
+      await expect(page.getByText("f(z) = z²")).toBeVisible();
+    });
+
+    test("shows Reset and zoom controls", async ({ page }) => {
+      await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
+    });
+
+    test("switches function on click", async ({ page }) => {
+      await page.getByRole("button", { name: "z³" }).click();
+      await expect(page.getByText("f(z) = z³")).toBeVisible();
+    });
+  });
+
+  test.describe("Domain Coloring", () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto("/gallery#domain-coloring");
+      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+    });
+
+    test.afterEach(async ({ page }) => {
+      await page.keyboard.press("Escape");
+    });
+
+    test("deep link opens modal with function buttons", async ({ page }) => {
+      await expect(page.getByRole("button", { name: "z^2" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "sin(z)" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "tanh(z)" })).toBeVisible();
+    });
+
+    test("shows formula display", async ({ page }) => {
+      await expect(page.getByText("f(z) = z^2")).toBeVisible();
+    });
+
+    test("shows grid overlay toggle", async ({ page }) => {
+      await expect(page.getByRole("button", { name: /Grid/i })).toBeVisible();
+    });
+
+    test("shows Reset button", async ({ page }) => {
+      await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
+    });
+
+    test("switches function on click and updates formula", async ({ page }) => {
+      await page.getByRole("button", { name: "cos(z)" }).click();
+      await expect(page.getByText("f(z) = cos(z)")).toBeVisible();
+    });
+  });
+
+  test.describe("Bézier Playground", () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto("/gallery#bezier-playground");
+      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+    });
+
+    test.afterEach(async ({ page }) => {
+      await page.keyboard.press("Escape");
+    });
+
+    test("deep link opens modal with curve type buttons", async ({ page }) => {
+      await expect(page.getByRole("button", { name: "Bézier" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "B-Spline" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Catmull-Rom" })).toBeVisible();
+    });
+
+    test("shows Construction toggle", async ({ page }) => {
+      await expect(page.getByRole("button", { name: /Construction/i })).toBeVisible();
+    });
+
+    test("shows preset buttons", async ({ page }) => {
+      await expect(page.getByRole("button", { name: "S-Curve" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Loop" })).toBeVisible();
+    });
+
+    test("shows Clear button", async ({ page }) => {
+      await expect(page.getByRole("button", { name: "Clear" })).toBeVisible();
+    });
+
+    test("loads preset on click", async ({ page }) => {
+      await page.getByRole("button", { name: "Star" }).click();
+      await expect(page.getByText("points, Degree")).toBeVisible();
+    });
+  });
+
+  test.describe("Moiré Patterns", () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto("/gallery#moire-patterns");
+      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+    });
+
+    test.afterEach(async ({ page }) => {
+      await page.keyboard.press("Escape");
+    });
+
+    test("deep link opens modal with layer tabs", async ({ page }) => {
+      await expect(page.getByRole("button", { name: "Layer 1" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Layer 2" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Layer 3" })).toBeVisible();
+    });
+
+    test("shows blend mode buttons", async ({ page }) => {
+      await expect(page.getByRole("button", { name: /multiply/i })).toBeVisible();
+      await expect(page.getByRole("button", { name: /screen/i })).toBeVisible();
+    });
+
+    test("shows preset buttons", async ({ page }) => {
+      await expect(page.getByRole("button", { name: "Classic" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Spiral" })).toBeVisible();
+    });
+
+    test("shows Reset button", async ({ page }) => {
+      await expect(page.getByRole("button", { name: /reset/i })).toBeVisible();
+    });
+
+    test("shows animation toggle", async ({ page }) => {
+      await expect(page.getByRole("button", { name: /Animate|Stop/i })).toBeVisible();
     });
   });
 });

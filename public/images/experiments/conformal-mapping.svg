@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <defs>
+    <clipPath id="cm-clip">
+      <rect width="400" height="300"/>
+    </clipPath>
+  </defs>
+  <rect width="400" height="300" fill="#0f0f11"/>
+  <g clip-path="url(#cm-clip)" opacity="0.85">
+    <!-- Warped horizontal lines (cyan) -->
+    <path d="M0,30 Q100,15 200,35 Q300,55 400,25" stroke="#06b6d4" stroke-width="0.8" fill="none"/>
+    <path d="M0,60 Q120,40 200,65 Q280,90 400,55" stroke="#06b6d4" stroke-width="0.8" fill="none"/>
+    <path d="M0,95 Q90,70 200,100 Q310,130 400,90" stroke="#06b6d4" stroke-width="0.8" fill="none"/>
+    <path d="M0,130 Q110,100 200,135 Q290,170 400,125" stroke="#06b6d4" stroke-width="0.8" fill="none"/>
+    <path d="M0,160 Q100,135 200,165 Q300,195 400,155" stroke="#06b6d4" stroke-width="0.8" fill="none"/>
+    <path d="M0,190 Q115,165 200,195 Q285,225 400,185" stroke="#06b6d4" stroke-width="0.8" fill="none"/>
+    <path d="M0,220 Q95,200 200,225 Q305,250 400,215" stroke="#06b6d4" stroke-width="0.8" fill="none"/>
+    <path d="M0,250 Q110,230 200,255 Q290,280 400,245" stroke="#06b6d4" stroke-width="0.8" fill="none"/>
+    <path d="M0,275 Q100,260 200,278 Q300,296 400,270" stroke="#06b6d4" stroke-width="0.8" fill="none"/>
+    <!-- Warped vertical lines (amber) -->
+    <path d="M40,0 Q25,75 45,150 Q65,225 35,300" stroke="#f59e0b" stroke-width="0.8" fill="none"/>
+    <path d="M90,0 Q65,80 95,150 Q125,220 85,300" stroke="#f59e0b" stroke-width="0.8" fill="none"/>
+    <path d="M145,0 Q120,70 150,145 Q180,220 140,300" stroke="#f59e0b" stroke-width="0.8" fill="none"/>
+    <path d="M200,0 Q185,60 200,150 Q215,240 195,300" stroke="#f59e0b" stroke-width="0.8" fill="none"/>
+    <path d="M255,0 Q230,75 260,150 Q290,225 250,300" stroke="#f59e0b" stroke-width="0.8" fill="none"/>
+    <path d="M310,0 Q285,80 315,150 Q345,220 305,300" stroke="#f59e0b" stroke-width="0.8" fill="none"/>
+    <path d="M360,0 Q340,70 365,145 Q390,220 355,300" stroke="#f59e0b" stroke-width="0.8" fill="none"/>
+  </g>
+  <text x="200" y="292" text-anchor="middle" fill="#555" font-family="monospace" font-size="8">z → z²</text>
+</svg>
