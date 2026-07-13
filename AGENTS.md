@@ -1,6 +1,7 @@
 # Codebase Snapshot
 
 > **Usage note**: Gunakan sub-agents (Task tool) sebisa mungkin untuk setiap sub-task agar hemat context window. Pecah task besar menjadi beberapa sub-agent yang jalan paralel (riset, baca file, generate test, dll).
+> **prompt.txt sync**: Setelah sprint selesai, WAJIB update `prompt.txt` baris 1 (Current Sprint) ke sprint berikutnya. File ini tidak di-git-track, tapi harus selalu ter-update di working directory.
 
 ## Project
 Astro SSG portfolio for **Abdul Majid Ridwan Tyastonoatmaja** (AI/ML Engineer & Systems Builder).
