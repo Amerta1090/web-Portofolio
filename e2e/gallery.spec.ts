@@ -5,7 +5,7 @@ test.describe("Gallery page", () => {
     await page.goto("/gallery");
     await expect(page.getByRole("heading", { name: "Creative Lab" })).toBeVisible();
     const cards = page.locator('[role="list"] > [role="listitem"]');
-    await expect(cards).toHaveCount(35);
+    await expect(cards).toHaveCount(39);
   });
 
   test("Fractal Explorer card is present", async ({ page }) => {
@@ -860,6 +860,156 @@ test.describe("Gallery page", () => {
 
     test("shows animation toggle", async ({ page }) => {
       await expect(page.getByRole("button", { name: /Animate|Stop/i })).toBeVisible();
+    });
+  });
+
+  // ═══════════════════════════════════════════
+  // Sprint 13 — New Experiments
+  // ═══════════════════════════════════════════
+
+  test.describe("Math Sonification", () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto("/gallery#math-sonification");
+      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+    });
+
+    test.afterEach(async ({ page }) => {
+      await page.keyboard.press("Escape");
+    });
+
+    test("deep link opens modal", async ({ page }) => {
+      await expect(page.getByRole("button", { name: "Primes" })).toBeVisible();
+    });
+
+    test("shows Primes, π Digits, Bifurcation, Fractal buttons", async ({ page }) => {
+      await expect(page.getByRole("button", { name: "Primes" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "π Digits" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Bifurcation" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Fractal" })).toBeVisible();
+    });
+
+    test("shows Play button", async ({ page }) => {
+      await expect(page.getByRole("button", { name: /Play|Stop/ })).toBeVisible();
+    });
+
+    test("shows tempo slider", async ({ page }) => {
+      await expect(page.getByText("Tempo")).toBeVisible();
+      await expect(page.locator('input[type="range"]').first()).toBeVisible();
+    });
+
+    test("can switch modes", async ({ page }) => {
+      await page.getByRole("button", { name: "π Digits" }).click();
+      await expect(page.getByRole("button", { name: "π Digits" })).toHaveAttribute("class", /bg-\[#f59e0b\]/);
+      await page.getByRole("button", { name: "Fractal" }).click();
+      await expect(page.getByRole("button", { name: "Fractal" })).toHaveAttribute("class", /bg-\[#f59e0b\]/);
+    });
+  });
+
+  test.describe("Quantum Circuit", () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto("/gallery#quantum-circuit");
+      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+    });
+
+    test.afterEach(async ({ page }) => {
+      await page.keyboard.press("Escape");
+    });
+
+    test("deep link opens modal", async ({ page }) => {
+      const modal = page.locator("[data-modal-content]");
+      await expect(modal.getByRole("button", { name: "H", exact: true })).toBeVisible();
+    });
+
+    test("shows gate buttons (H, X, Y, Z)", async ({ page }) => {
+      const modal = page.locator("[data-modal-content]");
+      await expect(modal.getByRole("button", { name: "H", exact: true })).toBeVisible();
+      await expect(modal.getByRole("button", { name: "X", exact: true })).toBeVisible();
+      await expect(modal.getByRole("button", { name: "Y", exact: true })).toBeVisible();
+      await expect(modal.getByRole("button", { name: "Z", exact: true })).toBeVisible();
+    });
+
+    test("shows Run Circuit button", async ({ page }) => {
+      await expect(page.getByRole("button", { name: /Run/ })).toBeVisible();
+    });
+
+    test("shows Bell State preset", async ({ page }) => {
+      await expect(page.getByRole("button", { name: "Bell State" })).toBeVisible();
+    });
+
+    test("escape closes modal", async ({ page }) => {
+      await page.keyboard.press("Escape");
+      await expect(page.locator("[data-modal-content]")).not.toBeVisible();
+    });
+  });
+
+  test.describe("Knot Theory", () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto("/gallery#knot-theory");
+      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+    });
+
+    test.afterEach(async ({ page }) => {
+      await page.keyboard.press("Escape");
+    });
+
+    test("deep link opens modal", async ({ page }) => {
+      await expect(page.getByRole("button", { name: /Trefoil/ })).toBeVisible();
+    });
+
+    test("shows Trefoil, Figure-Eight preset buttons", async ({ page }) => {
+      await expect(page.getByRole("button", { name: /Trefoil/ })).toBeVisible();
+      await expect(page.getByRole("button", { name: /Figure-Eight/ })).toBeVisible();
+    });
+
+    test("shows Reidemeister move buttons", async ({ page }) => {
+      const modal = page.locator("[data-modal-content]");
+      await expect(modal.getByRole("button", { name: "Move I", exact: true })).toBeVisible();
+      await expect(modal.getByRole("button", { name: "Move II", exact: true })).toBeVisible();
+      await expect(modal.getByRole("button", { name: "Move III", exact: true })).toBeVisible();
+    });
+
+    test("shows crossing info text", async ({ page }) => {
+      await expect(page.getByText("Crossings:")).toBeVisible();
+    });
+
+    test("escape closes modal", async ({ page }) => {
+      await page.keyboard.press("Escape");
+      await expect(page.locator("[data-modal-content]")).not.toBeVisible();
+    });
+  });
+
+  test.describe("Random Matrix Theory", () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto("/gallery#random-matrix");
+      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+    });
+
+    test.afterEach(async ({ page }) => {
+      await page.keyboard.press("Escape");
+    });
+
+    test("deep link opens modal", async ({ page }) => {
+      await expect(page.getByRole("button", { name: "GOE" })).toBeVisible();
+    });
+
+    test("shows GOE, GUE, GSE ensemble buttons", async ({ page }) => {
+      await expect(page.getByRole("button", { name: "GOE" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "GUE" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "GSE" })).toBeVisible();
+    });
+
+    test("shows Generate button", async ({ page }) => {
+      await expect(page.getByRole("button", { name: /Generate/ })).toBeVisible();
+    });
+
+    test("shows matrix size slider", async ({ page }) => {
+      const modal = page.locator("[data-modal-content]");
+      await expect(modal.locator('input[type="range"]').first()).toBeVisible();
+    });
+
+    test("escape closes modal", async ({ page }) => {
+      await page.keyboard.press("Escape");
+      await expect(page.locator("[data-modal-content]")).not.toBeVisible();
     });
   });
 });

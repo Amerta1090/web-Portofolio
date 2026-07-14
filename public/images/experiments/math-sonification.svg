@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <linearGradient id="ms-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#d946ef"/>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" fill="#0f0f11" rx="12"/>
+  <!-- Sound wave bars -->
+  <rect x="18" y="42" width="4" height="36" rx="2" fill="url(#ms-grad)" opacity="0.6"/>
+  <rect x="27" y="32" width="4" height="56" rx="2" fill="url(#ms-grad)" opacity="0.7"/>
+  <rect x="36" y="24" width="4" height="72" rx="2" fill="url(#ms-grad)" opacity="0.8"/>
+  <rect x="45" y="34" width="4" height="52" rx="2" fill="url(#ms-grad)" opacity="0.9"/>
+  <rect x="54" y="18" width="4" height="84" rx="2" fill="url(#ms-grad)"/>
+  <rect x="63" y="28" width="4" height="64" rx="2" fill="url(#ms-grad)" opacity="0.9"/>
+  <rect x="72" y="36" width="4" height="48" rx="2" fill="url(#ms-grad)" opacity="0.8"/>
+  <rect x="81" y="26" width="4" height="68" rx="2" fill="url(#ms-grad)" opacity="0.7"/>
+  <rect x="90" y="38" width="4" height="44" rx="2" fill="url(#ms-grad)" opacity="0.6"/>
+  <rect x="99" y="46" width="4" height="28" rx="2" fill="url(#ms-grad)" opacity="0.5"/>
+  <!-- Glow overlay -->
+  <rect x="50" y="14" width="12" height="92" rx="6" fill="url(#ms-grad)" opacity="0.06"/>
+  <text x="60" y="110" text-anchor="middle" fill="#666" font-family="monospace" font-size="7">sonification</text>
+</svg>

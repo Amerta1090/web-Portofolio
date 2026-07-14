@@ -29,6 +29,7 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 - Sprint 10 (PDEs, Physics & Emergence): ✅ COMPLETE
 - Sprint 11 (Number Theory): ✅ COMPLETE
 - Sprint 12 (Complex Analysis): ✅ COMPLETE
+- Sprint 13 (Wild Ideas I): ✅ COMPLETE
 
 ## Architecture
 - **Rendering**: SSG. No runtime API calls. GitHub data fetched at build time.
@@ -120,6 +121,10 @@ pinned-repos.json, all-repos.json, languages.json, commit-activity.json, contrib
 | DomainColoring.tsx | — | Complex function as color map (hue=arg, brightness=|f(z)|) with zoom/pan |
 | BezierPlayground.tsx | — | Interactive N-degree Bézier, B-spline, Catmull-Rom with de Casteljau animation |
 | MoirePatterns.tsx | — | Multi-layer overlapping grids with blend modes, rotation, and presets |
+| MathSonification.tsx | — | Map math concepts to audio — primes, π, bifurcation, fractals as sound |
+| QuantumCircuit.tsx | — | Quantum circuit builder with Bloch sphere, gates, and probability display |
+| KnotTheory.tsx | — | Knot diagrams with crossing invariants, Reidemeister moves, 3D wireframe |
+| RandomMatrixTheory.tsx | — | GOE/GUE/GSE ensembles, eigenvalue spacing, Wigner surmise histogram |
 
 ### Key Atoms (under `src/components/atoms/`)
 | File | Type | Notes |
@@ -362,3 +367,16 @@ index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skil
   - **Build verified**: `bun run build` succeeds (45 pages)
   - **Unit tests**: `bun run test` — 473 passed (35 files, +63 new tests)
   - **E2E tests**: `bun run test:e2e` — 108 passed (+10 new tests)
+
+### Sprint 13 (Wild Ideas I) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 20 (Wild Ideas — Crossover & Experimental)**: ✅ COMPLETE
+  - **MathSonification** (`src/islands/experiments/MathSonification.tsx`): Map mathematical concepts to sound — primes→pentatonic, π digits→C major, bifurcation→frequency modulation, fractal→depth-based harmonics. Web Audio API synthesizer with OscillatorNode, 4 wave types, tempo/wave controls, canvas visualization. 12 unit tests
+  - **QuantumCircuit** (`src/islands/experiments/QuantumCircuit.tsx`): Quantum circuit builder with 3 qubits × 8 columns. 9 gate types (H, X, Y, Z, CNOT, S, T, RX, RY) with correct unitary matrices. Statevector simulator (8 complex amplitudes), Bloch sphere visualization, probability bar chart, 3 presets (Bell, GHZ, Teleportation). 17 unit tests
+  - **KnotTheory** (`src/islands/experiments/KnotTheory.tsx`): Interactive knot explorer — 5 presets (Trefoil, Figure-Eight, Cinquefoil, Hopf, Unknot), parametric 3D→2D projection, crossing detection with over/under gaps, Reidemeister move animations (I, II, III), knot invariants (crossing number, writhe, tricolorability, Jones polynomial), pseudo-3D wireframe view. 12 unit tests
+  - **RandomMatrixTheory** (`src/islands/experiments/RandomMatrixTheory.tsx`): Gaussian ensembles (GOE, GUE, GSE), Jacobi eigenvalue algorithm, normalized spacing distribution histogram vs Wigner surmise overlay. Adjustable matrix size (2–200), sample count (10–1000), auto-generate mode, eigenvalue spectrum visualization. 14 unit tests
+  - **GalleryGrid registration**: 39 experiments total (4 new), with cursor/harmony mappings
+  - **Thumbnails**: `public/images/experiments/math-sonification.svg`, `quantum-circuit.svg`, `knot-theory.svg`, `random-matrix.svg`
+  - **Build verified**: `bun run build` succeeds (45 pages)
+  - **Unit tests**: `bun run test` — 528 passed (39 files, +55 new tests)
+  - **E2E tests**: `bun run test:e2e` — 137 passed (+29 new tests)

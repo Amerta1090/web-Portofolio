@@ -58,6 +58,10 @@ import ConformalMapping from "./experiments/ConformalMapping";
 import DomainColoring from "./experiments/DomainColoring";
 import BezierPlayground from "./experiments/BezierPlayground";
 import MoirePatterns from "./experiments/MoirePatterns";
+import MathSonification from "./experiments/MathSonification";
+import QuantumCircuit from "./experiments/QuantumCircuit";
+import KnotTheory from "./experiments/KnotTheory";
+import RandomMatrixTheory from "./experiments/RandomMatrixTheory";
 import AmbientSound from "../components/atoms/AmbientSound";
 
 interface Experiment {
@@ -448,6 +452,46 @@ const experiments: Experiment[] = [
     gradient: "from-emerald-500 to-teal-500",
     thumbnail: "/images/experiments/moire-patterns.svg",
   },
+  {
+    id: "math-sonification",
+    title: "Math Sonification",
+    description: "Map mathematical concepts to sound — primes, π digits, bifurcation, and fractals as music.",
+    longDescription: "Explore mathematics through audio. Primes become pentatonic melodies, π digits play a C major scale, the logistic map's bifurcation transitions from periodic tones to chaotic noise, and the Koch snowflake's recursive structure produces depth-based harmonics.",
+    tags: ["Audio", "Web Audio", "Math", "Sonification"],
+    icon: <Music className="w-5 h-5" />,
+    gradient: "from-violet-500 to-fuchsia-600",
+    thumbnail: "/images/experiments/math-sonification.svg",
+  },
+  {
+    id: "quantum-circuit",
+    title: "Quantum Circuit Simulator",
+    description: "Build quantum circuits with gates, run simulations, and visualize states on a Bloch sphere.",
+    longDescription: "A quantum computing playground. Place Hadamard, Pauli, CNOT, and rotation gates on a 3-qubit circuit grid, run the simulation to see the resulting quantum state on a rotating Bloch sphere, and view measurement probability distributions across all 8 basis states.",
+    tags: ["Quantum", "Circuit", "Bloch Sphere", "Simulation"],
+    icon: <CircuitBoard className="w-5 h-5" />,
+    gradient: "from-cyan-500 to-blue-600",
+    thumbnail: "/images/experiments/quantum-circuit.svg",
+  },
+  {
+    id: "knot-theory",
+    title: "Knot Theory Explorer",
+    description: "Explore mathematical knots — crossing invariants, Reidemeister moves, and 3D wireframe views.",
+    longDescription: "Dive into topology with interactive knot diagrams. Choose from trefoil, figure-eight, and cinquefoil presets, animate Reidemeister moves, compute crossing numbers and writhe, check tricolorability, and explore 3D wireframe projections with depth shading.",
+    tags: ["Topology", "Knots", "Jones Polynomial", "Reidemeister"],
+    icon: <GitBranch className="w-5 h-5" />,
+    gradient: "from-amber-500 to-orange-600",
+    thumbnail: "/images/experiments/knot-theory.svg",
+  },
+  {
+    id: "random-matrix",
+    title: "Random Matrix Theory",
+    description: "Gaussian ensembles, eigenvalue spacing, and Wigner surmise — the mathematics of quantum chaos.",
+    longDescription: "Generate random matrices from GOE, GUE, and GSE ensembles, compute their eigenvalue spectra via Jacobi diagonalization, and visualize the spacing distribution against the Wigner surmise. Watch level repulsion emerge as sample count increases.",
+    tags: ["Random Matrix", "Wigner", "Eigenvalues", "Quantum Chaos"],
+    icon: <Atom className="w-5 h-5" />,
+    gradient: "from-rose-500 to-violet-600",
+    thumbnail: "/images/experiments/random-matrix.svg",
+  },
 ];
 
 function LivePreview({ id }: { id: string }) {
@@ -488,6 +532,10 @@ function LivePreview({ id }: { id: string }) {
       {id === "domain-coloring" && <DomainColoring compact />}
       {id === "bezier-playground" && <BezierPlayground compact />}
       {id === "moire-patterns" && <MoirePatterns compact />}
+      {id === "math-sonification" && <MathSonification compact />}
+      {id === "quantum-circuit" && <QuantumCircuit compact />}
+      {id === "knot-theory" && <KnotTheory compact />}
+      {id === "random-matrix" && <RandomMatrixTheory compact />}
     </>
   );
 }
@@ -713,6 +761,10 @@ function ExperimentModal({
               {experiment.id === "domain-coloring" && <DomainColoring />}
               {experiment.id === "bezier-playground" && <BezierPlayground />}
               {experiment.id === "moire-patterns" && <MoirePatterns />}
+              {experiment.id === "math-sonification" && <MathSonification />}
+              {experiment.id === "quantum-circuit" && <QuantumCircuit />}
+              {experiment.id === "knot-theory" && <KnotTheory />}
+              {experiment.id === "random-matrix" && <RandomMatrixTheory />}
             </div>
           </motion.div>
         </motion.div>
@@ -758,6 +810,10 @@ function experimentCursor(id: string): string {
     "domain-coloring": "zoom-in",
     "bezier-playground": "crosshair",
     "moire-patterns": "grab",
+    "math-sonification": "pointer",
+    "quantum-circuit": "crosshair",
+    "knot-theory": "grab",
+    "random-matrix": "crosshair",
   };
   return cursors[id] || "pointer";
 }
@@ -884,6 +940,10 @@ export default function GalleryGrid() {
     : activeExperiment === "domain-coloring" ? "purple"
     : activeExperiment === "bezier-playground" ? "amber"
     : activeExperiment === "moire-patterns" ? "green"
+    : activeExperiment === "math-sonification" ? "purple"
+    : activeExperiment === "quantum-circuit" ? "cyan"
+    : activeExperiment === "knot-theory" ? "amber"
+    : activeExperiment === "random-matrix" ? "pink"
     : "amber";
 
   return (
@@ -913,7 +973,7 @@ export default function GalleryGrid() {
           More experiments coming soon&hellip;
         </p>
         <div className="flex justify-center gap-1.5 mt-2">
-          {["Gradient Descent", "Reaction-Diffusion", "Quantum Circuit", "RSA Visualization"].map(
+          {["Gradient Descent", "Reaction-Diffusion", "RSA Visualization", "3-Body Problem"].map(
             (name) => (
               <span
                 key={name}
