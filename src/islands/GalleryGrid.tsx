@@ -62,6 +62,10 @@ import MathSonification from "./experiments/MathSonification";
 import QuantumCircuit from "./experiments/QuantumCircuit";
 import KnotTheory from "./experiments/KnotTheory";
 import RandomMatrixTheory from "./experiments/RandomMatrixTheory";
+import FourDGameOfLife from "./experiments/4DGameOfLife";
+import NeuralNetworkArt from "./experiments/NeuralNetworkArt";
+import MathEscapeRoom from "./experiments/MathEscapeRoom";
+import FractalFlameSync from "./experiments/FractalFlameSync";
 import AmbientSound from "../components/atoms/AmbientSound";
 
 interface Experiment {
@@ -492,6 +496,50 @@ const experiments: Experiment[] = [
     gradient: "from-rose-500 to-violet-600",
     thumbnail: "/images/experiments/random-matrix.svg",
   },
+  {
+    id: "4d-game-of-life",
+    title: "4D Game of Life",
+    description: "Conway's Game of Life in 4 dimensions — 80 neighbors per cell, projected from 4D to 3D to 2D with real-time rotation.",
+    longDescription:
+      "Experience cellular automata in the fourth dimension. A 6×6×3×3 hypergrid with 80 neighbors per cell, projected through 4D rotation matrices to your 2D screen. Watch 4D gliders and oscillators emerge as the grid rotates through dimensions you can barely imagine.",
+    tags: ["4D", "Cellular Automata", "Hypercube", "Emergence"],
+    icon: <Globe className="w-5 h-5" />,
+    gradient: "from-amber-500 to-red-500",
+    thumbnail: "/images/experiments/4d-game-of-life.svg",
+  },
+  {
+    id: "nn-art",
+    title: "Neural Network as Art",
+    description: "A tiny neural network learning in real-time — activation particles flow between layers as weights update via backpropagation.",
+    longDescription:
+      "Watch a 2-6-1 neural network learn XOR, circle, and spiral classification in real-time. Activation particles flow along weighted connections during each forward pass, the loss curve drops as gradient descent优化, and a decision boundary evolves in the scatter plot below.",
+    tags: ["Neural Network", "Machine Learning", "Backprop", "Visualization"],
+    icon: <CircuitBoard className="w-5 h-5" />,
+    gradient: "from-purple-500 to-cyan-500",
+    thumbnail: "/images/experiments/neural-network-art.svg",
+  },
+  {
+    id: "math-escape-room",
+    title: "Math Escape Room",
+    description: "5 interconnected puzzle rooms — solve algebra, geometry, calculus, number theory, and probability to escape.",
+    longDescription:
+      "Navigate a floor plan of 5 math puzzle rooms. Solve each challenge to unlock the next door. Race against the clock, use hints wisely, and celebrate with a particle burst when you escape all 5 rooms.",
+    tags: ["Puzzle", "Math", "Escape Room", "Interactive"],
+    icon: <Target className="w-5 h-5" />,
+    gradient: "from-emerald-500 to-cyan-500",
+    thumbnail: "/images/experiments/math-escape-room.svg",
+  },
+  {
+    id: "fractal-flame-sync",
+    title: "Fractal Flame × Audio Sync",
+    description: "IFS flame fractals that breathe with music — bass controls shape, mids control rotation, treble shifts color.",
+    longDescription:
+      "An Iterated Function System flame fractal driven by real-time audio FFT. Upload a song or use your microphone — low frequencies morph the fractal's variation weights, mid frequencies rotate the transforms, and high frequencies shift the color palette. The flame literally dances to your music.",
+    tags: ["Fractal", "Audio", "FFT", "IFS", "Generative"],
+    icon: <Music className="w-5 h-5" />,
+    gradient: "from-amber-500 to-violet-500",
+    thumbnail: "/images/experiments/fractal-flame-sync.svg",
+  },
 ];
 
 function LivePreview({ id }: { id: string }) {
@@ -536,6 +584,10 @@ function LivePreview({ id }: { id: string }) {
       {id === "quantum-circuit" && <QuantumCircuit compact />}
       {id === "knot-theory" && <KnotTheory compact />}
       {id === "random-matrix" && <RandomMatrixTheory compact />}
+      {id === "4d-game-of-life" && <FourDGameOfLife compact />}
+      {id === "nn-art" && <NeuralNetworkArt compact />}
+      {id === "math-escape-room" && <MathEscapeRoom compact />}
+      {id === "fractal-flame-sync" && <FractalFlameSync compact />}
     </>
   );
 }
@@ -765,6 +817,10 @@ function ExperimentModal({
               {experiment.id === "quantum-circuit" && <QuantumCircuit />}
               {experiment.id === "knot-theory" && <KnotTheory />}
               {experiment.id === "random-matrix" && <RandomMatrixTheory />}
+              {experiment.id === "4d-game-of-life" && <FourDGameOfLife />}
+              {experiment.id === "nn-art" && <NeuralNetworkArt />}
+              {experiment.id === "math-escape-room" && <MathEscapeRoom />}
+              {experiment.id === "fractal-flame-sync" && <FractalFlameSync />}
             </div>
           </motion.div>
         </motion.div>
@@ -814,6 +870,10 @@ function experimentCursor(id: string): string {
     "quantum-circuit": "crosshair",
     "knot-theory": "grab",
     "random-matrix": "crosshair",
+    "4d-game-of-life": "crosshair",
+    "nn-art": "pointer",
+    "math-escape-room": "pointer",
+    "fractal-flame-sync": "crosshair",
   };
   return cursors[id] || "pointer";
 }
@@ -944,6 +1004,10 @@ export default function GalleryGrid() {
     : activeExperiment === "quantum-circuit" ? "cyan"
     : activeExperiment === "knot-theory" ? "amber"
     : activeExperiment === "random-matrix" ? "pink"
+    : activeExperiment === "4d-game-of-life" ? "amber"
+    : activeExperiment === "nn-art" ? "purple"
+    : activeExperiment === "math-escape-room" ? "green"
+    : activeExperiment === "fractal-flame-sync" ? "amber"
     : "amber";
 
   return (
@@ -973,7 +1037,7 @@ export default function GalleryGrid() {
           More experiments coming soon&hellip;
         </p>
         <div className="flex justify-center gap-1.5 mt-2">
-          {["Gradient Descent", "Reaction-Diffusion", "RSA Visualization", "3-Body Problem"].map(
+          {["Gradient Descent", "Reaction-Diffusion", "3-Body Problem", "RSA Visualization"].map(
             (name) => (
               <span
                 key={name}

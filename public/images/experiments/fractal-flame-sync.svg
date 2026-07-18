@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="ffs-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="40%" stop-color="#ef4444"/>
+      <stop offset="70%" stop-color="#ec4899"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <filter id="ffs-glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="120" height="120" fill="#0f0f11" rx="12"/>
+  <!-- flame fractal shape - organic curves -->
+  <g filter="url(#ffs-glow)">
+    <path d="M60,95 Q45,70 30,55 Q20,45 25,30 Q30,20 45,25 Q55,28 58,40 Q60,50 60,60 Q60,50 62,40 Q65,28 75,25 Q90,20 95,30 Q100,45 90,55 Q75,70 60,95Z" fill="url(#ffs-grad)" opacity="0.7"/>
+    <!-- inner detail -->
+    <path d="M60,85 Q50,65 42,52 Q38,42 45,35 Q52,32 57,42 Q60,50 60,58 Q60,50 63,42 Q68,32 75,35 Q82,42 78,52 Q70,65 60,85Z" fill="#fbbf24" opacity="0.5"/>
+  </g>
+  <!-- audio waveform hint -->
+  <g opacity="0.4" stroke="#06b6d4" stroke-width="1" fill="none">
+    <path d="M10,105 Q20,100 30,105 Q40,110 50,105 Q60,100 70,105 Q80,110 90,105 Q100,100 110,105"/>
+  </g>
+  <!-- sound wave arcs -->
+  <g opacity="0.3" stroke="#f59e0b" stroke-width="0.8" fill="none">
+    <path d="M15,50 Q20,45 25,50"/>
+    <path d="M12,45 Q20,38 28,45"/>
+    <path d="M95,45 Q100,40 105,45"/>
+    <path d="M92,40 Q100,33 108,40"/>
+  </g>
+  <text x="60" "110" text-anchor="middle" fill="#a1a1aa" font-family="monospace" font-size="7">FLAME SYNC</text>
+</svg>

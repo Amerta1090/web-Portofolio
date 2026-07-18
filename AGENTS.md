@@ -30,6 +30,7 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 - Sprint 11 (Number Theory): ✅ COMPLETE
 - Sprint 12 (Complex Analysis): ✅ COMPLETE
 - Sprint 13 (Wild Ideas I): ✅ COMPLETE
+- Sprint 14 (Wild Ideas II): ✅ COMPLETE
 
 ## Architecture
 - **Rendering**: SSG. No runtime API calls. GitHub data fetched at build time.
@@ -125,6 +126,10 @@ pinned-repos.json, all-repos.json, languages.json, commit-activity.json, contrib
 | QuantumCircuit.tsx | — | Quantum circuit builder with Bloch sphere, gates, and probability display |
 | KnotTheory.tsx | — | Knot diagrams with crossing invariants, Reidemeister moves, 3D wireframe |
 | RandomMatrixTheory.tsx | — | GOE/GUE/GSE ensembles, eigenvalue spacing, Wigner surmise histogram |
+| FourDGameOfLife.tsx | — | Conway's GoL in 4D, 80 neighbors, 4D→3D→2D projection, 6 rotation planes |
+| NeuralNetworkArt.tsx | — | Tiny 2-6-1 MLP learning XOR/Circle/Spiral, activation particles, loss curve |
+| MathEscapeRoom.tsx | — | 5 puzzle rooms (algebra/geometry/calculus/number-theory/probability), timer, hints |
+| FractalFlameSync.tsx | — | IFS flame fractal with audio FFT sync, 6 variations, mic/file input |
 
 ### Key Atoms (under `src/components/atoms/`)
 | File | Type | Notes |
@@ -380,3 +385,16 @@ index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skil
   - **Build verified**: `bun run build` succeeds (45 pages)
   - **Unit tests**: `bun run test` — 528 passed (39 files, +55 new tests)
   - **E2E tests**: `bun run test:e2e` — 137 passed (+29 new tests)
+
+### Sprint 14 (Wild Ideas II) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 20 (Wild Ideas — Crossover & Experimental, continued)**: ✅ COMPLETE
+  - **4DGameOfLife** (`src/islands/experiments/4DGameOfLife.tsx`): Conway's Game of Life in 4 dimensions — 6×6×3×3 hypergrid with 80 neighbors per cell, toroidal wrapping, 4D→3D→2D perspective projection with 6 rotation planes (XY/XZ/XW/YZ/YW/ZW). Rule presets (Standard 4D, HighLife 4D, Custom), pattern presets (Random, 4D Glider, 4D Oscillator), auto-rotate toggle, grid toggle. 13 unit tests, 5 E2E tests
+  - **NeuralNetworkArt** (`src/islands/experiments/NeuralNetworkArt.tsx`): Tiny 2-6-1 MLP learning XOR/Circle/Spiral classification in real-time. Activation particles flow along weighted connections during forward pass, loss curve panel, weight heatmap, 2D data scatter with decision boundary. Gradient descent backprop with adjustable speed. 14 unit tests, 5 E2E tests
+  - **MathEscapeRoom** (`src/islands/experiments/MathEscapeRoom.tsx`): 5 interconnected puzzle rooms (Algebra, Geometry, Calculus, Number Theory, Probability) as top-down floor plan. Glass-morphism puzzle overlay, hint system, timer with localStorage best time, particle burst celebration on escape. Randomized math problems each game. 13 unit tests, 5 E2E tests
+  - **FractalFlameSync** (`src/islands/experiments/FractalFlameSync.tsx`): IFS flame fractal (6 variations: Linear, Sinusoidal, Spherical, Swirl, Horseshoe, Heart) with audio FFT sync. Bass→variation weights, mids→rotation, treble→color palette. Microphone and file input, log-density coloring, additive glow blending. 13 unit tests, 5 E2E tests
+  - **GalleryGrid registration**: 43 experiments total (4 new), with cursor/harmony mappings
+  - **Thumbnails**: `public/images/experiments/4d-game-of-life.svg`, `neural-network-art.svg`, `math-escape-room.svg`, `fractal-flame-sync.svg`
+  - **Build verified**: `bun run build` succeeds (45 pages)
+  - **Unit tests**: `bun run test` — 581 passed (43 files, +53 new tests)
+  - **E2E tests**: `bun run test:e2e` — 157 passed (+20 new tests)

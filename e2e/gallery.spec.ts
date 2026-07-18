@@ -5,7 +5,7 @@ test.describe("Gallery page", () => {
     await page.goto("/gallery");
     await expect(page.getByRole("heading", { name: "Creative Lab" })).toBeVisible();
     const cards = page.locator('[role="list"] > [role="listitem"]');
-    await expect(cards).toHaveCount(39);
+    await expect(cards).toHaveCount(43);
   });
 
   test("Fractal Explorer card is present", async ({ page }) => {
@@ -1005,6 +1005,146 @@ test.describe("Gallery page", () => {
     test("shows matrix size slider", async ({ page }) => {
       const modal = page.locator("[data-modal-content]");
       await expect(modal.locator('input[type="range"]').first()).toBeVisible();
+    });
+
+    test("escape closes modal", async ({ page }) => {
+      await page.keyboard.press("Escape");
+      await expect(page.locator("[data-modal-content]")).not.toBeVisible();
+    });
+  });
+
+  test.describe("4D Game of Life", () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto("/gallery#4d-game-of-life");
+      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+    });
+
+    test.afterEach(async ({ page }) => {
+      await page.keyboard.press("Escape");
+    });
+
+    test("deep link opens modal", async ({ page }) => {
+      const modal = page.locator("[data-modal-content]");
+      await expect(modal.locator("canvas")).toBeVisible();
+    });
+
+    test("shows Play/Pause button", async ({ page }) => {
+      await expect(page.getByRole("button", { name: /Play|Pause/ })).toBeVisible();
+    });
+
+    test("shows Step and Reset buttons", async ({ page }) => {
+      await expect(page.getByRole("button", { name: "Step" })).toBeVisible();
+      await expect(page.getByRole("button", { name: /Reset/ })).toBeVisible();
+    });
+
+    test("shows rule selector", async ({ page }) => {
+      const modal = page.locator("[data-modal-content]");
+      await expect(modal.locator("select").first()).toBeVisible();
+    });
+
+    test("escape closes modal", async ({ page }) => {
+      await page.keyboard.press("Escape");
+      await expect(page.locator("[data-modal-content]")).not.toBeVisible();
+    });
+  });
+
+  test.describe("Neural Network Art", () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto("/gallery#nn-art");
+      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+    });
+
+    test.afterEach(async ({ page }) => {
+      await page.keyboard.press("Escape");
+    });
+
+    test("deep link opens modal", async ({ page }) => {
+      const modal = page.locator("[data-modal-content]");
+      await expect(modal.locator("canvas")).toBeVisible();
+    });
+
+    test("shows Pause/Resume button", async ({ page }) => {
+      await expect(page.getByRole("button", { name: /Pause|Resume/ })).toBeVisible();
+    });
+
+    test("shows Reset button", async ({ page }) => {
+      await expect(page.getByRole("button", { name: /Reset/ })).toBeVisible();
+    });
+
+    test("shows XOR, CIRCLE, SPIRAL task buttons", async ({ page }) => {
+      await expect(page.getByRole("button", { name: "XOR" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "CIRCLE" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "SPIRAL" })).toBeVisible();
+    });
+
+    test("escape closes modal", async ({ page }) => {
+      await page.keyboard.press("Escape");
+      await expect(page.locator("[data-modal-content]")).not.toBeVisible();
+    });
+  });
+
+  test.describe("Math Escape Room", () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto("/gallery#math-escape-room");
+      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+    });
+
+    test.afterEach(async ({ page }) => {
+      await page.keyboard.press("Escape");
+    });
+
+    test("deep link opens modal", async ({ page }) => {
+      const modal = page.locator("[data-modal-content]");
+      await expect(modal.locator("canvas")).toBeVisible();
+    });
+
+    test("shows New Game button", async ({ page }) => {
+      await expect(page.getByRole("button", { name: "New Game" })).toBeVisible();
+    });
+
+    test("shows solved counter", async ({ page }) => {
+      await expect(page.getByText(/\/5 solved/)).toBeVisible();
+    });
+
+    test("shows timer", async ({ page }) => {
+      await expect(page.getByText(/\d+:\d+/)).toBeVisible();
+    });
+
+    test("escape closes modal", async ({ page }) => {
+      await page.keyboard.press("Escape");
+      await expect(page.locator("[data-modal-content]")).not.toBeVisible();
+    });
+  });
+
+  test.describe("Fractal Flame Sync", () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto("/gallery#fractal-flame-sync");
+      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+    });
+
+    test.afterEach(async ({ page }) => {
+      await page.keyboard.press("Escape");
+    });
+
+    test("deep link opens modal", async ({ page }) => {
+      const modal = page.locator("[data-modal-content]");
+      await expect(modal.locator("canvas")).toBeVisible();
+    });
+
+    test("shows Static, Mic, File mode buttons", async ({ page }) => {
+      await expect(page.getByRole("button", { name: "Static" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Mic" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "File" })).toBeVisible();
+    });
+
+    test("shows Reset button", async ({ page }) => {
+      await expect(page.getByRole("button", { name: /Reset/ })).toBeVisible();
+    });
+
+    test("shows color mode buttons", async ({ page }) => {
+      await expect(page.getByRole("button", { name: "heat" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "cool" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "rainbow" })).toBeVisible();
     });
 
     test("escape closes modal", async ({ page }) => {
