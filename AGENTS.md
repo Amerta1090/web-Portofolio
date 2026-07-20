@@ -31,6 +31,7 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 - Sprint 12 (Complex Analysis): ✅ COMPLETE
 - Sprint 13 (Wild Ideas I): ✅ COMPLETE
 - Sprint 14 (Wild Ideas II): ✅ COMPLETE
+- Sprint 15 (Game Theory): ✅ COMPLETE
 
 ## Architecture
 - **Rendering**: SSG. No runtime API calls. GitHub data fetched at build time.

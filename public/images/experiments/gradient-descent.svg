@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 250">
+  <rect width="400" height="250" fill="#0f0f11"/>
+  <ellipse cx="200" cy="140" rx="120" ry="60" fill="none" stroke="#f59e0b" stroke-width="0.5" opacity="0.3"/>
+  <ellipse cx="200" cy="140" rx="90" ry="45" fill="none" stroke="#f59e0b" stroke-width="0.5" opacity="0.3"/>
+  <ellipse cx="200" cy="140" rx="60" ry="30" fill="none" stroke="#f59e0b" stroke-width="0.5" opacity="0.3"/>
+  <ellipse cx="200" cy="140" rx="30" ry="15" fill="none" stroke="#f59e0b" stroke-width="0.5" opacity="0.3"/>
+  <path d="M80 180 Q120 100 160 140 Q200 120 240 130 Q280 110 320 160" fill="none" stroke="#f59e0b" stroke-width="2" opacity="0.8"/>
+  <path d="M100 190 Q140 110 180 150 Q220 100 260 140 Q300 90 340 170" fill="none" stroke="#8b5cf6" stroke-width="2" opacity="0.8"/>
+  <path d="M60 170 Q130 90 200 130 Q250 80 310 150" fill="none" stroke="#06b6d4" stroke-width="2" opacity="0.8"/>
+  <circle cx="80" cy="180" r="3" fill="#f59e0b"/>
+  <circle cx="100" cy="190" r="3" fill="#8b5cf6"/>
+  <circle cx="60" cy="170" r="3" fill="#06b6d4"/>
+  <text x="200" y="230" text-anchor="middle" fill="#f59e0b" font-family="monospace" font-size="10">Gradient Descent</text>
+</svg>

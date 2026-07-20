@@ -66,6 +66,11 @@ import FourDGameOfLife from "./experiments/4DGameOfLife";
 import NeuralNetworkArt from "./experiments/NeuralNetworkArt";
 import MathEscapeRoom from "./experiments/MathEscapeRoom";
 import FractalFlameSync from "./experiments/FractalFlameSync";
+import PrisonersDilemma from "./experiments/PrisonersDilemma";
+import GradientDescent from "./experiments/GradientDescent";
+import NashEquilibrium from "./experiments/NashEquilibrium";
+import SimulatedAnnealingTSP from "./experiments/SimulatedAnnealingTSP";
+import EvolutionaryGameTheory from "./experiments/EvolutionaryGameTheory";
 import AmbientSound from "../components/atoms/AmbientSound";
 
 interface Experiment {
@@ -540,6 +545,61 @@ const experiments: Experiment[] = [
     gradient: "from-amber-500 to-violet-500",
     thumbnail: "/images/experiments/fractal-flame-sync.svg",
   },
+  {
+    id: "prisoners-dilemma",
+    title: "Prisoner's Dilemma",
+    description: "Evolutionary tournament of game theory strategies competing across generations.",
+    longDescription:
+      "Simulate an iterated Prisoner's Dilemma tournament with 7 strategies — Tit-for-Tat, Grim Trigger, Always Defect, Always Cooperate, Random, Pavlov, and Generous Tit-for-Tat. Watch as fitness-proportional selection and mutation drive strategy evolution over generations. A stacked area chart tracks population dynamics.",
+    tags: ["Game Theory", "Evolution", "Canvas", "Simulation"],
+    icon: <GitBranch className="w-5 h-5" />,
+    gradient: "from-red-500 to-amber-500",
+    thumbnail: "/images/experiments/prisoners-dilemma.svg",
+  },
+  {
+    id: "gradient-descent",
+    title: "Gradient Descent Landscape",
+    description: "3D loss landscape with SGD, Momentum, and Adam optimizers traversing from random starts toward minima.",
+    longDescription:
+      "Visualize gradient descent optimization on a 3D loss landscape. Watch SGD, Momentum, and Adam navigate contour lines from random starting points toward local minima. Compare optimizer paths, adjust learning rate, and explore how different algorithms handle saddle points.",
+    tags: ["Game Theory", "Optimization", "Gradient Descent", "3D"],
+    icon: <Activity className="w-5 h-5" />,
+    gradient: "from-amber-500 to-red-500",
+    thumbnail: "/images/experiments/gradient-descent.svg",
+  },
+  {
+    id: "nash-equilibrium",
+    title: "Nash Equilibrium Visualizer",
+    description: "2×2 payoff matrix with pure and mixed strategy Nash equilibria, best response curves, and 5 presets.",
+    longDescription:
+      "Explore Nash equilibria in 2×2 games. Input payoff values, see pure-strategy NE cells highlighted with amber glow, and watch mixed strategy probabilities visualized. Presets include Prisoner's Dilemma, Battle of the Sexes, Stag Hunt, Matching Pennies, and Chicken.",
+    tags: ["Game Theory", "Nash", "Equilibrium", "Matrix"],
+    icon: <Target className="w-5 h-5" />,
+    gradient: "from-purple-500 to-cyan-500",
+    thumbnail: "/images/experiments/nash-equilibrium.svg",
+  },
+  {
+    id: "simulated-annealing-tsp",
+    title: "Simulated Annealing TSP",
+    description: "Traveling Salesman Problem solved by Simulated Annealing — watch the path evolve from random to near-optimal.",
+    longDescription:
+      "The Traveling Salesman Problem (TSP) solved with Simulated Annealing. Click to place cities on the canvas, then watch the SA algorithm find shorter paths. Temperature cooling visualized in color, with acceptance probability allowing exploration at high temperatures and fine-tuning at low.",
+    tags: ["Game Theory", "TSP", "Simulated Annealing", "Optimization"],
+    icon: <CircuitBoard className="w-5 h-5" />,
+    gradient: "from-cyan-500 to-blue-500",
+    thumbnail: "/images/experiments/simulated-annealing-tsp.svg",
+  },
+  {
+    id: "evolutionary-game-theory",
+    title: "Evolutionary Game Theory",
+    description: "Replicator dynamics on a 2-simplex — strategy frequencies evolve over time with phase portrait visualization.",
+    longDescription:
+      "Replicator dynamics simulation on a 2-simplex triangle. Trajectories flow according to the replicator equation, showing how strategy frequencies evolve. Vector field arrows show the direction of selection. Presets: Hawk-Dove, Rock-Paper-Scissors, Stag Hunt, and Coordination Game.",
+    tags: ["Game Theory", "Replicator Dynamics", "Evolution", "Simplex"],
+    icon: <Layers className="w-5 h-5" />,
+    gradient: "from-purple-500 to-pink-500",
+    thumbnail: "/images/experiments/evolutionary-game-theory.svg",
+  },
 ];
 
 function LivePreview({ id }: { id: string }) {
@@ -588,6 +648,11 @@ function LivePreview({ id }: { id: string }) {
       {id === "nn-art" && <NeuralNetworkArt compact />}
       {id === "math-escape-room" && <MathEscapeRoom compact />}
       {id === "fractal-flame-sync" && <FractalFlameSync compact />}
+      {id === "prisoners-dilemma" && <PrisonersDilemma compact />}
+      {id === "gradient-descent" && <GradientDescent compact />}
+      {id === "nash-equilibrium" && <NashEquilibrium compact />}
+      {id === "simulated-annealing-tsp" && <SimulatedAnnealingTSP compact />}
+      {id === "evolutionary-game-theory" && <EvolutionaryGameTheory compact />}
     </>
   );
 }
@@ -821,6 +886,11 @@ function ExperimentModal({
               {experiment.id === "nn-art" && <NeuralNetworkArt />}
               {experiment.id === "math-escape-room" && <MathEscapeRoom />}
               {experiment.id === "fractal-flame-sync" && <FractalFlameSync />}
+              {experiment.id === "prisoners-dilemma" && <PrisonersDilemma />}
+              {experiment.id === "gradient-descent" && <GradientDescent />}
+              {experiment.id === "nash-equilibrium" && <NashEquilibrium />}
+              {experiment.id === "simulated-annealing-tsp" && <SimulatedAnnealingTSP />}
+              {experiment.id === "evolutionary-game-theory" && <EvolutionaryGameTheory />}
             </div>
           </motion.div>
         </motion.div>
@@ -874,6 +944,11 @@ function experimentCursor(id: string): string {
     "nn-art": "pointer",
     "math-escape-room": "pointer",
     "fractal-flame-sync": "crosshair",
+    "prisoners-dilemma": "crosshair",
+    "gradient-descent": "crosshair",
+    "nash-equilibrium": "crosshair",
+    "simulated-annealing-tsp": "crosshair",
+    "evolutionary-game-theory": "crosshair",
   };
   return cursors[id] || "pointer";
 }
@@ -1008,6 +1083,11 @@ export default function GalleryGrid() {
     : activeExperiment === "nn-art" ? "purple"
     : activeExperiment === "math-escape-room" ? "green"
     : activeExperiment === "fractal-flame-sync" ? "amber"
+    : activeExperiment === "prisoners-dilemma" ? "green"
+    : activeExperiment === "gradient-descent" ? "amber"
+    : activeExperiment === "nash-equilibrium" ? "purple"
+    : activeExperiment === "simulated-annealing-tsp" ? "cyan"
+    : activeExperiment === "evolutionary-game-theory" ? "purple"
     : "amber";
 
   return (
@@ -1037,7 +1117,7 @@ export default function GalleryGrid() {
           More experiments coming soon&hellip;
         </p>
         <div className="flex justify-center gap-1.5 mt-2">
-          {["Gradient Descent", "Reaction-Diffusion", "3-Body Problem", "RSA Visualization"].map(
+          {["Reaction-Diffusion", "3-Body Problem", "RSA Visualization", "Schrödinger Equation"].map(
             (name) => (
               <span
                 key={name}
