@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect width="200" height="200" fill="#0f0f11"/>
+  <defs>
+    <linearGradient id="ro-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#22d3ee"/>
+    </linearGradient>
+    <filter id="ro-glow">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- central mass glow -->
+  <circle cx="100" cy="100" r="8" fill="#f59e0b" opacity="0.15"/>
+  <circle cx="100" cy="100" r="3" fill="#fbbf24" filter="url(#ro-glow)"/>
+  <!-- Newtonian orbit (closed ellipse, cyan) -->
+  <ellipse cx="100" cy="100" rx="45" ry="30" fill="none" stroke="#22d3ee" stroke-width="1.5" opacity="0.6" transform="rotate(-15, 100, 100)"/>
+  <!-- GR orbit (precessing, amber) - drawn as partial arcs showing advance -->
+  <path d="M100,70 A45,30 0 0,1 137,118 A45,30 0 0,1 88,128 A45,30 0 0,1 58,85 A45,30 0 0,1 100,70" fill="none" stroke="#f59e0b" stroke-width="1.5" opacity="0.8" filter="url(#ro-glow)" transform="rotate(25, 100, 100)"/>
+  <!-- second precession arc (further advanced) -->
+  <path d="M105,72 A45,30 0 0,1 142,120 A45,30 0 0,1 93,130 A45,30 0 0,1 63,87 A45,30 0 0,1 105,72" fill="none" stroke="#f59e0b" stroke-width="1" opacity="0.4" transform="rotate(55, 100, 100)"/>
+  <!-- orbiting particle on GR path -->
+  <circle cx="139" cy="88" r="3.5" fill="#f59e0b" filter="url(#ro-glow)"/>
+  <circle cx="65" cy="122" r="2.5" fill="#22d3ee"/>
+  <!-- reference circles -->
+  <circle cx="100" cy="100" r="50" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
+  <circle cx="100" cy="100" r="60" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
+  <!-- labels -->
+  <rect x="10" y="178" width="14" height="2" rx="1" fill="#22d3ee" opacity="0.7"/>
+  <text x="26" y="182" fill="#9ca3af" font-family="monospace" font-size="7">Newton</text>
+  <rect x="80" y="178" width="14" height="2" rx="1" fill="#f59e0b" opacity="0.7"/>
+  <text x="96" y="182" fill="#9ca3af" font-family="monospace" font-size="7">GR</text>
+  <text x="100" y="194" text-anchor="middle" fill="#d1d5db" font-family="monospace" font-size="8" font-weight="bold">RELATIVISTIC ORBITS</text>
+</svg>

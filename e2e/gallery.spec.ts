@@ -5,7 +5,7 @@ test.describe("Gallery page", () => {
     await page.goto("/gallery");
     await expect(page.getByRole("heading", { name: "Creative Lab" })).toBeVisible();
     const cards = page.locator('[role="list"] > [role="listitem"]');
-    await expect(cards).toHaveCount(48);
+    await expect(cards).toHaveCount(53);
   });
 
   test("Fractal Explorer card is present", async ({ page }) => {
@@ -1107,7 +1107,8 @@ test.describe("Gallery page", () => {
     });
 
     test("shows timer", async ({ page }) => {
-      await expect(page.getByText(/\d+:\d+/)).toBeVisible();
+      const modal = page.locator("[data-modal-content]");
+      await expect(modal.getByText(/\d+:\d+/)).toBeVisible();
     });
 
     test("escape closes modal", async ({ page }) => {

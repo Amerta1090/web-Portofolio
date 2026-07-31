@@ -32,6 +32,7 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 - Sprint 13 (Wild Ideas I): ✅ COMPLETE
 - Sprint 14 (Wild Ideas II): ✅ COMPLETE
 - Sprint 15 (Game Theory): ✅ COMPLETE
+- Sprint 16 (Astrophysics): ✅ COMPLETE
 
 ## Architecture
 - **Rendering**: SSG. No runtime API calls. GitHub data fetched at build time.
@@ -399,3 +400,31 @@ index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skil
   - **Build verified**: `bun run build` succeeds (45 pages)
   - **Unit tests**: `bun run test` — 581 passed (43 files, +53 new tests)
   - **E2E tests**: `bun run test:e2e` — 157 passed (+20 new tests)
+
+### Sprint 15 (Game Theory) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 21 (Game Theory & Strategic Behavior)**: ✅ COMPLETE
+  - **GradientDescent** (`src/islands/experiments/GradientDescent.tsx`): 3D loss landscape visualization with SGD/Momentum/Adam optimizers, contour maps, learning rate slider, animated descent paths. 12 unit tests, 5 E2E tests
+  - **NashEquilibrium** (`src/islands/experiments/NashEquilibrium.tsx`): 2×2 payoff matrix explorer with pure/mixed NE detection, best-response curves, 5 presets (Prisoner's Dilemma, Stag Hunt, Chicken, Battle of Sexes, Matching Pennies). 12 unit tests, 5 E2E tests
+  - **PrisonersDilemma** (`src/islands/experiments/PrisonersDilemma.tsx`): Iterated Prisoner's Dilemma tournament with 7 strategies (Tit-for-Tat, Grudger, Always Cooperate, Always Defect, Random, Pavlov, TFTT), round-robin scoring, stacked area chart. 12 unit tests, 5 E2E tests
+  - **SimulatedAnnealingTSP** (`src/islands/experiments/SimulatedAnnealingTSP.tsx`): TSP solver with simulated annealing, click-to-add cities, 4 presets, temperature/cooling controls, animated tour construction. 12 unit tests, 5 E2E tests
+  - **EvolutionaryGameTheory** (`src/islands/experiments/EvolutionaryGameTheory.tsx`): Replicator dynamics on 2-simplex, vector field, trajectory curves, ESS detection. 12 unit tests, 5 E2E tests
+  - **GalleryGrid registration**: 48 experiments total (5 new), with cursor/harmony mappings
+  - **Thumbnails**: `public/images/experiments/gradient-descent.svg`, `nash-equilibrium.svg`, `prisoners-dilemma.svg`, `simulated-annealing-tsp.svg`, `evolutionary-game-theory.svg`
+  - **Build verified**: `bun run build` succeeds (45 pages)
+  - **Unit tests**: `bun run test` — 641 passed (48 files, +60 new tests)
+  - **E2E tests**: `bun run test:e2e` — 182 passed (+25 new tests)
+
+### Sprint 16 (Astrophysics) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 22 (Astrophysics & Celestial Mechanics)**: ✅ COMPLETE
+  - **ThreeBodyProblem** (`src/islands/experiments/ThreeBodyProblem.tsx`): N-body gravity simulation with RK4 integration. Presets: Figure-8, Lagrange L4/L5, Broucke orbit. Drag bodies to disturb, energy & momentum conservation display. 17 unit tests, 5 E2E tests
+  - **OrbitalResonance** (`src/islands/experiments/OrbitalResonance.tsx`): Multi-body resonant systems — Pluto-Neptune 3:2, Laplace chain 1:2:4, custom ratios. Perturbation arrows, 250-frame trails, speed control. 16 unit tests, 5 E2E tests
+  - **RelativisticOrbits** (`src/islands/experiments/RelativisticOrbits.tsx`): Newton vs General Relativity side-by-side. RK4 integration with Schwarzschild effective potential, perihelion precession Δφ display, mass slider reaching photon sphere/event horizon. 15 unit tests, 5 E2E tests
+  - **KeplersLaws** (`src/islands/experiments/KeplersLaws.tsx`): Three laws animated — elliptical orbits with Sun at focus, equal areas in equal times (swept-sector animation), P²∝a³ chart across planets. Eccentricity slider. 14 unit tests, 5 E2E tests
+  - **GalaxyFormation** (`src/islands/experiments/GalaxyFormation.tsx`): 900-particle N-body collapse from uniform disk into spiral galaxy. Dark matter + baryonic components, mulberry32 seeded RNG, Plummer softening, density color ramp, angular momentum & dark matter fraction sliders. 26 unit tests, 5 E2E tests
+  - **GalleryGrid registration**: 53 experiments total (5 new), with cursor/harmony mappings
+  - **Thumbnails**: `public/images/experiments/three-body-problem.svg`, `orbital-resonance.svg`, `relativistic-orbits.svg`, `keplers-laws.svg`, `galaxy-formation.svg`
+  - **Build verified**: `bun run build` succeeds (45 pages)
+  - **Unit tests**: `bun run test` — 729 passed (53 files, +88 new tests)
+  - **E2E tests**: `bun run test:e2e` — 207 passed (+25 new tests)
