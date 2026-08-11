@@ -5,7 +5,7 @@ import tailwind from "@astrojs/tailwind";
 import { defineConfig } from "astro/config";
 
 export default defineConfig({
-  site: "https://abdulmajidr708.dev",
+  site: "https://portfolio.abdulmajidr708.workers.dev",
   output: "static",
   integrations: [tailwind(), react(), sitemap(), mdx()],
   build: {

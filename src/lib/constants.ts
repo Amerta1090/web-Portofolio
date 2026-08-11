@@ -2,7 +2,7 @@ export const SITE = {
   title: "Abdul Majid Ridwan Tyastonoatmaja",
   description:
     "AI/ML Engineer & Systems Builder — Building production ML systems from sensor to deployment.",
-  url: "https://abdulmajidr708.dev",
+  url: "https://portfolio.abdulmajidr708.workers.dev",
   author: "Abdul Majid Ridwan Tyastonoatmaja",
   github: "https://github.com/Amerta1090",
   linkedin: "https://linkedin.com/in/abdulmajidr708",

@@ -158,7 +158,7 @@ Configured in `wrangler.toml`:
 
 ### Custom Domain
 
-The site is configured for `https://abdulmajidr708.dev`.  
+The site is configured for `https://portfolio.abdulmajidr708.workers.dev`.  
 Update the site URL in `astro.config.mjs` if changing domains.
 
 ---
@@ -171,7 +171,7 @@ Set up a free uptime monitor at:
 - [cron-job.org](https://cron-job.org) - checks every 5 minutes
 - [UptimeRobot](https://uptimerobot.com) - free tier (50 monitors, 5min checks)
 
-Monitor: `https://abdulmajidr708.dev`
+Monitor: `https://portfolio.abdulmajidr708.workers.dev`
 
 ### Analytics
 
