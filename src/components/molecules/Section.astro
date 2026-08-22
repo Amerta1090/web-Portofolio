@@ -22,9 +22,9 @@ const revealAttr = Astro.props["data-reveal"] ? { "data-reveal": "" } : {};
         <div class="mb-12">
           <div class="flex items-center gap-3 mb-3">
             <span class="w-1.5 h-1.5 bg-brand rounded-full"></span>
-            <span class="text-xs text-text-secondary">Section</span>
+            <span class="section-label text-text-secondary">Section</span>
           </div>
-          <h2 class="text-4xl md:text-6xl font-bold text-text-primary">
+          <h2 class="text-h2 font-bold text-text-primary">
             {title}
           </h2>
           {subtitle && (

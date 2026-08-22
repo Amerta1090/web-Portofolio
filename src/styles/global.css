@@ -48,6 +48,15 @@
   --font-sans: "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
   --font-display: "Fraunces", "Fraunces Fallback", Georgia, "Times New Roman", serif;
+
+  /* Fluid type scale — display untuk 1 headline raksasa per halaman,
+     heading lain turun bertahap. Min diuji bebas overflow mulai 375px. */
+  --text-display: clamp(2.25rem, 6vw + 1rem, 6.5rem);
+  --text-h1: clamp(2rem, 3.5vw + 0.5rem, 4rem);
+  --text-h2: clamp(1.625rem, 2vw + 0.75rem, 2.75rem);
+  --text-h3: clamp(1.25rem, 1vw + 0.65rem, 1.75rem);
+  --text-h4: clamp(1.0625rem, 0.8rem + 0.35vw, 1.25rem);
+  --tracking-display: -0.035em;
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
@@ -108,16 +117,16 @@ h6 {
 }
 
 h1 {
-  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  font-size: var(--text-h1);
 }
 h2 {
-  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-size: var(--text-h2);
 }
 h3 {
-  font-size: 1.5rem;
+  font-size: var(--text-h3);
 }
 h4 {
-  font-size: 1.25rem;
+  font-size: var(--text-h4);
 }
 h5 {
   font-size: 1.125rem;
@@ -254,6 +263,28 @@ pre {
 /* ── Typography utilities ── */
 .font-display {
   font-family: var(--font-display);
+}
+
+/* Display scale — satu headline raksasa per halaman (hero/page-title). */
+.text-display {
+  font-size: var(--text-display);
+  line-height: 0.95;
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+}
+
+/* Gradual scale untuk heading di bawah display. */
+.text-h1 { font-size: var(--text-h1); }
+.text-h2 { font-size: var(--text-h2); }
+.text-h3 { font-size: var(--text-h3); }
+.text-h4 { font-size: var(--text-h4); }
+
+/* Eyebrow editorial: mono kecil bercermin pada headline raksasa. */
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
 .text-balance {
