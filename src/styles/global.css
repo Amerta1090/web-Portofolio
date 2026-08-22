@@ -5,6 +5,36 @@
 @import "@fontsource/jetbrains-mono/400.css";
 @import "@fontsource/jetbrains-mono/500.css";
 
+/* ── Display font: Fraunces (self-hosted, latin subset) ── */
+@font-face {
+  font-family: "Fraunces";
+  src: url("/fonts/fraunces-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fraunces";
+  src: url("/fonts/fraunces-latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Metric-compatible fallback — prevents layout shift during swap.
+   Overrides mirror Fraunces vertical metrics (asc 1956/2000, desc 510/2000, gap 0);
+   size-adjust compensates Georgia's wider average character width. */
+@font-face {
+  font-family: "Fraunces Fallback";
+  src: local("Georgia"), local("Times New Roman");
+  ascent-override: 97.8%;
+  descent-override: 25.5%;
+  line-gap-override: 0%;
+  size-adjust: 97%;
+  font-display: swap;
+}
+
 :root {
   /* ── Spacing ── */
   --space-xs: 4px;
@@ -17,6 +47,7 @@
   /* ── Typography ── */
   --font-sans: "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
+  --font-display: "Fraunces", "Fraunces Fallback", Georgia, "Times New Roman", serif;
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
@@ -221,6 +252,10 @@ pre {
 }
 
 /* ── Typography utilities ── */
+.font-display {
+  font-family: var(--font-display);
+}
+
 .text-balance {
   text-wrap: balance;
 }

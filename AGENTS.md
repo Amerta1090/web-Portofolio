@@ -40,6 +40,10 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 - **Data flow**: `scripts/fetch-data.mjs` → `.cache/github/*.json` → `src/lib/github.ts` → components
 - **Theme**: Dark-first (`#0f0f11`), warm amber accent (`#f59e0b`), light mode toggle via CSS vars.
 - **Pattern**: Atomic design (atoms/molecules/organisms/islands).
+- **Fonts**: Inter + JetBrains Mono via `@fontsource/*` CSS imports; display serif **Fraunces** self-hosted di `public/fonts/fraunces-latin-{400,700}-normal.woff2` (~18KB/weight) dengan `@font-face` swap. Token `--font-display` di global.css + fallback metric-compatible ("Fraunces Fallback", size-adjust 97%). Preload hanya weight hero (700) di BaseLayout.
+
+## Sprint Naik Level (in progress)
+- L1.1 ✅: Display font Fraunces self-hosted. Ditemukan & diperbaiki: preload `/fonts/inter-*.woff2` 404 (file tak pernah ada — font aslinya dari @fontsource bundle) dan preconnect `fonts.bunny.net` dead → keduanya dihapus. Vitest kini exclude `.opencode/**` (test bawaan zod di skills node_modules mem-pollute suite). Playwright browser perlu `bunx playwright install chromium` bila hilang setelah update.
 
 ## Key Files
 

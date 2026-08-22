@@ -101,7 +101,7 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl }: Pr
               <RevealText
                 text={name}
                 as="h1"
-                className="text-5xl md:text-7xl font-bold text-text-primary leading-tight"
+                className="font-display text-5xl md:text-7xl font-bold text-text-primary leading-tight"
                 byWord
                 staggerDelay={0.04}
               />
