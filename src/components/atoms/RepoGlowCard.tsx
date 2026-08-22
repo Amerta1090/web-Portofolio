@@ -254,11 +254,11 @@ export default function RepoGlowCard({ repo, rank, index }: RepoGlowCardProps) {
                 {repo.language}
               </span>
             )}
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1 tabular-nums">
               <Star className="w-3 h-3" aria-hidden="true" />
               <AnimatedStarCount value={repo.stars} revealed={revealed} />
             </span>
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1 tabular-nums">
               <GitFork className="w-3 h-3" aria-hidden="true" />
               {repo.forks}
             </span>

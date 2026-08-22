@@ -91,6 +91,8 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 5rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
 }
 
 body {
@@ -191,19 +193,20 @@ pre {
   top: 0;
 }
 
-/* Scrollbar */
+/* Scrollbar — tipis 8px, token-driven, konsisten dark/light */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--accent);
-  border-radius: 3px;
+  background: var(--color-border);
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-muted);
+  background: var(--color-brand);
 }
 
 /* Fade In */
