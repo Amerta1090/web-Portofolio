@@ -43,7 +43,13 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 - **Fonts**: Inter + JetBrains Mono via `@fontsource/*` CSS imports; display serif **Fraunces** self-hosted di `public/fonts/fraunces-latin-{400,700}-normal.woff2` (~18KB/weight) dengan `@font-face` swap. Token `--font-display` di global.css + fallback metric-compatible ("Fraunces Fallback", size-adjust 97%). Preload hanya weight hero (700) di BaseLayout.
 
 ## Sprint Naik Level (in progress)
-- L1.1 ✅: Display font Fraunces self-hosted. Ditemukan & diperbaiki: preload `/fonts/inter-*.woff2` 404 (file tak pernah ada — font aslinya dari @fontsource bundle) dan preconnect `fonts.bunny.net` dead → keduanya dihapus. Vitest kini exclude `.opencode/**` (test bawaan zod di skills node_modules mem-pollute suite). Playwright browser perlu `bunx playwright install chromium` bila hilang setelah update.
+- ITERASI 1 ✅ (L1.1–L1.5): Tipografi editorial & craft foundation.
+  - L1.1: Display font **Fraunces** self-hosted (`public/fonts/fraunces-latin-{400,700}-normal.woff2`, ~18KB/weight), token `--font-display` + fallback size-adjust 97%. Diperbaiki: preload `/fonts/inter-*.woff2` 404 (file tak pernah ada — font aslinya dari @fontsource bundle) dan preconnect `fonts.bunny.net` dead → dihapus.
+  - L1.2: Fluid type scale `--text-display/h1–h4` (clamp) + util `.text-display`/`.text-h1..h4`/`.section-label`. Hero h1 pakai display scale (lh 0.95, tracking -0.035em). Section h2 diturunkan ke `--text-h2`. Min display 2.25rem agar nama panjang tak overflow @375px.
+  - L1.3: Scrollbar 8px thumb `--color-border`→hover brand (+Firefox props); tabular-nums di star/fork RepoGlowCard. `::selection`+focus ring sudah token adaptif (light accent #5d6b54 lebih gelap utk kontras).
+  - L1.4: Script unpkg dotLottie dihapus (tidak dipakai).
+  - Token baru global.css: `--font-display`, `--text-display/h1–h4`, `--tracking-display`; util `.font-display/.text-display/.text-h1..h4/.section-label`.
+- Catatan lingkungan: Vitest exclude `.opencode/**` (test bawaan zod di skills node_modules mem-pollute suite). Playwright browser perlu `bunx playwright install chromium` bila hilang setelah update. Test E2E WebGL-heavy (gallery) bisa timeout saat paralel penuh — re-run terisolasi untuk konfirmasi.
 
 ## Key Files
 
