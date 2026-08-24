@@ -41,44 +41,6 @@ test.describe("Game Theory experiments", () => {
     });
   });
 
-  test.describe("Nash Equilibrium Visualizer", () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto("/gallery#nash-equilibrium");
-      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
-    });
-
-    test.afterEach(async ({ page }) => {
-      await page.keyboard.press("Escape");
-    });
-
-    test("deep link opens modal with preset buttons", async ({ page }) => {
-      await expect(page.getByRole("button", { name: /Prisoner/ })).toBeVisible();
-      await expect(page.getByRole("button", { name: /Battle/ })).toBeVisible();
-    });
-
-    test("shows Reset button", async ({ page }) => {
-      await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
-    });
-
-    test("has payoff matrix inputs", async ({ page }) => {
-      const modal = page.locator("[data-modal-content]");
-      await expect(modal.locator("input[type='number']").first()).toBeVisible();
-    });
-
-    test("switches preset on click", async ({ page }) => {
-      await page.getByRole("button", { name: /Battle/ }).click();
-      await expect(page.getByRole("button", { name: /Battle/ })).toHaveClass(/amber/);
-      await expect(page.getByRole("button", { name: /Prisoner/ })).not.toHaveClass(/amber/);
-    });
-
-    test("card is present in gallery", async ({ page }) => {
-      await page.keyboard.press("Escape");
-      await page.goto("/gallery");
-      const card = page.locator('[role="listitem"]').filter({ hasText: "Nash Equilibrium" });
-      await expect(card).toBeVisible();
-    });
-  });
-
   test.describe("Prisoner's Dilemma Tournament", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto("/gallery#prisoners-dilemma");
@@ -156,48 +118,6 @@ test.describe("Game Theory experiments", () => {
       await page.keyboard.press("Escape");
       await page.goto("/gallery");
       const card = page.locator('[role="listitem"]').filter({ hasText: /Simulated Annealing/ });
-      await expect(card).toBeVisible();
-    });
-  });
-
-  test.describe("Evolutionary Game Theory", () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto("/gallery#evolutionary-game-theory");
-      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
-    });
-
-    test.afterEach(async ({ page }) => {
-      await page.keyboard.press("Escape");
-    });
-
-    test("deep link opens modal with preset buttons", async ({ page }) => {
-      await expect(page.getByRole("button", { name: /Hawk-Dove|Hawk/ })).toBeVisible();
-      await expect(page.getByRole("button", { name: /Rock-Paper-Scissors|RPS/ })).toBeVisible();
-    });
-
-    test("shows Run/Pause, Reset, trajectory buttons", async ({ page }) => {
-      await expect(page.getByRole("button", { name: /Run|Pause/ })).toBeVisible();
-      await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
-      await expect(page.getByRole("button", { name: /\+Traj/ })).toBeVisible();
-      await expect(page.getByRole("button", { name: /Clear Traj/ })).toBeVisible();
-    });
-
-    test("has VF On/Off toggle and speed slider", async ({ page }) => {
-      await expect(page.getByRole("button", { name: /VF/ })).toBeVisible();
-      const modal = page.locator("[data-modal-content]");
-      await expect(modal.locator('label:has-text("Speed") input[type="range"]')).toBeVisible();
-    });
-
-    test("switches preset on click", async ({ page }) => {
-      await page.getByRole("button", { name: "Rock-Paper-Scissors" }).click();
-      await expect(page.getByRole("button", { name: "Rock-Paper-Scissors" })).toHaveClass(/bg-amber/);
-      await expect(page.getByRole("button", { name: "Hawk-Dove" })).not.toHaveClass(/bg-amber/);
-    });
-
-    test("card is present in gallery", async ({ page }) => {
-      await page.keyboard.press("Escape");
-      await page.goto("/gallery");
-      const card = page.locator('[role="listitem"]').filter({ hasText: /Evolutionary Game Theory/ });
       await expect(card).toBeVisible();
     });
   });

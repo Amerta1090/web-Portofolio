@@ -51,47 +51,6 @@ test.describe("Astrophysics experiments", () => {
     });
   });
 
-  test.describe("Orbital Resonance Visualizer", () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto("/gallery#orbital-resonance");
-      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
-    });
-
-    test.afterEach(async ({ page }) => {
-      await page.keyboard.press("Escape");
-    });
-
-    test("deep link opens modal with preset buttons", async ({ page }) => {
-      await expect(page.getByRole("button", { name: /Pluto-Neptune/ })).toBeVisible();
-      await expect(page.getByRole("button", { name: /Laplace/ })).toBeVisible();
-      const modal = page.locator("[data-modal-content]");
-      await expect(modal.getByRole("button", { name: "Custom" })).toBeVisible();
-    });
-
-    test("shows Play, Reset and Arrows toggle", async ({ page }) => {
-      await expect(page.getByRole("button", { name: "Play" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
-      await expect(page.getByRole("button", { name: /Arrows/ })).toBeVisible();
-    });
-
-    test("has speed slider", async ({ page }) => {
-      const modal = page.locator("[data-modal-content]");
-      await expect(modal.locator('label:has-text("Speed") input[type="range"]')).toBeVisible();
-    });
-
-    test("switches preset on click", async ({ page }) => {
-      await page.getByRole("button", { name: "Laplace 1:2:4" }).click();
-      await expect(page.getByRole("button", { name: "Laplace 1:2:4" })).toHaveClass(/amber/);
-    });
-
-    test("card is present in gallery", async ({ page }) => {
-      await page.keyboard.press("Escape");
-      await page.goto("/gallery");
-      const card = page.locator('[role="listitem"]').filter({ hasText: /Orbital Resonance/ });
-      await expect(card).toBeVisible();
-    });
-  });
-
   test.describe("Relativistic Orbits", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto("/gallery#relativistic-orbits");
@@ -131,45 +90,6 @@ test.describe("Astrophysics experiments", () => {
       await page.keyboard.press("Escape");
       await page.goto("/gallery");
       const card = page.locator('[role="listitem"]').filter({ hasText: /Relativistic Orbits/ });
-      await expect(card).toBeVisible();
-    });
-  });
-
-  test.describe("Kepler's Laws", () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto("/gallery#keplers-laws");
-      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
-    });
-
-    test.afterEach(async ({ page }) => {
-      await page.keyboard.press("Escape");
-    });
-
-    test("deep link opens modal with law buttons", async ({ page }) => {
-      await expect(page.getByRole("button", { name: "Law 1" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "Law 2" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "Law 3" })).toBeVisible();
-    });
-
-    test("shows Pause and Reset buttons", async ({ page }) => {
-      await expect(page.getByRole("button", { name: "Pause" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
-    });
-
-    test("has eccentricity slider", async ({ page }) => {
-      const modal = page.locator("[data-modal-content]");
-      await expect(modal.locator('label:has-text("Eccentricity") input[type="range"]')).toBeVisible();
-    });
-
-    test("switches between laws", async ({ page }) => {
-      await page.getByRole("button", { name: "Law 3" }).click();
-      await expect(page.getByRole("button", { name: "Law 3" })).toHaveClass(/font-bold/);
-    });
-
-    test("card is present in gallery", async ({ page }) => {
-      await page.keyboard.press("Escape");
-      await page.goto("/gallery");
-      const card = page.locator('[role="listitem"]').filter({ hasText: "Kepler's Laws" });
       await expect(card).toBeVisible();
     });
   });

@@ -25,7 +25,6 @@ import AmbientSound from "../components/atoms/AmbientSound";
 import AudioVisualizer from "./experiments/AudioVisualizer";
 import BezierPlayground from "./experiments/BezierPlayground";
 import ConformalMapping from "./experiments/ConformalMapping";
-import EvolutionaryGameTheory from "./experiments/EvolutionaryGameTheory";
 import FourierEpicycles from "./experiments/FourierEpicycles";
 import FractalExplorer from "./experiments/FractalExplorer";
 import FractalFlameSync from "./experiments/FractalFlameSync";
@@ -33,16 +32,13 @@ import GalaxyFormation from "./experiments/GalaxyFormation";
 import GradientDescent from "./experiments/GradientDescent";
 import HyperbolicGoL from "./experiments/HyperbolicGoL";
 import InteractiveCanvas from "./experiments/InteractiveCanvas";
-import KeplersLaws from "./experiments/KeplersLaws";
 import KnotTheory from "./experiments/KnotTheory";
 import LiquidDistortion from "./experiments/LiquidDistortion";
 import LogisticMap from "./experiments/LogisticMap";
 import MathEscapeRoom from "./experiments/MathEscapeRoom";
 import MathSonification from "./experiments/MathSonification";
-import NashEquilibrium from "./experiments/NashEquilibrium";
 import NeuralNetworkArt from "./experiments/NeuralNetworkArt";
 import NoiseTopography from "./experiments/NoiseTopography";
-import OrbitalResonance from "./experiments/OrbitalResonance";
 import PCATSNEViz from "./experiments/PCATSNEViz";
 import PrisonersDilemma from "./experiments/PrisonersDilemma";
 import QuantumCircuit from "./experiments/QuantumCircuit";
@@ -379,18 +375,6 @@ const experiments: Experiment[] = [
     thumbnail: "/images/experiments/gradient-descent.svg",
   },
   {
-    id: "nash-equilibrium",
-    title: "Nash Equilibrium Visualizer",
-    description:
-      "2×2 payoff matrix with pure and mixed strategy Nash equilibria, best response curves, and 5 presets.",
-    longDescription:
-      "Explore Nash equilibria in 2×2 games. Input payoff values, see pure-strategy NE cells highlighted with amber glow, and watch mixed strategy probabilities visualized. Presets include Prisoner's Dilemma, Battle of the Sexes, Stag Hunt, Matching Pennies, and Chicken.",
-    tags: ["Game Theory", "Nash", "Equilibrium", "Matrix"],
-    icon: <Target className="w-5 h-5" />,
-    gradient: "from-purple-500 to-cyan-500",
-    thumbnail: "/images/experiments/nash-equilibrium.svg",
-  },
-  {
     id: "simulated-annealing-tsp",
     title: "Simulated Annealing TSP",
     description:
@@ -401,18 +385,6 @@ const experiments: Experiment[] = [
     icon: <CircuitBoard className="w-5 h-5" />,
     gradient: "from-cyan-500 to-blue-500",
     thumbnail: "/images/experiments/simulated-annealing-tsp.svg",
-  },
-  {
-    id: "evolutionary-game-theory",
-    title: "Evolutionary Game Theory",
-    description:
-      "Replicator dynamics on a 2-simplex — strategy frequencies evolve over time with phase portrait visualization.",
-    longDescription:
-      "Replicator dynamics simulation on a 2-simplex triangle. Trajectories flow according to the replicator equation, showing how strategy frequencies evolve. Vector field arrows show the direction of selection. Presets: Hawk-Dove, Rock-Paper-Scissors, Stag Hunt, and Coordination Game.",
-    tags: ["Game Theory", "Replicator Dynamics", "Evolution", "Simplex"],
-    icon: <Layers className="w-5 h-5" />,
-    gradient: "from-purple-500 to-pink-500",
-    thumbnail: "/images/experiments/evolutionary-game-theory.svg",
   },
   {
     id: "relativistic-orbits",
@@ -427,18 +399,6 @@ const experiments: Experiment[] = [
     thumbnail: "/images/experiments/relativistic-orbits.svg",
   },
   {
-    id: "orbital-resonance",
-    title: "Orbital Resonance Visualizer",
-    description:
-      "Resonant planetary systems — Pluto-Neptune 3:2, Jupiter's Laplace chain, and custom orbital ratios with perturbation arrows.",
-    longDescription:
-      "Visualize orbital resonance, the phenomenon where planets tug each other into locked orbital-period ratios. Watch Pluto and Neptune hold their famous 3:2 lock, or Jupiter's moons Io, Europa and Ganymede dance in the 1:2:4 Laplace resonance. Trails trace the orbits, amber markers flash at conjunctions, and arrows show gravitational perturbation directions. Presets include Pluto-Neptune, Laplace resonance, and custom ratios.",
-    tags: ["Astronomy", "Orbital Mechanics", "Resonance", "Canvas"],
-    icon: <Globe className="w-5 h-5" />,
-    gradient: "from-amber-500 to-green-500",
-    thumbnail: "/images/experiments/orbital-resonance.svg",
-  },
-  {
     id: "three-body-problem",
     title: "3-Body Problem",
     description:
@@ -449,18 +409,6 @@ const experiments: Experiment[] = [
     icon: <GitFork className="w-5 h-5" />,
     gradient: "from-cyan-500 to-purple-500",
     thumbnail: "/images/experiments/three-body-problem.svg",
-  },
-  {
-    id: "keplers-laws",
-    title: "Kepler's Laws",
-    description:
-      "Three laws animated — elliptical orbits with the Sun at a focus, equal areas in equal times, and P² ∝ a³ for the planets.",
-    longDescription:
-      "Watch Kepler's three laws of planetary motion come alive. Law 1: planets trace ellipses with the Sun at one focus — drag the eccentricity slider. Law 2: the radius vector sweeps out equal areas in equal time intervals, visualized as colored sectors that thin near perihelion and fatten near aphelion. Law 3: the period² vs semi-major axis³ chart shows every planet collapsing onto a single line with constant k = T²/a³.",
-    tags: ["Astrophysics", "Orbital Mechanics", "Kepler", "Classical"],
-    icon: <Activity className="w-5 h-5" />,
-    gradient: "from-amber-500 to-purple-500",
-    thumbnail: "/images/experiments/keplers-laws.svg",
   },
   {
     id: "galaxy-formation",
@@ -505,12 +453,8 @@ function LivePreview({ id }: { id: string }) {
       {id === "fractal-flame-sync" && <FractalFlameSync compact />}
       {id === "prisoners-dilemma" && <PrisonersDilemma compact />}
       {id === "gradient-descent" && <GradientDescent compact />}
-      {id === "nash-equilibrium" && <NashEquilibrium compact />}
       {id === "simulated-annealing-tsp" && <SimulatedAnnealingTSP compact />}
-      {id === "evolutionary-game-theory" && <EvolutionaryGameTheory compact />}
-      {id === "orbital-resonance" && <OrbitalResonance compact />}
       {id === "three-body-problem" && <ThreeBodyProblem compact />}
-      {id === "keplers-laws" && <KeplersLaws compact />}
       {id === "galaxy-formation" && <GalaxyFormation compact />}
       {id === "relativistic-orbits" && <RelativisticOrbits compact />}
     </>
@@ -719,12 +663,8 @@ function ExperimentModal({
               {experiment.id === "fractal-flame-sync" && <FractalFlameSync />}
               {experiment.id === "prisoners-dilemma" && <PrisonersDilemma />}
               {experiment.id === "gradient-descent" && <GradientDescent />}
-              {experiment.id === "nash-equilibrium" && <NashEquilibrium />}
               {experiment.id === "simulated-annealing-tsp" && <SimulatedAnnealingTSP />}
-              {experiment.id === "evolutionary-game-theory" && <EvolutionaryGameTheory />}
-              {experiment.id === "orbital-resonance" && <OrbitalResonance />}
               {experiment.id === "three-body-problem" && <ThreeBodyProblem />}
-              {experiment.id === "keplers-laws" && <KeplersLaws />}
               {experiment.id === "galaxy-formation" && <GalaxyFormation />}
               {experiment.id === "relativistic-orbits" && <RelativisticOrbits />}
             </div>
@@ -763,13 +703,9 @@ function experimentCursor(id: string): string {
     "fractal-flame-sync": "crosshair",
     "prisoners-dilemma": "crosshair",
     "gradient-descent": "crosshair",
-    "nash-equilibrium": "crosshair",
     "simulated-annealing-tsp": "crosshair",
-    "evolutionary-game-theory": "crosshair",
     "relativistic-orbits": "crosshair",
-    "orbital-resonance": "grab",
     "three-body-problem": "grab",
-    "keplers-laws": "crosshair",
     "galaxy-formation": "crosshair",
   };
   return cursors[id] || "pointer";
