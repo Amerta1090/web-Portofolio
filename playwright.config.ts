@@ -12,7 +12,10 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   webServer: {
-    command: "bun run build && bunx astro preview --port 4321",
+    // Lokal: skip fetch-data GitHub (pakai .cache) — build data fresh hanya di CI.
+    command: process.env.CI
+      ? "bun run build && bunx astro preview --port 4321"
+      : "bun run build:fast && bunx astro preview --port 4321",
     port: 4321,
     reuseExistingServer: !process.env.CI,
     timeout: 180000,
