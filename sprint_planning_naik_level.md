@@ -15,7 +15,7 @@
 | L1.3 | Craft details (selection/scrollbar/focus) | ✅ | Scrollbar 8px thumb `--color-border`→hover brand + Firefox `scrollbar-width/color`; `::selection` & focus ring sudah token-driven adaptif (light accent #5d6b54 lebih gelap utk kontras — by design); `tabular-nums` ditambah ke star/fork count RepoGlowCard (MetricCounter dkk sudah ada). +4 E2E `e2e/craft.spec.ts` |
 | L1.4 | Hapus dependensi unpkg dotLottie | ✅ | Tidak ada pemakaian `<dotlottie-player>` di codebase → baris script unpkg dihapus dari BaseLayout. `grep -rn unpkg src/` = nol hasil. Catatan: 2 test gallery sempat timeout saat run paralel penuh (kontensi WebGL), hijau saat re-run terisolasi — flake pre-existing |
 | L1.5 | Verifikasi & tutup Iterasi 1 | ✅ | Build 45 halaman ✓, unit 729 ✓, E2E 220 (2 flake WebGL gallery → hijau saat re-run terisolasi 142/142) ✓. 4 commit: L1.1–L1.4 |
-| L2.1 | Audit & scoring seluruh eksperimen | ⬜ | |
+| L2.1 | Audit & scoring seluruh eksperimen | ✅ | Audit kode penuh 53 eksperimen (~32K LOC, 6 auditor paralel). Hasil: **20 KEEP · 5 UPGRADE (FractalExplorer, LiquidDistortion, LogisticMap, PCATSNEViz, GradientDescent) · 28 CUT** → tersisa 25. Tabel skor lengkap + alasan + constraint: `docs/lab-audit.md`. Kritis: FractalExplorer pan/zoom handler tak pernah di-attach; 4DGameOfLife Play/Pause mati di full view; ⚠️ CreativeLabTeaser pakai 3 eksperimen CUT → wajib dirework saat L2.2 |
 | L2.2 | Eksekusi pruning (hapus CUT) | ⬜ | |
 | L2.3 | Rapikan arsitektur & copy gallery | ⬜ | |
 | L2.4 | Restraint pass efek dekoratif global | ⬜ | |

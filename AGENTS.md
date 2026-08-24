@@ -49,6 +49,8 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
   - L1.3: Scrollbar 8px thumb `--color-border`→hover brand (+Firefox props); tabular-nums di star/fork RepoGlowCard. `::selection`+focus ring sudah token adaptif (light accent #5d6b54 lebih gelap utk kontras).
   - L1.4: Script unpkg dotLottie dihapus (tidak dipakai).
   - Token baru global.css: `--font-display`, `--text-display/h1–h4`, `--tracking-display`; util `.font-display/.text-display/.text-h1..h4/.section-label`.
+- ITERASI 2 🔄 (L2.1 ✅): Gallery pruning.
+  - L2.1: Audit penuh 53 eksperimen → **20 KEEP · 5 UPGRADE · 28 CUT** (tersisa 25). Tabel skor, alasan per item, usulan pengelompokan commit cut, dan temuan sistemik ada di `docs/lab-audit.md` — WAJIB dibaca sebelum L2.2/L2.3. Constraint: `CreativeLabTeaser.tsx` (index) meng-import ImageSequenceScroll/ParticleGalaxy/TextScramble (CUT) + VideoSequenceScroll (KEEP) → teaser dirework bersamaan commit cut showcase. Temuan sistemik lintas eksperimen: RAF 60fps tanpa henti meski scene statis; setState di dalam loop RAF (HUD); fitur diiklankan tapi tak berfungsi (FractalExplorer pan/zoom handler yatim — prioritas UPGRADE); wheel React synthetic + preventDefault melanggar konvensi native-listener repo.
 - Catatan lingkungan: Vitest exclude `.opencode/**` (test bawaan zod di skills node_modules mem-pollute suite). Playwright browser perlu `bunx playwright install chromium` bila hilang setelah update. Test E2E WebGL-heavy (gallery) bisa timeout saat paralel penuh — re-run terisolasi untuk konfirmasi.
 
 ## Key Files
