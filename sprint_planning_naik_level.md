@@ -17,7 +17,7 @@
 | L1.5 | Verifikasi & tutup Iterasi 1 | ✅ | Build 45 halaman ✓, unit 729 ✓, E2E 220 (2 flake WebGL gallery → hijau saat re-run terisolasi 142/142) ✓. 4 commit: L1.1–L1.4 |
 | L2.1 | Audit & scoring seluruh eksperimen | ✅ | Audit kode penuh 53 eksperimen (~32K LOC, 6 auditor paralel). Hasil: **20 KEEP · 5 UPGRADE (FractalExplorer, LiquidDistortion, LogisticMap, PCATSNEViz, GradientDescent) · 28 CUT** → tersisa 25. Tabel skor lengkap + alasan + constraint: `docs/lab-audit.md`. Kritis: FractalExplorer pan/zoom handler tak pernah di-attach; 4DGameOfLife Play/Pause mati di full view; ⚠️ CreativeLabTeaser pakai 3 eksperimen CUT → wajib dirework saat L2.2 |
 | L2.2 | Eksekusi pruning (hapus CUT) | ✅ | 28 eksperimen dihapus dalam 6 commit terpisah: A showcase+teaser rework (`2639a79`), B chaos/CA (`96b163b`), C math-viz (`f9e25c6`), D GT/orbital (`2fd49b7`), E gimmicks (`3dac272`) + fix duplikasi describe e2e. GalleryGrid kini 25 entri; `toHaveCount(25)`; cursor map 25 key. Verifikasi: build 45 hal ✓, unit 397/397 ✓ (29 file), e2e hijau (gallery 63, craft 4, GT+astro 30 — run paralel penuh masih flaky WebGL sesuai catatan, dikonfirmasi terisolasi) |
-| L2.3 | Rapikan arsitektur & copy gallery | ⬜ | |
+| L2.3 | Rapikan arsitektur & copy gallery | ✅ | 9c46da8 |
 | L2.4 | Restraint pass efek dekoratif global | ⬜ | |
 | L2.5 | Verifikasi & tutup Iterasi 2 | ⬜ | |
 | L3.1 | Motion tokens | ⬜ | |
@@ -115,12 +115,13 @@ Legend: ⬜ pending · 🔄 in progress · ✅ done · ⏭️ skipped (wajib isi
 - Commit TERPISAH per kelompok kategori (mis. "cut: weak number-theory demos", "cut: redundant CA variants") agar mudah direvert.
 - **AC:** grep nama eksperimen terhapus di `src/` = nol hasil; tidak ada import mati; `bun run build` lulus; suite test hijau (jumlah test turun wajar sesuai penghapusan).
 
-### L2.3 — Rapikan arsitektur & copy pasca-pruning
-- Kelompokkan eksperimen tersisa ke kategori jelas (mis. Mathematics, Physics, Generative, Audio, Play/Games) — filter/kategori UI gallery disesuaikan.
-- Deskripsi tiap kartu ditulis ulang maksimal 1 kalimat yang MENJUAL skill ("Fluid solver Navier-Stokes real-time", bukan "Simulasi air keren").
-- Pastikan cursor/harmony mapping konsisten dengan kategori baru.
-- Halaman landing galeri: lead-in singkat yang framing-nya "engineering showcase", bukan toy collection.
-- **AC:** struktur kategori masuk akal; tidak ada kartu dengan copy generik; deep link `#experiment-id` tetap bekerja.
+### L2.3 — Rapikan arsitektur & copy pasca-pruning ✅ (commit `9c46da8`)
+- Kelompokkan eksperimen tersisa ke kategori jelas — **DONE**: `EXPERIMENT_CATEGORIES` Record + filter tablist di atas grid (All/Physics & Simulation 6/Mathematics 8/ML & Algorithms 6/Generative & Audio 3/Interaction & Tools 2). Keyboard nav, grid map, footer shortcut memakai `visibleExperiments` (default "All" → count e2e tetap 25).
+- Deskripsi tiap kartu ditulis ulang 1 kalimat yang MENJUAL skill — **DONE** (25/25).
+- Cursor/harmony mapping konsisten — **DONE**: chain ternary mati diganti `EXP_HARMONY: Record<string,string>` (bersih dari id ter-cut).
+- Lead-in galeri framing "engineering showcase" — **DONE** (`gallery.astro`: judul, meta description, badge, lead paragraph; chip "coming soon" usang dihapus).
+- BONUS FIX: branch `bezier-playground` di modal component chain ternyata terhapus saat surgery L2.2 → modal merender kosong tanpa error console; 4 test e2e Bézier gagal. Direstore.
+- **AC:** struktur kategori masuk akal ✓; tidak ada kartu copy generik ✓; deep link tetap bekerja ✓. Verifikasi: build 45 hal ✓, unit 397/397 ✓, e2e gallery 71/71 ✓ (2,7 menit via server reuse).
 
 ### L2.4 — Restraint pass efek dekoratif global
 - Evaluasi efek dekoratif lintas halaman: `FloatingElements`, `AmbientScene`, `CustomCursor`. Kriteria: jika tidak menyokong hierarki/konten → matikan default atau turunkan intensitas (opacity/kecepatan).
