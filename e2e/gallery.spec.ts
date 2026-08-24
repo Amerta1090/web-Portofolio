@@ -5,7 +5,7 @@ test.describe("Gallery page", () => {
     await page.goto("/gallery");
     await expect(page.getByRole("heading", { name: "Creative Lab" })).toBeVisible();
     const cards = page.locator('[role="list"] > [role="listitem"]');
-    await expect(cards).toHaveCount(43);
+    await expect(cards).toHaveCount(34);
   });
 
   test("Fractal Explorer card is present", async ({ page }) => {
@@ -272,126 +272,9 @@ test.describe("Gallery page", () => {
     await expect(page.getByText("Epicycles →")).toBeVisible({ timeout: 5000 });
   });
 
-  test("Taylor Series card is present", async ({ page }) => {
-    await page.goto("/gallery");
-    await expect(page.getByText("Taylor Series Approximation")).toBeVisible();
-    const card = page.locator('[role="listitem"]').filter({ hasText: "Taylor Series Approximation" });
-    await expect(card).toBeVisible();
-    await expect(card.getByText("Calculus", { exact: true })).toBeVisible();
-    await expect(card.getByText("Taylor Series", { exact: true })).toBeVisible();
-  });
-
-  test("Taylor Series modal shows function and animation controls", async ({ page }) => {
-    await page.goto("/gallery");
-    await page.getByText("Taylor Series Approximation").first().click();
-    await expect(page.getByRole("button", { name: "eˣ" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "sin" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "cos" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "ln" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Auto Animate" })).toBeVisible();
-    await expect(page.locator('label:has-text("N") input[type="range"]')).toBeVisible();
-  });
-
-  test("Taylor Series switches function on button click", async ({ page }) => {
-    await page.goto("/gallery");
-    await page.getByText("Taylor Series Approximation").first().click();
-    await page.getByRole("button", { name: "sin" }).click();
-    await expect(page.getByRole("button", { name: "sin" })).toBeVisible();
-    await page.getByRole("button", { name: "cos" }).click();
-    await expect(page.getByRole("button", { name: "cos" })).toBeVisible();
-  });
-
-  test("Taylor Series Auto Animate starts on click", async ({ page }) => {
-    await page.goto("/gallery");
-    await page.getByText("Taylor Series Approximation").first().click();
-    await expect(page.getByRole("button", { name: "Auto Animate" })).toBeVisible();
-    await page.getByRole("button", { name: "Auto Animate" }).click();
-    await expect(page.getByRole("button", { name: /Animating/ })).toBeVisible({ timeout: 3000 });
-  });
-
-  test("Taylor Series deep link opens via URL hash", async ({ page }) => {
-    await page.goto("/gallery#taylor-series");
-    await expect(page.getByRole("button", { name: "eˣ" })).toBeVisible({ timeout: 5000 });
-  });
-
-  test("Riemann Sum card is present", async ({ page }) => {
-    await page.goto("/gallery");
-    await expect(page.getByText("Riemann Sum → Integral")).toBeVisible();
-    const card = page.locator('[role="listitem"]').filter({ hasText: "Riemann Sum" });
-    await expect(card).toBeVisible();
-    await expect(card.getByText("Calculus", { exact: true })).toBeVisible();
-    await expect(card.getByText("Riemann Sum", { exact: true })).toBeVisible();
-  });
-
-  test("Riemann Sum modal shows method and preset controls", async ({ page }) => {
-    await page.goto("/gallery");
-    await page.getByText("Riemann Sum → Integral").first().click();
-    await expect(page.getByRole("button", { name: "Left" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Right" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Midpoint" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Trapezoidal" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Animate" })).toBeVisible();
-    await expect(page.locator('label:has-text("N") input[type="range"]')).toBeVisible();
-  });
-
-  test("Riemann Sum preset buttons switch function", async ({ page }) => {
-    await page.goto("/gallery");
-    await page.getByText("Riemann Sum → Integral").first().click();
-    await page.getByRole("button", { name: "sin" }).click();
-    await expect(page.getByRole("button", { name: "sin" })).toBeVisible();
-    await page.getByRole("button", { name: "1/x" }).click();
-    await expect(page.getByRole("button", { name: "1/x" })).toBeVisible();
-  });
-
-  test("Riemann Sum Animate starts on click", async ({ page }) => {
-    await page.goto("/gallery");
-    await page.getByText("Riemann Sum → Integral").first().click();
-    await expect(page.getByRole("button", { name: "Animate" })).toBeVisible();
-    await page.getByRole("button", { name: "Animate" }).click();
-    await expect(page.getByRole("button", { name: /Animating/ })).toBeVisible({ timeout: 3000 });
-  });
-
-  test("Riemann Sum deep link opens via URL hash", async ({ page }) => {
-    await page.goto("/gallery#riemann-sum");
-    await expect(page.getByRole("button", { name: "Left" })).toBeVisible({ timeout: 5000 });
-  });
-
   // ═══════════════════════════════════════════
   // Sprint 9 — Linear Algebra & Dimensionality
   // ═══════════════════════════════════════════
-
-  test("Eigenvector Flow Field card is present", async ({ page }) => {
-    await page.goto("/gallery");
-    await expect(page.getByText("Eigenvector Flow Field")).toBeVisible();
-    const card = page.locator('[role="listitem"]').filter({ hasText: "Eigenvector Flow Field" });
-    await expect(card).toBeVisible();
-    await expect(card.getByText("Linear Algebra", { exact: true })).toBeVisible();
-    await expect(card.getByText("PCA", { exact: true })).toBeVisible();
-  });
-
-  test("Eigenvector Flow Field modal shows matrix preset and PCA controls", async ({ page }) => {
-    await page.goto("/gallery");
-    await page.getByText("Eigenvector Flow Field").first().click();
-    await expect(page.locator("select")).toBeVisible();
-    await expect(page.getByRole("button", { name: "▶ Animate PCA", exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "PCA", exact: true })).toBeVisible();
-  });
-
-  test("Matrix Multiplication card is present", async ({ page }) => {
-    await page.goto("/gallery");
-    await expect(page.getByText("Matrix Multiplication Visual")).toBeVisible();
-    const card = page.locator('[role="listitem"]').filter({ hasText: "Matrix Multiplication Visual" });
-    await expect(card).toBeVisible();
-    await expect(card.getByText("Matrices", { exact: true })).toBeVisible();
-  });
-
-  test("Matrix Multiplication modal shows matrix presets and play controls", async ({ page }) => {
-    await page.goto("/gallery");
-    await page.getByText("Matrix Multiplication Visual").first().click();
-    await expect(page.locator("select")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Play" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Step" })).toBeVisible();
-  });
 
   test("SVD Image Compression card is present", async ({ page }) => {
     await page.goto("/gallery");
@@ -442,11 +325,6 @@ test.describe("Gallery page", () => {
     await expect(page.getByText("Perplexity:")).toBeVisible();
   });
 
-  test("deep link for eigenvector-flow opens via URL hash", async ({ page }) => {
-    await page.goto("/gallery#eigenvector-flow");
-    await expect(page.getByRole("button", { name: "▶ Animate PCA", exact: true })).toBeVisible({ timeout: 5000 });
-  });
-
   test("deep link for svd-compression opens via URL hash", async ({ page }) => {
     await page.goto("/gallery#svd-compression");
     await expect(page.getByText("Upload Image")).toBeVisible({ timeout: 5000 });
@@ -465,27 +343,6 @@ test.describe("Gallery page", () => {
   // ═══════════════════════════════════════════
   // Sprint 10 — PDEs, Physics & Emergence
   // ═══════════════════════════════════════════
-
-  test("Von Kármán Vortex Street card is present", async ({ page }) => {
-    await page.goto("/gallery");
-    await expect(page.getByText("Von Kármán Vortex Street")).toBeVisible();
-    const card = page.locator('[role="listitem"]').filter({ hasText: "Von Kármán Vortex Street" });
-    await expect(card).toBeVisible();
-    await expect(card.getByText("Fluid Dynamics", { exact: true })).toBeVisible();
-    await expect(card.getByText("Vortex", { exact: true })).toBeVisible();
-  });
-
-  test("Von Kármán Vortex Street modal shows controls", async ({ page }) => {
-    await page.goto("/gallery");
-    await page.getByText("Von Kármán Vortex Street").first().click();
-    await expect(page.locator('label:has-text("Re:") input[type="range"]')).toBeVisible();
-    await expect(page.getByRole("button", { name: "Pause" })).toBeVisible();
-  });
-
-  test("Von Kármán Vortex Street deep link opens via URL hash", async ({ page }) => {
-    await page.goto("/gallery#von-karmann-vortex");
-    await expect(page.locator('label:has-text("Re:") input[type="range"]')).toBeVisible({ timeout: 5000 });
-  });
 
   test("Spring Physics Sandbox card is present", async ({ page }) => {
     await page.goto("/gallery");
@@ -507,28 +364,6 @@ test.describe("Gallery page", () => {
   test("Spring Physics Sandbox deep link opens via URL hash", async ({ page }) => {
     await page.goto("/gallery#spring-physics");
     await expect(page.getByRole("button", { name: "Cloth" })).toBeVisible({ timeout: 5000 });
-  });
-
-  test("Rayleigh-Bénard Convection card is present", async ({ page }) => {
-    await page.goto("/gallery");
-    await expect(page.getByText("Rayleigh-Bénard Convection")).toBeVisible();
-    const card = page.locator('[role="listitem"]').filter({ hasText: "Rayleigh-Bénard Convection" });
-    await expect(card).toBeVisible();
-    await expect(card.getByText("PDE", { exact: true })).toBeVisible();
-  });
-
-  test("Rayleigh-Bénard Convection modal shows Ra slider and controls", async ({ page }) => {
-    await page.goto("/gallery");
-    await page.getByText("Rayleigh-Bénard Convection").first().click();
-    await expect(page.locator('label:has-text("Ra:") input[type="range"]')).toBeVisible();
-    await expect(page.getByRole("button", { name: "Arrows" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Pause" })).toBeVisible();
-  });
-
-  test("Rayleigh-Bénard Convection deep link opens via URL hash", async ({ page }) => {
-    await page.goto("/gallery#rayleigh-benard");
-    await expect(page.locator('label:has-text("Ra:") input[type="range"]')).toBeVisible({ timeout: 5000 });
   });
 
   // ═══════════════════════════════════════════
@@ -556,27 +391,6 @@ test.describe("Gallery page", () => {
       await expect(page.getByRole("button", { name: "Rectangular" })).toBeVisible();
       await page.getByRole("button", { name: "Rectangular" }).click();
       await expect(page.getByRole("button", { name: "Spiral" })).toBeVisible();
-    });
-  });
-
-  test.describe("Collatz Tree", () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto("/gallery#collatz-tree");
-      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
-    });
-
-    test.afterEach(async ({ page }) => {
-      await page.keyboard.press("Escape");
-    });
-
-    test("deep link opens modal with Auto Explore and Reset buttons", async ({ page }) => {
-      await expect(page.getByRole("button", { name: "Auto Explore" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
-    });
-
-    test("Auto Explore button is clickable", async ({ page }) => {
-      await page.getByRole("button", { name: "Auto Explore" }).click();
-      await expect(page.getByRole("button", { name: /Stop|Pause/ })).toBeVisible({ timeout: 3000 });
     });
   });
 
@@ -641,40 +455,6 @@ test.describe("Gallery page", () => {
     });
   });
 
-  test.describe("Domain Coloring", () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto("/gallery#domain-coloring");
-      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
-    });
-
-    test.afterEach(async ({ page }) => {
-      await page.keyboard.press("Escape");
-    });
-
-    test("deep link opens modal with function buttons", async ({ page }) => {
-      await expect(page.getByRole("button", { name: "z^2" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "sin(z)" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "tanh(z)" })).toBeVisible();
-    });
-
-    test("shows formula display", async ({ page }) => {
-      await expect(page.getByText("f(z) = z^2")).toBeVisible();
-    });
-
-    test("shows grid overlay toggle", async ({ page }) => {
-      await expect(page.getByRole("button", { name: /Grid/i })).toBeVisible();
-    });
-
-    test("shows Reset button", async ({ page }) => {
-      await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
-    });
-
-    test("switches function on click and updates formula", async ({ page }) => {
-      await page.getByRole("button", { name: "cos(z)" }).click();
-      await expect(page.getByText("f(z) = cos(z)")).toBeVisible();
-    });
-  });
-
   test.describe("Bézier Playground", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto("/gallery#bezier-playground");
@@ -707,41 +487,6 @@ test.describe("Gallery page", () => {
     test("loads preset on click", async ({ page }) => {
       await page.getByRole("button", { name: "Star" }).click();
       await expect(page.getByText("points, Degree")).toBeVisible();
-    });
-  });
-
-  test.describe("Moiré Patterns", () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto("/gallery#moire-patterns");
-      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
-    });
-
-    test.afterEach(async ({ page }) => {
-      await page.keyboard.press("Escape");
-    });
-
-    test("deep link opens modal with layer tabs", async ({ page }) => {
-      await expect(page.getByRole("button", { name: "Layer 1" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "Layer 2" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "Layer 3" })).toBeVisible();
-    });
-
-    test("shows blend mode buttons", async ({ page }) => {
-      await expect(page.getByRole("button", { name: /multiply/i })).toBeVisible();
-      await expect(page.getByRole("button", { name: /screen/i })).toBeVisible();
-    });
-
-    test("shows preset buttons", async ({ page }) => {
-      await expect(page.getByRole("button", { name: "Classic" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "Spiral" })).toBeVisible();
-    });
-
-    test("shows Reset button", async ({ page }) => {
-      await expect(page.getByRole("button", { name: /reset/i })).toBeVisible();
-    });
-
-    test("shows animation toggle", async ({ page }) => {
-      await expect(page.getByRole("button", { name: /Animate|Stop/i })).toBeVisible();
     });
   });
 

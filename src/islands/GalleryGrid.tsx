@@ -24,10 +24,7 @@ import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import AmbientSound from "../components/atoms/AmbientSound";
 import AudioVisualizer from "./experiments/AudioVisualizer";
 import BezierPlayground from "./experiments/BezierPlayground";
-import CollatzTree from "./experiments/CollatzTree";
 import ConformalMapping from "./experiments/ConformalMapping";
-import DomainColoring from "./experiments/DomainColoring";
-import EigenvectorFlowField from "./experiments/EigenvectorFlowField";
 import EvolutionaryGameTheory from "./experiments/EvolutionaryGameTheory";
 import FourierEpicycles from "./experiments/FourierEpicycles";
 import FractalExplorer from "./experiments/FractalExplorer";
@@ -42,8 +39,6 @@ import LiquidDistortion from "./experiments/LiquidDistortion";
 import LogisticMap from "./experiments/LogisticMap";
 import MathEscapeRoom from "./experiments/MathEscapeRoom";
 import MathSonification from "./experiments/MathSonification";
-import MatrixMultiplication from "./experiments/MatrixMultiplication";
-import MoirePatterns from "./experiments/MoirePatterns";
 import NashEquilibrium from "./experiments/NashEquilibrium";
 import NeuralNetworkArt from "./experiments/NeuralNetworkArt";
 import NoiseTopography from "./experiments/NoiseTopography";
@@ -52,19 +47,15 @@ import PCATSNEViz from "./experiments/PCATSNEViz";
 import PrisonersDilemma from "./experiments/PrisonersDilemma";
 import QuantumCircuit from "./experiments/QuantumCircuit";
 import RandomMatrixTheory from "./experiments/RandomMatrixTheory";
-import RayleighBenard from "./experiments/RayleighBenard";
 import RelativisticOrbits from "./experiments/RelativisticOrbits";
-import RiemannSum from "./experiments/RiemannSum";
 import SVDImageCompression from "./experiments/SVDImageCompression";
 import SimulatedAnnealingTSP from "./experiments/SimulatedAnnealingTSP";
 import SpringPhysics from "./experiments/SpringPhysics";
 import StrangeAttractorZoo from "./experiments/StrangeAttractorZoo";
-import TaylorSeries from "./experiments/TaylorSeries";
 import TesseractProjection from "./experiments/TesseractProjection";
 import ThreeBodyProblem from "./experiments/ThreeBodyProblem";
 import UlamSpiral from "./experiments/UlamSpiral";
 import VideoSequenceScroll from "./experiments/VideoSequenceScroll";
-import VonKarmannVortex from "./experiments/VonKarmannVortex";
 
 interface Experiment {
   id: string;
@@ -185,54 +176,6 @@ const experiments: Experiment[] = [
     thumbnail: "/images/experiments/fourier-epicycles.svg",
   },
   {
-    id: "taylor-series",
-    title: "Taylor Series Approximation",
-    description:
-      "Approximate eˣ, sin(x), cos(x), ln(1+x) by N terms. Watch each term added as a colored curve.",
-    longDescription:
-      "Taylor series let you approximate any function as a sum of polynomial terms. Watch eˣ, sin(x), cos(x), and ln(1+x) get approximated term-by-term from N=0 to N=20, with each new term shown as a colored curve and the residual error graph shrinking as the approximation tightens.",
-    tags: ["Canvas", "Calculus", "Taylor Series", "Approximation"],
-    icon: <Activity className="w-5 h-5" />,
-    gradient: "from-purple-500 to-pink-500",
-    thumbnail: "/images/experiments/taylor-series.svg",
-  },
-  {
-    id: "riemann-sum",
-    title: "Riemann Sum → Integral",
-    description:
-      "Animate the transition from discrete rectangles to continuous area under the curve.",
-    longDescription:
-      "The Riemann sum is the foundation of integral calculus. Watch discrete rectangles (left, right, midpoint, trapezoidal) smoothly transition into the continuous area under any curve. Draw your own f(x), change the number of partitions, and see Σ notation morph into ∫ notation.",
-    tags: ["Canvas", "Calculus", "Riemann Sum", "Integral"],
-    icon: <Activity className="w-5 h-5" />,
-    gradient: "from-cyan-500 to-green-500",
-    thumbnail: "/images/experiments/riemann-sum.svg",
-  },
-  {
-    id: "eigenvector-flow",
-    title: "Eigenvector Flow Field",
-    description:
-      "2D vector field where eigenvectors define flow lines. Drag a point to trace eigenvector directions. Animate PCA on random clusters with covariance ellipse.",
-    longDescription:
-      "A visual exploration of eigendecomposition and PCA. Drag a point through the vector field to trace eigenvector directions, watch PCA rotate principal components to capture maximum variance, and see the covariance ellipse whose axis lengths equal eigenvalue magnitudes.",
-    tags: ["Canvas", "Linear Algebra", "PCA", "Eigenvectors", "Interactive"],
-    icon: <GitFork className="w-5 h-5" />,
-    gradient: "from-teal-500 to-cyan-500",
-    thumbnail: "/images/experiments/eigenvector-flow.svg",
-  },
-  {
-    id: "matrix-multiplication",
-    title: "Matrix Multiplication Visual",
-    description:
-      "Animated dot product row×column with synchronized highlighting. 3D grid transformation by 2×2 matrix.",
-    longDescription:
-      "Watch matrix multiplication come alive. Each dot product animates step-by-step as matching row and column cells highlight in sync. See the result matrix build cell-by-cell, then visualize the same matrix as a linear transformation stretching and rotating a unit grid in 3D.",
-    tags: ["Canvas", "Linear Algebra", "Matrices", "3D Transform", "Interactive"],
-    icon: <CircuitBoard className="w-5 h-5" />,
-    gradient: "from-amber-500 to-purple-500",
-    thumbnail: "/images/experiments/matrix-multiplication.svg",
-  },
-  {
     id: "svd-compression",
     title: "SVD Image Compression",
     description:
@@ -269,18 +212,6 @@ const experiments: Experiment[] = [
     thumbnail: "/images/experiments/pca-tsne-viz.svg",
   },
   {
-    id: "von-karmann-vortex",
-    title: "Von Kármán Vortex Street",
-    description:
-      "Fluid flow past a cylinder with alternating vortex shedding, streamlines, and Reynolds number control.",
-    longDescription:
-      "Watch fluid flow past a circular cylinder and witness the birth of the Von Kármán vortex street — alternating vortices that shed from the cylinder above a critical Reynolds number. Adjust flow speed, Reynolds number, and cylinder size in real-time.",
-    tags: ["Canvas", "Fluid Dynamics", "PDE", "Vortex"],
-    icon: <Droplets className="w-5 h-5" />,
-    gradient: "from-cyan-500 to-blue-500",
-    thumbnail: "/images/experiments/von-karmann-vortex.svg",
-  },
-  {
     id: "spring-physics",
     title: "Spring Physics Sandbox",
     description:
@@ -293,18 +224,6 @@ const experiments: Experiment[] = [
     thumbnail: "/images/experiments/spring-physics.svg",
   },
   {
-    id: "rayleigh-benard",
-    title: "Rayleigh-Bénard Convection",
-    description:
-      "Fluid heated from below — watch convection cells emerge as the Rayleigh number crosses the critical threshold.",
-    longDescription:
-      "Simulate Rayleigh-Bénard convection: a fluid layer heated from below and cooled from above. Below the critical Rayleigh number, heat transfers by conduction. Above it, beautiful convection cells form as hot fluid rises and cool fluid sinks in rolling patterns.",
-    tags: ["Canvas", "PDE", "Convection", "Fluid Dynamics", "Thermal"],
-    icon: <Layers className="w-5 h-5" />,
-    gradient: "from-red-500 to-blue-500",
-    thumbnail: "/images/experiments/rayleigh-benard.svg",
-  },
-  {
     id: "ulam-spiral",
     title: "Ulam Spiral",
     description:
@@ -315,18 +234,6 @@ const experiments: Experiment[] = [
     icon: <Atom className="w-5 h-5" />,
     gradient: "from-violet-500 to-purple-600",
     thumbnail: "/images/experiments/ulam-spiral.svg",
-  },
-  {
-    id: "collatz-tree",
-    title: "Collatz Tree",
-    description:
-      "Explore the 3n+1 conjecture as an interactive growing tree. Click any number to watch its orbit to 1.",
-    longDescription:
-      "The Collatz conjecture — one of mathematics' simplest unsolved problems. Start with any positive integer, apply one simple rule, and always reach 1. Watch the tree of all explored numbers grow.",
-    tags: ["Number Theory", "Conjecture", "Tree", "Interactive"],
-    icon: <GitBranch className="w-5 h-5" />,
-    gradient: "from-emerald-500 to-teal-600",
-    thumbnail: "/images/experiments/collatz-tree.svg",
   },
   {
     id: "hyperbolic-gol",
@@ -353,18 +260,6 @@ const experiments: Experiment[] = [
     thumbnail: "/images/experiments/conformal-mapping.svg",
   },
   {
-    id: "domain-coloring",
-    title: "Domain Coloring",
-    description:
-      "Complex functions as color maps — hue = arg(f(z)), brightness = |f(z)|. See poles, zeros, branch cuts.",
-    longDescription:
-      "Domain coloring maps complex functions to vivid colors: hue encodes the argument (phase angle) of f(z), while brightness encodes the magnitude. Zeros appear as bright spots, poles as dark regions, and branch cuts as discontinuities in color.",
-    tags: ["Complex Analysis", "Color Map", "Poles", "Zeros"],
-    icon: <Atom className="w-5 h-5" />,
-    gradient: "from-violet-500 to-fuchsia-500",
-    thumbnail: "/images/experiments/domain-coloring.svg",
-  },
-  {
     id: "bezier-playground",
     title: "Bézier Curve Playground",
     description:
@@ -375,18 +270,6 @@ const experiments: Experiment[] = [
     icon: <Wand2 className="w-5 h-5" />,
     gradient: "from-amber-500 to-orange-500",
     thumbnail: "/images/experiments/bezier-playground.svg",
-  },
-  {
-    id: "moire-patterns",
-    title: "Moiré Patterns / Interference",
-    description:
-      "Overlapping periodic grids produce emergent interference patterns. Rotate, translate, blend layers.",
-    longDescription:
-      "Moiré patterns emerge when two periodic structures overlap. Configure concentric circles, parallel lines, radial grids, and dot patterns across multiple layers. Adjust rotation, scale, and blend modes to discover mesmerizing interference phenomena.",
-    tags: ["Interference", "Patterns", "Blending", "Optics"],
-    icon: <Layers className="w-5 h-5" />,
-    gradient: "from-emerald-500 to-teal-500",
-    thumbnail: "/images/experiments/moire-patterns.svg",
   },
   {
     id: "math-sonification",
@@ -605,23 +488,14 @@ function LivePreview({ id }: { id: string }) {
       {id === "logistic-map" && <LogisticMap compact />}
       {id === "noise-topography" && <NoiseTopography compact />}
       {id === "fourier-epicycles" && <FourierEpicycles compact />}
-      {id === "taylor-series" && <TaylorSeries compact />}
-      {id === "riemann-sum" && <RiemannSum compact />}
       {id === "tesseract-projection" && <TesseractProjection compact />}
-      {id === "eigenvector-flow" && <EigenvectorFlowField compact />}
-      {id === "matrix-multiplication" && <MatrixMultiplication compact />}
       {id === "svd-compression" && <SVDImageCompression compact />}
       {id === "pca-tsne-viz" && <PCATSNEViz compact />}
-      {id === "von-karmann-vortex" && <VonKarmannVortex compact />}
       {id === "spring-physics" && <SpringPhysics compact />}
-      {id === "rayleigh-benard" && <RayleighBenard compact />}
       {id === "ulam-spiral" && <UlamSpiral compact />}
-      {id === "collatz-tree" && <CollatzTree compact />}
       {id === "hyperbolic-gol" && <HyperbolicGoL compact />}
       {id === "conformal-mapping" && <ConformalMapping compact />}
-      {id === "domain-coloring" && <DomainColoring compact />}
       {id === "bezier-playground" && <BezierPlayground compact />}
-      {id === "moire-patterns" && <MoirePatterns compact />}
       {id === "math-sonification" && <MathSonification compact />}
       {id === "quantum-circuit" && <QuantumCircuit compact />}
       {id === "knot-theory" && <KnotTheory compact />}
@@ -829,23 +703,13 @@ function ExperimentModal({
               {experiment.id === "logistic-map" && <LogisticMap />}
               {experiment.id === "noise-topography" && <NoiseTopography />}
               {experiment.id === "fourier-epicycles" && <FourierEpicycles />}
-              {experiment.id === "taylor-series" && <TaylorSeries />}
-              {experiment.id === "riemann-sum" && <RiemannSum />}
               {experiment.id === "tesseract-projection" && <TesseractProjection />}
-              {experiment.id === "eigenvector-flow" && <EigenvectorFlowField />}
-              {experiment.id === "matrix-multiplication" && <MatrixMultiplication />}
               {experiment.id === "svd-compression" && <SVDImageCompression />}
               {experiment.id === "pca-tsne-viz" && <PCATSNEViz />}
-              {experiment.id === "von-karmann-vortex" && <VonKarmannVortex />}
               {experiment.id === "spring-physics" && <SpringPhysics />}
-              {experiment.id === "rayleigh-benard" && <RayleighBenard />}
               {experiment.id === "ulam-spiral" && <UlamSpiral />}
-              {experiment.id === "collatz-tree" && <CollatzTree />}
               {experiment.id === "hyperbolic-gol" && <HyperbolicGoL />}
               {experiment.id === "conformal-mapping" && <ConformalMapping />}
-              {experiment.id === "domain-coloring" && <DomainColoring />}
-              {experiment.id === "bezier-playground" && <BezierPlayground />}
-              {experiment.id === "moire-patterns" && <MoirePatterns />}
               {experiment.id === "math-sonification" && <MathSonification />}
               {experiment.id === "quantum-circuit" && <QuantumCircuit />}
               {experiment.id === "knot-theory" && <KnotTheory />}
@@ -882,23 +746,14 @@ function experimentCursor(id: string): string {
     "logistic-map": "zoom-in",
     "noise-topography": "grab",
     "fourier-epicycles": "crosshair",
-    "taylor-series": "crosshair",
-    "riemann-sum": "crosshair",
     "tesseract-projection": "crosshair",
-    "eigenvector-flow": "crosshair",
-    "matrix-multiplication": "crosshair",
     "svd-compression": "crosshair",
     "pca-tsne-viz": "crosshair",
-    "von-karmann-vortex": "crosshair",
     "spring-physics": "crosshair",
-    "rayleigh-benard": "crosshair",
     "ulam-spiral": "zoom-in",
-    "collatz-tree": "crosshair",
     "hyperbolic-gol": "crosshair",
     "conformal-mapping": "crosshair",
-    "domain-coloring": "zoom-in",
     "bezier-playground": "crosshair",
-    "moire-patterns": "grab",
     "math-sonification": "pointer",
     "quantum-circuit": "crosshair",
     "knot-theory": "grab",
