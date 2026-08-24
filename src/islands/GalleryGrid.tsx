@@ -63,7 +63,8 @@ const experiments: Experiment[] = [
   {
     id: "watch-demo",
     title: "Cinematic Watch Product Demo",
-    description: "Scroll through 302 frames from a cinematic watch product commercial.",
+    description:
+      "Scroll-driven 4K frame-sequence engine with momentum decay, bookmarking, and PNG export.",
     longDescription:
       "A real video-to-frame-sequence showcase. 302 frames from a cinematic watch product commercial featuring Rolex, Omega, and more.",
     tags: ["4K", "Image Sequence", "Video", "Cinematic"],
@@ -75,7 +76,7 @@ const experiments: Experiment[] = [
     id: "liquid-distortion",
     title: "Liquid Distortion",
     description:
-      "Real-time fluid simulation with mouse-driven distortion, vortices, and color dye injection.",
+      "Real-time Navier-Stokes fluid solver on Canvas 2D — advect dye with your cursor, click to spawn vortices.",
     longDescription:
       "A simplified Navier-Stokes fluid solver running in real-time. Move your mouse to push the fluid, click to spawn swirling vortices, and watch colored dye blend and flow.",
     tags: ["Canvas", "Fluid Simulation", "Interactive", "Physics"],
@@ -86,7 +87,8 @@ const experiments: Experiment[] = [
   {
     id: "audio-visualizer",
     title: "Audio Visualizer",
-    description: "Real-time FFT audio visualization with 5 modes — mic input or file upload.",
+    description:
+      "Live FFT visualizer with five render modes, mic/file input, and WebM recording via MediaRecorder.",
     longDescription:
       "A Web Audio API-powered audio visualizer with 5 visualization modes: frequency bars, circular ring, time-domain waveform, frequency-reactive particles, and hex grid. Supports live microphone input and MP3/WAV file upload. Export recordings as WebM video.",
     tags: ["Audio", "Web Audio API", "FFT", "Canvas"],
@@ -98,7 +100,7 @@ const experiments: Experiment[] = [
     id: "fractal-explorer",
     title: "Fractal Explorer",
     description:
-      "WebGL shader-based Mandelbrot/Julia renderer with infinite zoom, palette editor, and Julia morphing.",
+      "WebGL2 Mandelbrot/Julia explorer with smooth iteration shading, palette editor, and shareable bookmark URLs.",
     longDescription:
       "A WebGL 2.0-powered fractal explorer featuring Mandelbrot and Julia sets with infinite zoom capability. Drag to zoom into any region, tweak color palettes, morph Julia parameters in real-time, and bookmark your favorite fractal coordinates as shareable URLs.",
     tags: ["WebGL", "Fractal", "GLSL", "Interactive"],
@@ -110,7 +112,7 @@ const experiments: Experiment[] = [
     id: "interactive-canvas",
     title: "Interactive Canvas",
     description:
-      "Infinite whiteboard with drawing tools, particle brush, node graph editor, undo/redo timeline, and export.",
+      "Infinite whiteboard: DOMMatrix pan/zoom, node-graph editor, pressure-sensitive brushes, undo timeline, SVG export.",
     longDescription:
       "A full-featured infinite canvas whiteboard. Pan/zoom infinitely, draw with pressure-sensitive pen/marker/spray/eraser tools, paint with settling particles, build connected node graphs with draggable edges, undo/redo through history with a visual timeline scrubber, and export your creation as PNG or SVG.",
     tags: ["Canvas", "Whiteboard", "Drawing", "Node Graph", "Tools"],
@@ -122,7 +124,7 @@ const experiments: Experiment[] = [
     id: "strange-attractor",
     title: "Strange Attractor Zoo",
     description:
-      "Real-time 3D Lorenz, Rössler, Aizawa, and Thomas attractors with particle trails and parameter sliders.",
+      "Five chaotic attractors integrated in real time — Lorenz, Rössler, Aizawa, Thomas, Chen — as glowing particle trails.",
     longDescription:
       "Explore four strange attractors — Lorenz, Rössler, Aizawa, and Thomas — rendered as 3D particle trails projected onto 2D canvas. Toggle between attractors, adjust parameters (σ, ρ, β), and watch how tiny differences in initial conditions produce wildly divergent butterfly-wing patterns.",
     tags: ["Canvas", "Chaos", "3D", "Dynamical Systems"],
@@ -134,7 +136,7 @@ const experiments: Experiment[] = [
     id: "logistic-map",
     title: "Logistic Map / Bifurcation",
     description:
-      "Bifurcation diagram of xₙ₊₁ = rxₙ(1−xₙ), sweep r from 2→4, watch period-doubling cascade to chaos.",
+      "Bifurcation diagram with live cobweb plot — watch period-doubling route to chaos as r sweeps toward 4.",
     longDescription:
       "The logistic map — the classic route to chaos. A bifurcation diagram builds point-by-point as r sweeps from 2 to 4. Click any r for a cobweb plot overlay showing the orbit. The Feigenbaum constant δ ≈ 4.669 emerges from the period-doubling cascade. Adjust r and initial x₀ in real-time.",
     tags: ["Canvas", "Chaos", "Bifurcation", "Mathematical"],
@@ -146,7 +148,7 @@ const experiments: Experiment[] = [
     id: "noise-topography",
     title: "Noise Topography",
     description:
-      "Layered Perlin noise → infinite 3D terrain with real-time octave, persistence, lacunarity, and seed controls.",
+      "Layered Perlin-noise terrain with octave controls and STL mesh export for 3D printing.",
     longDescription:
       "Fractal noise terrain generator using layered Perlin noise. Explore how octaves, persistence, lacunarity, and seed shape the landscape. Adjust height multiplier, drag to pan, toggle auto-scroll for a flying-over effect, export the terrain as an STL file for 3D printing.",
     tags: ["Canvas", "Noise", "Terrain", "3D", "Procedural"],
@@ -158,7 +160,7 @@ const experiments: Experiment[] = [
     id: "fourier-epicycles",
     title: "Fourier Epicycles",
     description:
-      "Draw any closed shape — see it decomposed into rotating epicycles as N goes from 1 to 100.",
+      "Draw any shape, then watch a DFT rebuild it from rotating epicycles — reconstruction error computed live.",
     longDescription:
       "The Fourier series tells us any closed shape is just a sum of rotating circles. Draw any closed shape with your mouse, watch a DFT decompose it into rotating epicycles (circles), and see the reconstruction converge from a blurry blob to a perfect outline as N increases.",
     tags: ["Canvas", "Fourier", "Epicycles", "DFT"],
@@ -170,7 +172,7 @@ const experiments: Experiment[] = [
     id: "svd-compression",
     title: "SVD Image Compression",
     description:
-      "Upload an image → SVD decomposition UΣV^T. Slide rank k from 1→100, watch image reconstruct from k singular values.",
+      "Upload an image, decompose it with SVD, and slide rank k to trade fidelity for compression ratio.",
     longDescription:
       "The Singular Value Decomposition (SVD) is the mathematical foundation of lossy compression. Upload any image, watch SVD decompose it into U, Σ, V^T, then use the rank slider to reconstruct from k singular values. See compression ratio update in real-time, the Σ diagonal with kept values highlighted, and a side-by-side comparison of original versus SVD reconstruction.",
     tags: ["Canvas", "SVD", "Compression", "Linear Algebra", "Image Processing"],
@@ -182,7 +184,7 @@ const experiments: Experiment[] = [
     id: "tesseract-projection",
     title: "Tesseract Hypercube Projection",
     description:
-      "Interactive 4D hypercube (tesseract) projected to 3D and then to 2D screen with full 4D rotation controls.",
+      "A 4D hypercube projected through six independent rotation planes down to your 2D screen.",
     longDescription:
       "A 4D hypercube (tesseract) with 16 vertices and 32 edges, projected first from 4D to 3D via perspective projection, then to 2D. Rotate in all six 4D rotation planes (XY, XZ, XW, YZ, YW, ZW), toggle auto-rotation, adjust camera distance, and drag to explore the fourth dimension.",
     tags: ["Canvas", "4D", "Geometry", "Hypercube", "Visualization"],
@@ -194,7 +196,7 @@ const experiments: Experiment[] = [
     id: "pca-tsne-viz",
     title: "PCA / t-SNE Visualization",
     description:
-      "Generate high-dimensional clusters → animate PCA projection to 2D. Then t-SNE with adjustable perplexity — side-by-side comparison.",
+      "The same high-dimensional clusters through PCA and t-SNE side-by-side, with explained-variance readout.",
     longDescription:
       "Compare two dimensionality reduction techniques side-by-side. First, PCA projects high-dimensional clusters (5D–10D) to 2D, showing the covariance matrix and explained variance ratio. Then t-SNE separates clusters with adjustable perplexity, revealing how neighbor preservation differs from variance maximization.",
     tags: ["Canvas", "PCA", "t-SNE", "Dimensionality Reduction", "ML"],
@@ -206,7 +208,7 @@ const experiments: Experiment[] = [
     id: "spring-physics",
     title: "Spring Physics Sandbox",
     description:
-      "Interactive Verlet integration mass-spring system — click to create nodes, drag to connect, watch cloth and jelly come alive.",
+      "Verlet-integration mass-spring sandbox — build cloth, chains, and ragdolls with tension-colored constraints.",
     longDescription:
       "A full-featured spring physics sandbox using Verlet integration. Click to place nodes, drag between nodes to connect springs, double-click to pin. Watch cloth drape, chains swing, and jelly wobble under gravity with real-time tension visualization.",
     tags: ["Canvas", "Physics", "Verlet", "Interactive", "Springs"],
@@ -218,7 +220,7 @@ const experiments: Experiment[] = [
     id: "ulam-spiral",
     title: "Ulam Spiral",
     description:
-      "Primes on a square spiral reveal unexpected diagonal patterns. Zoom, pan, and highlight twin primes, Mersenne primes, and prime gaps.",
+      "200K primes sieved onto Ulam's spiral — twin-prime diagonals and Mersenne highlights under a zoomable lens.",
     longDescription:
       "The Ulam Spiral arranges natural numbers in a square spiral and highlights primes, revealing striking diagonal patterns that hint at deep number-theoretic structure.",
     tags: ["Number Theory", "Primes", "Spiral", "Visualization"],
@@ -230,7 +232,7 @@ const experiments: Experiment[] = [
     id: "hyperbolic-gol",
     title: "Hyperbolic Game of Life",
     description:
-      "Conway's Game of Life on the Poincaré disk — infinite cells in finite space with hyperbolic geometry.",
+      "Conway's Game of Life on a {7,3} Poincaré-disk tiling, where infinity fits inside a circle.",
     longDescription:
       "Conway's Game of Life rendered on the Poincaré disk model of the hyperbolic plane. The {7,3} heptagonal tiling packs infinite cells into a finite circle, creating mesmerizing patterns.",
     tags: ["Cellular Automata", "Hyperbolic", "Poincaré", "Emergence"],
@@ -242,7 +244,7 @@ const experiments: Experiment[] = [
     id: "conformal-mapping",
     title: "Conformal Mapping Gallery",
     description:
-      "Complex functions transform grids while preserving angles — see z², 1/z, e^z, sin(z) warp the plane.",
+      "Complex functions bending a polar grid in real time, angle preservation verified at every intersection.",
     longDescription:
       "Explore conformal mappings — complex functions that preserve angles locally. Watch a regular grid transform under z², 1/z, e^z, sin(z), z³, and √z while the angle markers at intersections stay constant, proving conformality.",
     tags: ["Complex Analysis", "Conformal", "Grid", "Interactive"],
@@ -254,7 +256,7 @@ const experiments: Experiment[] = [
     id: "bezier-playground",
     title: "Bézier Curve Playground",
     description:
-      "Interactive N-degree Bézier, B-spline, Catmull-Rom. Drag control points, watch de Casteljau's algorithm animate.",
+      "N-degree Bézier/B-spline/Catmull-Rom editor animating de Casteljau's algorithm level by level.",
     longDescription:
       "A full-featured curve editor. Click to add control points, drag to reshape, toggle between Bézier (de Casteljau), B-spline, and Catmull-Rom interpolation. Animate the construction process and visualize Bernstein basis functions in real-time.",
     tags: ["Bézier", "Curves", "de Casteljau", "Interactive"],
@@ -266,7 +268,7 @@ const experiments: Experiment[] = [
     id: "nn-art",
     title: "Neural Network as Art",
     description:
-      "A tiny neural network learning in real-time — activation particles flow between layers as weights update via backpropagation.",
+      "A 2-6-1 MLP learning XOR, circle, and spiral live — activation particles flow along weights each forward pass.",
     longDescription:
       "Watch a 2-6-1 neural network learn XOR, circle, and spiral classification in real-time. Activation particles flow along weighted connections during each forward pass, the loss curve drops as gradient descent优化, and a decision boundary evolves in the scatter plot below.",
     tags: ["Neural Network", "Machine Learning", "Backprop", "Visualization"],
@@ -278,7 +280,7 @@ const experiments: Experiment[] = [
     id: "fractal-flame-sync",
     title: "Fractal Flame × Audio Sync",
     description:
-      "IFS flame fractals that breathe with music — bass controls shape, mids control rotation, treble shifts color.",
+      "IFS flame fractal whose variation weights breathe with your microphone's FFT bands.",
     longDescription:
       "An Iterated Function System flame fractal driven by real-time audio FFT. Upload a song or use your microphone — low frequencies morph the fractal's variation weights, mid frequencies rotate the transforms, and high frequencies shift the color palette. The flame literally dances to your music.",
     tags: ["Fractal", "Audio", "FFT", "IFS", "Generative"],
@@ -289,7 +291,8 @@ const experiments: Experiment[] = [
   {
     id: "prisoners-dilemma",
     title: "Prisoner's Dilemma",
-    description: "Evolutionary tournament of game theory strategies competing across generations.",
+    description:
+      "Round-robin iterated Prisoner's Dilemma across seven classic strategies, scored generation by generation.",
     longDescription:
       "Simulate an iterated Prisoner's Dilemma tournament with 7 strategies — Tit-for-Tat, Grim Trigger, Always Defect, Always Cooperate, Random, Pavlov, and Generous Tit-for-Tat. Watch as fitness-proportional selection and mutation drive strategy evolution over generations. A stacked area chart tracks population dynamics.",
     tags: ["Game Theory", "Evolution", "Canvas", "Simulation"],
@@ -301,7 +304,7 @@ const experiments: Experiment[] = [
     id: "gradient-descent",
     title: "Gradient Descent Landscape",
     description:
-      "3D loss landscape with SGD, Momentum, and Adam optimizers traversing from random starts toward minima.",
+      "SGD, Momentum, and Adam racing down an animated loss landscape with contour overlay and learning-rate control.",
     longDescription:
       "Visualize gradient descent optimization on a 3D loss landscape. Watch SGD, Momentum, and Adam navigate contour lines from random starting points toward local minima. Compare optimizer paths, adjust learning rate, and explore how different algorithms handle saddle points.",
     tags: ["Game Theory", "Optimization", "Gradient Descent", "3D"],
@@ -313,7 +316,7 @@ const experiments: Experiment[] = [
     id: "simulated-annealing-tsp",
     title: "Simulated Annealing TSP",
     description:
-      "Traveling Salesman Problem solved by Simulated Annealing — watch the path evolve from random to near-optimal.",
+      "TSP solved by simulated annealing — temperature-colored tours cool from chaos to near-optimal routes.",
     longDescription:
       "The Traveling Salesman Problem (TSP) solved with Simulated Annealing. Click to place cities on the canvas, then watch the SA algorithm find shorter paths. Temperature cooling visualized in color, with acceptance probability allowing exploration at high temperatures and fine-tuning at low.",
     tags: ["Game Theory", "TSP", "Simulated Annealing", "Optimization"],
@@ -325,7 +328,7 @@ const experiments: Experiment[] = [
     id: "relativistic-orbits",
     title: "Relativistic Orbits",
     description:
-      "Mercury's perihelion precession — Newton vs Einstein, Schwarzschild effective potential, and the approach to the photon sphere.",
+      "Newton vs General Relativity side by side — Mercury's 43-arcsecond-per-century precession up close, photon sphere included.",
     longDescription:
       "Watch Mercury's famous perihelion precession unfold: a Newtonian orbit traces a closed ellipse while General Relativity adds a 1/r³ correction to the effective potential, causing the ellipse to precess by 43 arcseconds per century. Crank up the central mass and watch the photon sphere and event horizon (R_s) grow until the orbit becomes unstable and the particle plunges in.",
     tags: ["Physics", "GR", "Orbits", "Canvas"],
@@ -337,7 +340,7 @@ const experiments: Experiment[] = [
     id: "three-body-problem",
     title: "3-Body Problem",
     description:
-      "Three masses under gravity — figure-8, Lagrange points, and Broucke orbits with chaotic trajectories. Drag bodies, watch energy conservation.",
+      "RK4-integrated three-body gravity: figure-eight, Lagrange, and Broucke orbits with live energy conservation.",
     longDescription:
       "The three-body problem is famously chaotic. Start from figure-8, Lagrange L4/L5, or Broucke orbits, then drag any body to perturb the system and watch trajectories diverge wildly. RK4 integration keeps orbits accurate while the live energy (KE + PE) and momentum displays verify conservation.",
     tags: ["Astrophysics", "N-Body", "Chaos", "Gravity"],
@@ -349,7 +352,7 @@ const experiments: Experiment[] = [
     id: "galaxy-formation",
     title: "Galaxy Formation",
     description:
-      "N-body dark matter + baryonic particles collapse from a uniform disk into a spiral galaxy — tune angular momentum and dark matter fraction.",
+      "900-particle N-body collapse seeded into a rotating disk — tune angular momentum and dark-matter fraction.",
     longDescription:
       "Seed 900 particles in a uniform rotating disk and watch a spiral galaxy emerge. Newtonian gravity with Plummer softening and velocity-Verlet integration drives the collapse; the initial angular-momentum profile and dark-matter fraction determine whether you get tight spiral arms or a diffuse, structureless blob. Particles are colored by local density from blue → cyan → amber → red as the core heats up.",
     tags: ["Astrophysics", "N-Body", "Cosmology", "Spiral"],
@@ -584,6 +587,7 @@ function ExperimentModal({
               {experiment.id === "ulam-spiral" && <UlamSpiral />}
               {experiment.id === "hyperbolic-gol" && <HyperbolicGoL />}
               {experiment.id === "conformal-mapping" && <ConformalMapping />}
+              {experiment.id === "bezier-playground" && <BezierPlayground />}
               {experiment.id === "nn-art" && <NeuralNetworkArt />}
               {experiment.id === "fractal-flame-sync" && <FractalFlameSync />}
               {experiment.id === "prisoners-dilemma" && <PrisonersDilemma />}
@@ -631,12 +635,65 @@ function experimentCursor(id: string): string {
   return cursors[id] || "pointer";
 }
 
+type ExperimentCategory =
+  | "Physics & Simulation"
+  | "Mathematics"
+  | "ML & Algorithms"
+  | "Generative & Audio"
+  | "Interaction & Tools";
+
+const EXPERIMENT_CATEGORIES: Record<string, ExperimentCategory> = {
+  "watch-demo": "Interaction & Tools",
+  "liquid-distortion": "Physics & Simulation",
+  "audio-visualizer": "Generative & Audio",
+  "fractal-explorer": "Mathematics",
+  "interactive-canvas": "Interaction & Tools",
+  "strange-attractor": "Physics & Simulation",
+  "logistic-map": "Mathematics",
+  "noise-topography": "Generative & Audio",
+  "fourier-epicycles": "Mathematics",
+  "svd-compression": "ML & Algorithms",
+  "pca-tsne-viz": "ML & Algorithms",
+  "tesseract-projection": "Mathematics",
+  "spring-physics": "Physics & Simulation",
+  "ulam-spiral": "Mathematics",
+  "hyperbolic-gol": "Mathematics",
+  "conformal-mapping": "Mathematics",
+  "bezier-playground": "Mathematics",
+  "nn-art": "ML & Algorithms",
+  "fractal-flame-sync": "Generative & Audio",
+  "prisoners-dilemma": "ML & Algorithms",
+  "gradient-descent": "ML & Algorithms",
+  "simulated-annealing-tsp": "ML & Algorithms",
+  "three-body-problem": "Physics & Simulation",
+  "relativistic-orbits": "Physics & Simulation",
+  "galaxy-formation": "Physics & Simulation",
+};
+
+const CATEGORY_ORDER: ("All" | ExperimentCategory)[] = [
+  "All",
+  "Physics & Simulation",
+  "Mathematics",
+  "ML & Algorithms",
+  "Generative & Audio",
+  "Interaction & Tools",
+];
+
+function experimentCategory(id: string): ExperimentCategory {
+  return EXPERIMENT_CATEGORIES[id] ?? "Interaction & Tools";
+}
+
 export default function GalleryGrid() {
   const [activeExperiment, setActiveExperiment] = useState<string | null>(null);
   const [focusedIndex, setFocusedIndex] = useState(-1);
+  const [activeCategory, setActiveCategory] = useState<"All" | ExperimentCategory>("All");
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const activeExp = experiments.find((e) => e.id === activeExperiment) || null;
+  const visibleExperiments =
+    activeCategory === "All"
+      ? experiments
+      : experiments.filter((e) => experimentCategory(e.id) === activeCategory);
 
   // Deep link: auto-launch experiment from URL hash
   useEffect(() => {
@@ -677,7 +734,7 @@ export default function GalleryGrid() {
       // If modal is open, only Esc is handled (already in ExperimentModal)
       if (activeExperiment) return;
 
-      const count = experiments.length;
+      const count = visibleExperiments.length;
 
       switch (e.key) {
         case "ArrowRight":
@@ -702,7 +759,7 @@ export default function GalleryGrid() {
         case " ":
           if (focusedIndex >= 0 && focusedIndex < count) {
             e.preventDefault();
-            setActiveExperiment(experiments[focusedIndex].id);
+            setActiveExperiment(visibleExperiments[focusedIndex].id);
           }
           break;
         default:
@@ -710,7 +767,7 @@ export default function GalleryGrid() {
           const num = Number.parseInt(e.key);
           if (num >= 1 && num <= count) {
             e.preventDefault();
-            setActiveExperiment(experiments[num - 1].id);
+            setActiveExperiment(visibleExperiments[num - 1].id);
           }
           break;
       }
@@ -718,146 +775,73 @@ export default function GalleryGrid() {
 
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [activeExperiment, focusedIndex]);
+  }, [activeExperiment, focusedIndex, activeCategory]);
 
-  const expHarmony =
-    activeExperiment === "particle-galaxy"
-      ? "purple"
-      : activeExperiment === "text-scramble"
-        ? "pink"
-        : activeExperiment === "liquid-distortion"
-          ? "cyan"
-          : activeExperiment === "depth-playground"
-            ? "green"
-            : activeExperiment === "audio-visualizer"
-              ? "cyan"
-              : activeExperiment === "fractal-explorer"
-                ? "amber"
-                : activeExperiment === "interactive-canvas"
-                  ? "purple"
-                  : activeExperiment === "strange-attractor"
-                    ? "amber"
-                    : activeExperiment === "double-pendulum"
-                      ? "purple"
-                      : activeExperiment === "logistic-map"
-                        ? "amber"
-                        : activeExperiment === "butterfly-effect"
-                          ? "cyan"
-                          : activeExperiment === "noise-topography"
-                            ? "cyan"
-                            : activeExperiment === "fourier-epicycles"
-                              ? "amber"
-                              : activeExperiment === "taylor-series"
-                                ? "purple"
-                                : activeExperiment === "riemann-sum"
-                                  ? "green"
-                                  : activeExperiment === "tesseract-projection"
-                                    ? "amber"
-                                    : activeExperiment === "eigenvector-flow"
-                                      ? "cyan"
-                                      : activeExperiment === "matrix-multiplication"
-                                        ? "purple"
-                                        : activeExperiment === "svd-compression"
-                                          ? "purple"
-                                          : activeExperiment === "pca-tsne-viz"
-                                            ? "green"
-                                            : activeExperiment === "von-karmann-vortex"
-                                              ? "cyan"
-                                              : activeExperiment === "spring-physics"
-                                                ? "purple"
-                                                : activeExperiment === "sandpile-model"
-                                                  ? "amber"
-                                                  : activeExperiment === "rayleigh-benard"
-                                                    ? "purple"
-                                                    : activeExperiment === "ulam-spiral"
-                                                      ? "purple"
-                                                      : activeExperiment === "collatz-tree"
-                                                        ? "green"
-                                                        : activeExperiment === "hyperbolic-gol"
-                                                          ? "cyan"
-                                                          : activeExperiment ===
-                                                              "wave-function-collapse"
-                                                            ? "pink"
-                                                            : activeExperiment ===
-                                                                "cellular-automata"
-                                                              ? "amber"
-                                                              : activeExperiment ===
-                                                                  "conformal-mapping"
-                                                                ? "cyan"
-                                                                : activeExperiment ===
-                                                                    "domain-coloring"
-                                                                  ? "purple"
-                                                                  : activeExperiment ===
-                                                                      "bezier-playground"
-                                                                    ? "amber"
-                                                                    : activeExperiment ===
-                                                                        "moire-patterns"
-                                                                      ? "green"
-                                                                      : activeExperiment ===
-                                                                          "math-sonification"
-                                                                        ? "purple"
-                                                                        : activeExperiment ===
-                                                                            "quantum-circuit"
-                                                                          ? "cyan"
-                                                                          : activeExperiment ===
-                                                                              "knot-theory"
-                                                                            ? "amber"
-                                                                            : activeExperiment ===
-                                                                                "random-matrix"
-                                                                              ? "pink"
-                                                                              : activeExperiment ===
-                                                                                  "4d-game-of-life"
-                                                                                ? "amber"
-                                                                                : activeExperiment ===
-                                                                                    "nn-art"
-                                                                                  ? "purple"
-                                                                                  : activeExperiment ===
-                                                                                      "math-escape-room"
-                                                                                    ? "green"
-                                                                                    : activeExperiment ===
-                                                                                        "fractal-flame-sync"
-                                                                                      ? "amber"
-                                                                                      : activeExperiment ===
-                                                                                          "prisoners-dilemma"
-                                                                                        ? "green"
-                                                                                        : activeExperiment ===
-                                                                                            "gradient-descent"
-                                                                                          ? "amber"
-                                                                                          : activeExperiment ===
-                                                                                              "nash-equilibrium"
-                                                                                            ? "purple"
-                                                                                            : activeExperiment ===
-                                                                                                "simulated-annealing-tsp"
-                                                                                              ? "cyan"
-                                                                                              : activeExperiment ===
-                                                                                                  "evolutionary-game-theory"
-                                                                                                ? "purple"
-                                                                                                   : activeExperiment ===
-                                                                                                       "relativistic-orbits"
-                                                                                                     ? "cyan"
-                                                                                                     : activeExperiment ===
-                                                                                                         "orbital-resonance"
-                                                                                                       ? "green"
-                                                                                                       : activeExperiment ===
-                                                                                                           "three-body-problem"
-                                                                                                         ? "cyan"
-                                                                                                         : activeExperiment ===
-                                                                                                             "keplers-laws"
-                                                                                                           ? "amber"
-                                                                                                           : activeExperiment ===
-                                                                                                               "galaxy-formation"
-                                                                                                             ? "purple"
-                                                                                                             : "amber";
+  const EXP_HARMONY: Record<string, string> = {
+    "liquid-distortion": "cyan",
+    "audio-visualizer": "cyan",
+    "fractal-explorer": "amber",
+    "interactive-canvas": "purple",
+    "strange-attractor": "amber",
+    "logistic-map": "amber",
+    "noise-topography": "cyan",
+    "fourier-epicycles": "amber",
+    "tesseract-projection": "amber",
+    "svd-compression": "purple",
+    "pca-tsne-viz": "green",
+    "spring-physics": "purple",
+    "ulam-spiral": "purple",
+    "hyperbolic-gol": "cyan",
+    "conformal-mapping": "cyan",
+    "bezier-playground": "amber",
+    "nn-art": "purple",
+    "fractal-flame-sync": "amber",
+    "prisoners-dilemma": "green",
+    "gradient-descent": "amber",
+    "simulated-annealing-tsp": "cyan",
+    "relativistic-orbits": "cyan",
+    "three-body-problem": "cyan",
+    "galaxy-formation": "purple",
+  };
+  const expHarmony = activeExperiment ? (EXP_HARMONY[activeExperiment] ?? "amber") : "amber";
 
   return (
     <>
       <AmbientSound harmony={expHarmony} />
+      <div className="flex flex-wrap justify-center gap-2 mb-8" role="tablist" aria-label="Filter experiments by category">
+        {CATEGORY_ORDER.map((cat) => {
+          const isActive = activeCategory === cat;
+          const n =
+            cat === "All"
+              ? experiments.length
+              : experiments.filter((e) => experimentCategory(e.id) === cat).length;
+          return (
+            <button
+              key={cat}
+              role="tab"
+              aria-selected={isActive}
+              onClick={() => {
+                setActiveCategory(cat);
+                setFocusedIndex(-1);
+              }}
+              className={`px-3 py-1.5 rounded-full text-xs font-mono border transition-colors ${
+                isActive
+                  ? "bg-accent/15 border-accent text-accent"
+                  : "border-border/50 text-text-secondary hover:border-accent/50 hover:text-text-primary"
+              }`}
+            >
+              {cat} <span className="opacity-50">{n}</span>
+            </button>
+          );
+        })}
+      </div>
+
       <div
         className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
         role="list"
         aria-label="Experiments"
       >
-        {experiments.map((exp, i) => (
+        {visibleExperiments.map((exp, i) => (
           <ExperimentCard
             key={exp.id}
             exp={exp}
@@ -874,27 +858,12 @@ export default function GalleryGrid() {
       </div>
 
       <div className="text-center mt-12">
-        <p className="text-text-secondary text-sm">More experiments coming soon&hellip;</p>
-        <div className="flex justify-center gap-1.5 mt-2">
-          {[
-            "Reaction-Diffusion",
-            "RSA Visualization",
-            "Schrödinger Equation",
-          ].map((name) => (
-            <span
-              key={name}
-              className="text-[11px] px-2 py-0.5 rounded-full bg-bg-tertiary text-text-secondary/50 border border-border/30"
-            >
-              {name}
-            </span>
-          ))}
-        </div>
-        <div className="mt-6 flex justify-center gap-4 text-[11px] text-text-secondary/40 font-mono">
+        <div className="flex justify-center gap-4 text-[11px] text-text-secondary/40 font-mono">
           <span>← → navigate</span>
           <span className="w-px h-3 bg-border/40" />
           <span>Enter to launch</span>
           <span className="w-px h-3 bg-border/40" />
-          <span>1–{experiments.length} shortcut</span>
+          <span>1–{visibleExperiments.length} shortcut</span>
           <span className="w-px h-3 bg-border/40" />
           <span>#hash deep link</span>
         </div>
