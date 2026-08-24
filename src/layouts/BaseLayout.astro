@@ -5,7 +5,6 @@ import "../lib/scroll-animations.css";
 import "../lib/layout-queries.css";
 import ClientRouter from "astro/components/ClientRouter.astro";
 import { Toaster } from "sonner";
-import FloatingElements from "../components/atoms/FloatingElements";
 import Footer from "../components/templates/Footer.astro";
 import Header from "../components/templates/Header.astro";
 import AmbientScene from "../islands/AmbientScene";
@@ -173,7 +172,6 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
   <body class="min-h-screen bg-bg-primary text-text-primary">
 
     <AmbientScene client:visible />
-    <FloatingElements />
     <div class="relative z-10">
       <a href="#main-content" class="skip-to-content">Skip to content</a>
       <div class="scroll-progress-css" role="progressbar" aria-label="Page scroll progress"></div>

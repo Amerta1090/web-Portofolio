@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { FlaskConical, Sparkles, ArrowRight } from "lucide-react";
 
 export default function CreativeLabPill() {
   const [hovered, setHovered] = useState(false);
   const [isGallery, setIsGallery] = useState(false);
+  const prefersReducedMotion = useReducedMotion() ?? false;
 
   useEffect(() => {
     setIsGallery(window.location.pathname === "/gallery");
@@ -49,39 +50,45 @@ export default function CreativeLabPill() {
         </AnimatePresence>
 
         {/* Breathing glow ring */}
-        <motion.div
-          className="absolute inset-0 rounded-lg pointer-events-none"
-          animate={{
-            boxShadow: [
-              "0 0 0 0 rgba(245,158,11,0)",
-              "0 0 0 0 rgba(245,158,11,0)",
-              "0 0 0 3px rgba(245,158,11,0.15)",
-              "0 0 6px 3px rgba(245,158,11,0.08)",
-              "0 0 0 0 rgba(245,158,11,0)",
-              "0 0 0 0 rgba(245,158,11,0)",
-            ],
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut",
-            times: [0, 0.3, 0.4, 0.6, 0.7, 1],
-          }}
-        />
+        {!prefersReducedMotion && (
+          <motion.div
+            className="absolute inset-0 rounded-lg pointer-events-none"
+            animate={{
+              boxShadow: [
+                "0 0 0 0 rgba(245,158,11,0)",
+                "0 0 0 0 rgba(245,158,11,0)",
+                "0 0 0 3px rgba(245,158,11,0.15)",
+                "0 0 6px 3px rgba(245,158,11,0.08)",
+                "0 0 0 0 rgba(245,158,11,0)",
+                "0 0 0 0 rgba(245,158,11,0)",
+              ],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut",
+              times: [0, 0.3, 0.4, 0.6, 0.7, 1],
+            }}
+          />
+        )}
 
         {/* Badge */}
         <motion.a
           href="/gallery"
           className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg border border-amber-500/20 bg-[#0f0f11]/90 backdrop-blur-xl shadow-lg shadow-amber-500/5 hover:border-amber-500/30 transition-colors"
-          animate={{ scale: [1, 1.02, 1] }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut",
-            times: [0, 0.5, 1],
-          }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.97 }}
+          animate={prefersReducedMotion ? undefined : { scale: [1, 1.02, 1] }}
+          transition={
+            prefersReducedMotion
+              ? undefined
+              : {
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  times: [0, 0.5, 1],
+                }
+          }
+          whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
+          whileTap={prefersReducedMotion ? { scale: 0.97 } : undefined}
         >
           <FlaskConical size={14} className="text-amber-400" />
           <span className="text-xs font-medium text-amber-400">Lab</span>

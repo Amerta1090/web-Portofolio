@@ -9,6 +9,9 @@ export default function CustomCursor({ enableOnTouch = false }: CustomCursorProp
     const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
     if (isTouchDevice && !enableOnTouch) return;
 
+    const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    if (prefersReducedMotion) return;
+
     const cursor = document.createElement("div");
     cursor.className = "custom-cursor";
     cursor.style.cssText = `
