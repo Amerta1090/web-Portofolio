@@ -5,7 +5,7 @@ test.describe("Gallery page", () => {
     await page.goto("/gallery");
     await expect(page.getByRole("heading", { name: "Creative Lab" })).toBeVisible();
     const cards = page.locator('[role="list"] > [role="listitem"]');
-    await expect(cards).toHaveCount(53);
+    await expect(cards).toHaveCount(43);
   });
 
   test("Fractal Explorer card is present", async ({ page }) => {
@@ -162,28 +162,6 @@ test.describe("Gallery page", () => {
     await expect(page.getByRole("button", { name: "Rössler" })).toBeVisible();
   });
 
-  test("Double Pendulum Chaos card is present", async ({ page }) => {
-    await page.goto("/gallery");
-    await expect(page.getByText("Double Pendulum Chaos")).toBeVisible();
-    const card = page.locator('[role="listitem"]').filter({ hasText: "Double Pendulum Chaos" });
-    await expect(card).toBeVisible();
-  });
-
-  test("Double Pendulum Chaos modal shows controls", async ({ page }) => {
-    await page.goto("/gallery");
-    await page.getByText("Double Pendulum Chaos").first().click();
-    await expect(page.getByRole("button", { name: "Phase Space" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
-    await expect(page.getByText(/λ/)).toBeVisible();
-  });
-
-  test("Double Pendulum Chaos toggles phase space", async ({ page }) => {
-    await page.goto("/gallery");
-    await page.getByText("Double Pendulum Chaos").first().click();
-    await page.getByRole("button", { name: "Phase Space" }).click();
-    await expect(page.getByRole("button", { name: "Phase Space" })).toBeVisible();
-  });
-
   test("Logistic Map card is present", async ({ page }) => {
     await page.goto("/gallery");
     await expect(page.getByText("Logistic Map")).toBeVisible();
@@ -214,30 +192,6 @@ test.describe("Gallery page", () => {
     expect(Number(await slider.inputValue())).toBe(3.8);
   });
 
-  test("Butterfly Effect card is present", async ({ page }) => {
-    await page.goto("/gallery");
-    const card = page.locator('[role="listitem"]').filter({ hasText: "Butterfly Effect Sandbox" });
-    await expect(card).toBeVisible();
-    await expect(card.getByText("Canvas", { exact: true })).toBeVisible();
-  });
-
-  test("Butterfly Effect modal shows system and chaos controls", async ({ page }) => {
-    await page.goto("/gallery");
-    await page.getByText("Butterfly Effect Sandbox").first().click();
-    await expect(page.getByRole("button", { name: "Chaos" })).toBeVisible();
-    await expect(page.getByText(/λ/)).toBeVisible();
-    await expect(page.getByText("Click canvas to set")).toBeVisible();
-  });
-
-  test("Butterfly Effect Lorenz/Rössler toggle works", async ({ page }) => {
-    await page.goto("/gallery");
-    await page.getByText("Butterfly Effect Sandbox").first().click();
-    const lorenzBtn = page.getByRole("button", { name: "Lorenz" });
-    await expect(lorenzBtn).toBeVisible();
-    await lorenzBtn.click();
-    await expect(page.getByRole("button", { name: "Rössler" })).toBeVisible();
-  });
-
   test("deep link for strange-attractor opens via URL hash", async ({ page }) => {
     await page.goto("/gallery#strange-attractor");
     await expect(page.getByRole("button", { name: "Lorenz" })).toBeVisible({ timeout: 5000 });
@@ -246,11 +200,6 @@ test.describe("Gallery page", () => {
   test("deep link for logistic-map opens via URL hash", async ({ page }) => {
     await page.goto("/gallery#logistic-map");
     await expect(page.getByRole("button", { name: "Cobweb" })).toBeVisible({ timeout: 5000 });
-  });
-
-  test("Butterfly Effect deep link opens via URL hash", async ({ page }) => {
-    await page.goto("/gallery#butterfly-effect");
-    await expect(page.getByText("Click canvas to set")).toBeVisible({ timeout: 5000 });
   });
 
   test("Noise Topography card is present", async ({ page }) => {
@@ -560,27 +509,6 @@ test.describe("Gallery page", () => {
     await expect(page.getByRole("button", { name: "Cloth" })).toBeVisible({ timeout: 5000 });
   });
 
-  test("Sandpile Model card is present", async ({ page }) => {
-    await page.goto("/gallery");
-    await expect(page.getByText("Sandpile Model (SOC)")).toBeVisible();
-    const card = page.locator('[role="listitem"]').filter({ hasText: "Sandpile Model" });
-    await expect(card).toBeVisible();
-    await expect(card.getByText("Cellular Automata", { exact: true })).toBeVisible();
-  });
-
-  test("Sandpile Model modal shows Rain and Reset buttons", async ({ page }) => {
-    await page.goto("/gallery");
-    await page.getByText("Sandpile Model (SOC)").first().click();
-    await expect(page.getByRole("button", { name: /Rain/ })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
-    await expect(page.getByRole("button", { name: /Single/ })).toBeVisible();
-  });
-
-  test("Sandpile Model deep link opens via URL hash", async ({ page }) => {
-    await page.goto("/gallery#sandpile-model");
-    await expect(page.getByRole("button", { name: /Rain/ })).toBeVisible({ timeout: 5000 });
-  });
-
   test("Rayleigh-Bénard Convection card is present", async ({ page }) => {
     await page.goto("/gallery");
     await expect(page.getByText("Rayleigh-Bénard Convection")).toBeVisible();
@@ -679,52 +607,6 @@ test.describe("Gallery page", () => {
       await expect(ruleBtn).toBeVisible();
       await ruleBtn.click();
       await expect(ruleBtn).toBeVisible();
-    });
-  });
-
-  test.describe("Wave Function Collapse", () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto("/gallery#wave-function-collapse");
-      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
-    });
-
-    test.afterEach(async ({ page }) => {
-      await page.keyboard.press("Escape");
-    });
-
-    test("deep link opens modal with Step, Auto, and Reset buttons", async ({ page }) => {
-      await expect(page.getByRole("button", { name: "Step" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "Auto" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
-    });
-
-    test("Step button is clickable", async ({ page }) => {
-      await page.getByRole("button", { name: "Step" }).click();
-      await expect(page.getByRole("button", { name: "Step" })).toBeVisible();
-    });
-  });
-
-  test.describe("Cellular Automata", () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto("/gallery#cellular-automata");
-      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
-    });
-
-    test.afterEach(async ({ page }) => {
-      await page.keyboard.press("Escape");
-    });
-
-    test("deep link opens modal with 1D/2D mode buttons and rule buttons", async ({ page }) => {
-      await expect(page.getByRole("button", { name: "1D" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "2D" })).toBeVisible();
-    });
-
-    test("mode toggle between 1D and 2D changes rule options", async ({ page }) => {
-      await expect(page.getByRole("button", { name: "1D" })).toBeVisible();
-      await page.getByRole("button", { name: "2D" }).click();
-      await expect(page.getByRole("button", { name: "2D" })).toBeVisible();
-      await page.getByRole("button", { name: "1D" }).click();
-      await expect(page.getByRole("button", { name: "1D" })).toBeVisible();
     });
   });
 
@@ -1005,41 +887,6 @@ test.describe("Gallery page", () => {
     test("shows matrix size slider", async ({ page }) => {
       const modal = page.locator("[data-modal-content]");
       await expect(modal.locator('input[type="range"]').first()).toBeVisible();
-    });
-
-    test("escape closes modal", async ({ page }) => {
-      await page.keyboard.press("Escape");
-      await expect(page.locator("[data-modal-content]")).not.toBeVisible();
-    });
-  });
-
-  test.describe("4D Game of Life", () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto("/gallery#4d-game-of-life");
-      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
-    });
-
-    test.afterEach(async ({ page }) => {
-      await page.keyboard.press("Escape");
-    });
-
-    test("deep link opens modal", async ({ page }) => {
-      const modal = page.locator("[data-modal-content]");
-      await expect(modal.locator("canvas")).toBeVisible();
-    });
-
-    test("shows Play/Pause button", async ({ page }) => {
-      await expect(page.getByRole("button", { name: /Play|Pause/ })).toBeVisible();
-    });
-
-    test("shows Step and Reset buttons", async ({ page }) => {
-      await expect(page.getByRole("button", { name: "Step" })).toBeVisible();
-      await expect(page.getByRole("button", { name: /Reset/ })).toBeVisible();
-    });
-
-    test("shows rule selector", async ({ page }) => {
-      const modal = page.locator("[data-modal-content]");
-      await expect(modal.locator("select").first()).toBeVisible();
     });
 
     test("escape closes modal", async ({ page }) => {

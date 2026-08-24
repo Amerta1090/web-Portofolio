@@ -22,15 +22,11 @@ import {
 } from "lucide-react";
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import AmbientSound from "../components/atoms/AmbientSound";
-import FourDGameOfLife from "./experiments/4DGameOfLife";
 import AudioVisualizer from "./experiments/AudioVisualizer";
 import BezierPlayground from "./experiments/BezierPlayground";
-import ButterflyEffect from "./experiments/ButterflyEffect";
-import CellularAutomata from "./experiments/CellularAutomata";
 import CollatzTree from "./experiments/CollatzTree";
 import ConformalMapping from "./experiments/ConformalMapping";
 import DomainColoring from "./experiments/DomainColoring";
-import DoublePendulumChaos from "./experiments/DoublePendulumChaos";
 import EigenvectorFlowField from "./experiments/EigenvectorFlowField";
 import EvolutionaryGameTheory from "./experiments/EvolutionaryGameTheory";
 import FourierEpicycles from "./experiments/FourierEpicycles";
@@ -60,7 +56,6 @@ import RayleighBenard from "./experiments/RayleighBenard";
 import RelativisticOrbits from "./experiments/RelativisticOrbits";
 import RiemannSum from "./experiments/RiemannSum";
 import SVDImageCompression from "./experiments/SVDImageCompression";
-import SandpileModel from "./experiments/SandpileModel";
 import SimulatedAnnealingTSP from "./experiments/SimulatedAnnealingTSP";
 import SpringPhysics from "./experiments/SpringPhysics";
 import StrangeAttractorZoo from "./experiments/StrangeAttractorZoo";
@@ -70,7 +65,6 @@ import ThreeBodyProblem from "./experiments/ThreeBodyProblem";
 import UlamSpiral from "./experiments/UlamSpiral";
 import VideoSequenceScroll from "./experiments/VideoSequenceScroll";
 import VonKarmannVortex from "./experiments/VonKarmannVortex";
-import WaveFunctionCollapse from "./experiments/WaveFunctionCollapse";
 
 interface Experiment {
   id: string;
@@ -155,18 +149,6 @@ const experiments: Experiment[] = [
     thumbnail: "/images/experiments/strange-attractor.svg",
   },
   {
-    id: "double-pendulum",
-    title: "Double Pendulum Chaos",
-    description:
-      "Two linked pendulums with near-identical initial conditions diverge — Lyapunov exponent computed live.",
-    longDescription:
-      "A double pendulum simulation showing chaotic divergence. Two pendulums start with nearly identical θ₁ values (difference as small as 0.0001°). Watch them diverge in real-time as the Lyapunov exponent is computed. Toggle phase-space portrait, adjust mass/length/damping, and observe the butterfly effect in action.",
-    tags: ["Canvas", "Physics", "Chaos", "Pendulum"],
-    icon: <GitFork className="w-5 h-5" />,
-    gradient: "from-purple-500 to-pink-500",
-    thumbnail: "/images/experiments/double-pendulum.svg",
-  },
-  {
     id: "logistic-map",
     title: "Logistic Map / Bifurcation",
     description:
@@ -177,18 +159,6 @@ const experiments: Experiment[] = [
     icon: <Activity className="w-5 h-5" />,
     gradient: "from-amber-500 to-yellow-500",
     thumbnail: "/images/experiments/logistic-map.svg",
-  },
-  {
-    id: "butterfly-effect",
-    title: "Butterfly Effect Sandbox",
-    description:
-      "Interactive chaos playground — drag initial points, colored trails, Lyapunov exponent gauge.",
-    longDescription:
-      "An interactive chaos sandbox where you can explore the butterfly effect. Multiple trajectories start from nearly identical initial conditions and diverge in real-time. Click to set new initial conditions, adjust spread between paths, toggle between Lorenz and Rössler systems, and watch the Lyapunov exponent gauge measure chaos in action.",
-    tags: ["Canvas", "Chaos", "Interactive", "Butterfly Effect"],
-    icon: <Target className="w-5 h-5" />,
-    gradient: "from-cyan-500 to-teal-500",
-    thumbnail: "/images/experiments/butterfly-effect.svg",
   },
   {
     id: "noise-topography",
@@ -323,18 +293,6 @@ const experiments: Experiment[] = [
     thumbnail: "/images/experiments/spring-physics.svg",
   },
   {
-    id: "sandpile-model",
-    title: "Sandpile Model (SOC)",
-    description:
-      "Abelian sandpile — drop grains, watch avalanches follow a power law. Self-organized criticality in action.",
-    longDescription:
-      "The Abelian sandpile model demonstrates self-organized criticality. Drop grains onto a grid, and when any cell reaches 4 grains it topples, triggering chain-reaction avalanches. Over time, the system naturally evolves to a critical state where avalanche sizes follow a power law distribution.",
-    tags: ["Canvas", "Cellular Automata", "SOC", "Power Law"],
-    icon: <Activity className="w-5 h-5" />,
-    gradient: "from-amber-500 to-orange-500",
-    thumbnail: "/images/experiments/sandpile-model.svg",
-  },
-  {
     id: "rayleigh-benard",
     title: "Rayleigh-Bénard Convection",
     description:
@@ -381,30 +339,6 @@ const experiments: Experiment[] = [
     icon: <Globe className="w-5 h-5" />,
     gradient: "from-cyan-500 to-blue-600",
     thumbnail: "/images/experiments/hyperbolic-gol.svg",
-  },
-  {
-    id: "wave-function-collapse",
-    title: "Wave Function Collapse",
-    description:
-      "Constraint-based procedural generation — watch entropy decrease as cells resolve into valid patterns.",
-    longDescription:
-      "The Wave Function Collapse algorithm generates procedural terrain by observing cells with minimum entropy and propagating constraints. Watch the grid resolve from chaos into coherent patterns.",
-    tags: ["Algorithm", "Procedural", "Constraints", "Generation"],
-    icon: <Wand2 className="w-5 h-5" />,
-    gradient: "from-rose-500 to-pink-600",
-    thumbnail: "/images/experiments/wave-function-collapse.svg",
-  },
-  {
-    id: "cellular-automata",
-    title: "Cellular Automata Gallery",
-    description:
-      "1D and 2D cellular automata — from Rule 30 to Conway's Life. Space-time diagrams and pattern classification.",
-    longDescription:
-      "A unified gallery of classical cellular automata. Explore 1D rules like Rule 30 and Rule 90 with space-time diagrams, and 2D rules like Conway's Life with automatic pattern classification.",
-    tags: ["Cellular Automata", "1D", "2D", "Complexity"],
-    icon: <LayoutGrid className="w-5 h-5" />,
-    gradient: "from-orange-500 to-amber-600",
-    thumbnail: "/images/experiments/cellular-automata.svg",
   },
   {
     id: "conformal-mapping",
@@ -501,18 +435,6 @@ const experiments: Experiment[] = [
     icon: <Atom className="w-5 h-5" />,
     gradient: "from-rose-500 to-violet-600",
     thumbnail: "/images/experiments/random-matrix.svg",
-  },
-  {
-    id: "4d-game-of-life",
-    title: "4D Game of Life",
-    description:
-      "Conway's Game of Life in 4 dimensions — 80 neighbors per cell, projected from 4D to 3D to 2D with real-time rotation.",
-    longDescription:
-      "Experience cellular automata in the fourth dimension. A 6×6×3×3 hypergrid with 80 neighbors per cell, projected through 4D rotation matrices to your 2D screen. Watch 4D gliders and oscillators emerge as the grid rotates through dimensions you can barely imagine.",
-    tags: ["4D", "Cellular Automata", "Hypercube", "Emergence"],
-    icon: <Globe className="w-5 h-5" />,
-    gradient: "from-amber-500 to-red-500",
-    thumbnail: "/images/experiments/4d-game-of-life.svg",
   },
   {
     id: "nn-art",
@@ -680,9 +602,7 @@ function LivePreview({ id }: { id: string }) {
       {id === "fractal-explorer" && <FractalExplorer compact />}
       {id === "interactive-canvas" && <InteractiveCanvas compact />}
       {id === "strange-attractor" && <StrangeAttractorZoo compact />}
-      {id === "double-pendulum" && <DoublePendulumChaos compact />}
       {id === "logistic-map" && <LogisticMap compact />}
-      {id === "butterfly-effect" && <ButterflyEffect compact />}
       {id === "noise-topography" && <NoiseTopography compact />}
       {id === "fourier-epicycles" && <FourierEpicycles compact />}
       {id === "taylor-series" && <TaylorSeries compact />}
@@ -694,13 +614,10 @@ function LivePreview({ id }: { id: string }) {
       {id === "pca-tsne-viz" && <PCATSNEViz compact />}
       {id === "von-karmann-vortex" && <VonKarmannVortex compact />}
       {id === "spring-physics" && <SpringPhysics compact />}
-      {id === "sandpile-model" && <SandpileModel compact />}
       {id === "rayleigh-benard" && <RayleighBenard compact />}
       {id === "ulam-spiral" && <UlamSpiral compact />}
       {id === "collatz-tree" && <CollatzTree compact />}
       {id === "hyperbolic-gol" && <HyperbolicGoL compact />}
-      {id === "wave-function-collapse" && <WaveFunctionCollapse compact />}
-      {id === "cellular-automata" && <CellularAutomata compact />}
       {id === "conformal-mapping" && <ConformalMapping compact />}
       {id === "domain-coloring" && <DomainColoring compact />}
       {id === "bezier-playground" && <BezierPlayground compact />}
@@ -709,7 +626,6 @@ function LivePreview({ id }: { id: string }) {
       {id === "quantum-circuit" && <QuantumCircuit compact />}
       {id === "knot-theory" && <KnotTheory compact />}
       {id === "random-matrix" && <RandomMatrixTheory compact />}
-      {id === "4d-game-of-life" && <FourDGameOfLife compact />}
       {id === "nn-art" && <NeuralNetworkArt compact />}
       {id === "math-escape-room" && <MathEscapeRoom compact />}
       {id === "fractal-flame-sync" && <FractalFlameSync compact />}
@@ -910,9 +826,7 @@ function ExperimentModal({
               {experiment.id === "fractal-explorer" && <FractalExplorer />}
               {experiment.id === "interactive-canvas" && <InteractiveCanvas />}
               {experiment.id === "strange-attractor" && <StrangeAttractorZoo />}
-              {experiment.id === "double-pendulum" && <DoublePendulumChaos />}
               {experiment.id === "logistic-map" && <LogisticMap />}
-              {experiment.id === "butterfly-effect" && <ButterflyEffect />}
               {experiment.id === "noise-topography" && <NoiseTopography />}
               {experiment.id === "fourier-epicycles" && <FourierEpicycles />}
               {experiment.id === "taylor-series" && <TaylorSeries />}
@@ -924,13 +838,10 @@ function ExperimentModal({
               {experiment.id === "pca-tsne-viz" && <PCATSNEViz />}
               {experiment.id === "von-karmann-vortex" && <VonKarmannVortex />}
               {experiment.id === "spring-physics" && <SpringPhysics />}
-              {experiment.id === "sandpile-model" && <SandpileModel />}
               {experiment.id === "rayleigh-benard" && <RayleighBenard />}
               {experiment.id === "ulam-spiral" && <UlamSpiral />}
               {experiment.id === "collatz-tree" && <CollatzTree />}
               {experiment.id === "hyperbolic-gol" && <HyperbolicGoL />}
-              {experiment.id === "wave-function-collapse" && <WaveFunctionCollapse />}
-              {experiment.id === "cellular-automata" && <CellularAutomata />}
               {experiment.id === "conformal-mapping" && <ConformalMapping />}
               {experiment.id === "domain-coloring" && <DomainColoring />}
               {experiment.id === "bezier-playground" && <BezierPlayground />}
@@ -939,7 +850,6 @@ function ExperimentModal({
               {experiment.id === "quantum-circuit" && <QuantumCircuit />}
               {experiment.id === "knot-theory" && <KnotTheory />}
               {experiment.id === "random-matrix" && <RandomMatrixTheory />}
-              {experiment.id === "4d-game-of-life" && <FourDGameOfLife />}
               {experiment.id === "nn-art" && <NeuralNetworkArt />}
               {experiment.id === "math-escape-room" && <MathEscapeRoom />}
               {experiment.id === "fractal-flame-sync" && <FractalFlameSync />}
@@ -969,9 +879,7 @@ function experimentCursor(id: string): string {
     "fractal-explorer": "zoom-in",
     "interactive-canvas": "crosshair",
     "strange-attractor": "crosshair",
-    "double-pendulum": "grab",
     "logistic-map": "zoom-in",
-    "butterfly-effect": "crosshair",
     "noise-topography": "grab",
     "fourier-epicycles": "crosshair",
     "taylor-series": "crosshair",
@@ -983,13 +891,10 @@ function experimentCursor(id: string): string {
     "pca-tsne-viz": "crosshair",
     "von-karmann-vortex": "crosshair",
     "spring-physics": "crosshair",
-    "sandpile-model": "crosshair",
     "rayleigh-benard": "crosshair",
     "ulam-spiral": "zoom-in",
     "collatz-tree": "crosshair",
     "hyperbolic-gol": "crosshair",
-    "wave-function-collapse": "crosshair",
-    "cellular-automata": "crosshair",
     "conformal-mapping": "crosshair",
     "domain-coloring": "zoom-in",
     "bezier-playground": "crosshair",
@@ -998,7 +903,6 @@ function experimentCursor(id: string): string {
     "quantum-circuit": "crosshair",
     "knot-theory": "grab",
     "random-matrix": "crosshair",
-    "4d-game-of-life": "crosshair",
     "nn-art": "pointer",
     "math-escape-room": "pointer",
     "fractal-flame-sync": "crosshair",
