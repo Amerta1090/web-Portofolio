@@ -16,7 +16,7 @@
 | L1.4 | Hapus dependensi unpkg dotLottie | ✅ | Tidak ada pemakaian `<dotlottie-player>` di codebase → baris script unpkg dihapus dari BaseLayout. `grep -rn unpkg src/` = nol hasil. Catatan: 2 test gallery sempat timeout saat run paralel penuh (kontensi WebGL), hijau saat re-run terisolasi — flake pre-existing |
 | L1.5 | Verifikasi & tutup Iterasi 1 | ✅ | Build 45 halaman ✓, unit 729 ✓, E2E 220 (2 flake WebGL gallery → hijau saat re-run terisolasi 142/142) ✓. 4 commit: L1.1–L1.4 |
 | L2.1 | Audit & scoring seluruh eksperimen | ✅ | Audit kode penuh 53 eksperimen (~32K LOC, 6 auditor paralel). Hasil: **20 KEEP · 5 UPGRADE (FractalExplorer, LiquidDistortion, LogisticMap, PCATSNEViz, GradientDescent) · 28 CUT** → tersisa 25. Tabel skor lengkap + alasan + constraint: `docs/lab-audit.md`. Kritis: FractalExplorer pan/zoom handler tak pernah di-attach; 4DGameOfLife Play/Pause mati di full view; ⚠️ CreativeLabTeaser pakai 3 eksperimen CUT → wajib dirework saat L2.2 |
-| L2.2 | Eksekusi pruning (hapus CUT) | ⬜ | |
+| L2.2 | Eksekusi pruning (hapus CUT) | ✅ | 28 eksperimen dihapus dalam 6 commit terpisah: A showcase+teaser rework (`2639a79`), B chaos/CA (`96b163b`), C math-viz (`f9e25c6`), D GT/orbital (`2fd49b7`), E gimmicks (`3dac272`) + fix duplikasi describe e2e. GalleryGrid kini 25 entri; `toHaveCount(25)`; cursor map 25 key. Verifikasi: build 45 hal ✓, unit 397/397 ✓ (29 file), e2e hijau (gallery 63, craft 4, GT+astro 30 — run paralel penuh masih flaky WebGL sesuai catatan, dikonfirmasi terisolasi) |
 | L2.3 | Rapikan arsitektur & copy gallery | ⬜ | |
 | L2.4 | Restraint pass efek dekoratif global | ⬜ | |
 | L2.5 | Verifikasi & tutup Iterasi 2 | ⬜ | |
