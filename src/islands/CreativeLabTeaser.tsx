@@ -1,19 +1,19 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
-import ImageSequenceScroll from "./experiments/ImageSequenceScroll";
-import ParticleGalaxy from "./experiments/ParticleGalaxy";
-import TextScramble from "./experiments/TextScramble";
 import VideoSequenceScroll from "./experiments/VideoSequenceScroll";
+import FractalFlameSync from "./experiments/FractalFlameSync";
+import StrangeAttractorZoo from "./experiments/StrangeAttractorZoo";
+import ThreeBodyProblem from "./experiments/ThreeBodyProblem";
 import { experiments } from "../lib/experiments";
 
 function LivePreview({ id }: { id: string }) {
   return (
     <>
-      {id === "image-sequence" && <ImageSequenceScroll compact />}
-      {id === "particle-galaxy" && <ParticleGalaxy compact />}
-      {id === "text-scramble" && <TextScramble compact />}
       {id === "watch-demo" && <VideoSequenceScroll compact />}
+      {id === "fractal-flame-sync" && <FractalFlameSync compact />}
+      {id === "strange-attractor" && <StrangeAttractorZoo compact />}
+      {id === "three-body-problem" && <ThreeBodyProblem compact />}
     </>
   );
 }

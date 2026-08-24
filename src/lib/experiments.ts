@@ -9,30 +9,6 @@ export interface ExperimentMeta {
 
 export const experiments: ExperimentMeta[] = [
   {
-    id: "image-sequence",
-    title: "Image Sequence Scroll",
-    description: "Procedural frame-by-frame animation driven by scroll position.",
-    tags: ["Canvas", "Scroll-Driven", "Generative", "Procedural"],
-    gradient: "from-amber-500 to-orange-600",
-    thumbnail: "/images/experiments/image-sequence.svg",
-  },
-  {
-    id: "particle-galaxy",
-    title: "Particle Galaxy",
-    description: "Interactive particle system with gravitational attraction and constellation connections.",
-    tags: ["Canvas", "Particles", "Interactive", "WebGL-like"],
-    gradient: "from-purple-500 to-cyan-500",
-    thumbnail: "/images/experiments/particle-galaxy.svg",
-  },
-  {
-    id: "text-scramble",
-    title: "Text Scramble / Glitch",
-    description: "Cyberpunk text scrambler with multi-phrase cycling and glitch transitions.",
-    tags: ["Typography", "Glitch", "Cyberpunk", "Kinetic"],
-    gradient: "from-pink-500 to-violet-500",
-    thumbnail: "/images/experiments/text-scramble.svg",
-  },
-  {
     id: "watch-demo",
     title: "Cinematic Watch Product Demo",
     description: "Scroll through 302 frames from a cinematic watch product commercial.",
@@ -41,19 +17,30 @@ export const experiments: ExperimentMeta[] = [
     thumbnail: "/images/experiments/watch-demo.svg",
   },
   {
-    id: "liquid-distortion",
-    title: "Liquid Distortion",
-    description: "Real-time fluid simulation with mouse-driven distortion, vortices, and color dye injection.",
-    tags: ["Canvas", "Fluid Simulation", "Interactive", "Physics"],
-    gradient: "from-cyan-500 to-teal-500",
-    thumbnail: "/images/experiments/liquid-distortion.svg",
+    id: "fractal-flame-sync",
+    title: "Fractal Flame × Audio Sync",
+    description:
+      "IFS flame fractals that breathe with music — bass controls shape, mids control rotation, treble shifts color.",
+    tags: ["Fractal", "Audio", "FFT", "IFS", "Generative"],
+    gradient: "from-amber-500 to-violet-500",
+    thumbnail: "/images/experiments/fractal-flame-sync.svg",
   },
   {
-    id: "depth-playground",
-    title: "3D Parallax Depth Playground",
-    description: "Multi-layer parallax scene with depth-of-field, focus controls, and device orientation support.",
-    tags: ["Canvas", "Parallax", "Depth", "Interactive"],
-    gradient: "from-amber-500 to-rose-500",
-    thumbnail: "/images/experiments/depth-playground.svg",
+    id: "strange-attractor",
+    title: "Strange Attractor Zoo",
+    description:
+      "Real-time 3D Lorenz, Rössler, Aizawa, and Thomas attractors with particle trails and parameter sliders.",
+    tags: ["Canvas", "Chaos", "3D", "Dynamical Systems"],
+    gradient: "from-amber-500 to-red-500",
+    thumbnail: "/images/experiments/strange-attractor.svg",
+  },
+  {
+    id: "three-body-problem",
+    title: "3-Body Problem",
+    description:
+      "Three masses under gravity — figure-8, Lagrange points, and Broucke orbits with chaotic trajectories. Drag bodies, watch energy conservation.",
+    tags: ["Astrophysics", "N-Body", "Chaos", "Gravity"],
+    gradient: "from-cyan-500 to-purple-500",
+    thumbnail: "/images/experiments/three-body-problem.svg",
   },
 ];

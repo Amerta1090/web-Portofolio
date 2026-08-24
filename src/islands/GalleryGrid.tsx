@@ -9,7 +9,6 @@ import {
   GitFork,
   Globe,
   Hexagon,
-  Image,
   Layers,
   LayoutGrid,
   Maximize2,
@@ -20,7 +19,6 @@ import {
   Target,
   Wand2,
   X,
-  Zap,
 } from "lucide-react";
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import AmbientSound from "../components/atoms/AmbientSound";
@@ -31,7 +29,6 @@ import ButterflyEffect from "./experiments/ButterflyEffect";
 import CellularAutomata from "./experiments/CellularAutomata";
 import CollatzTree from "./experiments/CollatzTree";
 import ConformalMapping from "./experiments/ConformalMapping";
-import DepthPlayground from "./experiments/DepthPlayground";
 import DomainColoring from "./experiments/DomainColoring";
 import DoublePendulumChaos from "./experiments/DoublePendulumChaos";
 import EigenvectorFlowField from "./experiments/EigenvectorFlowField";
@@ -42,7 +39,6 @@ import FractalFlameSync from "./experiments/FractalFlameSync";
 import GalaxyFormation from "./experiments/GalaxyFormation";
 import GradientDescent from "./experiments/GradientDescent";
 import HyperbolicGoL from "./experiments/HyperbolicGoL";
-import ImageSequenceScroll from "./experiments/ImageSequenceScroll";
 import InteractiveCanvas from "./experiments/InteractiveCanvas";
 import KeplersLaws from "./experiments/KeplersLaws";
 import KnotTheory from "./experiments/KnotTheory";
@@ -57,7 +53,6 @@ import NeuralNetworkArt from "./experiments/NeuralNetworkArt";
 import NoiseTopography from "./experiments/NoiseTopography";
 import OrbitalResonance from "./experiments/OrbitalResonance";
 import PCATSNEViz from "./experiments/PCATSNEViz";
-import ParticleGalaxy from "./experiments/ParticleGalaxy";
 import PrisonersDilemma from "./experiments/PrisonersDilemma";
 import QuantumCircuit from "./experiments/QuantumCircuit";
 import RandomMatrixTheory from "./experiments/RandomMatrixTheory";
@@ -71,7 +66,6 @@ import SpringPhysics from "./experiments/SpringPhysics";
 import StrangeAttractorZoo from "./experiments/StrangeAttractorZoo";
 import TaylorSeries from "./experiments/TaylorSeries";
 import TesseractProjection from "./experiments/TesseractProjection";
-import TextScramble from "./experiments/TextScramble";
 import ThreeBodyProblem from "./experiments/ThreeBodyProblem";
 import UlamSpiral from "./experiments/UlamSpiral";
 import VideoSequenceScroll from "./experiments/VideoSequenceScroll";
@@ -90,40 +84,6 @@ interface Experiment {
 }
 
 const experiments: Experiment[] = [
-  {
-    id: "image-sequence",
-    title: "Image Sequence Scroll",
-    description: "Procedural frame-by-frame animation driven by scroll position.",
-    longDescription:
-      "A scroll-driven animation engine that generates unique procedural art frames in real-time. Move through hundreds of frames by scrolling.",
-    tags: ["Canvas", "Scroll-Driven", "Generative", "Procedural"],
-    icon: <Image className="w-5 h-5" />,
-    gradient: "from-amber-500 to-orange-600",
-    thumbnail: "/images/experiments/image-sequence.svg",
-  },
-  {
-    id: "particle-galaxy",
-    title: "Particle Galaxy",
-    description:
-      "Interactive particle system with gravitational attraction and constellation connections.",
-    longDescription:
-      "A living galaxy of thousands of particles connected by glowing filaments. Move your mouse to bend the gravitational field.",
-    tags: ["Canvas", "Particles", "Interactive", "WebGL-like"],
-    icon: <Sparkles className="w-5 h-5" />,
-    gradient: "from-purple-500 to-cyan-500",
-    thumbnail: "/images/experiments/particle-galaxy.svg",
-  },
-  {
-    id: "text-scramble",
-    title: "Text Scramble / Glitch",
-    description: "Cyberpunk text scrambler with multi-phrase cycling and glitch transitions.",
-    longDescription:
-      "A kinetic typography engine that scrambles and decodes text with authentic glitch artifacts.",
-    tags: ["Typography", "Glitch", "Cyberpunk", "Kinetic"],
-    icon: <Zap className="w-5 h-5" />,
-    gradient: "from-pink-500 to-violet-500",
-    thumbnail: "/images/experiments/text-scramble.svg",
-  },
   {
     id: "watch-demo",
     title: "Cinematic Watch Product Demo",
@@ -146,18 +106,6 @@ const experiments: Experiment[] = [
     icon: <Droplets className="w-5 h-5" />,
     gradient: "from-cyan-500 to-teal-500",
     thumbnail: "/images/experiments/liquid-distortion.svg",
-  },
-  {
-    id: "depth-playground",
-    title: "3D Parallax Depth Playground",
-    description:
-      "Multi-layer parallax scene with depth-of-field, focus controls, and device orientation support.",
-    longDescription:
-      "A depth playground with 6 parallax layers rendered on canvas. Each layer has independent speed, blur, opacity, and shape. Toggle depth-of-field to blur unfocused layers, or click a layer to bring it into sharp focus.",
-    tags: ["Canvas", "Parallax", "Depth", "Interactive"],
-    icon: <Layers className="w-5 h-5" />,
-    gradient: "from-amber-500 to-rose-500",
-    thumbnail: "/images/experiments/depth-playground.svg",
   },
   {
     id: "audio-visualizer",
@@ -726,12 +674,8 @@ const experiments: Experiment[] = [
 function LivePreview({ id }: { id: string }) {
   return (
     <>
-      {id === "image-sequence" && <ImageSequenceScroll compact />}
-      {id === "particle-galaxy" && <ParticleGalaxy compact />}
-      {id === "text-scramble" && <TextScramble compact />}
       {id === "watch-demo" && <VideoSequenceScroll compact />}
       {id === "liquid-distortion" && <LiquidDistortion compact />}
-      {id === "depth-playground" && <DepthPlayground compact />}
       {id === "audio-visualizer" && <AudioVisualizer compact />}
       {id === "fractal-explorer" && <FractalExplorer compact />}
       {id === "interactive-canvas" && <InteractiveCanvas compact />}
@@ -960,12 +904,8 @@ function ExperimentModal({
               style={{ height: "calc(90vh - 73px)" }}
               data-modal-content
             >
-              {experiment.id === "image-sequence" && <ImageSequenceScroll />}
-              {experiment.id === "particle-galaxy" && <ParticleGalaxy />}
-              {experiment.id === "text-scramble" && <TextScramble />}
               {experiment.id === "watch-demo" && <VideoSequenceScroll />}
               {experiment.id === "liquid-distortion" && <LiquidDistortion />}
-              {experiment.id === "depth-playground" && <DepthPlayground />}
               {experiment.id === "audio-visualizer" && <AudioVisualizer />}
               {experiment.id === "fractal-explorer" && <FractalExplorer />}
               {experiment.id === "interactive-canvas" && <InteractiveCanvas />}
@@ -1023,12 +963,8 @@ function ExperimentModal({
 
 function experimentCursor(id: string): string {
   const cursors: Record<string, string> = {
-    "image-sequence": "crosshair",
-    "particle-galaxy": "grab",
-    "text-scramble": "text",
     "watch-demo": "zoom-in",
     "liquid-distortion": "crosshair",
-    "depth-playground": "grab",
     "audio-visualizer": "crosshair",
     "fractal-explorer": "zoom-in",
     "interactive-canvas": "crosshair",
