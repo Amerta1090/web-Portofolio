@@ -12,3 +12,4 @@ prompt.txt
 *.tex
 love.*.mp3
 test-results/
+.opencode/
