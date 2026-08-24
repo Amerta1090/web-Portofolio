@@ -32,17 +32,12 @@ import GalaxyFormation from "./experiments/GalaxyFormation";
 import GradientDescent from "./experiments/GradientDescent";
 import HyperbolicGoL from "./experiments/HyperbolicGoL";
 import InteractiveCanvas from "./experiments/InteractiveCanvas";
-import KnotTheory from "./experiments/KnotTheory";
 import LiquidDistortion from "./experiments/LiquidDistortion";
 import LogisticMap from "./experiments/LogisticMap";
-import MathEscapeRoom from "./experiments/MathEscapeRoom";
-import MathSonification from "./experiments/MathSonification";
 import NeuralNetworkArt from "./experiments/NeuralNetworkArt";
 import NoiseTopography from "./experiments/NoiseTopography";
 import PCATSNEViz from "./experiments/PCATSNEViz";
 import PrisonersDilemma from "./experiments/PrisonersDilemma";
-import QuantumCircuit from "./experiments/QuantumCircuit";
-import RandomMatrixTheory from "./experiments/RandomMatrixTheory";
 import RelativisticOrbits from "./experiments/RelativisticOrbits";
 import SVDImageCompression from "./experiments/SVDImageCompression";
 import SimulatedAnnealingTSP from "./experiments/SimulatedAnnealingTSP";
@@ -268,54 +263,6 @@ const experiments: Experiment[] = [
     thumbnail: "/images/experiments/bezier-playground.svg",
   },
   {
-    id: "math-sonification",
-    title: "Math Sonification",
-    description:
-      "Map mathematical concepts to sound — primes, π digits, bifurcation, and fractals as music.",
-    longDescription:
-      "Explore mathematics through audio. Primes become pentatonic melodies, π digits play a C major scale, the logistic map's bifurcation transitions from periodic tones to chaotic noise, and the Koch snowflake's recursive structure produces depth-based harmonics.",
-    tags: ["Audio", "Web Audio", "Math", "Sonification"],
-    icon: <Music className="w-5 h-5" />,
-    gradient: "from-violet-500 to-fuchsia-600",
-    thumbnail: "/images/experiments/math-sonification.svg",
-  },
-  {
-    id: "quantum-circuit",
-    title: "Quantum Circuit Simulator",
-    description:
-      "Build quantum circuits with gates, run simulations, and visualize states on a Bloch sphere.",
-    longDescription:
-      "A quantum computing playground. Place Hadamard, Pauli, CNOT, and rotation gates on a 3-qubit circuit grid, run the simulation to see the resulting quantum state on a rotating Bloch sphere, and view measurement probability distributions across all 8 basis states.",
-    tags: ["Quantum", "Circuit", "Bloch Sphere", "Simulation"],
-    icon: <CircuitBoard className="w-5 h-5" />,
-    gradient: "from-cyan-500 to-blue-600",
-    thumbnail: "/images/experiments/quantum-circuit.svg",
-  },
-  {
-    id: "knot-theory",
-    title: "Knot Theory Explorer",
-    description:
-      "Explore mathematical knots — crossing invariants, Reidemeister moves, and 3D wireframe views.",
-    longDescription:
-      "Dive into topology with interactive knot diagrams. Choose from trefoil, figure-eight, and cinquefoil presets, animate Reidemeister moves, compute crossing numbers and writhe, check tricolorability, and explore 3D wireframe projections with depth shading.",
-    tags: ["Topology", "Knots", "Jones Polynomial", "Reidemeister"],
-    icon: <GitBranch className="w-5 h-5" />,
-    gradient: "from-amber-500 to-orange-600",
-    thumbnail: "/images/experiments/knot-theory.svg",
-  },
-  {
-    id: "random-matrix",
-    title: "Random Matrix Theory",
-    description:
-      "Gaussian ensembles, eigenvalue spacing, and Wigner surmise — the mathematics of quantum chaos.",
-    longDescription:
-      "Generate random matrices from GOE, GUE, and GSE ensembles, compute their eigenvalue spectra via Jacobi diagonalization, and visualize the spacing distribution against the Wigner surmise. Watch level repulsion emerge as sample count increases.",
-    tags: ["Random Matrix", "Wigner", "Eigenvalues", "Quantum Chaos"],
-    icon: <Atom className="w-5 h-5" />,
-    gradient: "from-rose-500 to-violet-600",
-    thumbnail: "/images/experiments/random-matrix.svg",
-  },
-  {
     id: "nn-art",
     title: "Neural Network as Art",
     description:
@@ -326,18 +273,6 @@ const experiments: Experiment[] = [
     icon: <CircuitBoard className="w-5 h-5" />,
     gradient: "from-purple-500 to-cyan-500",
     thumbnail: "/images/experiments/neural-network-art.svg",
-  },
-  {
-    id: "math-escape-room",
-    title: "Math Escape Room",
-    description:
-      "5 interconnected puzzle rooms — solve algebra, geometry, calculus, number theory, and probability to escape.",
-    longDescription:
-      "Navigate a floor plan of 5 math puzzle rooms. Solve each challenge to unlock the next door. Race against the clock, use hints wisely, and celebrate with a particle burst when you escape all 5 rooms.",
-    tags: ["Puzzle", "Math", "Escape Room", "Interactive"],
-    icon: <Target className="w-5 h-5" />,
-    gradient: "from-emerald-500 to-cyan-500",
-    thumbnail: "/images/experiments/math-escape-room.svg",
   },
   {
     id: "fractal-flame-sync",
@@ -444,12 +379,7 @@ function LivePreview({ id }: { id: string }) {
       {id === "hyperbolic-gol" && <HyperbolicGoL compact />}
       {id === "conformal-mapping" && <ConformalMapping compact />}
       {id === "bezier-playground" && <BezierPlayground compact />}
-      {id === "math-sonification" && <MathSonification compact />}
-      {id === "quantum-circuit" && <QuantumCircuit compact />}
-      {id === "knot-theory" && <KnotTheory compact />}
-      {id === "random-matrix" && <RandomMatrixTheory compact />}
       {id === "nn-art" && <NeuralNetworkArt compact />}
-      {id === "math-escape-room" && <MathEscapeRoom compact />}
       {id === "fractal-flame-sync" && <FractalFlameSync compact />}
       {id === "prisoners-dilemma" && <PrisonersDilemma compact />}
       {id === "gradient-descent" && <GradientDescent compact />}
@@ -654,12 +584,7 @@ function ExperimentModal({
               {experiment.id === "ulam-spiral" && <UlamSpiral />}
               {experiment.id === "hyperbolic-gol" && <HyperbolicGoL />}
               {experiment.id === "conformal-mapping" && <ConformalMapping />}
-              {experiment.id === "math-sonification" && <MathSonification />}
-              {experiment.id === "quantum-circuit" && <QuantumCircuit />}
-              {experiment.id === "knot-theory" && <KnotTheory />}
-              {experiment.id === "random-matrix" && <RandomMatrixTheory />}
               {experiment.id === "nn-art" && <NeuralNetworkArt />}
-              {experiment.id === "math-escape-room" && <MathEscapeRoom />}
               {experiment.id === "fractal-flame-sync" && <FractalFlameSync />}
               {experiment.id === "prisoners-dilemma" && <PrisonersDilemma />}
               {experiment.id === "gradient-descent" && <GradientDescent />}
@@ -694,12 +619,7 @@ function experimentCursor(id: string): string {
     "hyperbolic-gol": "crosshair",
     "conformal-mapping": "crosshair",
     "bezier-playground": "crosshair",
-    "math-sonification": "pointer",
-    "quantum-circuit": "crosshair",
-    "knot-theory": "grab",
-    "random-matrix": "crosshair",
     "nn-art": "pointer",
-    "math-escape-room": "pointer",
     "fractal-flame-sync": "crosshair",
     "prisoners-dilemma": "crosshair",
     "gradient-descent": "crosshair",
