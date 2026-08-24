@@ -495,8 +495,6 @@ test.describe("Gallery page", () => {
   // ═══════════════════════════════════════════
 
   test.describe("Neural Network Art", () => {
-
-  test.describe("Neural Network Art", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto("/gallery#nn-art");
       await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
