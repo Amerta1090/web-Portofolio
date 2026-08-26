@@ -1,0 +1,36 @@
+---
+title: "IoT Smart Environment System"
+summary: "Sensor-driven climate control system with edge inference and adaptive scheduling for commercial buildings."
+role: "Systems Engineer & ML Lead"
+stack: ["ESP32", "MQTT", "TensorFlow Lite", "Node.js", "TimescaleDB", "React", "Grafana"]
+period: "Aug 2024 – Dec 2024"
+category: "iot"
+metrics:
+  - { label: "Energy Savings", value: "34%" }
+  - { label: "Sensors Deployed", value: "128" }
+  - { label: "Response Time", value: "< 500ms" }
+  - { label: "Data Points/Day", value: "1.8M" }
+featured: true
+order: 2
+---
+
+## Problem
+
+Commercial buildings waste significant energy through static HVAC schedules that don't adapt to actual occupancy patterns, weather changes, or time-of-day usage. The goal was to build an intelligent climate control system that learns from sensor data and adjusts in real-time, while running inference at the edge to minimize latency and bandwidth.
+
+## Approach
+
+Deployed 128 ESP32-based sensor nodes across three floors measuring temperature, humidity, CO2, occupancy (PIR + ultrasonic), and ambient light. Data flows through MQTT to a central Node.js hub, where a TensorFlow Lite model running on the edge gateway makes occupancy prediction decisions. A TimescaleDB backend stores time-series data for model retraining and historical analysis.
+
+The ML component predicts room occupancy 30 minutes ahead using a lightweight LSTM trained on historical patterns. Predictions feed into a rule-based HVAC controller that adjusts setpoints per zone. A React dashboard provides real-time visualization and manual override capability.
+
+## Key Decisions
+
+- **Edge inference over cloud**: Running TFLite on the edge gateway eliminated network round-trips for control decisions. Critical for maintaining sub-500ms response when adjusting HVAC setpoints.
+- **MQTT over HTTP**: Lightweight pub/sub protocol reduced sensor bandwidth by 60% compared to initial HTTP prototypes. QoS levels ensured critical occupancy messages were never lost.
+- **TimescaleDB over InfluxDB**: SQL compatibility meant the team could use existing analytics tools. Continuous aggregates automatically downsample raw data for long-term trend analysis.
+- **Hybrid control**: ML predictions inform but don't directly control HVAC. A deterministic rule layer sits between inference and actuation, ensuring safety constraints are always respected.
+
+## Outcome
+
+Achieved 34% energy reduction across the monitored floors while maintaining occupant comfort scores above 4.2/5.0. The system processes 1.8 million data points daily with under 500ms end-to-end latency. Model accuracy for 30-minute occupancy prediction reached 89%, sufficient for proactive HVAC scheduling. The modular architecture allowed adding air quality monitoring without changing the core pipeline.

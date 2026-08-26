@@ -1,21 +1,41 @@
-import { defineCollection, z } from "astro:content";
+import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
+import { z } from "astro/zod";
 
 const blog = defineCollection({
-  loader: glob({ pattern: "**/*.md", base: "./src/content/blog" }),
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/blog" }),
   schema: z.object({
     title: z.string(),
     description: z.string(),
-    date: z.date(),
-    updatedDate: z.date().optional(),
-    tags: z.array(z.string()).default([]),
-    draft: z.boolean().default(false),
+    date: z.coerce.date(),
+    updatedDate: z.coerce.date().optional(),
+    tags: z.array(z.string()),
     image: z.string().optional(),
     imageAlt: z.string().optional(),
     series: z.string().optional(),
     seriesOrder: z.number().optional(),
-    canonical: z.string().url().optional(),
+    draft: z.boolean().optional().default(false),
   }),
 });
 
-export const collections = { blog };
+const caseStudies = defineCollection({
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/case-studies" }),
+  schema: z.object({
+    title: z.string(),
+    summary: z.string(),
+    role: z.string(),
+    stack: z.array(z.string()),
+    period: z.string(),
+    category: z.enum(["ai-ml", "iot", "web", "systems"]).optional(),
+    metrics: z.array(
+      z.object({
+        label: z.string(),
+        value: z.string(),
+      }),
+    ),
+    featured: z.boolean().optional().default(false),
+    order: z.number().optional().default(0),
+  }),
+});
+
+export const collections = { blog, caseStudies };

@@ -1,0 +1,36 @@
+---
+title: "Production ML Pipeline"
+summary: "End-to-end machine learning pipeline serving real-time inference at scale, from data ingestion through model monitoring."
+role: "Lead ML Engineer"
+stack: ["Python", "PyTorch", "Airflow", "FastAPI", "Redis", "Prometheus", "Docker", "Kubernetes"]
+period: "Jan 2025 – Jun 2025"
+category: "ai-ml"
+metrics:
+  - { label: "Latency P99", value: "< 120ms" }
+  - { label: "Daily Predictions", value: "2.4M" }
+  - { label: "Model Accuracy", value: "96.3%" }
+  - { label: "Uptime", value: "99.95%" }
+featured: true
+order: 1
+---
+
+## Problem
+
+The existing batch prediction system couldn't keep up with growing traffic. Models were retrained manually, deployed via shell scripts, and monitored through log tailing. As the user base grew from thousands to millions of daily active users, the pipeline needed to handle real-time inference while maintaining reliability and observability.
+
+## Approach
+
+Built a modular ML platform with clear separation between the training loop, feature store, serving layer, and monitoring stack. Used Airflow for orchestration, FastAPI for the inference API, and Redis for feature caching. Model artifacts are versioned with MLflow and deployed via canary releases on Kubernetes.
+
+The feature store was designed as a dual-write system: batch features computed daily from the data warehouse, and streaming features captured from the event bus. This ensured both training and serving used identical feature transformations.
+
+## Key Decisions
+
+- **FastAPI over gRPC**: Chose HTTP/JSON for easier debugging and broader client compatibility. Latency overhead was acceptable given the feature cache hit rate.
+- **Redis for feature serving**: Sub-millisecond reads for hot features. Eviction policy set to LRU with a 24-hour TTL aligned to the retraining cadence.
+- **Canary deployments**: New model versions receive 5% of traffic for 30 minutes before full rollout. Automated rollback triggers on latency or accuracy regression.
+- **Prometheus + Grafana**: Custom metrics for model drift, feature freshness, and prediction distribution shifts. Alerting rules catch anomalies before they impact users.
+
+## Outcome
+
+Reduced inference latency from 450ms to under 120ms at P99. Automated the entire retraining-to-deployment cycle, cutting release time from days to under an hour. Model monitoring caught two potential data drift incidents before they caused user-facing issues. The platform now serves 2.4 million predictions daily with 99.95% uptime.
