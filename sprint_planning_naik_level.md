@@ -23,7 +23,7 @@
 | L3.1 | Motion tokens | ✅ | Token `--dur-fast/base/slow` + `--ease-out/in/in-out` di global.css; `--transition-fast` di-alias ke base+ease-out; body/link/fadeIn/themeRotate pakai token. Build 45 ✓, unit 406/406 ✓ |
 | L3.2 | View Transitions antar halaman | ✅ | `transition:persist` pada Header/Footer wrapper div, `transition:animate="fade"` pada `<main>`. Cross-fade CSS pakai `--dur-fast` exit + `--dur-slow` enter. `@media prefers-reduced-motion` global sudah disable animation. Build 45 ✓, unit 406/406 ✓ |
 | L3.3 | Refactor transisi hardcoded → tokens | ✅ | Token `--ease-out-back` + `--dur-loop` ditambah ke global.css. Refactored: CustomCursor, TiltCard, MagneticButton, MagneticButtons, RepoGlowCard (inline CSS → var), ScrollAnimator (CSS → var), gsap.ts default pakai motion.ts. MetricCard, MetricCounter, PhaseIndicator, ContextTooltip (Framer Motion → motion.ts imports). Build 45 ✓, unit 406/406 ✓ |
-| L3.4 | Verifikasi & tutup Iterasi 3 | ⬜ | |
+| L3.4 | Verifikasi & tutup Iterasi 3 | ✅ | Ringkasan Iterasi 3 — **Sistem Motion Konsolidasi**: Token `--dur-fast/base/slow` + `--ease-out/in/in-out/out-back` + `--dur-loop` di global.css; view transitions cross-fade antar halaman (header/footer persist, reduced-motion guard); refactor 13 file hardcoded transisi → token (atoms + key islands). Build 45 ✓, unit 406/406 ✓, e2e 22/22 ✓ (craft 4 + fonts + typography 4 + micro-interactions 9) |
 | L4.1 | Fix kontras brand light mode | ⬜ | |
 | L4.2 | Noise/grain overlay halus | ⬜ | |
 | L4.3 | Hairline border + inset highlight | ⬜ | |
