@@ -14,7 +14,9 @@
   --color-text-secondary: #6b7268;
   --color-text-secondary-rgb: 107 114 104;
   --color-brand: #7a8c6f;
-  --color-brand-rgb: 122 140 111;
+  --color-brand-rgb: 93 107 84;
+  --color-brand-text: #5d6b54;
+  --color-brand-text-rgb: 93 107 84;
   --color-brand-muted: #8fa284;
   --color-brand-muted-rgb: 143 162 132;
   --color-brand-warm: #c17f59;
@@ -56,6 +58,8 @@
   --color-text-secondary-rgb: 156 163 156;
   --color-brand: #7a8c6f;
   --color-brand-rgb: 122 140 111;
+  --color-brand-text: #7a8c6f;
+  --color-brand-text-rgb: 122 140 111;
   --color-brand-muted: #5d6b54;
   --color-brand-muted-rgb: 93 107 84;
   --color-brand-warm: #c17f59;
@@ -96,6 +100,8 @@
   --color-text-secondary-rgb: 156 163 156;
   --color-brand: #7a8c6f;
   --color-brand-rgb: 122 140 111;
+  --color-brand-text: #7a8c6f;
+  --color-brand-text-rgb: 122 140 111;
   --color-brand-muted: #5d6b54;
   --color-brand-muted-rgb: 93 107 84;
   --color-brand-warm: #c17f59;

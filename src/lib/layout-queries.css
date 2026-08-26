@@ -31,7 +31,7 @@
 
 /* Nav: when link is current page, highlight it */
 nav:has([aria-current="page"]) [aria-current="page"] {
-  color: var(--color-brand);
+  color: var(--color-brand-text);
   font-weight: 600;
 }
 

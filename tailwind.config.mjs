@@ -26,9 +26,9 @@ export default {
           tertiary: "rgb(var(--color-surface-tertiary-rgb) / <alpha-value>)",
         },
         accent: {
-          DEFAULT: "rgb(var(--color-brand-rgb) / <alpha-value>)",
+          DEFAULT: "rgb(var(--color-brand-text-rgb) / <alpha-value>)",
           muted: "rgb(var(--color-brand-muted-rgb) / <alpha-value>)",
-          glow: "rgb(var(--color-brand-rgb) / 0.3)",
+          glow: "rgb(var(--color-brand-text-rgb) / 0.3)",
         },
       },
       fontFamily: {
