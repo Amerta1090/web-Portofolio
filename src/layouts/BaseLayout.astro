@@ -177,11 +177,15 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
       <div class="scroll-progress-css" role="progressbar" aria-label="Page scroll progress"></div>
       <SmoothScroll client:load />
       <ScrollProgress client:load />
-      <Header currentPath={currentPath} />
-      <main id="main-content" class="pt-16" role="main">
+      <div transition:persist="header">
+        <Header currentPath={currentPath} />
+      </div>
+      <main id="main-content" class="pt-16" role="main" transition:animate="fade">
         <slot />
       </main>
-      <Footer />
+      <div transition:persist="footer">
+        <Footer />
+      </div>
     </div>
     <CustomCursor client:load />
     <TimeAwareTheme client:load />

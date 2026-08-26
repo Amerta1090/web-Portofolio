@@ -249,6 +249,20 @@ pre {
   transform: rotate(180deg);
 }
 
+/* ── View Transitions (Astro ClientRouter) ── */
+::view-transition-old(root) {
+  animation: fade-out var(--dur-fast) var(--ease-in) both;
+}
+::view-transition-new(root) {
+  animation: fade-in var(--dur-slow) var(--ease-out) both;
+}
+@keyframes fade-out {
+  to { opacity: 0; }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+}
+
 /* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
   *,
