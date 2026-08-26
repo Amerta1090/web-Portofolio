@@ -23,7 +23,7 @@ export default function CustomCursor({ enableOnTouch = false }: CustomCursorProp
       border-radius: 50%;
       background: #C17F59;
       transform: translate(-50%, -50%);
-      transition: width 0.3s ease, height 0.3s ease, background 0.3s ease;
+      transition: width var(--dur-base) var(--ease-out), height var(--dur-base) var(--ease-out), background var(--dur-base) var(--ease-out);
       opacity: 0;
     `;
     document.body.appendChild(cursor);
@@ -39,7 +39,7 @@ export default function CustomCursor({ enableOnTouch = false }: CustomCursorProp
       border-radius: 50%;
       border: 1.5px solid #7A8C6F;
       transform: translate(-50%, -50%);
-      transition: width 0.4s ease, height 0.4s ease, border-color 0.3s ease;
+      transition: width var(--dur-slow) var(--ease-out), height var(--dur-slow) var(--ease-out), border-color var(--dur-base) var(--ease-out);
       opacity: 0;
     `;
     document.body.appendChild(ring);

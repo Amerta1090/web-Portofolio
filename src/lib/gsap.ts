@@ -1,11 +1,12 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { duration, easing } from "./motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
 gsap.defaults({
   ease: "power2.out",
-  duration: 0.8,
+  duration: duration.deliberate,
 });
 
 export { gsap, ScrollTrigger };

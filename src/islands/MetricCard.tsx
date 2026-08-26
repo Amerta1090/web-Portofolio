@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
+import { duration, easing, stagger } from "../lib/motion";
 import MetricCounter from "./MetricCounter";
 
 interface Props {
@@ -17,9 +18,9 @@ export default function MetricCard({ icon: Icon, value, suffix = "", label, inde
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{
-        duration: 0.5,
-        ease: [0.16, 1, 0.3, 1],
-        delay: index * 0.1,
+        duration: duration.slow,
+        ease: easing["ease-out-expo"],
+        delay: index * stagger.relaxed,
       }}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-brand/[0.03] to-transparent pointer-events-none" />

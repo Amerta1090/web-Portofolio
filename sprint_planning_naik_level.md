@@ -22,7 +22,7 @@
 | L2.5 | Verifikasi & tutup Iterasi 2 | ✅ | Ringkasan Iterasi 2: **28 eksperimen di-cut · 25 dipertahankan · 5 flag UPGRADE** (FractalExplorer, LiquidDistortion, LogisticMap, PCATSNEViz, GradientDescent — lihat `docs/lab-audit.md`). Full verifikasi pada tree final `50ab209`: build 45 halaman ✓, unit **406/406** (31 file) ✓, E2E lengkap 7/7 spec hijau — craft+typography+micro-interactions 17 ✓, gallery 71 (69 paralel + 2 flake WebGL rerun terisolasi ✓), fonts+game-theory+astrophysics 35 ✓ |
 | L3.1 | Motion tokens | ✅ | Token `--dur-fast/base/slow` + `--ease-out/in/in-out` di global.css; `--transition-fast` di-alias ke base+ease-out; body/link/fadeIn/themeRotate pakai token. Build 45 ✓, unit 406/406 ✓ |
 | L3.2 | View Transitions antar halaman | ✅ | `transition:persist` pada Header/Footer wrapper div, `transition:animate="fade"` pada `<main>`. Cross-fade CSS pakai `--dur-fast` exit + `--dur-slow` enter. `@media prefers-reduced-motion` global sudah disable animation. Build 45 ✓, unit 406/406 ✓ |
-| L3.3 | Refactor transisi hardcoded → tokens | ⬜ | |
+| L3.3 | Refactor transisi hardcoded → tokens | ✅ | Token `--ease-out-back` + `--dur-loop` ditambah ke global.css. Refactored: CustomCursor, TiltCard, MagneticButton, MagneticButtons, RepoGlowCard (inline CSS → var), ScrollAnimator (CSS → var), gsap.ts default pakai motion.ts. MetricCard, MetricCounter, PhaseIndicator, ContextTooltip (Framer Motion → motion.ts imports). Build 45 ✓, unit 406/406 ✓ |
 | L3.4 | Verifikasi & tutup Iterasi 3 | ⬜ | |
 | L4.1 | Fix kontras brand light mode | ⬜ | |
 | L4.2 | Noise/grain overlay halus | ⬜ | |

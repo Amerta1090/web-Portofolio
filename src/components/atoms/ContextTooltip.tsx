@@ -1,5 +1,6 @@
 import { type ReactNode, useRef, useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { duration, easing } from "../../lib/motion";
 
 interface TooltipContent {
   title?: string;
@@ -139,7 +140,7 @@ export default function ContextTooltip({
             initial={{ opacity: 0, scale: 0.85, y: adjustedSide === "top" ? 4 : adjustedSide === "bottom" ? -4 : 0 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.85, y: adjustedSide === "top" ? 4 : adjustedSide === "bottom" ? -4 : 0 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
+            transition={{ duration: duration.fast, ease: easing["ease-out-expo"] }}
             style={{
               position: "fixed",
               top: position.top,

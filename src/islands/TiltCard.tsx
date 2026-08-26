@@ -65,7 +65,7 @@ export default function TiltCard({
       onMouseLeave={handleMouseLeave}
       style={{
         transformStyle: "preserve-3d",
-        transition: "transform 0.2s ease-out",
+        transition: "transform var(--dur-base) var(--ease-out)",
         position: "relative",
       }}
     >

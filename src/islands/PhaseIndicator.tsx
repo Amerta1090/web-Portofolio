@@ -2,6 +2,7 @@ import { motion, useMotionValueEvent, useScroll, useSpring } from "framer-motion
 import { useState } from "react";
 import { useCapabilityStore } from "../lib/useCapabilityStore";
 import { useExperienceTier, getEffectiveTier } from "../lib/useExperienceTier";
+import { duration } from "../lib/motion";
 
 const PHASES = [
   { id: "boot", label: "Boot" },
@@ -55,7 +56,7 @@ export default function PhaseIndicator() {
                   ? "rgba(245, 158, 11, 0.4)"
                   : "rgba(255, 255, 255, 0.2)",
               }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: duration.normal }}
             />
             <span className="absolute right-full mr-3 px-2 py-0.5 rounded text-xs whitespace-nowrap bg-bg-tertiary/80 backdrop-blur-sm text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
               {phase.label}

@@ -82,6 +82,10 @@
   --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
   /* Easing — smooth both ways for continuous/looping motion */
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  /* Easing — gentle overshoot for playful/interactive elements */
+  --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Duration — long ambient loops (shimmer, breathing, rotation) */
+  --dur-loop: 2s;
   /* Legacy alias — kept for existing consumers, prefer --dur-* + --ease-* */
   --transition-fast: var(--dur-base) var(--ease-out);
 
@@ -243,7 +247,7 @@ pre {
 
 /* Theme Toggle Rotate */
 .theme-rotate {
-  transition: transform var(--dur-slow) cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform var(--dur-slow) var(--ease-out-back);
 }
 .theme-rotate:active {
   transform: rotate(180deg);
@@ -340,7 +344,7 @@ pre {
   inset: 0;
   background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.06) 50%, transparent 100%);
   background-size: 200% 100%;
-  animation: skeleton-shimmer 2s ease-in-out infinite;
+  animation: skeleton-shimmer var(--dur-loop) var(--ease-in-out) infinite;
 }
 
 /* ── Sentence case utility (override uppercase patterns) ── */

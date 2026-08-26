@@ -36,7 +36,7 @@ export default function MagneticButton({ children, href, className = "" }: Props
         className={className}
         style={{
           transform: `translate(${pos.x}px, ${pos.y}px)`,
-          transition: "transform 0.2s ease-out",
+          transition: "transform var(--dur-base) var(--ease-out)",
         }}
       >
         {children}

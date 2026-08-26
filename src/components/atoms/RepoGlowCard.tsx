@@ -189,7 +189,7 @@ export default function RepoGlowCard({ repo, rank, index }: RepoGlowCardProps) {
         )}
         style={{
           transformStyle: "preserve-3d",
-          transition: prefersReduced ? "none" : "transform 0.2s ease-out",
+          transition: prefersReduced ? "none" : "transform var(--dur-base) var(--ease-out)",
         }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}

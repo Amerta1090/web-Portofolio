@@ -1,5 +1,6 @@
 import { motion, useInView, useMotionValue, useSpring, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { duration, easing } from "../lib/motion";
 
 interface Props {
   value: number;
@@ -34,7 +35,7 @@ export default function MetricCounter({ value, suffix = "", label }: Props) {
         className="text-3xl md:text-4xl font-bold text-brand tabular-nums block"
         initial={{ opacity: 0, y: 12 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: duration.slow, ease: easing["ease-out-expo"] }}
         aria-live="polite"
       >
         {display}

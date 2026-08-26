@@ -77,8 +77,8 @@ export default function MagneticButtons({
         style={{
           transform: `translate(${pos.x}px, ${pos.y}px) scale(${isSnapped ? 1.08 : isNear ? 1.04 : 1})`,
           transition: isSnapped
-            ? "transform 0.08s ease-out"
-            : "transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)",
+            ? "transform var(--dur-fast) var(--ease-out)"
+            : "transform var(--dur-base) var(--ease-out-back)",
         }}
       >
         {children}
