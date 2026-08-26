@@ -1,0 +1,37 @@
+---
+title: "Red Devil Dynamics"
+summary: "AI-powered goal timing predictor for Manchester United using survival analysis to estimate in-match scoring probability in real-time."
+role: "ML Engineer & Full-Stack Developer"
+stack: ["Python", "FastAPI", "Survival Analysis", "Poisson Model", "JavaScript"]
+period: "Mar 2026 – Mar 2026"
+category: "ai-ml"
+featured: true
+order: 2
+metrics:
+  - { label: "Prediction Window", value: "10 min" }
+  - { label: "Model Type", value: "Survival" }
+  - { label: "Match Variables", value: "4+" }
+  - { label: "Deployment", value: "Live" }
+---
+
+## Problem
+
+Traditional football analytics focuses on "will a team score?" but not "when?". Coaches and analysts need time-aware scoring probability — the likelihood of a goal occurring within a specific match window, accounting for current match context (minute, shots, xG, home/away advantage). Static win probabilities miss the temporal dynamics that matter for in-game tactical decisions.
+
+## Approach
+
+Adapted survival analysis from reliability engineering and medical research to football. Treats a goal as a "time-to-event" problem where the Poisson-based scoring intensity model estimates hazard rate h(t) from match context variables (current minute, cumulative shots, expected goals, home/away). The survival function S(t) gives the probability of no goal occurring before time t — so 1-S(t) yields the scoring probability within any given window.
+
+The system ingests live match data, recomputes the hazard function as match context evolves, and serves updated probability estimates through a real-time dashboard. Each update reflects the current match state rather than pre-match predictions.
+
+## Key Decisions
+
+**Survival analysis over sequence models.** Interpretable, works with limited match data (hundreds of matches, not millions), and directly outputs time-aware probabilities. Sequence models like LSTMs require far more training data and obscure the temporal reasoning. The hazard function provides explainability that coaches can reason about.
+
+**Poisson process assumption.** Goals are rare events — Poisson naturally models this. The trade-off is assuming independent scoring intensity, which doesn't capture momentum shifts after goals or red cards. Acceptable for the initial model; future iterations can layer in state-dependent intensity.
+
+**FastAPI backend.** Lightweight, async, easy to deploy on Cloudflare Workers. Handles concurrent match connections without blocking. The JavaScript frontend renders a real-time probability gauge that updates as match context changes.
+
+## Outcome
+
+Live web application providing real-time scoring probability estimates during Manchester United matches. Demonstrates how statistical methods from reliability engineering and medical research (survival functions, hazard functions, censoring) can be creatively adapted for sports analytics. Structured as a complete end-to-end AI product from model development through cloud deployment, not just a notebook experiment.

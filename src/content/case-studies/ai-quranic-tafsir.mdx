@@ -1,0 +1,37 @@
+---
+title: "AI Quranic Tafsir Assistant"
+summary: "End-to-end RAG system democratizing access to Tafsir Ibn Kathir (10 volumes, 6,500+ pages) through hybrid sparse-dense retrieval and local LLM generation."
+role: "Solo ML Engineer"
+stack: ["Python", "LLaMA 3.2", "E5 Multilingual", "BM25", "Streamlit", "FAISS"]
+period: "Sep 2025 – Jan 2026"
+category: "ai-ml"
+featured: true
+order: 1
+metrics:
+  - { label: "Context Relevance", value: "0.972" }
+  - { label: "Avg Latency", value: "5.93s" }
+  - { label: "Volumes Indexed", value: "10" }
+  - { label: "Pages Processed", value: "6,500+" }
+---
+
+## Problem
+
+Accessing Tafsir Ibn Kathir requires navigating 10 physical volumes spanning 6,500+ pages. Existing digital copies are unstructured plain text with no semantic search capability. Users need precise, contextually grounded answers to theological questions — not generic LLM hallucinations that fabricate citations or misattribute scholarly opinions.
+
+## Approach
+
+Built a Hybrid Retrieval Engine combining BM25 (sparse path) for exact keyword matching with E5 Large Multilingual embeddings (dense path) for cross-lingual semantic understanding. The retrieval results are fed as context to LLaMA 3.2 3B for grounded generation with source citations.
+
+The pipeline flows: PDF ingestion → text extraction → chunking → FAISS index (dense) + BM25 index (sparse) → hybrid retrieval with reciprocal rank fusion → LLM generation. Each generated answer traces back to specific volume and page references in the source corpus.
+
+## Key Decisions
+
+**Hybrid over pure dense retrieval.** BM25 catches exact Arabic term matches that embeddings miss — theological vocabulary has precise meanings where synonymy breaks down. Dense retrieval catches paraphrases and conceptual queries where users describe ideas rather than specific terms. Combining both paths via reciprocal rank fusion outperformed either alone.
+
+**LLaMA 3.2 3B over larger models.** The 3B parameter model runs on consumer hardware (i3 processor, 4GB RAM) — critical for accessibility in regions with limited compute infrastructure. Latency trades off against deployability, and 5.93s per query is acceptable for research use.
+
+**Streamlit over a custom frontend.** Rapid prototyping for academic context where the priority was iterating on retrieval quality, not UI polish. The trade-off is limited customization, but the development velocity justified it.
+
+## Outcome
+
+Context Relevance score of 0.972 effectively eliminates hallucinated answers — the system either retrieves relevant tafsir passages or says it cannot find an answer. Runs on minimal hardware (i3 processor, 4GB RAM) making it deployable in resource-constrained environments. Successfully indexes and retrieves from the complete 10-volume corpus of Tafsir Ibn Kathir.

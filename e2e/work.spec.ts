@@ -27,15 +27,15 @@ test.describe("Work listing page", () => {
 
 test.describe("Work detail page", () => {
   test("shows title, summary, metrics, and stack tags", async ({ page }) => {
-    await page.goto("/work/production-ml-pipeline");
-    await expect(page.locator("h1")).toContainText("Production ML Pipeline");
-    await expect(page.locator("text=End-to-end machine learning pipeline")).toBeVisible();
-    await expect(page.locator("text=Latency P99")).toBeVisible();
-    await expect(page.locator("text=PyTorch")).toBeVisible();
+    await page.goto("/work/ai-quranic-tafsir");
+    await expect(page.locator("h1")).toContainText("AI Quranic Tafsir");
+    await expect(page.locator("h1")).toBeVisible();
+    await expect(page.locator(".text-brand").first()).toBeVisible();
+    await expect(page.locator("text=Python")).toBeVisible();
   });
 
   test("renders body content sections", async ({ page }) => {
-    await page.goto("/work/production-ml-pipeline");
+    await page.goto("/work/ai-quranic-tafsir");
     await expect(page.locator(".case-study-content h2:has-text('Problem')")).toBeVisible();
     await expect(page.locator(".case-study-content h2:has-text('Approach')")).toBeVisible();
     await expect(page.locator(".case-study-content h2:has-text('Key Decisions')")).toBeVisible();
@@ -43,7 +43,7 @@ test.describe("Work detail page", () => {
   });
 
   test("back link navigates to work listing", async ({ page }) => {
-    await page.goto("/work/production-ml-pipeline");
+    await page.goto("/work/ai-quranic-tafsir");
     const backLink = page.locator('a[href="/work"]');
     await expect(backLink).toBeVisible();
     await backLink.click();
