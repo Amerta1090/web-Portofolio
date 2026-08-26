@@ -27,7 +27,7 @@
 | L4.1 | Fix kontras brand light mode | ✅ | Token `--color-brand-text` (#5d6b54 light / #7a8c6f dark) ditambah ke semua block theme.css; `--color-brand-rgb` di-remap ke 93 107 84 di light mode → semua Tailwind `text-brand` (~100+ usages) otomatis fix; `text-accent` via Tailwind config juga dipoint ke `--color-brand-text-rgb`; `layout-queries.css:34` active nav ref `var(--color-brand)` → `var(--color-brand-text)`. Build 45 ✓, unit 406/406 ✓, E2E 117/123 pas (6 flake WebGL pre-existing, hijau isolasi) |
 | L4.2 | Noise/grain overlay halus | ✅ | SVG feTurbulence data-URI (`baseFrequency=0.65`, `numOctaves=3`, 200×200 tile) via `noise-overlay` class di global.css (position fixed, z-9999, pointer-events none, opacity 0.03, mix-blend-mode overlay); div `aria-hidden="true"` di BaseLayout.astro; auto-hide saat `tier-1` via `[data-experience-tier]` CSS hook. Build 45 ✓, unit 406/406 ✓, E2E 8/8 ✓ |
 | L4.3 | Hairline border + inset highlight | ✅ | `.card` base rules di `layout-queries.css` — border `var(--color-border)` + `.dark .card` border `rgba(255,255,255,0.06)` + `box-shadow: inset 0 1px 0 rgba(255,255,255,0.08)` (material feel tanpa glow); utility `.card-material` di `global.css` untuk non-.card elements. Build 45 ✓, unit 406/406 ✓ |
-| L4.4 | Elevation system | ⬜ | |
+| L4.4 | Elevation system | ✅ | Token `--shadow-1/2/3` (3 level: subtle→medium→high) di theme.css untuk light & dark; terapkan: Toaster `--shadow-3`, GalleryGrid modal `--shadow-3`, ContextTooltip `--shadow-2`. Build 45 ✓, unit 406/406 ✓ |
 | L4.5 | Verifikasi & tutup Iterasi 4 | ⬜ | |
 | L5.1 | Template case study + content collection | ⬜ | |
 | L5.2 | Tulis 2–3 case study mendalam | ⬜ | |

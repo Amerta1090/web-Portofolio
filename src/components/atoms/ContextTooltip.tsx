@@ -148,7 +148,7 @@ export default function ContextTooltip({
               zIndex: 9999,
               pointerEvents: "none",
             }}
-            className="w-[220px] bg-bg-secondary/95 backdrop-blur-md border border-border/60 rounded-xl p-3 shadow-2xl shadow-black/30"
+            className="w-[220px] bg-bg-secondary/95 backdrop-blur-md border border-border/60 rounded-xl p-3 shadow-[var(--shadow-2)]"
           >
             <div
               className="absolute w-2 h-2 bg-bg-secondary border border-border/60"

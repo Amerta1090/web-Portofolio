@@ -538,7 +538,7 @@ function ExperimentModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 20 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-6xl max-h-[90vh] bg-bg-primary/95 border border-border/60 rounded-2xl overflow-hidden shadow-2xl shadow-amber-500/5"
+            className="relative w-full max-w-6xl max-h-[90vh] bg-bg-primary/95 border border-border/60 rounded-2xl overflow-hidden shadow-[var(--shadow-3)]"
           >
             <div className="flex items-center justify-between px-6 py-4 border-b border-border/40 bg-bg-secondary/50">
               <div className="flex items-center gap-3">
