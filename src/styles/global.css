@@ -359,3 +359,18 @@ pre {
 [data-experience-tier="tier-2"] .tier-3-only {
   display: none !important;
 }
+
+/* ── Noise / grain overlay ── */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.03;
+  mix-blend-mode: overlay;
+  background-repeat: repeat;
+}
+[data-experience-tier="tier-1"] .noise-overlay,
+.noise-overlay-hidden {
+  display: none;
+}
