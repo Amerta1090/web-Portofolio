@@ -8,10 +8,6 @@ import { Toaster } from "sonner";
 import Footer from "../components/templates/Footer.astro";
 import Header from "../components/templates/Header.astro";
 import AmbientScene from "../islands/AmbientScene";
-import ScrollProgress from "../islands/ScrollProgress";
-import SmoothScroll from "../islands/SmoothScroll";
-import TimeAwareTheme from "../islands/TimeAwareTheme";
-import CustomCursor from "../islands/CustomCursor";
 import { SITE } from "../lib/constants";
 
 export interface Props {
@@ -173,6 +169,23 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
       })();
     </script>
 
+    <script is:inline>
+      (function () {
+        var hour = new Date().getHours();
+        var warmth;
+        if (hour >= 5 && hour < 7) warmth = 0.6;
+        else if (hour >= 7 && hour < 12) warmth = 0.8;
+        else if (hour >= 12 && hour < 17) warmth = 1.0;
+        else if (hour >= 17 && hour < 21) warmth = 0.7;
+        else warmth = 0.3;
+        var v = Math.round(warmth * 255);
+        document.documentElement.style.setProperty(
+          "--color-brand-warm-rgb",
+          v + " " + Math.round(v * 0.7) + " " + Math.round(v * 0.4)
+        );
+      })();
+    </script>
+
     {cfAnalyticsToken && (
       <script is:inline data-cf-beacon={JSON.stringify({ token: cfAnalyticsToken })} src="https://static.cloudflareinsights.com/beacon.min.js" defer></script>
     )}
@@ -188,8 +201,7 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
     <div class="relative z-10">
       <a href="#main-content" class="skip-to-content">Skip to content</a>
       <div class="scroll-progress-css" role="progressbar" aria-label="Page scroll progress"></div>
-      <SmoothScroll client:load />
-      <ScrollProgress client:load />
+
       <div transition:persist="header">
         <Header currentPath={currentPath} />
       </div>
@@ -200,10 +212,8 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
         <Footer />
       </div>
     </div>
-    <CustomCursor client:load />
-    <TimeAwareTheme client:load />
     <Toaster
-      client:load
+      client:idle
       position="bottom-right"
       toastOptions={{
         style: {
@@ -214,5 +224,105 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
         },
       }}
     />
+
+    <script is:inline>
+      (function () {
+        if ("ontouchstart" in window || navigator.maxTouchPoints > 0) return;
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        if (document.documentElement.dataset.experienceTier === "tier-1") return;
+
+        var cursor = document.createElement("div");
+        cursor.className = "custom-cursor";
+        cursor.style.cssText = "position:fixed;pointer-events:none;z-index:9999;width:12px;height:12px;border-radius:50%;background:#C17F59;transform:translate(-50%,-50%);transition:width var(--dur-base) var(--ease-out),height var(--dur-base) var(--ease-out),background var(--dur-base) var(--ease-out);opacity:0;";
+        document.body.appendChild(cursor);
+
+        var ring = document.createElement("div");
+        ring.className = "custom-cursor-ring";
+        ring.style.cssText = "position:fixed;pointer-events:none;z-index:9998;width:36px;height:36px;border-radius:50%;border:1.5px solid #7A8C6F;transform:translate(-50%,-50%);transition:width var(--dur-slow) var(--ease-out),height var(--dur-slow) var(--ease-out),border-color var(--dur-base) var(--ease-out);opacity:0;";
+        document.body.appendChild(ring);
+
+        var mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+
+        document.addEventListener("mousemove", function (e) {
+          mouseX = e.clientX; mouseY = e.clientY;
+          cursor.style.opacity = "1"; ring.style.opacity = "1";
+        }, { passive: true });
+
+        document.addEventListener("mouseleave", function () {
+          cursor.style.opacity = "0"; ring.style.opacity = "0";
+        });
+
+        function onHoverableEnter(e) {
+          if (e.currentTarget.dataset.cursorHover === "button") {
+            cursor.style.width = "20px"; cursor.style.height = "20px";
+            cursor.style.background = "#7A8C6F";
+            ring.style.width = "48px"; ring.style.height = "48px";
+            ring.style.borderColor = "#C17F59";
+          }
+        }
+        function onHoverableLeave() {
+          cursor.style.width = "12px"; cursor.style.height = "12px";
+          cursor.style.background = "#C17F59";
+          ring.style.width = "36px"; ring.style.height = "36px";
+          ring.style.borderColor = "#7A8C6F";
+        }
+
+        var hoverables = document.querySelectorAll("a, button, [data-cursor-hover]");
+        hoverables.forEach(function (el) {
+          el.addEventListener("mouseenter", onHoverableEnter);
+          el.addEventListener("mouseleave", onHoverableLeave);
+        });
+
+        function animate() {
+          ringX += (mouseX - ringX) * 0.12;
+          ringY += (mouseY - ringY) * 0.12;
+          cursor.style.left = mouseX + "px"; cursor.style.top = mouseY + "px";
+          ring.style.left = ringX + "px"; ring.style.top = ringY + "px";
+          requestAnimationFrame(animate);
+        }
+        requestAnimationFrame(animate);
+      })();
+    </script>
+
+    <script is:inline>
+      (function () {
+        if (document.documentElement.dataset.experienceTier === "tier-1") return;
+
+        import("https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js").then(function (mod) {
+          var Lenis = mod.default;
+          var lenis = new Lenis({
+            duration: 1.2,
+            easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
+            orientation: "vertical",
+            smoothWheel: true
+          });
+          window.__LENIS = lenis;
+
+          function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+          }
+          requestAnimationFrame(raf);
+
+          document.addEventListener("click", function (e) {
+            var link = e.target.closest("a");
+            if (!link) return;
+            var href = link.getAttribute("href");
+            if (!href || !href.startsWith("/#")) return;
+            var id = href.replace("/#", "");
+            var el = document.getElementById(id);
+            if (!el) return;
+            e.preventDefault();
+            lenis.scrollTo(el, { offset: -64 });
+          }, { passive: false });
+
+          if (window.location.hash) {
+            var id = window.location.hash.replace("#", "");
+            var el = document.getElementById(id);
+            if (el) setTimeout(function () { lenis.scrollTo(el, { offset: -64 }); }, 100);
+          }
+        });
+      })();
+    </script>
   </body>
 </html>
