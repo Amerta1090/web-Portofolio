@@ -37,7 +37,7 @@
 | L6.1 | Konsolidasi islands client:load | ✅ | 4 React islands dipindah ke vanilla `<script is:inline>`: TimeAwareTheme (head, ~15 baris), CustomCursor (body, ~80 baris), SmoothScroll/Lenis (body, dynamic import CDN), ScrollProgress dihapus (CSS fallback sudah ada); Toaster `client:load` → `client:idle`. Zero `client:load` global islands tersisa. Build 48 ✓, unit 420/420 ✓, E2E 28/28 ✓ |
 | L6.2 | Font loading audit (anti-CLS) | ✅ | Inter + JetBrains Mono diubah ke `latin-*` subset imports (eliminasi cyrillic/greek/vietnamese/latin-ext); Fraunces 400 dihapus (unused); `unicode-range` ditambahkan ke Fraunces @font-face. Total font transfer ~140KB (turun dari ~158KB), zero CLS (metric fallback + preloaded 700 tetap). Build 48 ✓, unit 420/420 ✓, E2E 28/28 ✓ |
 | L6.3 | QA akhir lintas halaman | ✅ | Build 48 ✓, unit 420/420 ✓, E2E 113/114 (1 flaky WebGL Tesseract — pre-existing, pass in isolation). Fix selector bugs: gallery.spec.ts duplicate `.first()` (2 tests), astrophysics.spec.ts timeout 5→8s + navigate-first pattern (15 tests). Semua halaman terverifikasi, font 7 woff2, CSS tokens utuh. |
-| L6.4 | Tutup seluruh sprint naik level | ⬜ | |
+| L6.4 | Tutup seluruh sprint naik level | ✅ | **SPRINT NAIK LEVEL SELESAI.** 6 iterasi, 25+ task, ~20 commit. Ringkasan akhir: (1) Konsolidasi islands — 4 React global islands → vanilla inline scripts (hemat ~24KB per-page JS, zero `client:load` global islands); (2) Font audit — latin-only subsets, Fraunces 400 dihapus, 7 woff2 total, ~140KB transfer; (3) QA lintas halaman — 48 pages, 420 unit, 113/114 E2E (1 WebGL flaky). Build 48 ✓, unit 420/420 ✓, E2E 113/114 ✓ |
 
 Legend: ⬜ pending · 🔄 in progress · ✅ done · ⏭️ skipped (wajib isi alasan di Catatan)
 
