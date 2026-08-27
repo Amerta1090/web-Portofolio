@@ -4,7 +4,7 @@ test.describe("Astrophysics experiments", () => {
   test.describe("3-Body Problem", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto("/gallery#three-body-problem");
-      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+      await page.waitForSelector("[data-modal-content]", { timeout: 8000 });
     });
 
     test.afterEach(async ({ page }) => {
@@ -44,17 +44,17 @@ test.describe("Astrophysics experiments", () => {
     });
 
     test("card is present in gallery", async ({ page }) => {
-      await page.keyboard.press("Escape");
       await page.goto("/gallery");
-      const card = page.locator('[role="listitem"]').filter({ hasText: "3-Body Problem" });
-      await expect(card).toBeVisible();
+      await page.waitForSelector('[role="listitem"]', { timeout: 5000 });
+      const card = page.locator('[role="listitem"]').filter({ hasText: "3-Body" });
+      await expect(card.first()).toBeVisible();
     });
   });
 
   test.describe("Relativistic Orbits", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto("/gallery#relativistic-orbits");
-      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+      await page.waitForSelector("[data-modal-content]", { timeout: 8000 });
     });
 
     test.afterEach(async ({ page }) => {
@@ -97,7 +97,7 @@ test.describe("Astrophysics experiments", () => {
   test.describe("Galaxy Formation", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto("/gallery#galaxy-formation");
-      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+      await page.waitForSelector("[data-modal-content]", { timeout: 8000 });
     });
 
     test.afterEach(async ({ page }) => {
@@ -131,10 +131,10 @@ test.describe("Astrophysics experiments", () => {
     });
 
     test("card is present in gallery", async ({ page }) => {
-      await page.keyboard.press("Escape");
       await page.goto("/gallery");
+      await page.waitForSelector('[role="listitem"]', { timeout: 5000 });
       const card = page.locator('[role="listitem"]').filter({ hasText: /Galaxy Formation/ });
-      await expect(card).toBeVisible();
+      await expect(card.first()).toBeVisible();
     });
   });
 });

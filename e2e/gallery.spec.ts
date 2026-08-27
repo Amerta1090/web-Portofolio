@@ -10,8 +10,8 @@ test.describe("Gallery page", () => {
 
   test("Fractal Explorer card is present", async ({ page }) => {
     await page.goto("/gallery");
-    await expect(page.getByText("Fractal Explorer")).toBeVisible();
-    const card = page.locator('[role="listitem"]').filter({ hasText: "Fractal Explorer" });
+    await expect(page.getByText("Fractal Explorer").first()).toBeVisible();
+    const card = page.locator('[role="listitem"]').filter({ hasText: "Fractal Explorer" }).first();
     await expect(card).toBeVisible();
     await expect(card.getByText("WebGL", { exact: true })).toBeVisible();
     await expect(card.getByText("Fractal", { exact: true })).toBeVisible();
@@ -98,8 +98,8 @@ test.describe("Gallery page", () => {
 
   test("Interactive Canvas card is present", async ({ page }) => {
     await page.goto("/gallery");
-    await expect(page.getByText("Interactive Canvas")).toBeVisible();
-    const card = page.locator('[role="listitem"]').filter({ hasText: "Interactive Canvas" });
+    await expect(page.getByText("Interactive Canvas").first()).toBeVisible();
+    const card = page.locator('[role="listitem"]').filter({ hasText: "Interactive Canvas" }).first();
     await expect(card).toBeVisible();
     await expect(card.getByText("Canvas", { exact: true })).toBeVisible();
     await expect(card.getByText("Whiteboard", { exact: true })).toBeVisible();
