@@ -18,6 +18,7 @@ export interface Props {
   title?: string;
   description?: string;
   ogImage?: string;
+  ogSlug?: string;
   ogType?: string;
   canonicalUrl?: string;
   jsonLd?: Record<string, unknown>;
@@ -26,13 +27,20 @@ export interface Props {
 const {
   title = SITE.title,
   description = SITE.description,
-  ogImage = "/og-image.png",
+  ogImage,
+  ogSlug,
   ogType = "website",
   canonicalUrl,
 } = Astro.props;
 
 const canonical = canonicalUrl ?? SITE.url;
-const ogImageUrl = ogImage.startsWith("http") ? ogImage : `${SITE.url}${ogImage}`;
+const ogImageUrl = ogImage
+  ? ogImage.startsWith("http")
+    ? ogImage
+    : `${SITE.url}${ogImage}`
+  : ogSlug
+    ? `${SITE.url}/og/${ogSlug}.png`
+    : `${SITE.url}/og/index.png`;
 const currentPath = Astro.url.pathname;
 
 const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;

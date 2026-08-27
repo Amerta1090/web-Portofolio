@@ -7,7 +7,7 @@ import { getProjects } from "../../lib/data";
 const projects = getProjects();
 ---
 
-<BaseLayout title="Projects — Abdul Majid Ridwan Tyastonoatmaja" description="Portfolio projects in ML, IoT, web development, and more." canonicalUrl="https://portfolio.abdulmajidr708.workers.dev/projects">
+<BaseLayout title="Projects — Abdul Majid Ridwan Tyastonoatmaja" description="Portfolio projects in ML, IoT, web development, and more." canonicalUrl="https://portfolio.abdulmajidr708.workers.dev/projects" ogSlug="projects">
   <Section title="All Projects" subtitle={projects.length > 0 ? `${projects.length} projects across ML, IoT, web, CLI, and DevOps` : ""}>
     <div class="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
       <ProjectFilter client:load projects={projects} baseUrl="/projects" />
