@@ -57,6 +57,7 @@ interface Experiment {
   icon: React.ReactNode;
   gradient: string;
   thumbnail: string;
+  featured?: boolean;
 }
 
 const experiments: Experiment[] = [
@@ -83,6 +84,7 @@ const experiments: Experiment[] = [
     icon: <Droplets className="w-5 h-5" />,
     gradient: "from-cyan-500 to-teal-500",
     thumbnail: "/images/experiments/liquid-distortion.svg",
+    featured: true,
   },
   {
     id: "audio-visualizer",
@@ -95,6 +97,7 @@ const experiments: Experiment[] = [
     icon: <Music className="w-5 h-5" />,
     gradient: "from-green-500 to-emerald-500",
     thumbnail: "/images/experiments/audio-visualizer.svg",
+    featured: true,
   },
   {
     id: "fractal-explorer",
@@ -107,6 +110,7 @@ const experiments: Experiment[] = [
     icon: <Hexagon className="w-5 h-5" />,
     gradient: "from-amber-500 to-yellow-500",
     thumbnail: "/images/experiments/fractal-explorer.svg",
+    featured: true,
   },
   {
     id: "interactive-canvas",
@@ -119,6 +123,7 @@ const experiments: Experiment[] = [
     icon: <Paintbrush className="w-5 h-5" />,
     gradient: "from-purple-500 to-cyan-500",
     thumbnail: "/images/experiments/interactive-canvas.svg",
+    featured: true,
   },
   {
     id: "strange-attractor",
@@ -359,6 +364,7 @@ const experiments: Experiment[] = [
     icon: <Sparkles className="w-5 h-5" />,
     gradient: "from-blue-500 to-purple-500",
     thumbnail: "/images/experiments/galaxy-formation.svg",
+    featured: true,
   },
 ];
 
@@ -835,6 +841,29 @@ export default function GalleryGrid() {
           );
         })}
       </div>
+
+      {activeCategory === "All" && (
+        <div className="mb-10">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="w-1.5 h-1.5 bg-amber-400 rounded-full" />
+            <h2 className="text-sm font-semibold text-text-secondary uppercase tracking-widest">Featured</h2>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {experiments.filter(e => e.featured).map((exp, i) => (
+              <ExperimentCard
+                key={exp.id}
+                exp={exp}
+                index={i}
+                onLaunch={handleLaunch}
+                isFocused={false}
+                onFocus={() => {}}
+                ref={() => {}}
+                cursorStyle={experimentCursor(exp.id)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       <div
         className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
