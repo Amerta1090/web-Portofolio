@@ -30,7 +30,7 @@
   {
     "id": "location",
     "category": "profile",
-    "keywords": ["where", "location", "based", "live", "city", "address", "country"],
+    "keywords": ["where", "location", "based", "live", "city", "address", "country", "tinggal", "domisili", "lokasi"],
     "question": "Kamu tinggal di mana?",
     "answer": "Aku berlokasi di Tulungagung, East Java, Indonesia. Waktu zone: Asia/Jakarta (WIB)."
   },
@@ -51,7 +51,7 @@
   {
     "id": "contact",
     "category": "contact",
-    "keywords": ["email", "phone", "contact", "reach", "linkedin", "github", "social"],
+    "keywords": ["email", "phone", "contact", "reach", "linkedin", "github", "social", "kontak", "hubungi", "telepon", "nomor"],
     "question": "Bagaimana cara menghubungimu?",
     "answer": "Email: abdulmajidr708@gmail.com | Phone: +6285927450991 | LinkedIn: linkedin.com/in/abdulmajidr708 | GitHub: github.com/Amerta1090"
   },
