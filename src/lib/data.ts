@@ -5,6 +5,7 @@ import type { Profile } from "../types/profile";
 import type { Project } from "../types/projects";
 import type { SkillsData } from "../types/skills";
 import type { Testimonial } from "../types/testimonials";
+import type { FaqItem } from "../types/faq";
 import type { TimelineItem } from "../types/timeline";
 import type { Volunteering } from "../types/volunteering";
 
@@ -16,6 +17,7 @@ import projectsData from "../../data/projects.json";
 import skillsData from "../../data/skills.json";
 import testimonialsData from "../../data/testimonials.json";
 import volunteeringData from "../../data/volunteering.json";
+import faqData from "../../data/faq.json";
 
 export function getProfile(): Profile {
   return profileData as Profile;
@@ -57,6 +59,10 @@ export function getHonors(): Honor[] {
 
 export function getTestimonials(): Testimonial[] {
   return testimonialsData as Testimonial[];
+}
+
+export function getFaq(): FaqItem[] {
+  return faqData as FaqItem[];
 }
 
 function parseDate(dateStr: string | null): { year: number; month: number } | null {

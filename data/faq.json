@@ -1,0 +1,107 @@
+[
+  {
+    "id": "whoami",
+    "category": "profile",
+    "keywords": ["who", "are", "you", "name", "about", "yourself", "introduce"],
+    "question": "Siapa kamu?",
+    "answer": "Aku Abdul Majid Ridwan Tyastonoatmaja — AI/ML Engineer & Systems Builder. Lulusan CS dari Universitas AMIKOM Yogyakarta dengan fokus pada machine learning, data science, dan intelligent systems. Berpengalaman 2 tahun di bidang AI/ML, IoT, dan full-stack development."
+  },
+  {
+    "id": "skills",
+    "category": "skills",
+    "keywords": ["skill", "tech", "stack", "technology", "can", "do", "expertise", "proficiency", "tools"],
+    "question": "Skill apa saja yang kamu kuasai?",
+    "answer": "Core skills: Machine Learning, Deep Learning, NLP, Computer Vision, Recommender Systems, Data Science, Data Engineering, Time Series Forecasting. Programming: Python (expert), JavaScript, C++, SQL, Bash. Frameworks: Django, FastAPI, React.js, TensorFlow. Infra: Docker, MLflow, Prometheus, Grafana, GCP, Linux. IoT: ESP32, Arduino, Raspberry Pi. Total 54 sertifikasi dari DeepLearning.AI, Dicoding, Google Cloud, dan lainnya."
+  },
+  {
+    "id": "projects",
+    "category": "projects",
+    "keywords": ["project", "portfolio", "work", "built", "created", "shipped", "flagship"],
+    "question": "Project apa saja yang pernah kamu buat?",
+    "answer": "Beberapa project flagship: (1) AI Quranic Tafsir Assistant — Hybrid sparse-dense RAG dengan BM25 + E5 + LLaMA 3.2, Context Relevance 0.972; (2) IJO PLIS — IHSG & USD/IDR forecasting platform pakai Facebook Prophet; (3) Red Devil Dynamics — AI goal timing predictor untuk Manchester United pakai survival analysis; (4) SweetLife — Mobile AI wellness app (Bangkit Academy capstone); (5) NyatetDuwit — Offline-first PWA personal finance. Total 18 project ter.Shipping."
+  },
+  {
+    "id": "experience",
+    "category": "experience",
+    "keywords": ["experience", "work", "job", "career", "history", "position", "employed"],
+    "question": "Pengalaman kerja kamu apa saja?",
+    "answer": "Pengalaman kerja: (1) Full-Stack Systems Engineer (AI & Automation) di Ferswit Indonesia — current, ERP, internal tools, automation, VPS infra; (2) AI Engineer di Program Studi Informatika AMIKOM — AI/ML solutions untuk riset; (3) Prompt AI Trainer di Aksoro — prompt engineering & model training; (4) Machine Learning Cohort di Bangkit Academy (Google/ Tokopedia/Gojek/Traveloka) — TensorFlow, NLP, computer vision; (5) Lab Assistant di Forum Asisten — instruksi lab untuk mahasiswa informatika."
+  },
+  {
+    "id": "location",
+    "category": "profile",
+    "keywords": ["where", "location", "based", "live", "city", "address", "country"],
+    "question": "Kamu tinggal di mana?",
+    "answer": "Aku berlokasi di Tulungagung, East Java, Indonesia. Waktu zone: Asia/Jakarta (WIB)."
+  },
+  {
+    "id": "certifications",
+    "category": "certifications",
+    "keywords": ["certificate", "certification", "credential", "badge", "course", "training", "completed"],
+    "question": "Sertifikasi apa saja yang kamu miliki?",
+    "answer": "Total 54 sertifikasi, antara lain: DeepLearning.AI TensorFlow Developer Specialization, Machine Learning Specialization (Andrew Ng), Advanced Computer Vision with TensorFlow, NLP in TensorFlow, GANs, Generative AI for Everyone. Dicoding: Machine Learning Terapan, Membangun Sistem ML, Prompt Engineering untuk Software Developer, Fundamental Pemrosesan Data, Belajar Dasar AI. Google Cloud Skills Boost: ML APIs, Document AI, Vertex AI Prompt Design. EF SET English C2 Proficient (72/100)."
+  },
+  {
+    "id": "availability",
+    "category": "profile",
+    "keywords": ["available", "hire", "freelance", "opportunity", "collaboration", "work together", "contact"],
+    "question": "Apakah kamu tersedia untuk kolaborasi atau pekerjaan?",
+    "answer": "Ya, aku terbuka untuk kolaborasi, freelance, dan peluang kerja. Saat ini aktif sebagai Full-Stack Systems Engineer (AI & Automation) di Ferswit Indonesia. Kontak: abdulmajidr708@gmail.com atau LinkedIn: linkedin.com/in/abdulmajidr708."
+  },
+  {
+    "id": "contact",
+    "category": "contact",
+    "keywords": ["email", "phone", "contact", "reach", "linkedin", "github", "social"],
+    "question": "Bagaimana cara menghubungimu?",
+    "answer": "Email: abdulmajidr708@gmail.com | Phone: +6285927450991 | LinkedIn: linkedin.com/in/abdulmajidr708 | GitHub: github.com/Amerta1090"
+  },
+  {
+    "id": "resume",
+    "category": "profile",
+    "keywords": ["resume", "cv", "curriculum", "vitae", "download"],
+    "question": "Di mana resume kamu?",
+    "answer": "Resume bisa diakses di halaman /resume di website ini."
+  },
+  {
+    "id": "ai_ml",
+    "category": "skills",
+    "keywords": ["artificial", "intelligence", "machine", "learning", "deep", "neural", "model", "training", "ai", "ml"],
+    "question": "Ceritakan tentang keahlian AI/ML kamu.",
+    "answer": "Keahlian AI/ML: Machine Learning (5/5), Deep Learning (4/5), NLP (4/5), Computer Vision (3/5), Recommender Systems (4/5), LLM (3/5), RAG (3/5), AI Agents (3/5). Tools: TensorFlow, PyTorch, Scikit-learn, MLflow. Project unggulan: RAG untuk Tafsir Ibn Kathir (Hybrid BM25 + E5 + LLaMA), food classification dengan computer vision (SweetLife), time series forecasting (IJO PLIS pakai Prophet)."
+  },
+  {
+    "id": "iot",
+    "category": "skills",
+    "keywords": ["iot", "embedded", "hardware", "sensor", "arduino", "esp32", "esp8266", "raspberry", "physical"],
+    "question": "Pengalaman kamu di IoT dan embedded systems?",
+    "answer": "IoT & Embedded: ESP8266/ESP32 (4/5), Arduino (4/5), Raspberry Pi (3/5), Electronic Circuit Design (3/5). Project: Smart Laundry Bin (load sensor + Wemos D1 R1), Automated Chicken Coop Environment Controller (DHT sensor + relay + fan + heating), selama program Samsung Innovation Campus. Stack: Blynk IoT platform, embedded C++, sensor integration."
+  },
+  {
+    "id": "web",
+    "category": "skills",
+    "keywords": ["web", "development", "frontend", "backend", "fullstack", "django", "react", "javascript", "html", "css"],
+    "question": "Kemampuan web development kamu?",
+    "answer": "Full-stack web: Django (4/5), React.js (3/5), JavaScript (4/5), HTML (5/5), CSS (4/5), FastAPI (3/5), Responsive Web Design (4/5), PWAs (3/5). Project: Retro Game Portfolio (Astro + React + Tailwind + Three.js), NyatetDuwit PWA (IndexedDB, offline-first), IJO PLIS (Django + PostgreSQL + Chart.js), Resepku (Next.js 13+ multi-modal recipe discovery)."
+  },
+  {
+    "id": "portfolio",
+    "category": "meta",
+    "keywords": ["portfolio", "website", "this", "site", "built with", "tech stack", "made"],
+    "question": "Website portofolio ini dibuat dengan apa?",
+    "answer": "Website ini dibangun dengan Astro (SSG) + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.js/R3F + TypeScript + Bun. 53 eksperimen interaktif di Creative Lab, GitHub Universe visualization, micro-interactions library, dan tentu saja — aku, assistant bot deterministik tanpa backend."
+  },
+  {
+    "id": "creative_lab",
+    "category": "meta",
+    "keywords": ["lab", "experiment", "creative", "interactive", "demo", "playground", "gallery"],
+    "question": "Apa itu Creative Lab?",
+    "answer": "Creative Lab adalah kumpulan 53 eksperimen matematika, sains, dan interaktif — semuanya pure frontend. Termasuk: Strange Attractors, Fractal Explorer, Audio Visualizer, Quantum Circuit Builder, Neural Network Art, Math Escape Room, Galaxy Formation, dan banyak lagi. Setiap eksperimen menampilkan konsep kompleks secara visual dan interaktif. Cek di /gallery."
+  },
+  {
+    "id": "deterministic",
+    "category": "meta",
+    "keywords": ["how", "work", "deterministic", "engine", "mechanism", "ai", "not", "real", "llm", "backend"],
+    "question": "Kamu bekerja bagaimana? Apakah ini AI sungguhan?",
+    "answer": "Aku adalah ilusi AI yang 100% deterministik — tanpa backend, tanpa LLM, tanpa model. Yang aku pakai: (1) Intent engine berbasis keyword matching dengan bobot, (2) ELIZA-style fallback dengan refleksi pronomina, (3) FAQ knowledge base dari data profil, skill, dan project. Klik tombol 'Buka Engine' untuk melihat mekanisme di balik layar — transparansi adalah bagian dari craft."
+  }
+]

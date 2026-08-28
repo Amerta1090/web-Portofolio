@@ -30,6 +30,9 @@ const schemas = {
   "certifications.json": {
     requiredItems: ["title", "issuer"],
   },
+  "faq.json": {
+    requiredItems: ["id", "category", "keywords", "question", "answer"],
+  },
 };
 
 let errors = 0;

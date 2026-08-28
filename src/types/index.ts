@@ -6,6 +6,7 @@ export type { Experience } from "./experience";
 export type { Volunteering } from "./volunteering";
 export type { Honor } from "./honors";
 export type { Testimonial } from "./testimonials";
+export type { FaqItem } from "./faq";
 export type { TimelineItem } from "./timeline";
 export type {
   GitHubRepo,
