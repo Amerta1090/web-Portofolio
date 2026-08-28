@@ -1,0 +1,187 @@
+# Sprint Planning — "detAIministic" (Ilusi AI Tanpa Backend)
+
+> **PRD:** `docs/prd-detAIministic.md` (WAJIB dibaca sebelum mengerjakan task di sprint ini).
+> **Status awal:** Draft rencana. Tracker dipindah per eksekusi via protokol prompt.txt.
+> **Target:** Ilusi AI 100% frontend — Assistant Bot (P0) + Command Palette (P0) minimum, lanjut Tracery (P1) + Recommender (P1) bila ruang.
+
+---
+
+## Slicing & Prioritas
+
+| Sprint/Priority | Fitur | ID task | Estimasi |
+|-----------------|-------|---------|----------|
+| **P0** | Assistant Bot | A1–A8 | 8 task |
+| **P0** | Command Palette | B1–B6 | 6 task |
+| P1 | Tracery generator | C1–C4 | 4 task |
+| P1 | Recommender | D1–D4 | 4 task |
+| P2 | Sentiment gauge + Markov (lab) | E1–E6 | backlog |
+
+---
+
+## P0 — Assistant Bot (`detAIministic chat`) — 8 microtasks
+
+### A1. Data & knowledge base
+- [ ] Buat `data/faq.json`: array intent `{ id, category, keywords[], question, answer }`. Isi 14–18 intent umum (stack, skill, availability/pengalaman 2 tahun, proyek flagship, sertifikasi, kontak, lokasi, resume, dsb.) — ambil fakta dari `data/profile.json`, `skills.json`, `projects.json`, `experience.json`, `certifications.json` (JANGAN mengarang angka; profil/user adalah sumber).
+- [ ] Tambah validasi di `scripts/validate-data.mjs` (pola schema zod) untuk `faq.json`.
+- [ ] Buat getter `getFaq()` di `src/lib/data.ts` + tambahkan ke barrel `src/lib/index.ts`.
+- **AC:** `bun run validate-data` lulus; unit test getter.
+- **File:** `data/faq.json`, `scripts/validate-data.mjs`, `src/lib/data.ts`, `src/lib/index.ts`
+
+### A2. Intent engine (pure lib)
+- [ ] `src/lib/assistant/intentEngine.ts`: fungsi `matchIntent(input, intents) → { intent, score } | null`. Skor = jumlah keyword word-boundary match (regex `\bkw\b`, case-insensitive), bobot kata. Threshold konfig.
+- [ ] Export `topIntents(input, n)` untuk multi-match.
+- **AC:** unit test: match exact, typo-parsial, keyword di dalam kata (anti-false-positive), no-match → null.
+- **File:** `src/lib/assistant/intentEngine.ts` (+ `intentEngine.test.ts`)
+
+### A3. ELIZA-style fallback
+- [ ] `src/lib/assistant/eliza.ts`: function `elizaRespond(input) → string`. Minimal: normalize, deret pattern (regex) ranking keyword, refleksi pronomina (`i am`→`you are`, `my`→`your`), generic promoter fallback ("Bisa diperjelas? Aku paling paham soal skill, proyek, dan pengalaman."). Jangan mengarang fakta.
+- **AC:** unit test reflection, keyword hit, fallback, empty input.
+- **File:** `src/lib/assistant/eliza.ts` (+ test)
+
+### A4. Assistant engine compositor
+- [ ] `src/lib/assistant/engine.ts`: `respond(input) → { type: 'intent'|'faq'|'eliza'|'greeting'|'help', text, payload? }`. Urutan: greeting/help khusus → intent → faq exact → eliza. Ini pure, tanpa DOM.
+- [ ] Handler khusus: "help", "whoami", "proyek/skill" yang menarik dari data layer & repo (top repos dari `.cache/github` optional via getter).
+- **AC:** unit test setiap cabang; deterministik (input sama → output sama).
+- **File:** `src/lib/assistant/engine.ts` (+ test)
+
+### A5. Streaming / thinking hook
+- [ ] `src/lib/assistant/useAssistantSession.ts`: state messages `{id, role, text, stage}` (idle/thinking/streaming/done). Hook `send(message)`: set stage=thinking (300–500ms, teks status kontekstual), jalankan engine, lalu stream karakter via interval/RAF. Dukungan `prefers-reduced-motion` (skip thinking+instan). Untuk test: terima prop/inject untuk buat deterministik/sinkron.
+- [ ] Abort/interrupt saat user ketik lagi.
+- **AC:** unit + hook test (RTL) — thinking lalu selesai, reduce-motion skip, abort.
+- **File:** `src/lib/assistant/useAssistantSession.ts` (+ test)
+
+### A6. AssistantBot island (UI utama)
+- [ ] `src/islands/AssistantBot.tsx` (client:load): FAB (ikon MessageSquare/Sparkles) fixed bottom-right → slide-up drawer (Framer Motion spring, z-index tinggi di atas Ambient/CustomCursor).
+- [ ] Header drawer (judul "detAIministic assistant", sub "deterministic · no LLM"), FAQ quick-pick chips (dari `getFaq()`), message list (role user/assistant), input + Enter, tombol reset, tombol ❌ tutup.
+- [ ] Render balasan dengan TypewriterText / streaming dari hook; bubbles amber untuk assistant, dark untuk user.
+- [ ] Tombol "buka engine" → small modal (Radix Dialog) membongkar mekanisme deterministik (transparansi).
+- [ ] A11y: toolbar, ARIA (dialog role, live region untuk messages), keyboard (Esc tutup, focus masuk input).
+- **AC:** unit test (render, kirim msg → muncul balasan, chips, tutup, reset, engine modal). E2E: open → click chip → terlihat balasan → tutup.
+- **File:** `src/islands/AssistantBot.tsx` (+ test), polish di `theme.css` (token), `global.css` jika perlu class util.
+
+### A7. Mount + integrasi global
+- [ ] Pasang `<AssistantBot client:load />` di `src/layouts/BaseLayout.astro` (semua halaman). Cek z-index utk tidak menutupi CustomCursor/Ambient/MorphingNavigation.
+- **AC:** build 45 halaman lulus; muncul di semua page preview.
+- **File:** `src/layouts/BaseLayout.astro`
+
+### A8. FAQ JSON-LD + QA sprint P0
+- [ ] Tambah `FAQPage` JSON-LD script (Q/A dari `getFaq()`) di `BaseLayout.astro`/`index.astro` (build-time SEO).
+- [ ] Jalankan full `bun run test`, `bun run test:e2e`, `bun run typecheck`, `bun run lint`, `bun run build`. Update gallery toHaveCount jika tak berubah (tidak — bot bukan eksperimen gallery).
+- **AC:** seluruh suite hijau; bot tampil & berfungsi di e2e.
+- **File:** lintas; commit `A0: assistant bot e2e`.
+
+---
+
+## P0 — Command Palette (fuzzy search) — 6 microtasks
+
+### B1. Search index builder
+- [ ] `src/lib/search/buildIndex.ts`: build item index dari `getProfile/getSkills/getProjects/getExperience/getCertifications` + halaman (NAV_ITEMS/FOOTER_LINKS) + eksperimen lab (dari `GalleryGrid` registry / `experiments.ts`). Item: `{ id, type, title, description, keywords[], target }`.
+- **AC:** unit test jumlah & jenis item; target URL benar.
+- **File:** `src/lib/search/buildIndex.ts` (+ test)
+
+### B2. Fuzzy matcher (manual Bitap ATAU fuse.js)
+- [ ] `src/lib/search/fuzzy.ts`: pilih & implementasikan matcher — weighted (title>description), typo-tolerant, return skor + pangkat. Boleh pakai `fuse.js` (tambah dependency) ATAU tulis Bitap dari nol (preferensi repo "from scratch"; konfirmasi via PRD §6).
+- [ ] Setup weighted scoring & ranking.
+- **AC:** unit test: typo, substring, ranking title-first, no-result.
+- **File:** `src/lib/search/fuzzy.ts` (+ test), `package.json` bila fuse.js
+
+### B3. CommandPalette island — trigger & overlay
+- [ ] `src/islands/CommandPalette.tsx` (client:load): global `keydown` listener `meta/ctrl+K` untuk buka; tombol header ikon cari; overlay Radix Dialog (atau custom) full top; input; hasil list; keyboard nav (Arrow/Enter/Esc); highlight match; status "thinking" singkat (debounce) sebelum hasil.
+- [ ] Action per type: skill → scroll `#skills`; proyek → `/projects/[slug]`; lab → `/gallery#id`; halaman → navigate.
+- **AC:** unit test render, nav keyboard, action dispatch. E2E: buka via Cmd+K, ketik, pilih item → navigasi.
+- **File:** `src/islands/CommandPalette.tsx` (+ test)
+
+### B4. Mount global + aksesibilitas
+- [ ] Pasang `<CommandPalette client:load />` di `BaseLayout.astro`. Fokus trap, focus input saat buka, Esc tutup & restore focus, ARIA attributes (listbox/option roles).
+- **AC:** build+test+e2e lulus; keyboard-first usable.
+- **File:** `src/layouts/BaseLayout.astro`
+
+### B5. Visual polish command palette
+- [ ] Styling konsisten tema (amber highlight match, Fraunces/Inter, token CSS), kategori segmented (Skill/Proyek/Pengalaman/Lab/Halaman), empty-state.
+- **AC:** review visual; token via CSS vars.
+- **File:** `src/islands/CommandPalette.tsx`, `theme.css`/`global.css`
+
+### B6. QA sprint P0 Command Palette
+- [ ] Full suite hijau (`test`, `test:e2e`, `typecheck`, `lint`, `build`).
+- **AC:** hijau total.
+- **File:** lintas; commit `B6: command palette e2e`.
+
+---
+
+## P1 — Tracery capability generator — 4 microtasks
+
+### C1. Lightweight Tracery core
+- [ ] `src/lib/tracery/tracery.ts`: implement replace-from-grammar (JSON: symbol → array expansions, sub-symbol `#x#`, modifier `.capitalize`). Tulis sendiri (~60 baris) untuk menghindari dependency & selaras persona.
+- **AC:** unit test ekspansi berulang, sub-simbol, modifier, no infinite-recursion guard.
+- **File:** `src/lib/tracery/tracery.ts` (+ test)
+
+### C2. Capability grammars (konten)
+- [ ] `data/capability-grammars.json`: grammar utk one-liner capability, blurb proyek, random fact (ambil vocab dari skills/proyek/persona). Tak mengarang fakta.
+- [ ] Validate-data schema baru.
+- **AC:** validate-data lulus; unit test menghasilkan variasi deterministik.
+- **File:** `data/capability-grammars.json`, `scripts/validate-data.mjs`
+
+### C3. CapabilityGenerator component
+- [ ] `src/components/molecules/CapabilityGenerator.tsx`: tampilkan satu hasil, tombol hasil "generate lagi", toggle "lihat grammar" (craft reveal menampilkan JSON source).
+- **AC:** unit test generate & toggle.
+- **File:** `src/components/molecules/CapabilityGenerator.tsx` (+ test)
+
+### C4. Mount di index + QA P1
+- [ ] Pasang di `index.astro` (About atau Hero area). Full suite hijau.
+- **AC:** hijau total.
+- **File:** `src/pages/index.astro`; commit `C4: tracery capability gen`.
+
+---
+
+## P1 — Content-based Recommender — 4 microtasks
+
+### D1. Vector & similarity lib
+- [ ] `src/lib/recommend/similarity.ts`: `cosine(a,b)` atas tag/skill vectors dari eksperimen (`EXPERIMENT_CATEGORIES`/meta) & proyek (`projects[].skills`).
+- **AC:** unit test cosine math & edge cases (empty vector).
+- **File:** `src/lib/recommend/similarity.ts` (+ test)
+
+### D2. Interaction tracking
+- [ ] `src/lib/recommend/useRecommendation.ts`: track view/hover/click via IntersectionObserver + handlers → accumulative "liked" vector (state, optional localStorage persist). Rank `recommend(current, all, history)`.
+- **AC:** unit/hook test: akumulasi & re-rank.
+- **File:** `src/lib/recommend/useRecommendation.ts` (+ test)
+
+### D3. RecommendedRow component
+- [ ] `src/components/organisms/RecommendedRow.tsx`: strip "Karena kamu jelajahi X, coba Y" (tampilkan 3–4 kartu ke rekomendasi). Kosong & disabled bila belum ada interaksi.
+- **AC:** unit test render & empty-state.
+- **File:** `src/components/organisms/RecommendedRow.tsx` (+ test)
+
+### D4. Integrasi ke gallery/projects + QA P1
+- [ ] Pasang row di `gallery.astro` (di bawah grid) &/atau `projects/index.astro`. Full suite hijau.
+- **AC:** hijau total.
+- **File:** `src/pages/gallery.astro` &/or `src/pages/projects/index.astro`; commit `D4: recommender row`.
+
+---
+
+## P2 (Backlog) — Lab experiments
+
+### E1–E3. Sentiment Gauge (lab exp ke-26)
+- `E1`: `src/lib/sentiment/afinn.ts` (inline AFINN table + `score(text)`). 
+- `E2`: `src/islands/experiments/SentimentGauge.tsx` (ketik → gauge + per-word scoring) + thumbnail svg.
+- `E3`: registrasi di `GalleryGrid.tsx` + kategori + unit/E2E test + update `toHaveCount` (25→26) + mount.
+
+### E4–E6. Markov generator (lab exp ke-27)
+- `E4`: `src/lib/markov/markov.ts` (build transition matrix dari corpus data saat build → JSON; `generate` walk).
+- `E5`: `src/islands/experiments/MarkovGenerator.tsx` (generasi bio/caption ala gaya sendiri; tag "generated, not AI") + thumbnail.
+- `E6`: registrasi GalleryGrid + test + `toHaveCount` (26→27).
+
+---
+
+## Protokol Verifikasi (per task — wajib)
+
+1. `bun run build` lulus sebelum lanjut.
+2. `bun run test` lulus (min 10 unit per komponen baru).
+3. `bun run test:e2e` — targeted per feature; full 1× di akhir.
+4. `bun run typecheck` & `bun run lint` lulus.
+5. Komponen baru WAJIB ter-mount di ≥1 halaman `.astro`.
+6. Token warna/teks via CSS vars (Rule 3).
+7. Deterministik: input sama → output sama; test bebas timing-flake (skip thinking di test).
+
+## Catatan Lingkungan (dari AGENTS.md)
+- Vitest exclude `.opencode/**`. Playwright perlu `bunx playwright install chromium` bila hilang.
+- Workflow: `bun run serve` sekali per sesi → playwright reuse server (tanpa build ulang).
+- WebGL-heavy e2e bisa timeout saat paralel penuh → re-run terisolasi.
