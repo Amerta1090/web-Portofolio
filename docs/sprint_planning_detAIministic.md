@@ -115,9 +115,10 @@
 - **Catatan (B5):** Kategori segmented row (`CATEGORIES`: Semua/Profil/Skill/Proyek/Pengalaman/Sertifikasi/Halaman/Lab) di bawah input — pill `rounded-full`, aktif `bg-brand/15 text-brand` (`aria-pressed`), non-aktif `text-text-secondary`. `setFilter` → `visible = filter==="all" ? results : results.filter(type)`. Semua render + keyboard nav (Arrow/Enter) + count footer kini memakai `visible`. Segmen & opsi pakai `tabIndex={-1}` (keluar dari alur Tab → focus trap tetap input↔clear; keyboard tetap via input + arrow). Highlight match = `<mark>` amber; empty-state & hint; type badges per item. Semua styling via token CSS var (bg-bg-primary/bg-bg-secondary, border-border, brand). Unit: +1 filter segmen (14 total). Verifikasi: lint/typecheck bersih, build 48 page ✓.
 
 ### B6. QA sprint P0 Command Palette
-- [ ] Full suite hijau (`test`, `test:e2e`, `typecheck`, `lint`, `build`).
+- [x] Full suite hijau (`test`, `test:e2e`, `typecheck`, `lint`, `build`).
 - **AC:** hijau total.
 - **File:** lintas; commit `B6: command palette e2e`.
+- **Catatan (B6):** e2e baru `e2e/command-palette.spec.ts` (4 test: buka via tombol cari header, buka via Ctrl+K + ketik "galaxy" → hasil, Enter → navigasi `/gallery#galaxy-formation`, Escape → tutup). **Deteksi race hydration:** island termount terakhir setelah ~60 island lain → hydrasi laku lambat; Ctrl+K/click pertama di-e2e hilang sebelum listener window terdaftar → dialog tak pernah terbuka. Fix: island set `window.__COMMAND_PALETTE_READY = true` di effect yang mendaftarkan listener; e2e `waitForFunction` tunggu flag tsb sebelum trigger → deterministik. Verifikasi penuh: unit 531/531 (41 file), e2e 139 (136 ✓ + 3 flake WebGL galeri yang pass terisolasi), typecheck HANYA error pre-existing (canvas mock `transferFromImageBitmap`, `og/[...route].ts`, `rss.xml.ts` — nol dari file CommandPalette), lint ZERO a11y diagnostics (735 = kategori non-a11y pre-existing yg di-ignore; `biome check` pada `CommandPalette.tsx`/`.test.tsx` = bersih), build:fast 48 page ✓.
 
 ---
 

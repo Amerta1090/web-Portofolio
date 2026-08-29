@@ -3,6 +3,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { type SearchItem, type SearchItemType, buildSearchIndex } from "../lib/search/buildIndex";
 import { type ScoredSearch, searchIndex } from "../lib/search/fuzzy";
 
+declare global {
+  interface Window {
+    __COMMAND_PALETTE_READY?: boolean;
+  }
+}
+
 export const PALETTE_OPEN_EVENT = "opencode:palette";
 
 const TYPE_LABEL: Record<SearchItemType, string> = {
@@ -125,6 +131,7 @@ export default function CommandPalette() {
     const onOpenEvent = () => setOpen(true);
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener(PALETTE_OPEN_EVENT, onOpenEvent);
+    if (typeof window !== "undefined") window.__COMMAND_PALETTE_READY = true;
     return () => {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener(PALETTE_OPEN_EVENT, onOpenEvent);
