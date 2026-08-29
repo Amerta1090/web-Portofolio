@@ -148,6 +148,7 @@ pinned-repos.json, all-repos.json, languages.json, commit-activity.json, contrib
 | NeuralNetworkArt.tsx | — | Tiny 2-6-1 MLP learning XOR/Circle/Spiral, activation particles, loss curve |
 | MathEscapeRoom.tsx | — | 5 puzzle rooms (algebra/geometry/calculus/number-theory/probability), timer, hints |
 | FractalFlameSync.tsx | — | IFS flame fractal with audio FFT sync, 6 variations, mic/file input |
+| AssistantBot.tsx | `client:load` | detAIministic assistant — FAB → drawer, intent/ELIZA engine, streaming (reduced-motion→instant), engine transparency modal. Mounted globally in BaseLayout. |
 
 ### Key Atoms (under `src/components/atoms/`)
 | File | Type | Notes |
@@ -444,3 +445,11 @@ index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skil
   - **Build verified**: `bun run build` succeeds (45 pages)
   - **Unit tests**: `bun run test` — 729 passed (53 files, +88 new tests)
   - **E2E tests**: `bun run test:e2e` — 207 passed (+25 new tests)
+
+### Sprint detAIministic (in progress)
+- **Sprint plan**: `docs/sprint_planning_detAIministic.md` · **PRD**: `docs/prd-detAIministic.md`
+- **Filosofi**: ilusi AI frontend tanpa backend — SSG murni, deterministik (input sama → output sama; `Math.random()` dilarang, pakai hash FNV-1a via `hashString`/`hashIndex`).
+- **P0 (A1–A8)**: ✅ COMPLETE — 64 unit assistant + 9 island + 3 seo + 6 e2e.
+  - **A1** data/faq.json (15 intent) + schema validate-data + `getFaq()`/`buildFaqLd()`; **A2** `src/lib/assistant/intentEngine.ts` (word-boundary keyword match, weight, threshold); **A3** `src/lib/assistant/eliza.ts` (patterns + refleksi pronomina 2-pass placeholder, pick deterministik); **A4** `src/lib/assistant/engine.ts` (compositor: empty→help→special cmd→greeting→intent→eliza; `respond→AssistantResponse{type,text,payload}`); **A5** `src/lib/assistant/useAssistantSession.ts` (thinking+streaming hook, reduced-motion→instant); **A6** `src/islands/AssistantBot.tsx` (FAB→drawer, quick-pick chips, bubbles amber/dark, engine modal, ARIA); **A7** mount `<AssistantBot client:load/>` di BaseLayout (semua halaman, build 48 page); **A8** FAQPage JSON-LD valid (`set:html` — **catatan**: script Person schema bawaan masih `is:inline`+source-JS = pre-existing, out of scope).
+  - **Pelajaran**: JSON-LD di Astro jangan pakai `is:inline`+`{JSON.stringify…}` (emits source-JS, invalid utk SEO); pakai `<script type="application/ld+json" set:html={JSON.stringify(obj)}/>`. Framer Motion `AnimatePresence` tak unmount saat exit di jsdom → mock `motion.*`/`AnimatePresence` passthrough utk test deterministik; deteksi reduced-motion via `matchMedia` (mock `matches:true` utk instant reply). z-index: CustomCursor 9999/9998, FAB 9997, drawer 9996, engine modal 9999.
+- **P1 (B1–B6)**: pending — Command Palette (fuzzy search over skills/projects/lab/pages)+next.
