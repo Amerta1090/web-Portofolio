@@ -25,6 +25,17 @@ const TYPE_BADGE: Record<SearchItemType, string> = {
   lab: "bg-pink-500/15 text-pink-300",
 };
 
+const CATEGORIES: Array<{ value: SearchItemType | "all"; label: string }> = [
+  { value: "all", label: "Semua" },
+  { value: "person", label: "Profil" },
+  { value: "skill", label: "Skill" },
+  { value: "project", label: "Proyek" },
+  { value: "experience", label: "Pengalaman" },
+  { value: "certification", label: "Sertifikasi" },
+  { value: "page", label: "Halaman" },
+  { value: "lab", label: "Lab" },
+];
+
 const PLACEHOLDER = "Cari skill, proyek, lab, halaman…";
 
 function highlight(text: string, query: string): React.ReactNode {
@@ -48,6 +59,7 @@ export default function CommandPalette() {
   const items = useMemo(() => buildSearchIndex(), []);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState<SearchItemType | "all">("all");
   const [active, setActive] = useState(0);
   const [thinking, setThinking] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -60,6 +72,8 @@ export default function CommandPalette() {
     () => searchIndex(query, items, { limit: 12 }),
     [query, items],
   );
+
+  const visible = filter === "all" ? results : results.filter((r) => r.item.type === filter);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -74,12 +88,12 @@ export default function CommandPalette() {
       if (!open) return;
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setActive((a) => (results.length ? (a + 1) % results.length : 0));
+        setActive((a) => (visible.length ? (a + 1) % visible.length : 0));
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        setActive((a) => (results.length ? (a - 1 + results.length) % results.length : 0));
+        setActive((a) => (visible.length ? (a - 1 + visible.length) % visible.length : 0));
       } else if (e.key === "Enter") {
-        const hit = results[active];
+        const hit = visible[active];
         if (hit) {
           e.preventDefault();
           activate(hit.item);
@@ -115,7 +129,7 @@ export default function CommandPalette() {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener(PALETTE_OPEN_EVENT, onOpenEvent);
     };
-  }, [open, results, active]);
+  }, [open, visible, active]);
 
   useEffect(() => {
     if (open) {
@@ -143,6 +157,7 @@ export default function CommandPalette() {
   function close() {
     setOpen(false);
     setQuery("");
+    setFilter("all");
     setThinking(false);
     if (thinkingTimer.current) clearTimeout(thinkingTimer.current);
   }
@@ -218,13 +233,35 @@ export default function CommandPalette() {
           )}
         </div>
 
-        {results.length > 0 ? (
+        <div className="flex items-center gap-1 overflow-x-auto border-b border-border px-3 py-2">
+          {CATEGORIES.map((c) => {
+            const isActive = filter === c.value;
+            return (
+              <button
+                key={c.value}
+                type="button"
+                tabIndex={-1}
+                onClick={() => setFilter(c.value)}
+                aria-pressed={isActive}
+                className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                  isActive
+                    ? "bg-brand/15 text-brand"
+                    : "text-text-secondary hover:bg-bg-secondary hover:text-text-primary"
+                }`}
+              >
+                {c.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {visible.length > 0 ? (
           <ul
             ref={listRef}
             aria-label="Hasil pencarian"
             className="max-h-[min(60vh,420px)] overflow-y-auto py-1"
           >
-            {results.map((r, i) => {
+            {visible.map((r, i) => {
               const item = r.item;
               const selected = i === active;
               return (
@@ -280,7 +317,7 @@ export default function CommandPalette() {
             </span>
           </span>
           <span className="flex items-center gap-1">
-            <span>{results.length} hasil</span>
+            <span>{visible.length} hasil</span>
           </span>
         </div>
       </dialog>

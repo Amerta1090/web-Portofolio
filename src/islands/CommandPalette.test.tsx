@@ -181,4 +181,19 @@ describe("CommandPalette", () => {
     fireEvent.keyDown(window, { key: "Tab" });
     expect(document.activeElement).toBe(input);
   });
+
+  it("filters results by category segment", () => {
+    render(<CommandPalette />);
+    openWithKey();
+    const input = screen.getByRole("searchbox");
+    // "python" spans skills, certifications, experience, and projects.
+    fireEvent.change(input, { target: { value: "python" } });
+    const allCount = getOptions().length;
+    expect(allCount).toBeGreaterThan(1);
+
+    fireEvent.click(screen.getByRole("button", { name: "Proyek" }));
+    const filtered = getOptions();
+    expect(filtered.length).toBeLessThan(allCount);
+    expect(filtered.length).toBeGreaterThan(0);
+  });
 });
