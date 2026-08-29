@@ -21,48 +21,55 @@
 ## P0 — Assistant Bot (`detAIministic chat`) — 8 microtasks
 
 ### A1. Data & knowledge base
-- [ ] Buat `data/faq.json`: array intent `{ id, category, keywords[], question, answer }`. Isi 14–18 intent umum (stack, skill, availability/pengalaman 2 tahun, proyek flagship, sertifikasi, kontak, lokasi, resume, dsb.) — ambil fakta dari `data/profile.json`, `skills.json`, `projects.json`, `experience.json`, `certifications.json` (JANGAN mengarang angka; profil/user adalah sumber).
-- [ ] Tambah validasi di `scripts/validate-data.mjs` (pola schema zod) untuk `faq.json`.
-- [ ] Buat getter `getFaq()` di `src/lib/data.ts` + tambahkan ke barrel `src/lib/index.ts`.
+- [x] Buat `data/faq.json`: array intent `{ id, category, keywords[], question, answer }`. Isi 14–18 intent umum (stack, skill, availability/pengalaman 2 tahun, proyek flagship, sertifikasi, kontak, lokasi, resume, dsb.) — ambil fakta dari `data/profile.json`, `skills.json`, `projects.json`, `experience.json`, `certifications.json` (JANGAN mengarang angka; profil/user adalah sumber).
+- [x] Tambah validasi di `scripts/validate-data.mjs` (pola schema zod) untuk `faq.json`.
+- [x] Buat getter `getFaq()` di `src/lib/data.ts` + tambahkan ke barrel `src/lib/index.ts` (barrel baru dibuat).
 - **AC:** `bun run validate-data` lulus; unit test getter.
 - **File:** `data/faq.json`, `scripts/validate-data.mjs`, `src/lib/data.ts`, `src/lib/index.ts`
+  - Catatan: 15 intent (whoami, skills, projects, experience, location, certifications, availability, contact, resume, ai_ml, iot, web, portfolio, creative_lab, deterministic). Type `src/types/faq.ts` + barrel `src/types/index.ts`. Test `src/lib/data.test.ts` (4 unit). validate-data ✓, typecheck (no new err), lint (3 style organizeImports — pre-existing pattern), build 48 pages ✓.
 
 ### A2. Intent engine (pure lib)
-- [ ] `src/lib/assistant/intentEngine.ts`: fungsi `matchIntent(input, intents) → { intent, score } | null`. Skor = jumlah keyword word-boundary match (regex `\bkw\b`, case-insensitive), bobot kata. Threshold konfig.
-- [ ] Export `topIntents(input, n)` untuk multi-match.
+- [x] `src/lib/assistant/intentEngine.ts`: fungsi `matchIntent(input, intents) → { intent, score } | null`. Skor = jumlah keyword word-boundary match (regex `\bkw\b`, case-insensitive), bobot kata. Threshold konfig.
+- [x] Export `topIntents(input, n)` untuk multi-match.
 - **AC:** unit test: match exact, typo-parsial, keyword di dalam kata (anti-false-positive), no-match → null.
 - **File:** `src/lib/assistant/intentEngine.ts` (+ `intentEngine.test.ts`)
+  - Catatan: left-boundary guard (non-word sebelum keyword) meng-*handle* anti-false-positive (ai dalam "said"), right unconstrained utk plural/partial ("skill"→"skills"). `intent.weight` boost. `intentsFromFaq()` helper. Test 21 unit ✓. Threshold/default config via `IntentEngineConfig`.
 
 ### A3. ELIZA-style fallback
-- [ ] `src/lib/assistant/eliza.ts`: function `elizaRespond(input) → string`. Minimal: normalize, deret pattern (regex) ranking keyword, refleksi pronomina (`i am`→`you are`, `my`→`your`), generic promoter fallback ("Bisa diperjelas? Aku paling paham soal skill, proyek, dan pengalaman."). Jangan mengarang fakta.
+- [x] `src/lib/assistant/eliza.ts`: function `elizaRespond(input) → string`. Minimal: normalize, deret pattern (regex) ranking keyword, refleksi pronomina (`i am`→`you are`, `my`→`your`), generic promoter fallback ("Bisa diperjelas? Aku paling paham soal skill, proyek, dan pengalaman."). Jangan mengarang fakta.
 - **AC:** unit test reflection, keyword hit, fallback, empty input.
 - **File:** `src/lib/assistant/eliza.ts` (+ test)
+  - Catatan: refleksi pronomina pakai teknik placeholder unique (hindari cascade me→you→me). Pemilihan template deterministik via FNV-1a hash input (bukan Math.random → deterministik). `indexOfKeyword` dengan left-boundary guard. Test 14 unit ✓.
 
 ### A4. Assistant engine compositor
-- [ ] `src/lib/assistant/engine.ts`: `respond(input) → { type: 'intent'|'faq'|'eliza'|'greeting'|'help', text, payload? }`. Urutan: greeting/help khusus → intent → faq exact → eliza. Ini pure, tanpa DOM.
-- [ ] Handler khusus: "help", "whoami", "proyek/skill" yang menarik dari data layer & repo (top repos dari `.cache/github` optional via getter).
+- [x] `src/lib/assistant/engine.ts`: `respond(input) → { type: 'intent'|'faq'|'eliza'|'greeting'|'help', text, payload? }`. Urutan: greeting/help khusus → intent → faq exact → eliza. Ini pure, tanpa DOM.
+- [x] Handler khusus: "help", "whoami", "proyek/skill" yang menarik dari data layer & repo (top repos dari `.cache/github` optional via getter).
 - **AC:** unit test setiap cabang; deterministik (input sama → output sama).
 - **File:** `src/lib/assistant/engine.ts` (+ test)
+  - Catatan: handler khusus (help/whoami/skill/proyek/pengalaman/sertifikasi/kontak) tarik data layer via `get*()` — deterministik, build-time. Greeting via FNV-1a hash (bukan random). FAQ intent keywords di-dateh dengan form Indonesia (location/contact). Test 15 unit ✓ (total 50 di assistant ✓).
 
 ### A5. Streaming / thinking hook
-- [ ] `src/lib/assistant/useAssistantSession.ts`: state messages `{id, role, text, stage}` (idle/thinking/streaming/done). Hook `send(message)`: set stage=thinking (300–500ms, teks status kontekstual), jalankan engine, lalu stream karakter via interval/RAF. Dukungan `prefers-reduced-motion` (skip thinking+instan). Untuk test: terima prop/inject untuk buat deterministik/sinkron.
-- [ ] Abort/interrupt saat user ketik lagi.
+- [x] `src/lib/assistant/useAssistantSession.ts`: state messages `{id, role, text, stage}` (idle/thinking/streaming/done). Hook `send(message)`: set stage=thinking (300–500ms, teks status kontekstual), jalankan engine, lalu stream karakter via interval/RAF. Dukungan `prefers-reduced-motion` (skip thinking+instan). Untuk test: terima prop/inject untuk buat deterministik/sinkron.
+- [x] Abort/interrupt saat user ketik lagi.
 - **AC:** unit + hook test (RTL) — thinking lalu selesai, reduce-motion skip, abort.
 - **File:** `src/lib/assistant/useAssistantSession.ts` (+ test)
+  - Catatan: `send()` abort in-flight (clear timers) bila user kirim lagi. `reducedMotion`/auto `prefers-reduced-motion` → instan, tanpa thinking. Status thinking deterministik via FNV-1a. Test 5 hook unit (RTL fake timers) ✓.
 
 ### A6. AssistantBot island (UI utama)
-- [ ] `src/islands/AssistantBot.tsx` (client:load): FAB (ikon MessageSquare/Sparkles) fixed bottom-right → slide-up drawer (Framer Motion spring, z-index tinggi di atas Ambient/CustomCursor).
-- [ ] Header drawer (judul "detAIministic assistant", sub "deterministic · no LLM"), FAQ quick-pick chips (dari `getFaq()`), message list (role user/assistant), input + Enter, tombol reset, tombol ❌ tutup.
-- [ ] Render balasan dengan TypewriterText / streaming dari hook; bubbles amber untuk assistant, dark untuk user.
-- [ ] Tombol "buka engine" → small modal (Radix Dialog) membongkar mekanisme deterministik (transparansi).
-- [ ] A11y: toolbar, ARIA (dialog role, live region untuk messages), keyboard (Esc tutup, focus masuk input).
+- [x] `src/islands/AssistantBot.tsx` (client:load): FAB (ikon MessageSquare/Sparkles) fixed bottom-right → slide-up drawer (Framer Motion spring, z-index tinggi di atas Ambient/CustomCursor).
+- [x] Header drawer (judul "detAIministic assistant", sub "deterministic · no LLM"), FAQ quick-pick chips (dari `getFaq()`), message list (role user/assistant), input + Enter, tombol reset, tombol ❌ tutup.
+- [x] Render balasan dengan TypewriterText / streaming dari hook; bubbles amber untuk assistant, dark untuk user.
+- [x] Tombol "buka engine" → small modal (Radix Dialog) membongkar mekanisme deterministik (transparansi).
+- [x] A11y: toolbar, ARIA (dialog role, live region untuk messages), keyboard (Esc tutup, focus masuk input).
 - **AC:** unit test (render, kirim msg → muncul balasan, chips, tutup, reset, engine modal). E2E: open → click chip → terlihat balasan → tutup.
 - **File:** `src/islands/AssistantBot.tsx` (+ test), polish di `theme.css` (token), `global.css` jika perlu class util.
+- **Catatan (A6):** Drawer FAB `z-[9997]`, drawer `z-[9996]`, engine modal `z-[9999]`. Engine modal merender `<Cara kerja engine>` + `ENGINE_MODAL_COPY`; pakai hook `useAssistantSession` (reduced-motion → instant reply, skip thinking). 9 unit test (RTL; mock `framer-motion` passthrough agar AnimatePresence exit unmount sinkron di jsdom + mock matchMedia reduced-motion true) → semua hijau. E2E `e2e/assistant.spec.ts` 6 test (FAB, drawer+chips, chip→balasan, ketik+Enter→balasan, engine modal, Esc tutup) → hijau.
 
 ### A7. Mount + integrasi global
-- [ ] Pasang `<AssistantBot client:load />` di `src/layouts/BaseLayout.astro` (semua halaman). Cek z-index utk tidak menutupi CustomCursor/Ambient/MorphingNavigation.
+- [x] Pasang `<AssistantBot client:load />` di `src/layouts/BaseLayout.astro` (semua halaman). Cek z-index utk tidak menutupi CustomCursor/Ambient/MorphingNavigation.
 - **AC:** build 45 halaman lulus; muncul di semua page preview.
 - **File:** `src/layouts/BaseLayout.astro`
+- **Catatan (A7):** `AssistantBot` import + `<AssistantBot client:load />` di BaseLayout (sebelum penutup `</body>`). Build 48 halaman lulus; bundle `AssistantBot.*.js` ter-emit & referensi ada di semua page HTML (konten drawer hidrasi client-side). z-index drawer (9996) < CustomCursor (9999/9998); FAB 9997 tetap di atas Ambient; tidak menutupi MorphingNavigation (z-index nav lebih rendah di header area).
 
 ### A8. FAQ JSON-LD + QA sprint P0
 - [ ] Tambah `FAQPage` JSON-LD script (Q/A dari `getFaq()`) di `BaseLayout.astro`/`index.astro` (build-time SEO).

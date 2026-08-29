@@ -8,6 +8,7 @@ import { Toaster } from "sonner";
 import Footer from "../components/templates/Footer.astro";
 import Header from "../components/templates/Header.astro";
 import AmbientScene from "../islands/AmbientScene";
+import AssistantBot from "../islands/AssistantBot";
 import { SITE } from "../lib/constants";
 
 export interface Props {
@@ -224,6 +225,8 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
         },
       }}
     />
+
+    <AssistantBot client:load />
 
     <script is:inline>
       (function () {
