@@ -83,9 +83,10 @@
 ## P0 — Command Palette (fuzzy search) — 6 microtasks
 
 ### B1. Search index builder
-- [ ] `src/lib/search/buildIndex.ts`: build item index dari `getProfile/getSkills/getProjects/getExperience/getCertifications` + halaman (NAV_ITEMS/FOOTER_LINKS) + eksperimen lab (dari `GalleryGrid` registry / `experiments.ts`). Item: `{ id, type, title, description, keywords[], target }`.
+- [x] `src/lib/search/buildIndex.ts`: build item index dari `getProfile/getSkills/getProjects/getExperience/getCertifications` + halaman (NAV_ITEMS/FOOTER_LINKS) + eksperimen lab (dari `GalleryGrid` registry / `experiments.ts`). Item: `{ id, type, title, description, keywords[], target }`.
 - **AC:** unit test jumlah & jenis item; target URL benar.
 - **File:** `src/lib/search/buildIndex.ts` (+ test)
+- **Catatan (B1):** `SearchItemType` = `person|skill|project|experience|certification|page|lab`; `SearchItem{id,type,title,description,keywords[],target}`. Sumber: `getProfile` (person→`/`), `getSkills` (skill→`/#skills`, id unik per category+name — ada 2 "JavaScript" beda kategori), `getProjects` (project→`/projects/[slugify]`), `getExperience` (→`/#experience`), `getCertifications` (→`/certifications`, 62), `NAV_ITEMS+FOOTER_LINKS` (page→href), dan `LAB_REGISTRY` (25 lab→`/gallery#id`) — registri lean lokal yang mencerminkan GalleryGrid `EXPERIMENT_CATEGORIES`, di-import alias langsung (menghindari import island berat). `slugify` lokal (same regex spt `getProjectBySlug`). 8 unit test ✓ (deterministik, jenis, counts, target, id unik).
 
 ### B2. Fuzzy matcher (manual Bitap ATAU fuse.js)
 - [ ] `src/lib/search/fuzzy.ts`: pilih & implementasikan matcher — weighted (title>description), typo-tolerant, return skor + pangkat. Boleh pakai `fuse.js` (tambah dependency) ATAU tulis Bitap dari nol (preferensi repo "from scratch"; konfirmasi via PRD §6).
