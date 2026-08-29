@@ -72,9 +72,10 @@
 - **Catatan (A7):** `AssistantBot` import + `<AssistantBot client:load />` di BaseLayout (sebelum penutup `</body>`). Build 48 halaman lulus; bundle `AssistantBot.*.js` ter-emit & referensi ada di semua page HTML (konten drawer hidrasi client-side). z-index drawer (9996) < CustomCursor (9999/9998); FAB 9997 tetap di atas Ambient; tidak menutupi MorphingNavigation (z-index nav lebih rendah di header area).
 
 ### A8. FAQ JSON-LD + QA sprint P0
-- [ ] Tambah `FAQPage` JSON-LD script (Q/A dari `getFaq()`) di `BaseLayout.astro`/`index.astro` (build-time SEO).
-- [ ] Jalankan full `bun run test`, `bun run test:e2e`, `bun run typecheck`, `bun run lint`, `bun run build`. Update gallery toHaveCount jika tak berubah (tidak — bot bukan eksperimen gallery).
+- [x] Tambah `FAQPage` JSON-LD script (Q/A dari `getFaq()`) di `BaseLayout.astro`/`index.astro` (build-time SEO).
+- [x] Jalankan full `bun run test`, `bun run test:e2e`, `bun run typecheck`, `bun run lint`, `bun run build`. Update gallery toHaveCount jika tak berubah (tidak — bot bukan eksperimen gallery).
 - **AC:** seluruh suite hijau; bot tampil & berfungsi di e2e.
+- **Catatan (A8):** `buildFaqLd()` baru di `src/lib/data.ts` (mapping FAQ → `{@type:"FAQPage", mainEntity:[{@type:"Question", acceptedAnswer}]}`; deterministik & JSON-safe) + export di `src/lib/index.ts`. Di BaseLayout: `<script is:inline type="application/ld+json" set:html={JSON.stringify(buildFaqLd())} />` → terbukti valid (parse JSON 15 pertanyaan) di `dist/index.html`. **Catatan:** script Person schema bawaan BaseLayout masih memakai pola `is:inline` + `JSON.stringify(Astro.props.jsonLd ?? …)` yang TIDAK dievaluasi (emits source-JS di dalam ld+json — pre-existing, out of scope A8; jika mau bisa dipatch dengan `set:html` yang sama). QA: unit 491/491 ✓ (9 island + 3 buildFaqLd + 64 assistant); typecheck tanpa error baru ✓; lint hanya pola organizeImports di data.ts (diabaikan per protokol) ✓; build 48 halaman ✓; e2e 130 passed — 5 galley WebGL deep-link/modal fail hanya saat paralel penuh, re-run terisolasi 5/5 hijau (flaky familiar, bukan regresi) ✓.
 - **File:** lintas; commit `A0: assistant bot e2e`.
 
 ---

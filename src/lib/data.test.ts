@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getFaq } from "./data";
+import { getFaq, buildFaqLd } from "./data";
 
 describe("getFaq", () => {
   it("returns all faq items", () => {
@@ -32,5 +32,30 @@ describe("getFaq", () => {
     expect(answers).toMatch(/54/);
     expect(answers).toMatch(/Tulungagung/);
     expect(answers).toMatch(/abdulmajidr708@gmail\.com/);
+  });
+});
+
+describe("buildFaqLd", () => {
+  it("returns a valid FAQPage JSON-LD shape", () => {
+    const ld = buildFaqLd();
+    expect(ld["@type"]).toBe("FAQPage");
+    expect(ld["@context"]).toBe("https://schema.org");
+    expect(Array.isArray(ld.mainEntity)).toBe(true);
+    expect(ld.mainEntity.length).toBe(getFaq().length);
+  });
+
+  it("maps every FAQ item to Question/AcceptedAnswer deterministically", () => {
+    const ld = buildFaqLd();
+    const faq = getFaq();
+    ld.mainEntity.forEach((q, i) => {
+      expect(q["@type"]).toBe("Question");
+      expect(q.name).toBe(faq[i].question);
+      expect(q.acceptedAnswer["@type"]).toBe("Answer");
+      expect(q.acceptedAnswer.text).toBe(faq[i].answer);
+    });
+  });
+
+  it("is JSON-serializable (no circular refs)", () => {
+    expect(() => JSON.stringify(buildFaqLd())).not.toThrow();
   });
 });

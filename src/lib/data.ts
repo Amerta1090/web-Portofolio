@@ -65,6 +65,24 @@ export function getFaq(): FaqItem[] {
   return faqData as FaqItem[];
 }
 
+export interface FaqLdQuestion {
+  "@type": "Question";
+  name: string;
+  acceptedAnswer: { "@type": "Answer"; text: string };
+}
+
+export function buildFaqLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: getFaq().map<FaqLdQuestion>((f) => ({
+      "@type": "Question",
+      name: f.question,
+      acceptedAnswer: { "@type": "Answer", text: f.answer },
+    })),
+  };
+}
+
 function parseDate(dateStr: string | null): { year: number; month: number } | null {
   if (!dateStr) return null;
   const parts = dateStr.split("-");

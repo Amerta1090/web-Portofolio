@@ -10,6 +10,7 @@ import Header from "../components/templates/Header.astro";
 import AmbientScene from "../islands/AmbientScene";
 import AssistantBot from "../islands/AssistantBot";
 import { SITE } from "../lib/constants";
+import { buildFaqLd } from "../lib/data";
 
 export interface Props {
   title?: string;
@@ -39,6 +40,8 @@ const ogImageUrl = ogImage
     ? `${SITE.url}/og/${ogSlug}.png`
     : `${SITE.url}/og/index.png`;
 const currentPath = Astro.url.pathname;
+
+const faqLd = buildFaqLd();
 
 const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
 ---
@@ -74,6 +77,8 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
         sameAs: [SITE.github, SITE.linkedin],
       })}
     </script>
+
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(faqLd)} />
 
     <link rel="preload" href="/fonts/fraunces-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin />
 

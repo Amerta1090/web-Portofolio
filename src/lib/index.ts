@@ -10,5 +10,6 @@ export {
   getHonors,
   getTestimonials,
   getFaq,
+  buildFaqLd,
   getTimeline,
 } from "./data";
