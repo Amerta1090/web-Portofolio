@@ -89,10 +89,11 @@
 - **Catatan (B1):** `SearchItemType` = `person|skill|project|experience|certification|page|lab`; `SearchItem{id,type,title,description,keywords[],target}`. Sumber: `getProfile` (person→`/`), `getSkills` (skill→`/#skills`, id unik per category+name — ada 2 "JavaScript" beda kategori), `getProjects` (project→`/projects/[slugify]`), `getExperience` (→`/#experience`), `getCertifications` (→`/certifications`, 62), `NAV_ITEMS+FOOTER_LINKS` (page→href), dan `LAB_REGISTRY` (25 lab→`/gallery#id`) — registri lean lokal yang mencerminkan GalleryGrid `EXPERIMENT_CATEGORIES`, di-import alias langsung (menghindari import island berat). `slugify` lokal (same regex spt `getProjectBySlug`). 8 unit test ✓ (deterministik, jenis, counts, target, id unik).
 
 ### B2. Fuzzy matcher (manual Bitap ATAU fuse.js)
-- [ ] `src/lib/search/fuzzy.ts`: pilih & implementasikan matcher — weighted (title>description), typo-tolerant, return skor + pangkat. Boleh pakai `fuse.js` (tambah dependency) ATAU tulis Bitap dari nol (preferensi repo "from scratch"; konfirmasi via PRD §6).
-- [ ] Setup weighted scoring & ranking.
+- [x] `src/lib/search/fuzzy.ts`: pilih & implementasikan matcher — weighted (title>description), typo-tolerant, return skor + pangkat. Boleh pakai `fuse.js` (tambah dependency) ATAU tulis Bitap dari nol (preferensi repo "from scratch"; konfirmasi via PRD §6).
+- [x] Setup weighted scoring & ranking.
 - **AC:** unit test: typo, substring, ranking title-first, no-result.
 - **File:** `src/lib/search/fuzzy.ts` (+ test), `package.json` bila fuse.js
+- **Catatan (B2):** from-scratch (tanpa fuse.js, selaras PRD §6). `normalize` (lowercase/trim/collapse), `editDistance` (DP Levenshtein), `defaultMaxErrors(qLen)` (0/1/luas; cap 3), `fuzzyMatch(query,text)` → skor 0..1 atau null (exact substring ~1.0 dgn penalty offset, prefix ~0.96, else best-window bounded edit distance; threshold 0.5), `fieldScore` (title→keyword→desc), `searchIndex(query,items,{limit,weights})` — **tokenisasi** query jadi kata, AND-semua-token harus match (membuat query multi-kata "gradient descent"/"svd compression" bekerja), skor = rata-rata bobot (title 1.0, keyword 0.6, desc 0.35), urut turun + alphabetical tiebreak. 18 unit test ✓. Integrasi dgn buildIndex: "three body"→lab:3-Body Problem (perlu alias keyword "three" krn judul pakai angka "3").
 
 ### B3. CommandPalette island — trigger & overlay
 - [ ] `src/islands/CommandPalette.tsx` (client:load): global `keydown` listener `meta/ctrl+K` untuk buka; tombol header ikon cari; overlay Radix Dialog (atau custom) full top; input; hasil list; keyboard nav (Arrow/Enter/Esc); highlight match; status "thinking" singkat (debounce) sebelum hasil.

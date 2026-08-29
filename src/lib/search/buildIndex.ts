@@ -63,7 +63,7 @@ const LAB_REGISTRY: LabEntry[] = [
   { id: "gradient-descent", title: "Gradient Descent Landscape", description: "3D loss landscape with SGD, Momentum, and Adam optimizers.", tags: ["Optimization", "Gradient Descent", "ML"], category: "ML & Algorithms" },
   { id: "simulated-annealing-tsp", title: "Simulated Annealing TSP", description: "Traveling salesman solved via simulated annealing.", tags: ["Optimization", "TSP", "Annealing"], category: "ML & Algorithms" },
   { id: "relativistic-orbits", title: "Relativistic Orbits", description: "Newton vs General Relativity orbit integration with perihelion precession.", tags: ["Relativity", "Orbits", "Physics"], category: "Physics & Simulation" },
-  { id: "three-body-problem", title: "3-Body Problem", description: "N-body gravity simulation with RK4 and known periodic orbits.", tags: ["N-body", "Physics", "Simulation"], category: "Physics & Simulation" },
+  { id: "three-body-problem", title: "3-Body Problem", description: "N-body gravity simulation with RK4 and known periodic orbits.", tags: ["N-body", "Physics", "Simulation", "three", "three-body", "orbit"], category: "Physics & Simulation" },
   { id: "galaxy-formation", title: "Galaxy Formation", description: "900-particle N-body collapse from uniform disk into a spiral galaxy.", tags: ["Galaxy", "N-body", "Astrophysics"], category: "Physics & Simulation" },
 ];
 
