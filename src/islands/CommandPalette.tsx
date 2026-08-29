@@ -51,6 +51,7 @@ export default function CommandPalette() {
   const [active, setActive] = useState(0);
   const [thinking, setThinking] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const prevFocusRef = useRef<HTMLElement | null>(null);
   const thinkingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -82,6 +83,27 @@ export default function CommandPalette() {
         if (hit) {
           e.preventDefault();
           activate(hit.item);
+        }
+      } else if (e.key === "Tab") {
+        const dialog = dialogRef.current;
+        if (!dialog) return;
+        const focusables = Array.from(
+          dialog.querySelectorAll<HTMLElement>(
+            'button:not([disabled]):not([tabindex="-1"]), [href]:not([tabindex="-1"]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+          ),
+        );
+        if (focusables.length === 0) {
+          e.preventDefault();
+          return;
+        }
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
         }
       }
     };
@@ -155,6 +177,7 @@ export default function CommandPalette() {
       }}
     >
       <dialog
+        ref={dialogRef}
         open
         aria-label="Command palette"
         className="m-0 block w-full max-w-xl overflow-hidden rounded-2xl border border-border bg-bg-primary p-0 shadow-2xl shadow-black/60"

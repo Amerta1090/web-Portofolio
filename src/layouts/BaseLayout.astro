@@ -9,6 +9,7 @@ import Footer from "../components/templates/Footer.astro";
 import Header from "../components/templates/Header.astro";
 import AmbientScene from "../islands/AmbientScene";
 import AssistantBot from "../islands/AssistantBot";
+import CommandPalette from "../islands/CommandPalette";
 import { SITE } from "../lib/constants";
 import { buildFaqLd } from "../lib/data";
 
@@ -232,6 +233,7 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
     />
 
     <AssistantBot client:load />
+    <CommandPalette client:load />
 
     <script is:inline>
       (function () {

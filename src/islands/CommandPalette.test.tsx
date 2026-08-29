@@ -2,9 +2,8 @@ import { cleanup, fireEvent, render, screen, within } from "@testing-library/rea
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import CommandPalette from "./CommandPalette";
 
-function openWithKey(ctrl = true) {
-  fireEvent.keyDown(window, { key: "k", ctrlKey: ctrl });
-  fireEvent.keyDown(window, { key: "k", metaKey: !ctrl });
+function openWithKey() {
+  fireEvent.keyDown(window, { key: "k", ctrlKey: true });
 }
 
 function getOptions() {
@@ -168,5 +167,18 @@ describe("CommandPalette", () => {
     fireEvent.change(input, { target: { value: "galaxy" } });
     const listbox = screen.getByRole("list", { name: "Hasil pencarian" });
     expect(within(listbox).getByText("Lab")).toBeTruthy();
+  });
+
+  it("traps Tab focus within the dialog", () => {
+    render(<CommandPalette />);
+    openWithKey();
+    const input = screen.getByRole("searchbox");
+    fireEvent.change(input, { target: { value: "galaxy" } });
+    const clearBtn = screen.getByLabelText("Bersihkan pencarian");
+    clearBtn.focus();
+    expect(document.activeElement).toBe(clearBtn);
+    // Tab from the last focusable wraps back to the first (input).
+    fireEvent.keyDown(window, { key: "Tab" });
+    expect(document.activeElement).toBe(input);
   });
 });
