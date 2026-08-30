@@ -11,6 +11,8 @@ import { cosineVectors, toTagVector } from "./similarity";
 export interface Recommendable {
   id: string;
   tags: string[];
+  /** Human-readable name used in the "Karena kamu jelajahi X" copy. */
+  title?: string;
 }
 
 export type TrackKind = "view" | "hover" | "click";
