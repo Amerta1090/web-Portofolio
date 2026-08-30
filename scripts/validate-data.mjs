@@ -33,6 +33,9 @@ const schemas = {
   "faq.json": {
     requiredItems: ["id", "category", "keywords", "question", "answer"],
   },
+  "capability-grammars.json": {
+    grammarSymbols: ["capability", "project_blurb", "fact"],
+  },
 };
 
 let errors = 0;
@@ -78,6 +81,26 @@ for (const [file, schema] of Object.entries(schemas)) {
   if (schema.requiredNested) {
     const items = data.projects || data.categories || [];
     if (!Array.isArray(items)) continue;
+  }
+
+  if (schema.grammarSymbols) {
+    for (const symbol of schema.grammarSymbols) {
+      const value = data[symbol];
+      if (value === undefined) {
+        console.error(`ERROR: ${file} missing grammar symbol "${symbol}"`);
+        errors++;
+        continue;
+      }
+      const expansions = Array.isArray(value) ? value : [value];
+      const valid =
+        expansions.length > 0 && expansions.every((e) => typeof e === "string" && e.length > 0);
+      if (!valid) {
+        console.error(
+          `ERROR: ${file} symbol "${symbol}" must be a non-empty string or array of non-empty strings`,
+        );
+        errors++;
+      }
+    }
   }
 }
 

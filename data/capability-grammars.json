@@ -1,0 +1,72 @@
+{
+  "capability": [
+    "#cap_build# #cap_system# from #cap_source#.",
+    "#cap_build# #cap_system# where #cap_where#.",
+    "#cap_build# #cap_system# and #cap_loop#.",
+    "#cap_build# #cap_system# that #cap_property#."
+  ],
+  "cap_build": ["I build", "I engineer", "I design", "I ship", "I operate"],
+  "cap_system": [
+    "production machine learning systems",
+    "end-to-end ML pipelines",
+    "AI-powered products",
+    "intelligent systems",
+    "machine-learning systems",
+    "AI agents",
+    "recommender systems",
+    "data science products"
+  ],
+  "cap_source": [
+    "sensor data to cloud deployment",
+    "raw data to deployed models",
+    "experiment to production monitoring",
+    "dataset to deployment",
+    "real-world signals to action"
+  ],
+  "cap_where": [
+    "data, automation, and physical computing intersect",
+    "the model meets the real world",
+    "the offline and the online world reconcile",
+    "every metric can be checked in a live dashboard"
+  ],
+  "cap_loop": [
+    "close the loop from data to decision",
+    "keep the loop closed with live monitoring",
+    "turn signals from the field into products"
+  ],
+  "cap_property": [
+    "stays grounded in real data",
+    "monitors itself in production",
+    "survives low bandwidth and offline moments",
+    "keeps learning as new data arrives",
+    "runs inside real resource limits"
+  ],
+  "project_blurb": [
+    "Grounded a RAG assistant on the 10-volume Tafsir Ibn Kathir with hybrid BM25 and dense retrieval.",
+    "Forecast IHSG and USD/IDR using Facebook Prophet over roughly ten years of market data.",
+    "Predicted Manchester United goal timing with survival analysis and a Poisson scoring model.",
+    "Built an offline-first personal finance PWA that keeps every transaction private on device.",
+    "Engineered an MLOps pipeline with Prometheus and Grafana watching model health in real time.",
+    "Created a CLI that turns ASCII tree plans into real project directories.",
+    "Built a hybrid book recommender reaching NDCG@5 of 0.95 over a million ratings.",
+    "Trained a housing price model on 29,000 South Tangerang listings to an R-squared of 0.864.",
+    "Tracked laundry load and estimated washing cost from an ESP8266 smart bin.",
+    "Predicted student dropout risk with Scikit-learn for Jaya Jaya Institut.",
+    "Deployed a diabetes-risk and food-recognition app from the Bangkit Academy capstone.",
+    "Shipped an MLOps experiment with online learning that retrains on new data via MLflow."
+  ],
+  "fact": [
+    "Two years of hands-on engineering experience across AI, ML, and systems.",
+    "22 public projects spanning ML, IoT, CLI tooling, and full-stack web.",
+    "50+ professional certifications across machine learning, cloud, and development.",
+    "Background in electronics and IoT before moving into AI and data science.",
+    "A computer science graduate building at the intersection of data, automation, and physical computing.",
+    "Completed Bangkit Academy, led by Google, Tokopedia, Gojek, and Traveloka.",
+    "Samsung Innovation Campus alumnus focused on IoT and embedded systems.",
+    "Fluent in English and Indonesian.",
+    "Based in Tulungagung, East Java, Indonesia.",
+    "Currently a full-stack systems engineer working on AI and automation for Ferswit Indonesia.",
+    "Worked as an AI engineer at AMIKOM, a prompt AI trainer at Aksoro, and a laboratory assistant.",
+    "Builds production ML systems from sensor to deployment."
+  ]
+}
