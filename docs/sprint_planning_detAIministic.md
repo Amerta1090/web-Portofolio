@@ -154,7 +154,7 @@
 ## P1 — Content-based Recommender — 4 microtasks
 
 ### D1. Vector & similarity lib
-- [ ] `src/lib/recommend/similarity.ts`: `cosine(a,b)` atas tag/skill vectors dari eksperimen (`EXPERIMENT_CATEGORIES`/meta) & proyek (`projects[].skills`).
+- [x] `src/lib/recommend/similarity.ts`: `cosine(a,b)` atas tag/skill vectors dari eksperimen (`EXPERIMENT_CATEGORIES`/meta) & proyek (`projects[].skills`).
 - **AC:** unit test cosine math & edge cases (empty vector).
 - **File:** `src/lib/recommend/similarity.ts` (+ test)
 
