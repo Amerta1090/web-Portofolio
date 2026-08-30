@@ -138,9 +138,10 @@
   - **Catatan (C2):** 3 simbol top-level — **`capability`** (4 template x sub-simbol `cap_build`/`cap_system`/`cap_source`/`cap_where`/`cap_loop`/`cap_property` = kombinasi), **`project_blurb`** (12 blurb proyek nyata, angka dipakai apa adanya: RAG 0.972, NDCG@5 0.95, R² 0.864, 29.000 listing, 10 jilid Tafsir, ~10 tahun data IHSG), **`fact`** (12 fakta persona — 2 tahun exp, 22 proyek di `projects.json` (bukan metrics `projects_shipped:18` yang tak sinkron dgn list 22), 50+ sertif (bebas konflik dgn count 62 vs metrics 54), Bangkit, Samsung Innovation Campus, Ferswit, AMIKOM/Aksoro/Asisten, Tulungagung). Validate-data: schema baru `grammarSymbols` (key wajib + semua ekspansi string non-empty). Unit `src/lib/tracery/capability.test.ts` 10 ✓ (shape, ekspansi tanpa `#`, sub-simbol, enum containment, no-cycle, determinism, variasi >4). Verifikasi: validate-data ✓, lint/typecheck scoped bersih, build 48 page ✓.
 
 ### C3. CapabilityGenerator component
-- [ ] `src/components/molecules/CapabilityGenerator.tsx`: tampilkan satu hasil, tombol hasil "generate lagi", toggle "lihat grammar" (craft reveal menampilkan JSON source).
+- [x] `src/components/molecules/CapabilityGenerator.tsx`: tampilkan satu hasil, tombol hasil "generate lagi", toggle "lihat grammar" (craft reveal menampilkan JSON source).
 - **AC:** unit test generate & toggle.
 - **File:** `src/components/molecules/CapabilityGenerator.tsx` (+ test)
+  - **Catatan (C3):** React component (akan di-hydrate `client:*` di index.astro). 3 mode segmented (`CAPABILITY_MODES`: One-liner/Project/Fact → `fieldset`+`legend sr-only`, `aria-pressed`), output di elemen `<output>` (live region), tombol "Generate lagi" (bump seed → variant deterministik baru), toggle "Lihat grammar" (`aria-expanded` + `<pre>` JSON.stringify grammar, `max-h-64 overflow-auto`). Deterministic: seed FNV `seed-${counter}` — input sama → output sama; `initialSeed` prop utk test. Terpasang `createTracery(grammar)` dari C1+C2. Styling token CSS (`bg-surface-primary`, `border-border`, `bg-brand`, `bg-brand/15 text-brand`, `bg-brand px-4 ... text-brand-text`). 8 unit ✓. Biome: `role="group"`→`<fieldset>`+legend & `role="status"`→`<output>` (aturan useSemanticElements).
 
 ### C4. Mount di index + QA P1
 - [ ] Pasang di `index.astro` (About atau Hero area). Full suite hijau.
