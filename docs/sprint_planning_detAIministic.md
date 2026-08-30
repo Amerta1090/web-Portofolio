@@ -125,9 +125,10 @@
 ## P1 — Tracery capability generator — 4 microtasks
 
 ### C1. Lightweight Tracery core
-- [ ] `src/lib/tracery/tracery.ts`: implement replace-from-grammar (JSON: symbol → array expansions, sub-symbol `#x#`, modifier `.capitalize`). Tulis sendiri (~60 baris) untuk menghindari dependency & selaras persona.
+- [x] `src/lib/tracery/tracery.ts`: implement replace-from-grammar (JSON: symbol → array expansions, sub-symbol `#x#`, modifier `.capitalize`). Tulis sendiri (~60 baris) untuk menghindari dependency & selaras persona.
 - **AC:** unit test ekspansi berulang, sub-simbol, modifier, no infinite-recursion guard.
 - **File:** `src/lib/tracery/tracery.ts` (+ test)
+  - **Catatan (C1):** from-scratch (tanpa tracery-grammar, selaras PRD §6). `Grammar = Record<string, string | string[]>`; `#key.modifier#` (modifier chain dipisah `.`, diterapkan urut terdaftar), sub-simbol `#x#`; `DEFAULT_MODIFIERS` (capitalize/capitalizeAll/upper/lower/trim) + custom via `options.modifiers`. **Picker deterministik** FNV-1a hash `(seed|key|depth)` — bukan Math.random; `options.seed` utk variasi ("generate lagi" = seed baru), callback `options.pick` utk kontrol penuh. **Guard:** stack symbol aktif (mutual recursion → `TraceryError`), `maxDepth` (default 6, self-recursion tertangkan lebih cepat di stack), `maxIterations` (safety cap sub-simbol per template). Unknown symbol → passthrough `#x#` literal (bukan crash). `createTracery(grammar, opts)` factory → `generate(symbol, seed?)` utk komponen. Unit 26 ✓. **BUG FIX:** stack di-push/pop harus membungkus EKSPANSI template yang dipilih (bukan hanya `pick`) — kalau hanya di sekitar pick, mutual recursion (a→b→a) lolos ke guard depth; dibungkus `try/finally` → tertangkap sebagai "Recursion". Verifikasi: lint & typecheck scoped bersih, build 48 page ✓ (557 unit total, +26).
 
 ### C2. Capability grammars (konten)
 - [ ] `data/capability-grammars.json`: grammar utk one-liner capability, blurb proyek, random fact (ambil vocab dari skills/proyek/persona). Tak mengarang fakta.
