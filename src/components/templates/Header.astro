@@ -42,7 +42,18 @@ const navLinks = [
       <div class="flex items-center gap-2">
         <button
           type="button"
-          class="grid place-items-center h-9 w-9 rounded-lg text-text-secondary hover:text-brand hover:bg-bg-secondary transition-colors"
+          class="hidden lg:inline-flex items-center gap-2 h-9 px-3 rounded-lg border border-border bg-bg-secondary text-text-secondary hover:text-brand hover:border-brand/40 transition-colors"
+          aria-label="Cari (⌘K)"
+          data-cursor-hover="button"
+          onclick="window.dispatchEvent(new CustomEvent('opencode:palette'))"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+          <span class="text-sm">Cari</span>
+          <kbd class="px-1.5 py-0.5 text-[10px] font-mono leading-none rounded bg-bg-tertiary border border-border text-text-secondary/70">⌘K</kbd>
+        </button>
+        <button
+          type="button"
+          class="grid lg:hidden place-items-center h-9 w-9 rounded-lg text-text-secondary hover:text-brand hover:bg-bg-secondary transition-colors"
           aria-label="Cari (⌘K)"
           title="Cari (⌘K)"
           data-cursor-hover="button"
