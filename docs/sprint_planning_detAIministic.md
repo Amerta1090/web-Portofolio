@@ -144,9 +144,10 @@
   - **Catatan (C3):** React component (akan di-hydrate `client:*` di index.astro). 3 mode segmented (`CAPABILITY_MODES`: One-liner/Project/Fact → `fieldset`+`legend sr-only`, `aria-pressed`), output di elemen `<output>` (live region), tombol "Generate lagi" (bump seed → variant deterministik baru), toggle "Lihat grammar" (`aria-expanded` + `<pre>` JSON.stringify grammar, `max-h-64 overflow-auto`). Deterministic: seed FNV `seed-${counter}` — input sama → output sama; `initialSeed` prop utk test. Terpasang `createTracery(grammar)` dari C1+C2. Styling token CSS (`bg-surface-primary`, `border-border`, `bg-brand`, `bg-brand/15 text-brand`, `bg-brand px-4 ... text-brand-text`). 8 unit ✓. Biome: `role="group"`→`<fieldset>`+legend & `role="status"`→`<output>` (aturan useSemanticElements).
 
 ### C4. Mount di index + QA P1
-- [ ] Pasang di `index.astro` (About atau Hero area). Full suite hijau.
+- [x] Pasang di `index.astro` (About atau Hero area). Full suite hijau.
 - **AC:** hijau total.
 - **File:** `src/pages/index.astro`; commit `C4: tracery capability gen`.
+  - **Catatan (C4):** `<CapabilityGenerator client:load />` dipasang di Section About (bawah `<About profile>`, `mt-10`) → ter-SSR di `dist/index.html` (markup generator + tombol ada; presisi hydrate client-side). Unit: 12 utk komponen (total 579 unit/44 file, +22 dari C-series). E2E baru `e2e/capability-generator.spec.ts` 5 test (render label, output tanpa `#`, Generate lagi ganti output, switch Project → blurb, toggle grammar source) → **pelajaran**: `getByRole('button', {name:'Project'})` non-exact match "View Projects" di hero → pakai `exact:true`. Full e2e 137 passed, 7 gagal SAAT PARALEL PENUH = flake familiar (gallery WebGL: Fractal/Julia/PCA + Logistic canvas + craft tabular + assistant Esc) — semua pass terisolasi (10/10 assistant+craft, 6/6 gallery, morph 2/2) → bukan regresi. build 48 page ✓, lint/typecheck scoped bersih (import order index.astro dirapikan biome --write).
 
 ---
 
