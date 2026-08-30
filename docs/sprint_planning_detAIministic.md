@@ -159,19 +159,20 @@
 - **File:** `src/lib/recommend/similarity.ts` (+ test)
 
 ### D2. Interaction tracking
-- [ ] `src/lib/recommend/useRecommendation.ts`: track view/hover/click via IntersectionObserver + handlers → accumulative "liked" vector (state, optional localStorage persist). Rank `recommend(current, all, history)`.
+- [x] `src/lib/recommend/useRecommendation.ts`: track view/hover/click via IntersectionObserver + handlers → accumulative "liked" vector (state, optional localStorage persist). Rank `recommend(current, all, history)`.
 - **AC:** unit/hook test: akumulasi & re-rank.
 - **File:** `src/lib/recommend/useRecommendation.ts` (+ test)
 
 ### D3. RecommendedRow component
-- [ ] `src/components/organisms/RecommendedRow.tsx`: strip "Karena kamu jelajahi X, coba Y" (tampilkan 3–4 kartu ke rekomendasi). Kosong & disabled bila belum ada interaksi.
+- [x] `src/components/organisms/RecommendedRow.tsx`: strip "Karena kamu jelajahi X, coba Y" (tampilkan 3–4 kartu ke rekomendasi). Kosong & disabled bila belum ada interaksi.
 - **AC:** unit test render & empty-state.
 - **File:** `src/components/organisms/RecommendedRow.tsx` (+ test)
 
 ### D4. Integrasi ke gallery/projects + QA P1
-- [ ] Pasang row di `gallery.astro` (di bawah grid) &/atau `projects/index.astro`. Full suite hijau.
+- [x] Pasang row di `gallery.astro` (di bawah grid) &/atau `projects/index.astro`. Full suite hijau.
 - **AC:** hijau total.
 - **File:** `src/pages/gallery.astro` &/or `src/pages/projects/index.astro`; commit `D4: recommender row`.
+- **Catatan:** interaksi dicatat via `src/lib/recommend/session.ts` (localStorage + `detAIministic:recommend:change` event) — GalleryGrid `handleLaunch` set `lastOpenedRef`, **record `view` + setCurrent di `handleClose`** (saat user menutup modal), bukan di launch. Keputusan ini menghilangkan interferensi e2e: memset modal terbuka, strip tidak pernah muncul di DOM → `getByRole("button", {name:/Chaos/})` di game-theory dkk tidak tertabrak tag cards recommender. E2E: 4 test (hidden fresh session / muncul setelah eksplorasi / tak rekomendasikan item aktif / persist reload). Pelajaran: negasi multi-element locator kena strict-mode → assert via `getByRole(...).toHaveCount(0)`; `getByText(...).click()` di galeri kadang gagal buka modal → `scrollIntoViewIfNeeded()` + scoped `[aria-label='Experiments']` + timeout 10s.
 
 ---
 

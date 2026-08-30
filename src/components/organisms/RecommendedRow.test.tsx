@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { RecommendedRow } from "./RecommendedRow";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Recommendable } from "../../lib/recommend/useRecommendation";
+import { RecommendedRow } from "./RecommendedRow";
 
 const STORAGE_KEY = "detAIministic:recommend:v1";
 
@@ -36,9 +36,7 @@ describe("RecommendedRow", () => {
   it("renders the strip plus up to the default 3 cards once history exists", () => {
     seedHistory({ audio: 6, fft: 6, "web-audio": 6 });
     render(<RecommendedRow items={LAB} current={CURRENT} />);
-    expect(
-      screen.getByText(/Karena kamu jelajahi/, { selector: "p" }),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Karena kamu jelajahi/, { selector: "p" })).toBeInTheDocument();
     expect(screen.getByText("Liquid Distortion", { selector: "span" })).toBeInTheDocument();
     const cards = screen.getAllByTestId("recommendation-card");
     expect(cards).toHaveLength(3);

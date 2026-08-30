@@ -1,10 +1,5 @@
-import { describe, it, expect } from "vitest";
-import {
-  cosineVectors,
-  cosineTags,
-  normalizeTag,
-  toTagVector,
-} from "./similarity";
+import { describe, expect, it } from "vitest";
+import { cosineTags, cosineVectors, normalizeTag, toTagVector } from "./similarity";
 
 describe("normalizeTag", () => {
   it("lowercases and trims whitespace", () => {
@@ -27,8 +22,19 @@ describe("toTagVector", () => {
 
 describe("cosineVectors", () => {
   it("is 1 for identical weighted vectors", () => {
-    const a = new Map([["ml", 1], ["python", 1]]);
-    expect(cosineVectors(a, new Map([["python", 1], ["ml", 1]]))).toBe(1);
+    const a = new Map([
+      ["ml", 1],
+      ["python", 1],
+    ]);
+    expect(
+      cosineVectors(
+        a,
+        new Map([
+          ["python", 1],
+          ["ml", 1],
+        ]),
+      ),
+    ).toBe(1);
   });
 
   it("is 0 for disjoint vectors", () => {
@@ -48,8 +54,14 @@ describe("cosineVectors", () => {
   });
 
   it("scores shared tags within (0,1)", () => {
-    const a = new Map([["ml", 1], ["python", 1]]);
-    const b = new Map([["ml", 1], ["web", 1]]);
+    const a = new Map([
+      ["ml", 1],
+      ["python", 1],
+    ]);
+    const b = new Map([
+      ["ml", 1],
+      ["web", 1],
+    ]);
     expect(cosineVectors(a, b)).toBeCloseTo(0.5, 4);
   });
 
@@ -58,14 +70,26 @@ describe("cosineVectors", () => {
   });
 
   it("is symmetric", () => {
-    const a = new Map([["ml", 1], ["genai", 2]]);
-    const b = new Map([["ml", 1], ["web", 3]]);
+    const a = new Map([
+      ["ml", 1],
+      ["genai", 2],
+    ]);
+    const b = new Map([
+      ["ml", 1],
+      ["web", 3],
+    ]);
     expect(cosineVectors(a, b)).toBe(cosineVectors(b, a));
   });
 
   it("is deterministic for repeated calls", () => {
-    const a = new Map([["ml", 1], ["python", 2]]);
-    const b = new Map([["ml", 1], ["web", 1]]);
+    const a = new Map([
+      ["ml", 1],
+      ["python", 2],
+    ]);
+    const b = new Map([
+      ["ml", 1],
+      ["web", 1],
+    ]);
     const first = cosineVectors(a, b);
     for (let i = 0; i < 20; i++) {
       expect(cosineVectors(a, b)).toBe(first);

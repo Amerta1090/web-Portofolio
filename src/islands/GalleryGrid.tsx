@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import AmbientSound from "../components/atoms/AmbientSound";
+import { recordInteraction, setCurrent } from "../lib/recommend/session";
 import AudioVisualizer from "./experiments/AudioVisualizer";
 import BezierPlayground from "./experiments/BezierPlayground";
 import ConformalMapping from "./experiments/ConformalMapping";
@@ -368,6 +369,10 @@ const experiments: Experiment[] = [
   },
 ];
 
+/** Shared registry for other islands (recommender strip) — id/title/tags only. */
+export const GALLERY_EXPERIMENTS: Array<{ id: string; title: string; tags: string[] }> =
+  experiments.map(({ id, title, tags }) => ({ id, title, tags }));
+
 function LivePreview({ id }: { id: string }) {
   return (
     <>
@@ -694,6 +699,7 @@ export default function GalleryGrid() {
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const [activeCategory, setActiveCategory] = useState<"All" | ExperimentCategory>("All");
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const lastOpenedRef = useRef<string | null>(null);
 
   const activeExp = experiments.find((e) => e.id === activeExperiment) || null;
   const visibleExperiments =
@@ -708,7 +714,7 @@ export default function GalleryGrid() {
       const match = experiments.find((e) => e.id === hash);
       if (match) {
         // Small delay to let the page render first
-        setTimeout(() => setActiveExperiment(match.id), 300);
+        setTimeout(() => handleLaunch(match.id), 300);
       }
     }
   }, []);
@@ -726,10 +732,20 @@ export default function GalleryGrid() {
   }, [activeExperiment]);
 
   const handleLaunch = useCallback((id: string) => {
+    lastOpenedRef.current = id;
     setActiveExperiment(id);
   }, []);
 
   const handleClose = useCallback(() => {
+    const id = lastOpenedRef.current;
+    if (id) {
+      const exp = experiments.find((e) => e.id === id);
+      if (exp) {
+        recordInteraction(id, exp.tags, "view");
+        setCurrent(id);
+      }
+      lastOpenedRef.current = null;
+    }
     setActiveExperiment(null);
     setFocusedIndex(-1);
   }, []);
@@ -765,7 +781,7 @@ export default function GalleryGrid() {
         case " ":
           if (focusedIndex >= 0 && focusedIndex < count) {
             e.preventDefault();
-            setActiveExperiment(visibleExperiments[focusedIndex].id);
+            handleLaunch(visibleExperiments[focusedIndex].id);
           }
           break;
         default:
@@ -773,7 +789,7 @@ export default function GalleryGrid() {
           const num = Number.parseInt(e.key);
           if (num >= 1 && num <= count) {
             e.preventDefault();
-            setActiveExperiment(visibleExperiments[num - 1].id);
+            handleLaunch(visibleExperiments[num - 1].id);
           }
           break;
       }
@@ -781,7 +797,7 @@ export default function GalleryGrid() {
 
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [activeExperiment, focusedIndex, activeCategory]);
+  }, [activeExperiment, focusedIndex, activeCategory, handleLaunch]);
 
   const EXP_HARMONY: Record<string, string> = {
     "liquid-distortion": "cyan",
@@ -814,7 +830,11 @@ export default function GalleryGrid() {
   return (
     <>
       <AmbientSound harmony={expHarmony} />
-      <div className="flex flex-wrap justify-center gap-2 mb-8" role="tablist" aria-label="Filter experiments by category">
+      <div
+        className="flex flex-wrap justify-center gap-2 mb-8"
+        role="tablist"
+        aria-label="Filter experiments by category"
+      >
         {CATEGORY_ORDER.map((cat) => {
           const isActive = activeCategory === cat;
           const n =
@@ -846,21 +866,25 @@ export default function GalleryGrid() {
         <div className="mb-10">
           <div className="flex items-center gap-2 mb-4">
             <span className="w-1.5 h-1.5 bg-amber-400 rounded-full" />
-            <h2 className="text-sm font-semibold text-text-secondary uppercase tracking-widest">Featured</h2>
+            <h2 className="text-sm font-semibold text-text-secondary uppercase tracking-widest">
+              Featured
+            </h2>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {experiments.filter(e => e.featured).map((exp, i) => (
-              <ExperimentCard
-                key={exp.id}
-                exp={exp}
-                index={i}
-                onLaunch={handleLaunch}
-                isFocused={false}
-                onFocus={() => {}}
-                ref={() => {}}
-                cursorStyle={experimentCursor(exp.id)}
-              />
-            ))}
+            {experiments
+              .filter((e) => e.featured)
+              .map((exp, i) => (
+                <ExperimentCard
+                  key={exp.id}
+                  exp={exp}
+                  index={i}
+                  onLaunch={handleLaunch}
+                  isFocused={false}
+                  onFocus={() => {}}
+                  ref={() => {}}
+                  cursorStyle={experimentCursor(exp.id)}
+                />
+              ))}
           </div>
         </div>
       )}

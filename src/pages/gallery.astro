@@ -1,6 +1,7 @@
 ---
+import RecommendedRow from "../components/organisms/RecommendedRow";
+import GalleryGrid, { GALLERY_EXPERIMENTS } from "../islands/GalleryGrid";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import GalleryGrid from "../islands/GalleryGrid";
 ---
 
 <BaseLayout
@@ -27,6 +28,15 @@ import GalleryGrid from "../islands/GalleryGrid";
       </header>
 
       <GalleryGrid client:load />
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <RecommendedRow
+          client:load
+          items={GALLERY_EXPERIMENTS}
+          current={GALLERY_EXPERIMENTS[0]}
+          limit={3}
+        />
+      </div>
     </div>
   </div>
 </BaseLayout>

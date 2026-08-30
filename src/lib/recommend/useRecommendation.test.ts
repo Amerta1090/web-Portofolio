@@ -1,12 +1,12 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
+  type Recommendable,
   TRACK_WEIGHTS,
   accumulateHistory,
   createViewTracker,
   rankRecommendations,
   useRecommendation,
-  type Recommendable,
 } from "./useRecommendation";
 
 const LAB: Recommendable[] = [
@@ -57,7 +57,10 @@ describe("rankRecommendations", () => {
   });
 
   it("history dominates the query", () => {
-    const history = new Map([["ml", 5], ["neural-net", 2]]);
+    const history = new Map([
+      ["ml", 5],
+      ["neural-net", 2],
+    ]);
     const ranked = rankRecommendations(current, LAB, history, { limit: 10 });
     const order = ranked.map((r) => r.item.id);
     expect(order[0]).toBe("ml-clock");
@@ -85,7 +88,10 @@ describe("rankRecommendations", () => {
   });
 
   it("is deterministic: identical inputs yield identical ordering", () => {
-    const history = new Map([["audio", 2], ["shader", 1]]);
+    const history = new Map([
+      ["audio", 2],
+      ["shader", 1],
+    ]);
     const first = rankRecommendations(current, LAB, history, { limit: 10 });
     for (let i = 0; i < 10; i++) {
       const again = rankRecommendations(current, LAB, history, { limit: 10 });
@@ -151,9 +157,7 @@ describe("useRecommendation", () => {
     const restored = renderHook(() =>
       useRecommendation({ items: LAB, storageKey: "test:v1", enabled: true }),
     );
-    expect(restored.result.current.history.get("gravity")).toBe(
-      TRACK_WEIGHTS.hover,
-    );
+    expect(restored.result.current.history.get("gravity")).toBe(TRACK_WEIGHTS.hover);
     expect(restored.result.current.hasInteractions).toBe(true);
   });
 

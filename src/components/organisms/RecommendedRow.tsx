@@ -1,15 +1,21 @@
-import { useRef } from "react";
-import { cn } from "../../lib/utils";
+import { useEffect, useRef, useState } from "react";
 import {
-  useRecommendation,
-  createViewTracker,
+  onSessionChange,
+  readCurrent,
+  readHistory,
+  recordInteraction,
+} from "../../lib/recommend/session";
+import {
   type Recommendable,
+  createViewTracker,
+  rankRecommendations,
 } from "../../lib/recommend/useRecommendation";
+import { cn } from "../../lib/utils";
 
 export interface RecommendedRowProps {
   /** Candidate pool (all items that can be recommended). */
   items: Recommendable[];
-  /** The item the visitor is currently exploring. */
+  /** Fallback "current" item when no browsing session is recorded yet. */
   current: Recommendable;
   /** Optional icons (emoji/SVG) per item id, shown on cards. */
   icons?: Record<string, string>;
@@ -29,6 +35,8 @@ const FALLBACK_TITLE = "kamu jelajahi";
  * interacted (view/hover/click) with at least one item, so empty & disabled
  * states render nothing. Tracking accumulates into a deterministic liked
  * vector (persisted to localStorage) and ranking is pure cosine similarity.
+ * Reads the shared browsing session (current item + history) and re-renders
+ * whenever another island (e.g. GalleryGrid) records an interaction.
  */
 export function RecommendedRow({
   items,
@@ -39,25 +47,49 @@ export function RecommendedRow({
   className,
   onOpen,
 }: RecommendedRowProps) {
-  const { hasInteractions, track, recommend } = useRecommendation({ items });
-  const trackRef = useRef(track);
-  trackRef.current = track;
+  const [history, setHistory] = useState<ReadonlyMap<string, number>>(() => readHistory());
+  const [activeId, setActiveId] = useState<string | null>(() => readCurrent());
+  const [, setTick] = useState(0);
+
+  useEffect(
+    () =>
+      onSessionChange(() => {
+        setHistory(readHistory());
+        setActiveId(readCurrent());
+        setTick((n) => n + 1);
+      }),
+    [],
+  );
+
+  const currentItem: Recommendable = items.find((item) => item.id === activeId) ?? current;
+
+  const record = (id: string, kind: "view" | "hover" | "click") => {
+    const item = items.find((candidate) => candidate.id === id);
+    if (!item) return;
+    recordInteraction(id, item.tags, kind);
+    setHistory(readHistory());
+  };
 
   const viewTrackerRef = useRef<ReturnType<typeof createViewTracker> | null>(null);
   if (viewTrackerRef.current === null) {
-    viewTrackerRef.current = createViewTracker((id) => trackRef.current(id, "view"));
+    viewTrackerRef.current = createViewTracker((id) => record(id, "view"));
   }
 
   const observedFor = useRef<{ el: Element; id: string } | null>(null);
   const ref = (element: Element | null) => {
     if (!element) return;
-    if (observedFor.current?.el === element && observedFor.current.id === current.id) return;
-    observedFor.current = { el: element, id: current.id };
-    viewTrackerRef.current?.(element, current.id);
+    if (observedFor.current?.el === element && observedFor.current.id === currentItem.id) return;
+    observedFor.current = { el: element, id: currentItem.id };
+    viewTrackerRef.current?.(element, currentItem.id);
   };
 
+  const hasInteractions = history.size > 0;
   const recommendations = hasInteractions
-    ? recommend(current, { limit, historyWeight: 0.6, currentWeight: 0.4 })
+    ? rankRecommendations(currentItem, items, history, {
+        limit,
+        historyWeight: 0.6,
+        currentWeight: 0.4,
+      })
     : [];
 
   if (
@@ -68,19 +100,14 @@ export function RecommendedRow({
     return null;
   }
 
-  const currentLabel = current.title ?? FALLBACK_TITLE;
+  const currentLabel = currentItem.title ?? FALLBACK_TITLE;
   const shownTitle = title ?? "Rekomendasi berdasarkan aktivitas";
 
   return (
-    <section
-      ref={ref}
-      aria-label={shownTitle}
-      className={cn("mt-10", className)}
-    >
+    <section ref={ref} aria-label={shownTitle} className={cn("mt-10", className)}>
       <div className="mb-3 flex items-center gap-2">
         <p className="section-label text-text-secondary">
-          Karena kamu jelajahi <span className="text-text-primary">{currentLabel}</span>, coba
-          juga:
+          Karena kamu jelajahi <span className="text-text-primary">{currentLabel}</span>, coba juga:
         </p>
         <span className="rounded-full border border-border px-2 py-0.5 text-[11px] font-mono text-text-secondary">
           content-based · no LLM
@@ -94,10 +121,10 @@ export function RecommendedRow({
               type="button"
               data-testid="recommendation-card"
               onClick={() => {
-                track(item.id, "click");
+                record(item.id, "click");
                 onOpen?.(item.id);
               }}
-              onMouseEnter={() => track(item.id, "hover")}
+              onMouseEnter={() => record(item.id, "hover")}
               className={cn(
                 "group flex h-full w-full flex-col gap-2 rounded-xl border border-border",
                 "bg-surface-secondary p-4 text-left transition-colors",
@@ -133,3 +160,5 @@ export function RecommendedRow({
     </section>
   );
 }
+
+export default RecommendedRow;
