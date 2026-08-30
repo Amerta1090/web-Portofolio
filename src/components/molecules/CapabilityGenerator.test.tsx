@@ -2,6 +2,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
 import CapabilityGenerator, { CAPABILITY_MODES } from "./CapabilityGenerator";
+import grammar from "../../../data/capability-grammars.json";
 
 describe("CapabilityGenerator", () => {
   afterEach(() => {
@@ -81,5 +82,37 @@ describe("CapabilityGenerator", () => {
     expect(first).toBeTruthy();
     expect(second).toBeTruthy();
     expect(firstText).toBe(secondText);
+  });
+
+  it("Fact mode always yields a known, grounded fact", async () => {
+    const user = userEvent.setup();
+    render(<CapabilityGenerator initialSeed={3} />);
+    await user.click(screen.getByRole("button", { name: "Fact" }));
+    expect(grammar.fact).toContain(screen.getByRole("status").textContent);
+  });
+
+  it("Project mode always yields a known, grounded blurb", async () => {
+    const user = userEvent.setup();
+    render(<CapabilityGenerator initialSeed={4} />);
+    await user.click(screen.getByRole("button", { name: "Project" }));
+    const text = screen.getByRole("status").textContent;
+    expect(text?.length).toBeGreaterThan(0);
+    expect(grammar.project_blurb).toContain(text);
+  });
+
+  it("never leaks template markers across modes and seeds", async () => {
+    const user = userEvent.setup();
+    render(<CapabilityGenerator initialSeed={1} />);
+    for (let i = 0; i < 6; i++) {
+      expect(screen.getByRole("status").textContent).not.toMatch(/#/);
+      await user.click(screen.getByRole("button", { name: "Generate lagi" }));
+    }
+    await user.click(screen.getByRole("button", { name: "Project" }));
+    expect(screen.getByRole("status").textContent).not.toMatch(/#/);
+  });
+
+  it("honors a custom className", () => {
+    const { container } = render(<CapabilityGenerator className="custom-shell" />);
+    expect(container.querySelector(".custom-shell")).toBeTruthy();
   });
 });
