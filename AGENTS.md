@@ -446,7 +446,8 @@ index.astro, projects/index.astro, projects/[slug].astro, experience.astro, skil
   - **Unit tests**: `bun run test` — 729 passed (53 files, +88 new tests)
   - **E2E tests**: `bun run test:e2e` — 207 passed (+25 new tests)
 
-### Sprint detAIministic (in progress)
+### Sprint detAIministic ✅ P0+P1 COMPLETE (P2 = backlog, belum dimulai)
+- **Filosofi**: ilusi AI frontend tanpa backend — SSG murni, deterministik. P0 (Assistant A1–A8 + Command Palette B1–B6) dan P1 (Tracery C1–C4 + Recommender D1–D4) seluruhnya selesai; backlog P2 (E1–E6: Sentiment Gauge, dll.) belum dikerjakan, lanjutkan bila sprint dibuka lagi.
 - **Sprint plan**: `docs/sprint_planning_detAIministic.md` · **PRD**: `docs/prd-detAIministic.md`
 - **Filosofi**: ilusi AI frontend tanpa backend — SSG murni, deterministik (input sama → output sama; `Math.random()` dilarang, pakai hash FNV-1a via `hashString`/`hashIndex`).
 - **P0 (A1–A8)**: ✅ COMPLETE — 64 unit assistant + 9 island + 3 seo + 6 e2e.
