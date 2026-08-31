@@ -176,17 +176,19 @@
 
 ---
 
-## P2 (Backlog) — Lab experiments
+## P2 (Backlog) — Lab experiments ✅ COMPLETE
 
 ### E1–E3. Sentiment Gauge (lab exp ke-26)
-- `E1`: `src/lib/sentiment/afinn.ts` (inline AFINN table + `score(text)`). 
-- `E2`: `src/islands/experiments/SentimentGauge.tsx` (ketik → gauge + per-word scoring) + thumbnail svg.
-- `E3`: registrasi di `GalleryGrid.tsx` + kategori + unit/E2E test + update `toHaveCount` (25→26) + mount.
+- [x] `E1`: `src/lib/sentiment/afinn.ts` — inline AFINN-style lexicon (~90 kata, int valence −5..+5) + `score(text)` pure & deterministik: `total/avg(-1..1)/magnitude/count/positive/negative/neutral/words` (per-word, urut teks). `tokenize`/`normalizeToken` case-insensitive. 14 unit test.
+- [x] `E2`: `src/islands/experiments/SentimentGauge.tsx` — textarea → gauge (needle amber↔merah↔hijau, `filledPct`), stat panels Total/Avg/Magnitude/Mood, per-word scored chips, Sample/Clear. compact = textarea + gauge mini. Thumbnail `sentiment-gauge.svg` (gradient amber→green). 10 unit test.
+- [x] `E3`: registrasi GalleryGrid (id `sentiment-gauge`, kategori **ML & Algorithms**, icon Gauge, cursor `text`, harmony `amber`, featured no) — LivePreview compact + ExperimentModal full. e2e `sentiment.spec.ts` 6 test (deep link, positive/negative mood, Clear/Sample, card). `toHaveCount(25→26)`.
 
 ### E4–E6. Markov generator (lab exp ke-27)
-- `E4`: `src/lib/markov/markov.ts` (build transition matrix dari corpus data saat build → JSON; `generate` walk).
-- `E5`: `src/islands/experiments/MarkovGenerator.tsx` (generasi bio/caption ala gaya sendiri; tag "generated, not AI") + thumbnail.
-- `E6`: registrasi GalleryGrid + test + `toHaveCount` (26→27).
+- [x] `E4`: `src/lib/markov/markov.ts` — from-scratch: `buildGraph(sentences)` (first-order, END sentinel, case-insensitive key), `walk`, `generate` (weighted nexttoken, injectable `rng`), `mulberry32` seeded PRNG + `hashSeed` (FNV-1a) → deterministic (no Math.random). 21 unit test.
+- [x] `E5`: `src/islands/experiments/MarkovGenerator.tsx` — corpus dibangun dari data layer (`getProjects` desc/readme_summary, `getExperience` role/company/highlights, `getTestimonials` text), tag "generated, not AI", mode Bio/Project/Fact (fieldset), Length slider, Generate again=bump seed. compact = output + Regenerate. Thumbnail `markov-generator.svg`. 9 unit test.
+- [x] `E6`: registrasi GalleryGrid (id `markov-generator`, kategori **ML & Algorithms**, icon Dices, cursor `text`, harmony `amber`) — LivePreview compact + ExperimentModal full. e2e `markov.spec.ts` 6 test (deep link, non-empty output, Generate again, mode switch, length slider, card). `toHaveCount(26→27)`.
+
+- **Verifikasi P2:** build 48 page ✓; unit 679/679 (53 file, +54 dari P2: afinn 14 + SentimentGauge 10 + markov 21 + MarkovGenerator 9) ✓; e2e targeted sentiment 6 + markov 6 + count 27 ✓; typecheck tanpa error baru dari file baru (GalleryGrid line 470 `current` read-only & line 870 `DroneHarmony` = pre-existing, tak disentuh diff) ✓; lint bersih pada seluruh 8 file P2 (button `type`, fieldset+legend, no unsafe template literal) ✓.
 
 ---
 

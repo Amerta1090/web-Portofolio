@@ -4,10 +4,12 @@ import {
   Atom,
   ChevronLeft,
   CircuitBoard,
+  Dices,
   Droplets,
   GitBranch,
   GitFork,
   Globe,
+  Gauge,
   Hexagon,
   Layers,
   LayoutGrid,
@@ -35,12 +37,14 @@ import HyperbolicGoL from "./experiments/HyperbolicGoL";
 import InteractiveCanvas from "./experiments/InteractiveCanvas";
 import LiquidDistortion from "./experiments/LiquidDistortion";
 import LogisticMap from "./experiments/LogisticMap";
+import MarkovGenerator from "./experiments/MarkovGenerator";
 import NeuralNetworkArt from "./experiments/NeuralNetworkArt";
 import NoiseTopography from "./experiments/NoiseTopography";
 import PCATSNEViz from "./experiments/PCATSNEViz";
 import PrisonersDilemma from "./experiments/PrisonersDilemma";
 import RelativisticOrbits from "./experiments/RelativisticOrbits";
 import SVDImageCompression from "./experiments/SVDImageCompression";
+import SentimentGauge from "./experiments/SentimentGauge";
 import SimulatedAnnealingTSP from "./experiments/SimulatedAnnealingTSP";
 import SpringPhysics from "./experiments/SpringPhysics";
 import StrangeAttractorZoo from "./experiments/StrangeAttractorZoo";
@@ -367,6 +371,30 @@ const experiments: Experiment[] = [
     thumbnail: "/images/experiments/galaxy-formation.svg",
     featured: true,
   },
+  {
+    id: "sentiment-gauge",
+    title: "Sentiment Gauge",
+    description:
+      "Type a sentence and watch a live AFINN-style gauge swing from red to amber to green, word by word.",
+    longDescription:
+      "A hand-rolled AFINN-style sentiment lexicon runs entirely in your browser. Type any text and see the aggregate valence swing across a red→amber→green gauge, per-word scores as colored chips, and intensity (magnitude) all computed deterministically — no network, no model.",
+    tags: ["NLP", "Sentiment", "Lexicon", "Text", "Deterministic"],
+    icon: <Gauge className="w-5 h-5" />,
+    gradient: "from-amber-500 to-green-500",
+    thumbnail: "/images/experiments/sentiment-gauge.svg",
+  },
+  {
+    id: "markov-generator",
+    title: "Markov Text Generator",
+    description:
+      "A first-order word chain over your own write-ups — walk it to mint a fresh-sounding bio, project blurb, or fact.",
+    longDescription:
+      "A from-scratch Markov chain is built over your actual projects, experience, and testimonials. Pick Bio / Project / Fact, bump the seed, and walk the transition graph to mint a fresh-sounding one-liner. Deterministic from a seed — regenerating is reproducible, and labelled 'generated, not AI'.",
+    tags: ["Markov", "NLP", "Generative", "Text", "Deterministic"],
+    icon: <Dices className="w-5 h-5" />,
+    gradient: "from-amber-500 to-violet-500",
+    thumbnail: "/images/experiments/markov-generator.svg",
+  },
 ];
 
 /** Shared registry for other islands (recommender strip) — id/title/tags only. */
@@ -401,6 +429,8 @@ function LivePreview({ id }: { id: string }) {
       {id === "three-body-problem" && <ThreeBodyProblem compact />}
       {id === "galaxy-formation" && <GalaxyFormation compact />}
       {id === "relativistic-orbits" && <RelativisticOrbits compact />}
+      {id === "sentiment-gauge" && <SentimentGauge compact />}
+      {id === "markov-generator" && <MarkovGenerator compact />}
     </>
   );
 }
@@ -607,6 +637,8 @@ function ExperimentModal({
               {experiment.id === "three-body-problem" && <ThreeBodyProblem />}
               {experiment.id === "galaxy-formation" && <GalaxyFormation />}
               {experiment.id === "relativistic-orbits" && <RelativisticOrbits />}
+              {experiment.id === "sentiment-gauge" && <SentimentGauge />}
+              {experiment.id === "markov-generator" && <MarkovGenerator />}
             </div>
           </motion.div>
         </motion.div>
@@ -642,6 +674,8 @@ function experimentCursor(id: string): string {
     "relativistic-orbits": "crosshair",
     "three-body-problem": "grab",
     "galaxy-formation": "crosshair",
+    "sentiment-gauge": "text",
+    "markov-generator": "text",
   };
   return cursors[id] || "pointer";
 }
@@ -679,6 +713,8 @@ const EXPERIMENT_CATEGORIES: Record<string, ExperimentCategory> = {
   "three-body-problem": "Physics & Simulation",
   "relativistic-orbits": "Physics & Simulation",
   "galaxy-formation": "Physics & Simulation",
+  "sentiment-gauge": "ML & Algorithms",
+  "markov-generator": "ML & Algorithms",
 };
 
 const CATEGORY_ORDER: ("All" | ExperimentCategory)[] = [
@@ -824,6 +860,8 @@ export default function GalleryGrid() {
     "relativistic-orbits": "cyan",
     "three-body-problem": "cyan",
     "galaxy-formation": "purple",
+    "sentiment-gauge": "amber",
+    "markov-generator": "amber",
   };
   const expHarmony = activeExperiment ? (EXP_HARMONY[activeExperiment] ?? "amber") : "amber";
 

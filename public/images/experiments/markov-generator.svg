@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#0a0a0c"/>
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+  </defs>
+  <text x="40" y="46" font-family="monospace" font-size="13" fill="#9ca39c">Markov chain · generated, not AI</text>
+  <rect x="40" y="66" width="320" height="118" rx="10" fill="#17181a" stroke="#ffffff22"/>
+  <text x="56" y="92" font-family="monospace" font-size="12" fill="#f59e0b">I built an AI recommendation</text>
+  <text x="56" y="110" font-family="monospace" font-size="12" fill="#e0e0e0">engine solving retrieval and</text>
+  <text x="56" y="128" font-family="monospace" font-size="12" fill="#e0e0e0">systems challenges at scale</text>
+  <text x="56" y="160" font-family="monospace" font-size="10" fill="#6b7268">23,800 word states from projects · experience · testimonials</text>
+  <g stroke="url(#g)" stroke-width="2" opacity="0.5" fill="none">
+    <circle cx="120" cy="225" r="7"/>
+    <circle cx="180" cy="215" r="7"/>
+    <circle cx="245" cy="235" r="7"/>
+    <circle cx="300" cy="220" r="7"/>
+  </g>
+  <g stroke="#ffffff33" stroke-width="1" opacity="0.6" fill="none">
+    <path d="M127 225 L173 215 L181 215 L238 235 L246 235 L293 220"/>
+  </g>
+</svg>
