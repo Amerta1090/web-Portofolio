@@ -28,6 +28,10 @@ const pages: Record<string, { title: string; description: string }> = {
     title: "GitHub Universe",
     description: `${AUTHOR} — Contributions, languages & repositories`,
   },
+  observatory: {
+    title: "Observatory",
+    description: `${AUTHOR} — Portfolio viewed as a dataset`,
+  },
   contact: {
     title: "Contact",
     description: `Get in touch with ${AUTHOR}`,

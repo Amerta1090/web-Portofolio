@@ -23,6 +23,7 @@ const schemas = {
   },
   "projects.json": {
     requiredNested: ["title", "description"],
+    requiredPeriod: true,
   },
   "skills.json": {
     requiredNested: ["categories"],
@@ -81,6 +82,34 @@ for (const [file, schema] of Object.entries(schemas)) {
   if (schema.requiredNested) {
     const items = data.projects || data.categories || [];
     if (!Array.isArray(items)) continue;
+  }
+
+  if (schema.requiredPeriod) {
+    const items = data.projects || [];
+    const token = /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}$/;
+    const dash = /(?:–|—|-)/;
+    for (let i = 0; i < items.length; i++) {
+      const period = items[i].period;
+      if (typeof period !== "string") {
+        console.error(`ERROR: projects.json[${i}] period must be a string`);
+        errors++;
+        continue;
+      }
+      const parts = period.split(dash).map((s) => s.trim());
+      if (parts.length !== 2) {
+        console.error(
+          `ERROR: projects.json[${i}] period "${period}" is not "Mon YYYY – Mon YYYY"`,
+        );
+        errors++;
+        continue;
+      }
+      const [start, end] = parts;
+      const endOk = end === "Present" || end === "Now" || token.test(end);
+      if (!token.test(start) || !endOk) {
+        console.error(`ERROR: projects.json[${i}] period "${period}" has invalid month/year token`);
+        errors++;
+      }
+    }
   }
 
   if (schema.grammarSymbols) {

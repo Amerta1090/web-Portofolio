@@ -13,6 +13,7 @@ export const NAV_ITEMS = [
   { label: "Experience", href: "/#experience" },
   { label: "Projects", href: "/#projects" },
   { label: "Skills", href: "/#skills" },
+  { label: "Observatory", href: "/observatory" },
   { label: "Contact", href: "/#contact" },
 ] as const;
 
@@ -22,4 +23,5 @@ export const FOOTER_LINKS = [
   { label: "GitHub", href: "/github" },
   { label: "Timeline", href: "/timeline" },
   { label: "Resume", href: "/resume" },
+  { label: "Observatory", href: "/observatory" },
 ] as const;

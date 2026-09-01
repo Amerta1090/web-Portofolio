@@ -1,0 +1,337 @@
+---
+import Container from "../components/atoms/Container.astro";
+import ObservatoryOverview from "../islands/ObservatoryOverview";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { buildObservatoryDataset } from "../lib/observatory/index";
+import { generateInsights } from "../lib/observatory/insights";
+import { categoryCounts, skillPairs } from "../lib/observatory/metrics";
+import {
+  categoryBars,
+  formatPercent,
+  patternGeometry,
+  technologyBars,
+  timelineGeometry,
+} from "../lib/observatory/visual";
+
+const ds = buildObservatoryDataset();
+const insights = generateInsights({
+  projects: ds.projects,
+  github: ds.github,
+});
+
+const cats = categoryCounts(ds.projects, []);
+const pairs = skillPairs(ds.projects);
+const timeline = timelineGeometry(ds.projects);
+const tech = technologyBars(ds.projects, 12);
+const catBars = categoryBars(ds.projects);
+const pattern = patternGeometry(ds.projects, 14, 1);
+
+const dates = ds.datedProjects
+  .filter(
+    (p): p is typeof p & { periodParsed: NonNullable<typeof p.periodParsed> } =>
+      p.periodParsed !== null,
+  )
+  .map((p) => p.periodParsed);
+const startYear = Math.min(...dates.map((d) => d.start.year));
+const maxEndYear = Math.max(...dates.map((d) => (d.end ? d.end.year : d.start.year)));
+const yearSpan = Math.max(1, maxEndYear - startYear + 1);
+
+const techMax = tech.maxValue;
+
+const overviewMetrics = {
+  projects: ds.projects.length,
+  categories: cats.length,
+  technologies: ds.distinctSkills.length,
+  yearSpan,
+  totalRepos: ds.github?.total_repos ?? 0,
+  totalStars: ds.github?.total_stars ?? 0,
+  totalForks: ds.github?.total_forks ?? 0,
+};
+
+const catDesc = [...cats].sort((a, b) => b.count - a.count);
+
+function barPct(value: number): number {
+  return techMax > 0 ? (value / techMax) * 100 : 0;
+}
+
+function edgeOpacity(count: number): number {
+  return Math.min(1, 0.18 + count * 0.18);
+}
+---
+
+<BaseLayout
+  title="Observatory — Abdul Majid Ridwan Tyastonoatmaja"
+  description="A deterministic, data-driven view of the portfolio — the engineering record read as a dataset. Projects, technology, patterns, and derived insights."
+  canonicalUrl="https://portfolio.abdulmajidr708.workers.dev/observatory"
+  ogSlug="observatory"
+>
+  <div class="pt-24 pb-16">
+    <Container size="xl">
+      <!-- Header -->
+      <header class="mb-14" data-reveal>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium mb-6">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+          Analytical layer · deterministic insights
+        </div>
+        <h1 class="font-display text-[clamp(2.25rem,6vw+0.5rem,5rem)] leading-[0.95] tracking-[-0.035em] text-text-primary mb-4">
+          The portfolio,{" "}
+          <span class="bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent">
+            read as a dataset
+          </span>
+        </h1>
+        <p class="text-lg text-text-secondary max-w-3xl leading-relaxed">
+          This page treats the projects, skills, and GitHub record as structured data —
+          not prose. Every number and insight is computed at build time by a fixed set of
+          rules. No LLM, no randomness: the same dataset always yields the same observatory.
+        </p>
+      </header>
+
+      <!-- Overview -->
+      <section class="mb-20" aria-labelledby="obs-overview">
+        <div class="flex items-end justify-between mb-6">
+          <div>
+            <p class="section-label text-text-secondary">01</p>
+            <h2 id="obs-overview" class="font-display text-h2 text-text-primary">Overview</h2>
+          </div>
+        </div>
+        <ObservatoryOverview client:visible metrics={overviewMetrics} />
+      </section>
+
+      <!-- Timeline -->
+      <section class="mb-20" aria-labelledby="obs-timeline">
+        <div class="mb-6">
+          <p class="section-label text-text-secondary">02</p>
+          <h2 id="obs-timeline" class="font-display text-h2 text-text-primary">Timeline</h2>
+          <p class="text-text-secondary mt-2 max-w-2xl">
+            {timeline.nodes.length} projects placed on a shared time axis, coloured by category.
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-border bg-bg-secondary/40 p-4 sm:p-6 overflow-x-auto">
+          <svg
+            viewBox={`0 0 ${timeline.width} ${timeline.height}`}
+            class="w-full h-auto"
+            role="img"
+            aria-label="Project timeline by start date, coloured by category"
+          >
+            <!-- axis -->
+            <line
+              x1={timeline.xRange[0]}
+              y1={156}
+              x2={timeline.xRange[1]}
+              y2={156}
+              stroke="var(--color-border)"
+              stroke-width="1.5"
+            />
+            <!-- year ticks -->
+            {timeline.yearTicks.map((tick) => (
+              <>
+                <line x1={tick.x} y1={150} x2={tick.x} y2={162} stroke="var(--color-border)" stroke-width="1" />
+                <text x={tick.x} y={178} text-anchor="middle" fill="var(--color-text-secondary)" font-size="11" font-family="JetBrains Mono, monospace">
+                  {tick.label}
+                </text>
+              </>
+            ))}
+            {/* project range markers */}
+            {timeline.nodes
+              .filter((n) => n.endIndex > n.startIndex)
+              .map((n) => (
+                <line
+                  key={`${n.slug}-range`}
+                  x1={n.startIndex}
+                  y1={156}
+                  x2={n.endIndex}
+                  y2={156}
+                  stroke={n.color}
+                  stroke-width="2.5"
+                  stroke-opacity="0.45"
+                />
+              ))}
+            {/* project nodes */}
+            {timeline.nodes.map((n) => (
+              <g key={n.slug}>
+                <circle
+                  cx={n.x}
+                  cy={156}
+                  r={n.featured ? 7 : 5}
+                  fill={n.color}
+                  stroke="var(--color-surface-primary)"
+                  stroke-width="2"
+                  data-cursor-hover="button"
+                >
+                  <title>{`${n.title}\n${n.label}`}</title>
+                </circle>
+                <text x={n.x} y={n.labelY} text-anchor="middle" fill="var(--color-text-secondary)" font-size="9.5" font-family="JetBrains Mono, monospace">
+                  {n.title.length > 22 ? n.title.slice(0, 22) + "…" : n.title}
+                </text>
+              </g>
+            ))}
+          </svg>
+          <div class="flex flex-wrap gap-x-5 gap-y-2 mt-4 pt-4 border-t border-border">
+            {timeline.legend.map((l) => (
+              <span class="inline-flex items-center gap-2 text-xs text-text-secondary">
+                <span class="w-3 h-3 rounded-full" style={`background:${l.color}`} />
+                {l.label}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <!-- Technology -->
+      <section class="mb-20" aria-labelledby="obs-technology">
+        <div class="mb-6">
+          <p class="section-label text-text-secondary">03</p>
+          <h2 id="obs-technology" class="font-display text-h2 text-text-primary">Technology</h2>
+          <p class="text-text-secondary mt-2 max-w-2xl">
+            Skill frequency weighted across all projects — the recurring ingredients of the build.
+          </p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-6">
+          <div class="rounded-xl border border-border bg-bg-secondary/40 p-5 sm:p-6">
+            <h3 class="text-text-primary font-semibold mb-4">Top technologies by project count</h3>
+            <div class="space-y-2.5">
+              {tech.rows.map((row) => (
+                <div data-observatory="bar" class="flex items-center gap-3">
+                  <span class="w-[190px] shrink-0 text-xs text-text-secondary truncate" title={row.label}>
+                    {row.label}
+                  </span>
+                  <div class="flex-1 h-5 rounded bg-bg-tertiary relative overflow-hidden">
+                    <div
+                      class="h-full rounded bg-gradient-to-r from-[#7a8c6f] to-[#c17f59]"
+                      style={`width:${Math.max(2, barPct(row.value))}%`}
+                    />
+                  </div>
+                  <span class="w-8 text-right text-xs font-mono text-text-primary tabular-nums">{row.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-border bg-bg-secondary/40 p-5 sm:p-6">
+            <h3 class="text-text-primary font-semibold mb-4">Category mix</h3>
+            <div class="flex items-end gap-3 h-40">
+              {catBars.map((c) => (
+                <div key={c.label} class="flex-1 flex flex-col items-center justify-end gap-1.5 h-full min-w-0 group">
+                  <span class="text-xs font-mono text-text-primary tabular-nums">{c.count}</span>
+                  <div
+                    class="w-full rounded-t group-hover:opacity-80 transition-opacity"
+                    style={`height:${Math.max(4, c.share * 100)}%;background:${c.color}`}
+                    title={`${c.label}: ${c.count} (${formatPercent(c.share)})`}
+                  />
+                  <span class="text-[10px] text-text-secondary truncate w-full text-center">{c.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Patterns -->
+      <section class="mb-20" aria-labelledby="obs-patterns">
+        <div class="mb-6">
+          <p class="section-label text-text-secondary">04</p>
+          <h2 id="obs-patterns" class="font-display text-h2 text-text-primary">Patterns</h2>
+          <p class="text-text-secondary mt-2 max-w-2xl">
+            Recurring technology combinations across projects. Nodes are skills; edges are projects
+            where two skills appear together.
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-border bg-bg-secondary/40 p-4 sm:p-6 overflow-x-auto">
+          <svg
+            viewBox={`0 0 ${pattern.width} ${pattern.height}`}
+            class="w-full h-auto"
+            role="img"
+            aria-label="Skill co-occurrence graph"
+          >
+            {pattern.edges.map((e) => (
+              <line
+                key={`${e.a}-${e.b}`}
+                x1={e.ax}
+                y1={e.ay}
+                x2={e.bx}
+                y2={e.by}
+                stroke="var(--color-brand)"
+                stroke-width={Math.min(3, e.count)}
+                stroke-opacity={edgeOpacity(e.count)}
+              />
+            ))}
+            {pattern.nodes.map((n) => (
+              <g key={n.id}>
+                <circle cx={n.cx} cy={n.cy} r={Math.max(8, Math.min(20, 6 + n.count * 3))} fill="rgba(122,140,111,0.18)" stroke="var(--color-brand)" stroke-width="1.5">
+                  <title>{`${n.id}: ${n.count} projects`}</title>
+                </circle>
+                <text x={n.cx} y={n.cy + 3.5} text-anchor="middle" fill="var(--color-text-primary)" font-size="9" font-family="JetBrains Mono, monospace">
+                  {n.id.length > 14 ? n.id.slice(0, 13) + "…" : n.id}
+                </text>
+              </g>
+            ))}
+          </svg>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 mt-8">
+          <div class="rounded-xl border border-border bg-bg-secondary/40 p-5 sm:p-6">
+            <h3 class="text-text-primary font-semibold mb-4">Most recurrent combinations</h3>
+            {pairs.length === 0 ? (
+              <p class="text-text-secondary text-sm">No co-occurring technology pairs found.</p>
+            ) : (
+              <ol class="space-y-2">
+                {pairs.slice(0, 8).map((pair, i) => (
+                  <li class="flex items-center justify-between text-sm">
+                    <span class="text-text-secondary">
+                      <span class="text-accent">{i + 1}.</span> {pair.a} <span class="text-text-secondary/50">+</span> {pair.b}
+                    </span>
+                    <span class="font-mono text-xs text-text-primary tabular-nums">{pair.count} project{pair.count !== 1 ? "s" : ""}</span>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+
+          <div class="rounded-xl border border-border bg-bg-secondary/40 p-5 sm:p-6">
+            <h3 class="text-text-primary font-semibold mb-4">Category snapshot</h3>
+            <div class="space-y-3">
+              {catDesc.map((c) => (
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-text-secondary">{c.label}</span>
+                  <span class="font-mono text-xs text-text-primary tabular-nums">
+                    {c.count} · {formatPercent(c.share)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Insights -->
+      <section class="mb-8" aria-labelledby="obs-insights">
+        <div class="mb-6">
+          <p class="section-label text-text-secondary">05</p>
+          <h2 id="obs-insights" class="font-display text-h2 text-text-primary">Derived insights</h2>
+          <p class="text-text-secondary mt-2 max-w-2xl">
+            Findings computed by fixed rules over the dataset. Each card shows the exact rule used.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-4 sm:gap-6">
+          {insights.map((ins) => (
+            <article
+              class="group relative rounded-xl border border-border bg-bg-secondary/40 p-5 sm:p-6 hover:border-amber-500/30 transition-colors duration-300"
+              data-reveal
+            >
+              <h3 class="text-text-primary font-semibold mb-2">{ins.title}</h3>
+              <p class="text-sm text-text-secondary leading-relaxed mb-4">{ins.body}</p>
+              <p data-observatory="rule" class="text-[11px] font-mono text-text-secondary/60 flex gap-1.5 items-start">
+                <span class="text-amber-400/80 shrink-0">rule&gt;</span>
+                <span>{ins.rule}</span>
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
+    </Container>
+  </div>
+</BaseLayout>
