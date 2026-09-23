@@ -1,4 +1,4 @@
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Check, Loader2, X } from "lucide-react";
 import { type ButtonHTMLAttributes, type ReactNode, useCallback, useState } from "react";
 import { cn } from "../../lib/utils";

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { ArrowRight, Sparkles } from "lucide-react";
 import VideoSequenceScroll from "./experiments/VideoSequenceScroll";
 import FractalFlameSync from "./experiments/FractalFlameSync";

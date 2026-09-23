@@ -66,6 +66,19 @@
 | Animation triggering layout | C/B | swap ke transform/scale |
 | Mount thrashing | B | batch read→write mount |
 
+## §7. Bundle motion (Phase A — migrasi framer-motion → motion/react)
+
+> Diukur `bun run build:fast` pre/post migrasi (2026-09-23, sesi Phase A).
+> Identifikasi chunk motion: grep `MotionValue` di `dist/_astro/*.js` (32×).
+
+| Tahap | Chunk motion | Ukuran | Catatan |
+|---|---|---|---|
+| **Pre** (framer-motion 12.40.0) | `proxy.B072igBE.js` | 122,752 B | 32× MotionValue |
+| **Post** (motion 13.4.1) | `react.PUfK8XYu.js` | 125,269 B | 32× MotionValue identik |
+| **Delta** | — | **+2,517 B (+2.05%)** | Selisih intrinsik versi; chunk rename proxy→react (layout paket `motion/react`). Total `dist/_astro` tetap **2.7M** (JS total 2,141,429 B). |
+
+**Alasan delta >2% (marginal)**: naiknya ukuran datang dari versi 13.4.1 vs 12.40.0 (package motion), bukan dari kesalahan migrasi — konten bundle identik (32 token MotionValue pre & post). Ambang 2% spek terlewati 0.05%; diterima dengan alasan ini (catat di baseline → tidak perlu injeksi LazyMotion dulu; evaluasi lagi di Phase C bila muncul chunk >15% JS).
+
 ## Cara ulang audit
 ```
 bun run serve              # preview lokal :4321

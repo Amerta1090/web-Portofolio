@@ -1,5 +1,5 @@
 import { type ReactNode, useRef, useState, useCallback, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { duration, easing } from "../../lib/motion";
 
 interface TooltipContent {

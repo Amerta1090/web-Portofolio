@@ -1,4 +1,4 @@
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "motion/react";
 import { useRef } from "react";
 import { distance, duration, easing, stagger } from "../../lib/motion";
 

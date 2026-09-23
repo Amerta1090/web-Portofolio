@@ -1,4 +1,4 @@
-import { useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import ErrorBoundary from "../components/atoms/ErrorBoundary";
 import { gsap, ScrollTrigger } from "../lib/gsap";

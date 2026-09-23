@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { useReducedMotion, motion } from "framer-motion";
+import { useReducedMotion, motion } from "motion/react";
 import { Star } from "lucide-react";
 import ErrorBoundary from "../components/atoms/ErrorBoundary";
 import { useCapabilityStore } from "../lib/useCapabilityStore";

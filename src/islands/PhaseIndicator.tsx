@@ -1,4 +1,4 @@
-import { motion, useMotionValueEvent, useScroll, useSpring } from "framer-motion";
+import { motion, useMotionValueEvent, useScroll, useSpring } from "motion/react";
 import { useState } from "react";
 import { useCapabilityStore } from "../lib/useCapabilityStore";
 import { useExperienceTier, getEffectiveTier } from "../lib/useExperienceTier";

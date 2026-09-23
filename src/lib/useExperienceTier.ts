@@ -21,7 +21,7 @@ const LIGHTNING_STORAGE_KEY = "experience-tier";
  * select a lower tier for performance or preference.
  *
  * Lightning Mode forces tier-1, disabling all creative effects:
- * smooth scroll, 3D, GSAP, framer-motion, custom cursor, D3 charts.
+ * smooth scroll, 3D, GSAP, motion (motion.dev), custom cursor, D3 charts.
  */
 export const useExperienceTier = create<ExperienceTierState>()(
   persist(

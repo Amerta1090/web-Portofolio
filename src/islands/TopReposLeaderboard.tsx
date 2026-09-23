@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "motion/react";
 import { ArrowRight, GitCommit } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import RepoGlowCard from "../components/atoms/RepoGlowCard";

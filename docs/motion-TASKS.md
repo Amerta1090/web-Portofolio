@@ -11,12 +11,13 @@
 - [x] MotionScore CLI butuh Chromium (puppeteer) — download sekali; failure pertama karena download timeout, bukan CLI rusak.
 
 ## Phase A — Migrasi import → motion/react (mekanis)
-- [ ] `bun remove framer-motion` + `bun add motion` (13.4.1). Verifikasi package.json.
-- [ ] Find-replace 40 lokasi: `from "framer-motion"` → `from "motion/react"` (39 file src/; perhatikan import gabungan `{ type Variants, motion }` di GameMenuItem).
-- [ ] Update 2 mock test: `vi.mock("framer-motion", ...)` → `vi.mock("motion/react", ...)` (importOriginal tetap).
-- [ ] `grep -rn "framer-motion" src e2e docs` → kosong (sejarah AGENTS.md/prompt.txt boleh).
-- [ ] Ukur bundle sebelum/after: `bun run build:fast`; catat chunk berisi motion (dist/_astro) ke baseline — delta < 2% atau catat alasan.
-- [ ] VERIFIKASI: build:fast ✓, `bun run test` ✓, `bunx astro check` ✓ tanpa error baru, biome ✓, e2e targeted (gallery, home) ✓.
+- [x] `bun remove framer-motion` + `bun add motion` (13.4.1). Verifikasi package.json. — `"motion": "^13.4.1"` ✓, framer-motion hilang dari deps.
+- [x] Find-replace 40 lokasi: `from "framer-motion"` → `from "motion/react"` (39 file src/; perhatikan import gabungan `{ type Variants, motion }` di GameMenuItem). — verified: 40 import motion/react, src bersih (0 framer-motion). Bonus fix: komentar stack `useExperienceTier.ts` → "motion (motion.dev)".
+- [x] Update 2 mock test: `vi.mock("framer-motion", ...)` → `vi.mock("motion/react", ...)` (importOriginal tetap). — CreativeLabPill.test + AssistantBot.test; sekalian fix 2 `noNonNullAssertion` lama (`chip!`→`as HTMLElement`) + organizeImports biar biome bersih.
+- [x] `grep -rn "framer-motion" src e2e docs` → kosong (sejarah AGENTS.md/prompt.txt boleh). — src 0, e2e 0 (docs/*.md spec memuat istilah historis = boleh).
+- [x] Ukur bundle sebelum/after: `bun run build:fast`; catat chunk berisi motion (dist/_astro) ke baseline — delta < 2% atau catat alasan. — **pre**: `proxy.B072igBE.js` 122,752 B · **post**: `react.PUfK8XYu.js` 125,269 B → **+2,517 B (+2.05%)** = selisih intrinsik v12.40.0→v13.4.1 (ranama chunk proxy→react krn layout paket motion/react; 32× "MotionValue" identik). Total dist/_astro tetap 2.7M. Tercatat di baseline §7.
+- [x] VERIFIKASI: build:fast ✓ (49 page), `bun run test` ✓ **709/709 (57 file)**, `bunx astro check` ✓ **108 error = identik HEAD** (per-file diff kosong → 0 baru), biome ✓ (count HEAD==NOW → 0 baru; 3 file disentuh dibersihkan), e2e targeted ✓ (gallery+craft+micro 82 pass; 2 flake WebGL paralel → isolated 5/5 pass).
+  - **Bonus fix (pre-existing red test)**: `buildIndex.test.ts` "unique id" gagal di HEAD — duplikat `page-observatory` (item di NAV_ITEMS **dan** FOOTER_LINKS sejak sprint Observatory). Fix: dedupe by id di `buildIndex.ts` + 1 `useTemplate` biome. Bukan regresi migrasi (file identik HEAD), tapi suite harus hijau (DoD).
 
 ## Phase B — MotionScore baseline + fix tier D/F
 - [x] **Baseline SUDAH ter-ukur 2026-09-23** (bonus sesi analisis): `/` = C 49/100, `/gallery` = B 43/100 (Animations **F**!), `/observatory` = A 74/100. Detail + findings → `docs/motion-score-baseline.md`.

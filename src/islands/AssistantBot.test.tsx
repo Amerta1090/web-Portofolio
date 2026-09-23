@@ -1,17 +1,18 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, cleanup, fireEvent, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import AssistantBot from "./AssistantBot";
 
-// Replace framer-motion with plain passthrough components so AnimatePresence
+// Replace motion/react with plain passthrough components so AnimatePresence
 // exit does not retain elements in jsdom (deterministic mount/unmount).
-vi.mock("framer-motion", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("framer-motion")>();
+vi.mock("motion/react", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("motion/react")>();
   const passthrough =
     (tag: string) =>
-    ({ children, ...props }: Record<string, unknown>) =>
+    ({ children, ...props }: Record<string, unknown>) => (
       // @ts-expect-error dynamic tag
-      <tag {...props}>{children}</tag>;
+      <tag {...props}>{children}</tag>
+    );
   return {
     ...actual,
     AnimatePresence: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
@@ -73,7 +74,9 @@ describe("AssistantBot", () => {
     await user.click(screen.getByLabelText("Buka assistant detAIministic"));
     const dialog = screen.getByRole("dialog");
     // At least the skills chip text should be present.
-    const chip = within(dialog).getAllByRole("button").find((b) => /skill/i.test(b.textContent ?? ""));
+    const chip = within(dialog)
+      .getAllByRole("button")
+      .find((b) => /skill/i.test(b.textContent ?? ""));
     expect(chip).toBeTruthy();
   });
 
@@ -99,9 +102,11 @@ describe("AssistantBot", () => {
     await user.click(screen.getByLabelText("Buka assistant detAIministic"));
 
     const dialog = screen.getByRole("dialog");
-    const chip = within(dialog).getAllByRole("button").find((b) => /skill/i.test(b.textContent ?? ""));
+    const chip = within(dialog)
+      .getAllByRole("button")
+      .find((b) => /skill/i.test(b.textContent ?? ""));
     expect(chip).toBeTruthy();
-    await user.click(chip!);
+    await user.click(chip as HTMLElement);
 
     const bubbles = within(dialog).getAllByRole("status");
     expect(bubbles.length).toBeGreaterThan(0);
@@ -126,9 +131,11 @@ describe("AssistantBot", () => {
     await user.click(screen.getByLabelText("Buka assistant detAIministic"));
     const dialog = screen.getByRole("dialog");
     expect(dialog).toBeTruthy();
-    const closeBtn = within(dialog).getAllByRole("button").find((b) => b.getAttribute("aria-label") === "Tutup assistant");
+    const closeBtn = within(dialog)
+      .getAllByRole("button")
+      .find((b) => b.getAttribute("aria-label") === "Tutup assistant");
     expect(closeBtn).toBeTruthy();
-    await user.click(closeBtn!);
+    await user.click(closeBtn as HTMLElement);
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 

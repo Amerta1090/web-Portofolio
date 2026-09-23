@@ -1,4 +1,4 @@
-import { motion, useInView, useReducedMotion, AnimatePresence } from "framer-motion";
+import { motion, useInView, useReducedMotion, AnimatePresence } from "motion/react";
 import { useRef, useState, useMemo } from "react";
 import type { GitHubLangStats, GitHubRepo } from "../types/github";
 

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { MessageSquare, Sparkles, X, Send, RotateCcw, Cpu, Code2 } from "lucide-react";
 import { useAssistantSession, type ChatMessage } from "../lib/assistant/useAssistantSession";
 import { getFaq } from "../lib/data";

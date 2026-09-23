@@ -7,7 +7,7 @@ import {
   Stars,
 } from "@react-three/drei";
 import * as THREE from "three";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { ExternalLink, Star, GitFork, X } from "lucide-react";
 import RepoPlanet from "../components/atoms/RepoPlanet";
 import type { GitHubRepo, GitHubData } from "../types/github";

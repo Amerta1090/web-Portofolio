@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "motion/react";
 import * as d3 from "d3";
 import { useThemeStore } from "../../lib/useThemeStore";
 

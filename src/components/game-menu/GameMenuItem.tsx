@@ -1,6 +1,6 @@
-import { type Variants, motion } from "framer-motion";
+import { type Variants, motion } from "motion/react";
 import type React from "react";
-import { duration, easing, distance } from "../../lib/motion";
+import { distance, duration, easing } from "../../lib/motion";
 
 interface GameMenuItemProps {
   label: string;

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { FlaskConical, Sparkles, ArrowRight } from "lucide-react";
 
 export default function CreativeLabPill() {

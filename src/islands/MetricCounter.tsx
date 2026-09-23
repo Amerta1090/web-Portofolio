@@ -1,4 +1,4 @@
-import { motion, useInView, useMotionValue, useSpring, useReducedMotion } from "framer-motion";
+import { motion, useInView, useMotionValue, useSpring, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { duration, easing } from "../lib/motion";
 

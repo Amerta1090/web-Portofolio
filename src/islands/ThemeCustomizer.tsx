@@ -1,5 +1,5 @@
-import { useReducedMotion } from "framer-motion";
-import { AnimatePresence, motion } from "framer-motion";
+import { useReducedMotion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { Palette, RotateCcw, X, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";

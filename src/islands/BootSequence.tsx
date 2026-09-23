@@ -1,4 +1,4 @@
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import TypewriterText from "../components/atoms/TypewriterText";
 import { gsap } from "../lib/gsap";

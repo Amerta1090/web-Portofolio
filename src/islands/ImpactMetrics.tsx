@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { useGSAP } from "../lib/useGSAP";
 import { gsap, ScrollTrigger } from "../lib/gsap";
-import { useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "motion/react";
 
 interface Metric {
   label: string;

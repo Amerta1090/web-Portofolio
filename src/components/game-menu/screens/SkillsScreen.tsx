@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { BarChart3, BrainCircuit, Cloud, Code2, Container, Cpu, Zap } from "lucide-react";
 import type React from "react";
 import { useState } from "react";

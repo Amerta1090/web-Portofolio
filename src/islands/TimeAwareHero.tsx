@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import HeroAvatar from "../components/atoms/HeroAvatar";
