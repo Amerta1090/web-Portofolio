@@ -175,6 +175,28 @@ Cara pakai:
 
 Pola findings: off-screen work (RAF), stale `will-change` (3), **excess scroll listeners** (home 40), JS scroll-linked (bukan ScrollTimeline), high GPU memory (662MB), layout-triggering, mount thrashing. Semua sudah dipetakan ke fase di §6 (lihat baseline).
 
+### 3.5.1 Target grade per halaman (diturunkan dari analisis baseline — WAJIB MATCH DoD)
+
+> Jawaban pertanyaan "target audit berapa, A atau S?": **A-tier per halaman** (bukan
+> S). Penjelasan mengapa bukan S ada di tabel → hilangkan S dari ekspektasi.
+
+| Halaman | Baseline overall | **Target** | Alasan (dari temuan terukur baseline §3.5, bukan asumsi) |
+|---|---|---|---|
+| `/` | C (49/100) | **A (≥70)** | Nilai C datang dari Scroll **D-tier mobile** (50 det, 36–40 scroll listeners) + Animations C dgn 6 off-screen + GPU 662MB. Semua TIGA penyebab ada di scope fix Phase B/C (RAF guard, ScrollTimeline, will-change audit). Thrashing sudah S. → Setelah fix, kategori animasi/scroll target S/A. Stretch (opsional): A- dalam 1 fase. |
+| `/gallery` | B (43/100) | **A (≥70)** | Satu-satunya penekan: Animations **F-tier** (66–67 deteksi = RAF eksperimen off-screen). Itu justru fix terbesar & paling terukur di Phase C (inView guard). Kategori lain sudah A/S. → F→S/A setelah guard = lompatan langsung ke A. |
+| `/observatory` | A (74/100) | **A (≥70, pertahankan)** | Sudah A. Wajib DIJAGA (jangan turun gara-gara perubahan global MotionConfig/LazyMotion). Stretch: A+ bila GPU B (189MB) bisa ditekan lokal — tidak wajib, catat keputusan. |
+
+**Kenapa bukan S-tier (resolved, jangan ditanya ulang):**
+MotionScore S-tier overall = semua kategori S (Animations S + Scroll S + Thrashing S +
+GPU S). S kategori Animations/Scroll butuh *semua* animasi compositor-only + ScrollTimeline
+penuh — realistik berkategori. Tapi **GPU S** butuh texture memory minimal & tanpa
+layer besar permanen; proyek ini punya canvas eksperimen/WebGL yang inheren berat
+(& concurrency raf). Menarget S overall = memaksa redesign eksperimen atau Motion+
+berbayar — **di luar scope sprint ini**. Keputusan konservatif: A overall, dengan
+target **kategori S/A** untuk Animations & Scroll + **nol temuan D/F** (gate keras,
+sudah ada di baseline & DoD). Ini sesuai tier list Motion: upgrade tier, bukan hanya
+naik grade huruf.
+
 ---
 
 ## 4. Data & model changes

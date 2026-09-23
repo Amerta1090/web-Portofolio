@@ -19,9 +19,11 @@
 - [ ] VERIFIKASI: build:fast ✓, `bun run test` ✓, `bunx astro check` ✓ tanpa error baru, biome ✓, e2e targeted (gallery, home) ✓.
 
 ## Phase B — MotionScore baseline + fix tier D/F
-- [x] **Baseline SUDAH ter-ukur 2026-09-23** (bonus sesi analisis): `/` = C 49/100, `/gallery` = B 43/100 (Animations **F**!), `/observatory` = A 74/100. Detail + findings → `docs/motion-score-baseline.md`. CLI menerima SATU URL/pemanggilan.
+- [x] **Baseline SUDAH ter-ukur 2026-09-23** (bonus sesi analisis): `/` = C 49/100, `/gallery` = B 43/100 (Animations **F**!), `/observatory` = A 74/100. Detail + findings → `docs/motion-score-baseline.md`.
+- [ ] **TARGET GRADE (PRD §3.5.1 — WAJIB MATCH, bukan asumsi baru)**: setap halaman = **A-tier (≥70)** secara overall — `/` & `/gallery` naik ke A; `/observatory` pertahankan A. **BUKAN S-tier** (alasan keras di PRD §3.5 "Kenapa bukan S": S butuh semua kategori S incl Scroll/GPU S yang tak realistis utk proyek canvas-eksperimen ini). Gate keras DoD: **nol temuan tier D/F** di 3 halaman (bukan preferensi). CLI menerima SATU URL/pemanggilan.
 - [ ] (Opsional re-audit ulang saat lokal) `bun run serve` + `npx motionscore http://localhost:4321 --no-upload` — Chrome sudah ter-install di mesin ini.
 - [ ] Terapkan fix temuan HIGH → mapping di `docs/motion-score-baseline.md` (§Pemetaan): off-screen RAF (C), scroll listeners (C), will-change (C), high GPU mem (C), layout-triggering (B).
+- [ ] **JANGAN LUPA target grade**: PRD §3.5.1 → walau `fetch` baseline sudah ada, fix Phase B/C harus mengejar **overall A-tier** di 3 halaman (`/`, `/gallery`, `/observatory`) → target akhir per halaman sesuai tabel §3.5.1 (A/A/A), dengan **animations kategori target S/A** + **nol temuan D/F** (gate keras, non-opsional).
 - [ ] Fix semua tier D (layout/frame) & F (thrashing). Patokan fix: prop layout → transform/scale; read/write interleaved → `frame.read`/`frame.update`; CSS var global per-frame → scope lokal / `@property { inherits:false }` / targeted style.
 - [ ] Tambah script npm `score:motion` (motionscore localhost:4321 --no-upload).
 - [ ] Dokumentasikan tier C yang sengaja dibiarkan (dengan alasan) di baseline.
