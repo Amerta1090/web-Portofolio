@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 /* ------------------------------------------------------------------ */
 /*  Types & Complex helpers                                           */
@@ -325,6 +326,8 @@ export default function ConformalMapping({
   const panXRef = useRef(panX);
   const panYRef = useRef(panY);
 
+  const guard = useRafGuard(containerRef);
+
   useEffect(() => { funcIdRef.current = funcId; }, [funcId]);
   useEffect(() => { zoomRef.current = zoom; }, [zoom]);
   useEffect(() => { panXRef.current = panX; }, [panX]);
@@ -357,6 +360,7 @@ export default function ConformalMapping({
 
   // --- Main render loop ---
   useEffect(() => {
+    if (guard.paused) return; // off-screen / tab hidden → hentikan loop
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
@@ -449,7 +453,7 @@ export default function ConformalMapping({
       cancelAnimationFrame(rafRef.current);
       ro.disconnect();
     };
-  }, [compact, prevFuncId]);
+  }, [compact, prevFuncId, guard.paused]);
 
   // Mouse handlers for pan
   const onMouseDown = useCallback(

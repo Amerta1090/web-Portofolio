@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 type VizMode = "bar" | "ring" | "wave" | "particle" | "hex";
 
@@ -34,6 +35,8 @@ export default function AudioVisualizer({ compact }: { compact?: boolean }) {
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
+
+  const guard = useRafGuard(containerRef);
 
   const initAudio = useCallback(() => {
     if (audioCtxRef.current) return;
@@ -170,6 +173,7 @@ export default function AudioVisualizer({ compact }: { compact?: boolean }) {
 
   // Drawing loop
   useEffect(() => {
+    if (guard.paused) return; // off-screen / tab hidden → hentikan loop
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
@@ -407,7 +411,7 @@ export default function AudioVisualizer({ compact }: { compact?: boolean }) {
       cancelAnimationFrame(rafRef.current);
       ro.disconnect();
     };
-  }, [mode, compact]);
+  }, [mode, compact, guard.paused]);
 
   useEffect(() => {
     return () => {

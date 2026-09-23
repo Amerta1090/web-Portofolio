@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 interface City {
   x: number;
@@ -275,6 +276,8 @@ export default function SimulatedAnnealingTSP({
   const speedRef = useRef(50);
   const pausedRef = useRef(true);
 
+  const guard = useRafGuard(containerRef);
+
   useEffect(() => { citiesRef.current = cities; }, [cities]);
   useEffect(() => { initialTempRef.current = initialTemp; }, [initialTemp]);
   useEffect(() => { coolingRateRef.current = coolingRate; }, [coolingRate]);
@@ -369,9 +372,10 @@ export default function SimulatedAnnealingTSP({
   }, [doStep, render]);
 
   useEffect(() => {
+    if (guard.paused) return;
     rafRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [loop]);
+  }, [loop, guard.paused]);
 
   const handleCanvasClick = useCallback(
     (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -453,7 +457,7 @@ export default function SimulatedAnnealingTSP({
 
   if (compact) {
     return (
-      <div className="relative w-full h-full overflow-hidden bg-[#0f0f11]">
+      <div ref={guard.ref} className="relative w-full h-full overflow-hidden bg-[#0f0f11]">
         <canvas
           ref={canvasRef}
           className="w-full h-full"

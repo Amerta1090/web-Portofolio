@@ -21,7 +21,8 @@ export default function PhaseIndicator() {
   const [currentPhase, setCurrentPhase] = useState(0);
 
   useMotionValueEvent(smoothProgress, "change", (latest) => {
-    setCurrentPhase(Math.min(Math.floor(latest * PHASES.length), PHASES.length - 1));
+    const next = Math.min(Math.floor(latest * PHASES.length), PHASES.length - 1);
+    setCurrentPhase((prev) => (prev === next ? prev : next));
   });
 
   if (effectiveTier === "tier-1") return null;
@@ -46,10 +47,9 @@ export default function PhaseIndicator() {
             type="button"
           >
             <motion.span
-              className="block rounded-full transition-colors duration-300"
+              className="block w-1.5 h-1.5 rounded-full transition-colors duration-300"
               animate={{
-                width: isActive ? 10 : 6,
-                height: isActive ? 10 : 6,
+                scale: isActive ? 1.667 : 1,
                 backgroundColor: isActive
                   ? "rgb(245, 158, 11)"
                   : isPast

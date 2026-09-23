@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 interface AttractorParams {
   sigma: number;
@@ -110,6 +111,8 @@ export default function StrangeAttractorZoo({ compact }: { compact?: boolean }) 
   const paramsRef = useRef(params);
   const sensRef = useRef(sensitivity);
 
+  const guard = useRafGuard(containerRef);
+
   useEffect(() => { typeRef.current = type; }, [type]);
   useEffect(() => { paramsRef.current = params; }, [params]);
   useEffect(() => { sensRef.current = sensitivity; }, [sensitivity]);
@@ -151,6 +154,7 @@ export default function StrangeAttractorZoo({ compact }: { compact?: boolean }) 
   }, [handleReset]);
 
   useEffect(() => {
+    if (guard.paused) return; // off-screen / tab hidden → hentikan RAF loop
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
@@ -239,7 +243,7 @@ export default function StrangeAttractorZoo({ compact }: { compact?: boolean }) 
       cancelAnimationFrame(rafRef.current);
       ro.disconnect();
     };
-  }, [compact, rotX, rotY]);
+  }, [compact, rotX, rotY, guard.paused]);
 
   const formulaOverlay = type === "lorenz"
     ? "σ=" + params.sigma.toFixed(1) + " ρ=" + params.rho.toFixed(1) + " β=" + params.beta.toFixed(2)

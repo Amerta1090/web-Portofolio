@@ -1,10 +1,9 @@
 import { ArrowRight } from "lucide-react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { useEffect, useState } from "react";
 import HeroAvatar from "../components/atoms/HeroAvatar";
 import RevealText from "../components/atoms/RevealText";
 import { duration, easing } from "../lib/motion";
-import { useScrollProgress } from "../lib/useScrollProgress";
 import { useTimeOfDay } from "../lib/useTimeOfDay";
 
 interface Props {
@@ -28,7 +27,10 @@ function useReturnVisitor(): boolean {
 
 export default function TimeAwareHero({ name, headline, tagline, resumeUrl }: Props) {
   const prefersReduced = useReducedMotion();
-  const { scrollY } = useScrollProgress();
+  const { scrollY } = useScroll();
+  const bgParallax = useTransform(scrollY, (v) => v * 0.15);
+  const overlayParallax = useTransform(scrollY, (v) => v * 0.05);
+  const contentParallax = useTransform(scrollY, (v) => v * -0.02);
   const [loaded, setLoaded] = useState(prefersReduced);
   const time = useTimeOfDay();
   const isReturning = useReturnVisitor();
@@ -48,7 +50,7 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl }: Pr
     <section className="relative min-h-[calc(100vh-4rem)] flex flex-col justify-center overflow-hidden z-10">
       <motion.picture
         className="absolute inset-0 z-0"
-        style={prefersReduced ? {} : { y: scrollY * 0.15, willChange: "transform" }}
+        style={prefersReduced ? {} : { y: bgParallax }}
       >
         <source
           type="image/webp"
@@ -69,13 +71,13 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl }: Pr
       </motion.picture>
       <motion.div
         className="absolute inset-0 z-[1] bg-gradient-to-r from-bg-primary/85 via-bg-primary/60 to-bg-primary/40"
-        style={prefersReduced ? {} : { y: scrollY * 0.05, willChange: "transform" }}
+        style={prefersReduced ? {} : { y: overlayParallax }}
       />
       <div className="absolute bottom-0 left-0 right-0 h-32 z-[1] bg-gradient-to-t from-bg-primary to-transparent" />
 
       <motion.div
         className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8 relative z-20 flex-1 flex items-center"
-        style={prefersReduced ? {} : { y: scrollY * -0.02, willChange: "transform" }}
+        style={prefersReduced ? {} : { y: contentParallax }}
       >
         <div className="flex flex-col items-start gap-6 md:gap-8">
           <motion.div

@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import OrganicLoader from "./OrganicLoader";
 
 describe("OrganicLoader", () => {
@@ -76,5 +76,50 @@ describe("OrganicLoader", () => {
     const { container } = render(<OrganicLoader variant="growing" indeterminate />);
     const inner = container.querySelector(".h-full") as HTMLElement;
     expect(inner.style.width).toBe("40%");
+  });
+
+  it("breathing RAF loop stops when tab is hidden", () => {
+    const raf = vi.spyOn(window, "requestAnimationFrame").mockImplementation(() => 1);
+    const caf = vi.spyOn(window, "cancelAnimationFrame").mockImplementation(() => {});
+    const original = document.hidden;
+    Object.defineProperty(document, "hidden", { configurable: true, value: true });
+
+    render(<OrganicLoader variant="breathing" />);
+    document.dispatchEvent(new Event("visibilitychange"));
+
+    expect(caf).toHaveBeenCalled();
+    raf.mockRestore();
+    caf.mockRestore();
+    Object.defineProperty(document, "hidden", { configurable: true, value: original });
+  });
+
+  it("pulsing RAF loop stops when tab is hidden", () => {
+    const raf = vi.spyOn(window, "requestAnimationFrame").mockImplementation(() => 1);
+    const caf = vi.spyOn(window, "cancelAnimationFrame").mockImplementation(() => {});
+    const original = document.hidden;
+    Object.defineProperty(document, "hidden", { configurable: true, value: true });
+
+    render(<OrganicLoader variant="pulsing" />);
+    document.dispatchEvent(new Event("visibilitychange"));
+
+    expect(caf).toHaveBeenCalled();
+    raf.mockRestore();
+    caf.mockRestore();
+    Object.defineProperty(document, "hidden", { configurable: true, value: original });
+  });
+
+  it("growing indeterminate RAF loop stops when tab is hidden", () => {
+    const raf = vi.spyOn(window, "requestAnimationFrame").mockImplementation(() => 1);
+    const caf = vi.spyOn(window, "cancelAnimationFrame").mockImplementation(() => {});
+    const original = document.hidden;
+    Object.defineProperty(document, "hidden", { configurable: true, value: true });
+
+    render(<OrganicLoader variant="growing" indeterminate />);
+    document.dispatchEvent(new Event("visibilitychange"));
+
+    expect(caf).toHaveBeenCalled();
+    raf.mockRestore();
+    caf.mockRestore();
+    Object.defineProperty(document, "hidden", { configurable: true, value: original });
   });
 });

@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 function fade(t: number): number {
   return t * t * t * (t * (t * 6 - 15) + 10);
@@ -195,6 +196,8 @@ export default function NoiseTopography({ compact }: { compact?: boolean }) {
     permRef.current = seededPerm(seed);
   }, [seed]);
 
+  const guard = useRafGuard(containerRef);
+
   const handleExportSTL = useCallback(() => {
     const h = heightsRef.current;
     if (!h || h.length < 2) return;
@@ -206,6 +209,7 @@ export default function NoiseTopography({ compact }: { compact?: boolean }) {
   }, []);
 
   useEffect(() => {
+    if (guard.paused) return;
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
@@ -429,7 +433,7 @@ export default function NoiseTopography({ compact }: { compact?: boolean }) {
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
     };
-  }, [compact]);
+  }, [compact, guard.paused]);
 
   return (
     <div ref={containerRef} className="relative w-full h-full bg-[#0f0f11] overflow-hidden select-none">

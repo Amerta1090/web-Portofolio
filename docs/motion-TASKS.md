@@ -31,13 +31,13 @@
 - [x] VERIFIKASI: grade tercatat ✓, D/F = 0 ✓ (D fixed; F → C.0 ter-mapping), unit hijau (709/709) ✓, e2e targeted hijau (craft+typography+micro 17/17) ✓, biome NOW=10 < HEAD=11 (0 baru) ✓.
 
 ## Phase C — Upgrade tier S/A + RAF off-screen (paling berdampak)
-- [ ] Guard viewport utk RAF eksperimen (`src/islands/experiments/*`): pause saat off-screen (inView/IO), resume saat masuk; scene statis → render-on-demand; `visibilitychange` → pause saat tab hidden. Cek GalleryGrid unmount melepas RAF.
-- [ ] PhaseIndicator: pastikan progress diteruskan ke style (GPU/ScrollTimeline), state hanya utk pergantian fase (throttle) — bukan per-frame.
-- [ ] Dedupe cursor: hapus script cursor lerp inline di BaseLayout.astro bila terbukti duplikat CustomCursor (island tetap client:load).
-- [ ] useScrollProgress: putuskan keep vs ganti `useScroll()`+`useTransform`; catat keputusan di baseline.
-- [ ] Audit `will-change` di src/styles/*.css → hapus `will-change` permanen tak perlu.
-- [ ] Bundle LazyMotion: ukur chunk motion; hanya evaluasi `LazyMotion`+`m`+`domAnimation` bila satu chunk >15% JS total; jika kecil, lewati & catat.
-- [ ] VERIFIKASI: RAF berhenti saat off-screen (test/e2e spy), unit+e2e hijau, build tetap 45+ page.
+- [x] Guard viewport utk RAF eksperimen (`src/islands/experiments/*`): pause saat off-screen (inView/IO), resume saat masuk; scene statis → render-on-demand; `visibilitychange` → pause saat tab hidden. Cek GalleryGrid unmount melepas RAF. — **DONE**: hook `src/lib/useRafGuard.ts` (IO off-screen + visibilitychange + reduced-motion + prefersReducedBurden) + 4 test; 24/24 eksperimen RAF pakai `useRafGuard` + `if (guard.paused) return` + deps `guard.paused` (G1–G4 via 4 sub-agents); RAF non-eksperimen ikut di-guard: `OrganicLoader` (3 varian → guard) + ticker `TopReposLeaderboard` (interval 4s → `guard.paused` bailout).
+- [x] PhaseIndicator: pastikan progress diteruskan ke style (GPU/ScrollTimeline), state hanya utk pergantian fase (throttle) — bukan per-frame. — `setCurrentPhase` functional-updater bailout; dot 10↔6px `width/height`→`scale 1.667` (compositor-only). Detail baseline §8.
+- [x] Dedupe cursor: hapus script cursor lerp inline di BaseLayout.astro bila terbukti duplikat CustomCursor (island tetap client:load). — terbukti duplikat persis; inline dihapus; island **di-mount `client:load`** (single source of truth) + guard `tier-1` + 1 test (6 total). Detail baseline §8.
+- [x] useScrollProgress: putuskan keep vs ganti `useScroll()`+`useTransform`; catat keputusan di baseline. — **REPLACE** (hanya `scrollY` px dipakai); `useScrollProgress.ts` dihapus (dead code); 3 willChange stale hilang. Detail baseline §8.
+- [x] Audit `will-change` di src/styles/*.css → hapus `will-change` permanen tak perlu. — `grep will-change src` → **0 match** (semua manual stale hilang di fix TimeAwareHero).
+- [x] Bundle LazyMotion: ukur chunk motion; hanya evaluasi `LazyMotion`+`m`+`domAnimation` bila satu chunk >15% JS total; jika kecil, lewati & catat. — **SKIP**: chunk motion 125,269 B = 5.9% JS total (2,141,429 B) < 15%. Detail baseline §8.
+- [x] VERIFIKASI: unit `bun run test` ✓ **719/719 (59 file)** (+10 baru: useRafGuard 4, OrganicLoader +4, TopReposLeaderboard +2); build:fast ✓ **49 page**; typecheck (`bunx astro check`) error = identik HEAD (0 baru); biome 0 error baru di file disentuh; e2e: gallery **71/71 (3.2m)** — flake klik card diperbaiki via helper `openExperiment` (grid-scope + `scrollIntoViewIfNeeded` + `[data-modal-content]` timeout 10s, pola dari recommend.spec) + observatory **5/5**; re-audit MotionScore pasca-Phase C → baseline §8 (target A-tier terkonfirmasi).
 
 ## Phase D — Opsional (butuh konfirmasi user)
 - [ ] [BUTUH USER] MotionScore Guard: `.github/workflows/motionscore.yml` (deployment_status, pages / /gallery /observatory) — gratis utk comment; gate threshold berbayar, jangan pasang tanpa persetujuan.

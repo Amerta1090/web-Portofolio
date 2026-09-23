@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 const BIFURCATION_POINTS = 20000;
 const SWEEP_STEPS = 2000;
@@ -51,6 +52,8 @@ export default function LogisticMap({ compact }: { compact?: boolean }) {
   useEffect(() => { x0Ref.current = x0; }, [x0]);
   useEffect(() => { showCobwebRef.current = showCobweb; }, [showCobweb]);
 
+  const guard = useRafGuard(containerRef);
+
   const handleSweep = useCallback(() => {
     setSweeping(true);
     setFeigenbaum(computeFeigenbaum());
@@ -71,6 +74,7 @@ export default function LogisticMap({ compact }: { compact?: boolean }) {
   }, []);
 
   useEffect(() => {
+    if (guard.paused) return;
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
@@ -263,7 +267,7 @@ export default function LogisticMap({ compact }: { compact?: boolean }) {
       cancelAnimationFrame(rafRef.current);
       ro.disconnect();
     };
-  }, [compact]);
+  }, [compact, guard.paused]);
 
   return (
     <div ref={containerRef} className="relative w-full h-full bg-[#0f0f11] overflow-hidden">

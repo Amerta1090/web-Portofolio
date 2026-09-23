@@ -16,7 +16,8 @@ export default function MetricCard({ icon: Icon, value, suffix = "", label, inde
     <motion.div
       className="relative overflow-hidden rounded-xl border border-border/60 bg-bg-secondary/40 p-5 backdrop-blur-sm group hover:border-brand/30 transition-colors duration-500"
       initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
       transition={{
         duration: duration.slow,
         ease: easing["ease-out-expo"],

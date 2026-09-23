@@ -173,7 +173,8 @@ export default function RepoGlowCard({ repo, rank, index }: RepoGlowCardProps) {
       rel="noopener noreferrer"
       className="block"
       initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
       transition={{
         duration: duration.deliberate,
         ease: easing["ease-out-expo"],

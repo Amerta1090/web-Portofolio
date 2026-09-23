@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test.describe("Observatory — portfolio viewed as a dataset", () => {
   test("nav includes Observatory and it navigates to /observatory", async ({ page }) => {
     await page.goto("/");
-    const link = page.getByRole("link", { name: "Observatory", exact: true });
+    const link = page.getByRole("link", { name: "Observatory", exact: true }).first();
     await expect(link).toBeVisible();
     await link.click();
     await expect(page).toHaveURL(/\/observatory$/);
@@ -12,7 +12,7 @@ test.describe("Observatory — portfolio viewed as a dataset", () => {
 
   test("page renders all analytical sections", async ({ page }) => {
     await page.goto("/observatory");
-    for (const label of ["Overview", "Timeline", "Technology", "Patterns", "Insights"]) {
+    for (const label of ["Overview", "Timeline", "Technology", "Patterns", "Derived insights"]) {
       await expect(page.getByText(label, { exact: true }).first()).toBeVisible();
     }
   });
@@ -31,7 +31,7 @@ test.describe("Observatory — portfolio viewed as a dataset", () => {
 
   test("insights cards each expose their derivation rule", async ({ page }) => {
     await page.goto("/observatory");
-    const insights = page.getByText("Insights", { exact: true }).first();
+    const insights = page.getByText("Derived insights", { exact: true }).first();
     await insights.scrollIntoViewIfNeeded();
     const footnotes = page.locator("[data-observatory='rule']");
     expect(await footnotes.count()).toBeGreaterThan(0);

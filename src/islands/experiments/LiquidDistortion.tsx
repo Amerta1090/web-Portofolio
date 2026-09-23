@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 const GRID_W = 80;
 const GRID_H = 50;
@@ -40,7 +41,10 @@ export default function LiquidDistortion({ compact }: { compact?: boolean }) {
 
   const mouseRef = useRef({ x: -1, y: -1, px: -1, py: -1, down: false });
 
+  const guard = useRafGuard(containerRef);
+
   useEffect(() => {
+    if (guard.paused) return; // off-screen / tab hidden / reduced-motion → hentikan loop
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
@@ -200,7 +204,7 @@ export default function LiquidDistortion({ compact }: { compact?: boolean }) {
       cancelAnimationFrame(rafRef.current);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     };
-  }, [compact]);
+  }, [compact, guard.paused]);
 
   if (compact) {
     return (

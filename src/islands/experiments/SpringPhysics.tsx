@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 interface Point {
   x: number;
@@ -159,6 +160,8 @@ export default function SpringPhysics({ compact }: { compact?: boolean }) {
   useEffect(() => { stiffnessRef.current = stiffness; }, [stiffness]);
   useEffect(() => { pausedRef.current = paused; }, [paused]);
 
+  const guard = useRafGuard(containerRef);
+
   const applyPreset = useCallback((preset: string) => {
     const container = containerRef.current;
     if (!container) return;
@@ -208,6 +211,7 @@ export default function SpringPhysics({ compact }: { compact?: boolean }) {
   }, [compact]);
 
   useEffect(() => {
+    if (guard.paused) return;
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
@@ -386,7 +390,7 @@ export default function SpringPhysics({ compact }: { compact?: boolean }) {
       cancelAnimationFrame(rafRef.current);
       ro.disconnect();
     };
-  }, [compact]);
+  }, [compact, guard.paused]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

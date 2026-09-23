@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 type CanvasTool = "pan" | "pen" | "marker" | "spray" | "eraser" | "particle" | "node";
 type ExportFormat = "png" | "svg";
@@ -334,6 +335,8 @@ export default function InteractiveCanvas({ compact }: { compact?: boolean }) {
   const particlesRef = useRef<CanvasParticle[]>(initParticles());
   const particleModeRef = useRef(false);
   const lastParticleSpawnRef = useRef({ x: 0, y: 0, time: 0 });
+
+  const guard = useRafGuard(containerRef);
 
   const [strokes, setStrokes] = useState<StrokeData[]>([]);
   const [nodes, setNodes] = useState<GraphNode[]>([]);
@@ -777,6 +780,7 @@ export default function InteractiveCanvas({ compact }: { compact?: boolean }) {
   }, [compact]);
 
   useEffect(() => {
+    if (guard.paused) return; // off-screen / tab hidden / reduced-motion → hentikan loop
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
@@ -817,7 +821,7 @@ export default function InteractiveCanvas({ compact }: { compact?: boolean }) {
       window.removeEventListener("resize", resize);
       el.removeEventListener("wheel", handleWheel);
     };
-  }, [compact, renderScene, handleWheel]);
+  }, [compact, renderScene, handleWheel, guard.paused]);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {

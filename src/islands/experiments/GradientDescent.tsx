@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 type OptimizerType = "sgd" | "momentum" | "adam";
 
@@ -191,6 +192,8 @@ export default function GradientDescent({ compact }: { compact?: boolean }) {
   const runningRef = useRef(true);
   const timeRef = useRef(0);
 
+  const guard = useRafGuard(containerRef);
+
   const [visible, setVisible] = useState<Record<OptimizerType, boolean>>({
     sgd: true,
     momentum: true,
@@ -235,6 +238,7 @@ export default function GradientDescent({ compact }: { compact?: boolean }) {
   }, []);
 
   useEffect(() => {
+    if (guard.paused) return; // off-screen / tab hidden → hentikan loop
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
@@ -541,7 +545,7 @@ export default function GradientDescent({ compact }: { compact?: boolean }) {
       cancelAnimationFrame(rafRef.current);
       ro.disconnect();
     };
-  }, [compact]);
+  }, [compact, guard.paused]);
 
   const toggleOpt = (type: OptimizerType) => {
     setVisible(v => ({ ...v, [type]: !v[type] }));

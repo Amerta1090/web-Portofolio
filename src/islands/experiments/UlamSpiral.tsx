@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 type HighlightMode = "primes" | "twin" | "mersenne" | "gaps";
 type LayoutMode = "spiral" | "rectangular";
@@ -82,6 +83,8 @@ export default function UlamSpiral({ compact }: { compact?: boolean }) {
   });
   const primesCacheRef = useRef<boolean[]>([]);
 
+  const guard = useRafGuard(containerRef);
+
   const [stats, setStats] = useState({ primesShown: 0, density: 0, largestPrime: 0 });
 
   useEffect(() => { cellSizeRef.current = cellSize; }, [cellSize]);
@@ -96,6 +99,7 @@ export default function UlamSpiral({ compact }: { compact?: boolean }) {
   }, []);
 
   useEffect(() => {
+    if (guard.paused) return; // off-screen / tab hidden → hentikan RAF loop
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
@@ -223,7 +227,7 @@ export default function UlamSpiral({ compact }: { compact?: boolean }) {
       cancelAnimationFrame(rafRef.current);
       ro.disconnect();
     };
-  }, [compact]);
+  }, [compact, guard.paused]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     if (compact) return;

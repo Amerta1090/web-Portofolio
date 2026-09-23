@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, cleanup } from "@testing-library/react";
+import { cleanup, render } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import CustomCursor from "./CustomCursor";
 
 type MatchMediaMock = (query: string) => {
@@ -48,7 +48,10 @@ describe("CustomCursor", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     setTouchDevice(false);
     setMatchMedia(false);
-    vi.stubGlobal("requestAnimationFrame", vi.fn(() => 1));
+    vi.stubGlobal(
+      "requestAnimationFrame",
+      vi.fn(() => 1),
+    );
     vi.stubGlobal("cancelAnimationFrame", vi.fn());
   });
 
@@ -76,6 +79,14 @@ describe("CustomCursor", () => {
     setTouchDevice(true);
     render(<CustomCursor />);
     expect(document.querySelector(".custom-cursor")).toBeNull();
+  });
+
+  it("does not inject anything on tier-1 (lightning) experience tier", () => {
+    document.documentElement.dataset.experienceTier = "tier-1";
+    render(<CustomCursor />);
+    expect(document.querySelector(".custom-cursor")).toBeNull();
+    expect(document.querySelector(".custom-cursor-ring")).toBeNull();
+    delete document.documentElement.dataset.experienceTier;
   });
 
   it("injects cursor on touch devices when enableOnTouch is true", () => {

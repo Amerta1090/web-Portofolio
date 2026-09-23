@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 type Task = "xor" | "circle" | "spiral";
 
@@ -430,6 +431,8 @@ export default function NeuralNetworkArt({ compact }: { compact?: boolean }) {
   const stepsRef = useRef(2);
   const timeRef = useRef(0);
 
+  const guard = useRafGuard(containerRef);
+
   useEffect(() => { taskRef.current = task; }, [task]);
   useEffect(() => { pausedRef.current = paused; }, [paused]);
   useEffect(() => { stepsRef.current = stepsPerFrame; }, [stepsPerFrame]);
@@ -446,6 +449,7 @@ export default function NeuralNetworkArt({ compact }: { compact?: boolean }) {
   }, [task]);
 
   useEffect(() => {
+    if (guard.paused) return; // off-screen / tab hidden → hentikan loop
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
@@ -594,7 +598,7 @@ export default function NeuralNetworkArt({ compact }: { compact?: boolean }) {
       cancelAnimationFrame(rafRef.current);
       ro.disconnect();
     };
-  }, [learningRate, compact]);
+  }, [learningRate, compact, guard.paused]);
 
   return (
     <div

@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 interface Props {
   compact?: boolean;
@@ -227,6 +228,8 @@ export default function TesseractProjection({ compact }: Props) {
   const dragRotatingRef = useRef(dragRotating);
   const dragStartRef = useRef({ x: 0, y: 0 });
 
+  const guard = useRafGuard(containerRef);
+
   useEffect(() => { planesRef.current = planes; }, [planes]);
   useEffect(() => { autoRotateRef.current = autoRotate; }, [autoRotate]);
   useEffect(() => { masterSpeedRef.current = masterSpeed; }, [masterSpeed]);
@@ -248,6 +251,7 @@ export default function TesseractProjection({ compact }: Props) {
   const starsRef = useRef<{ x: number; y: number; r: number; a: number }[]>([]);
 
   useEffect(() => {
+    if (guard.paused) return; // off-screen / tab hidden / reduced-motion → hentikan loop
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
@@ -449,7 +453,7 @@ export default function TesseractProjection({ compact }: Props) {
       cancelAnimationFrame(rafRef.current);
       ro.disconnect();
     };
-  }, [compact]);
+  }, [compact, guard.paused]);
 
   // Pointer event handlers for drag rotation (non-compact only)
   useEffect(() => {

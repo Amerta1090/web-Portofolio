@@ -10,6 +10,7 @@ import Header from "../components/templates/Header.astro";
 import AmbientScene from "../islands/AmbientScene";
 import AssistantBot from "../islands/AssistantBot";
 import CommandPalette from "../islands/CommandPalette";
+import CustomCursor from "../islands/CustomCursor";
 import { SITE } from "../lib/constants";
 import { buildFaqLd } from "../lib/data";
 
@@ -234,65 +235,7 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
 
     <AssistantBot client:load />
     <CommandPalette client:load />
-
-    <script is:inline>
-      (function () {
-        if ("ontouchstart" in window || navigator.maxTouchPoints > 0) return;
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-        if (document.documentElement.dataset.experienceTier === "tier-1") return;
-
-        var cursor = document.createElement("div");
-        cursor.className = "custom-cursor";
-        cursor.style.cssText = "position:fixed;pointer-events:none;z-index:9999;width:12px;height:12px;border-radius:50%;background:#C17F59;transform:translate(-50%,-50%);transition:width var(--dur-base) var(--ease-out),height var(--dur-base) var(--ease-out),background var(--dur-base) var(--ease-out);opacity:0;";
-        document.body.appendChild(cursor);
-
-        var ring = document.createElement("div");
-        ring.className = "custom-cursor-ring";
-        ring.style.cssText = "position:fixed;pointer-events:none;z-index:9998;width:36px;height:36px;border-radius:50%;border:1.5px solid #7A8C6F;transform:translate(-50%,-50%);transition:width var(--dur-slow) var(--ease-out),height var(--dur-slow) var(--ease-out),border-color var(--dur-base) var(--ease-out);opacity:0;";
-        document.body.appendChild(ring);
-
-        var mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
-
-        document.addEventListener("mousemove", function (e) {
-          mouseX = e.clientX; mouseY = e.clientY;
-          cursor.style.opacity = "1"; ring.style.opacity = "1";
-        }, { passive: true });
-
-        document.addEventListener("mouseleave", function () {
-          cursor.style.opacity = "0"; ring.style.opacity = "0";
-        });
-
-        function onHoverableEnter(e) {
-          if (e.currentTarget.dataset.cursorHover === "button") {
-            cursor.style.width = "20px"; cursor.style.height = "20px";
-            cursor.style.background = "#7A8C6F";
-            ring.style.width = "48px"; ring.style.height = "48px";
-            ring.style.borderColor = "#C17F59";
-          }
-        }
-        function onHoverableLeave() {
-          cursor.style.width = "12px"; cursor.style.height = "12px";
-          cursor.style.background = "#C17F59";
-          ring.style.width = "36px"; ring.style.height = "36px";
-          ring.style.borderColor = "#7A8C6F";
-        }
-
-        var hoverables = document.querySelectorAll("a, button, [data-cursor-hover]");
-        hoverables.forEach(function (el) {
-          el.addEventListener("mouseenter", onHoverableEnter);
-          el.addEventListener("mouseleave", onHoverableLeave);
-        });
-
-        function animate() {
-          ringX += (mouseX - ringX) * 0.12;
-          ringY += (mouseY - ringY) * 0.12;
-          cursor.style.left = mouseX + "px"; cursor.style.top = mouseY + "px";
-          ring.style.left = ringX + "px"; ring.style.top = ringY + "px";
-          requestAnimationFrame(animate);
-        }
-        requestAnimationFrame(animate);
-      })();
-    </script>
+    <CustomCursor client:load />
 
     <script is:inline>
       (function () {

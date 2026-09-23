@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRafGuard } from "../../lib/useRafGuard";
 
 interface Point {
   x: number;
@@ -258,6 +259,8 @@ export default function BezierPlayground({ compact }: { compact?: boolean }) {
   const pointsRef = useRef<Point[]>([]);
   pointsRef.current = points;
 
+  const guard = useRafGuard(containerRef);
+
   const drawFrame = useCallback(() => {
     const canvas = canvasRef.current;
     const container = containerRef.current;
@@ -382,6 +385,7 @@ export default function BezierPlayground({ compact }: { compact?: boolean }) {
   }, [compact, showConstruction, curveType, animT]);
 
   useEffect(() => {
+    if (guard.paused) return;
     if (compact) {
       drawFrame();
       return;
@@ -397,9 +401,10 @@ export default function BezierPlayground({ compact }: { compact?: boolean }) {
       running = false;
       cancelAnimationFrame(animRef.current);
     };
-  }, [compact, drawFrame]);
+  }, [compact, drawFrame, guard.paused]);
 
   useEffect(() => {
+    if (guard.paused) return;
     if (!isAnimating || compact || curveType !== 'bezier' || points.length < 2) return;
     animStartRef.current = performance.now();
     let running = true;
@@ -417,7 +422,7 @@ export default function BezierPlayground({ compact }: { compact?: boolean }) {
       running = false;
       cancelAnimationFrame(animRef.current);
     };
-  }, [isAnimating, compact, curveType, points.length]);
+  }, [isAnimating, compact, curveType, points.length, guard.paused]);
 
   const handlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {

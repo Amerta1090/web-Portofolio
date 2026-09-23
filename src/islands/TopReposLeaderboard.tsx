@@ -1,10 +1,11 @@
-import { motion, useReducedMotion } from "motion/react";
 import { ArrowRight, GitCommit } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import RepoGlowCard from "../components/atoms/RepoGlowCard";
-import MagneticButton from "./MagneticButton";
 import { duration, easing, stagger } from "../lib/motion";
+import { useRafGuard } from "../lib/useRafGuard";
 import type { GitHubData } from "../types/github";
+import MagneticButton from "./MagneticButton";
 
 interface Props {
   topRepos: GitHubData["top_repos"];
@@ -16,6 +17,7 @@ export default function TopReposLeaderboard({ topRepos, repoActivity }: Props) {
   const [feedIndex, setFeedIndex] = useState(0);
   const feedRef = useRef<HTMLDivElement>(null);
   const isPaused = useRef(false);
+  const guard = useRafGuard(feedRef);
 
   const allCommits = repoActivity.flatMap((r) =>
     r.commits.map((c) => ({
@@ -27,14 +29,14 @@ export default function TopReposLeaderboard({ topRepos, repoActivity }: Props) {
   );
 
   useEffect(() => {
-    if (allCommits.length === 0 || prefersReduced) return;
+    if (allCommits.length === 0 || prefersReduced || guard.paused) return;
     const id = setInterval(() => {
       if (!isPaused.current) {
         setFeedIndex((i) => (i + 1) % allCommits.length);
       }
     }, 4000);
     return () => clearInterval(id);
-  }, [allCommits.length, prefersReduced]);
+  }, [allCommits.length, prefersReduced, guard.paused]);
 
   const handleFeedMouseEnter = useCallback(() => {
     isPaused.current = true;
@@ -53,7 +55,8 @@ export default function TopReposLeaderboard({ topRepos, repoActivity }: Props) {
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
           initial="hidden"
-          animate="visible"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
           variants={
             prefersReduced
               ? undefined
@@ -98,7 +101,8 @@ export default function TopReposLeaderboard({ topRepos, repoActivity }: Props) {
       {allCommits.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
           transition={{ delay: 0.6, duration: duration.deliberate, ease: easing["ease-out-expo"] }}
           className="relative overflow-hidden rounded-xl border border-border/60 bg-bg-secondary/30 p-5"
           onMouseEnter={handleFeedMouseEnter}
@@ -159,7 +163,10 @@ export default function TopReposLeaderboard({ topRepos, repoActivity }: Props) {
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand/10 border border-brand/20 text-brand text-sm font-medium hover:bg-brand/20 transition-all duration-300 group"
           >
             Explore Full Universe
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+            <ArrowRight
+              className="w-4 h-4 group-hover:translate-x-1 transition-transform"
+              aria-hidden="true"
+            />
           </a>
         </MagneticButton>
       </motion.div>

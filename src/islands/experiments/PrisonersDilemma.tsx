@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 type StrategyId = "tft" | "grim" | "defect" | "cooperate" | "random" | "pavlov" | "gtft";
 
@@ -203,6 +204,8 @@ export default function PrisonersDilemma({ compact }: { compact?: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const animRef = useRef<number>(0);
 
+  const guard = useRafGuard(containerRef);
+
   const [population, setPopulation] = useState<StrategyId[]>(initPopulation);
   const [history, setHistory] = useState<GenerationStats[]>([]);
   const [generation, setGeneration] = useState(0);
@@ -238,6 +241,7 @@ export default function PrisonersDilemma({ compact }: { compact?: boolean }) {
   }, []);
 
   useEffect(() => {
+    if (guard.paused) return; // off-screen / tab hidden → hentikan RAF loop
     if (!running) return;
     const interval = 1000 / Math.max(speed, 0.5);
     let last = performance.now();
@@ -253,7 +257,7 @@ export default function PrisonersDilemma({ compact }: { compact?: boolean }) {
     };
     animRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(animRef.current);
-  }, [running, speed, stepGen]);
+  }, [running, speed, stepGen, guard.paused]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 const PARTICLE_COUNT = 900;
 const COMPACT_COUNT = 500;
@@ -180,6 +181,8 @@ export default function GalaxyFormation({ compact }: { compact?: boolean }) {
   const speedRef = useRef(speed);
   const pausedRef = useRef(paused);
 
+  const guard = useRafGuard(containerRef);
+
   useEffect(() => {
     dmRef.current = dmFraction;
   }, [dmFraction]);
@@ -208,6 +211,7 @@ export default function GalaxyFormation({ compact }: { compact?: boolean }) {
   }, [dmFraction, angularMomentum, initialize]);
 
   useEffect(() => {
+    if (guard.paused) return; // off-screen / tab hidden / reduced-motion → hentikan loop
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
@@ -305,7 +309,7 @@ export default function GalaxyFormation({ compact }: { compact?: boolean }) {
       cancelAnimationFrame(rafRef.current);
       ro.disconnect();
     };
-  }, [compact]);
+  }, [compact, guard.paused]);
 
   return (
     <div ref={containerRef} className="relative w-full h-full bg-[#0f0f11] overflow-hidden">

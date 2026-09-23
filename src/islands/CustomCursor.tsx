@@ -12,6 +12,9 @@ export default function CustomCursor({ enableOnTouch = false }: CustomCursorProp
     const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
     if (prefersReducedMotion) return;
 
+    // Lightning/low-power tier: skip the custom cursor entirely.
+    if (document.documentElement.dataset.experienceTier === "tier-1") return;
+
     const cursor = document.createElement("div");
     cursor.className = "custom-cursor";
     cursor.style.cssText = `

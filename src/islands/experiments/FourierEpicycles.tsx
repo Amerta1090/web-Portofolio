@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 interface Epicycle {
   freq: number;
@@ -108,6 +109,8 @@ export default function FourierEpicycles({ compact }: { compact?: boolean }) {
   useEffect(() => { speedRef.current = speed; }, [speed]);
   useEffect(() => { showCirclesRef.current = showCircles; }, [showCircles]);
 
+  const guard = useRafGuard(containerRef);
+
   const handleClear = useCallback(() => {
     pointsRef.current = [];
     centeredRef.current = [];
@@ -120,6 +123,7 @@ export default function FourierEpicycles({ compact }: { compact?: boolean }) {
   }, []);
 
   useEffect(() => {
+    if (guard.paused) return;
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
@@ -283,7 +287,7 @@ export default function FourierEpicycles({ compact }: { compact?: boolean }) {
       cancelAnimationFrame(rafRef.current);
       ro.disconnect();
     };
-  }, [compact]);
+  }, [compact, guard.paused]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

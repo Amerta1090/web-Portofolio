@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 type RuleName = "conway" | "seeds" | "highlife";
 type PatternName = "random" | "center" | "ring" | "custom";
@@ -109,6 +110,8 @@ export default function HyperbolicGoL({ compact }: { compact?: boolean }) {
   const genRef = useRef(0);
   const gridRef = useRef<boolean[]>(makePattern("random"));
 
+  const guard = useRafGuard(containerRef);
+
   useEffect(() => {
     pausedRef.current = paused;
   }, [paused]);
@@ -168,6 +171,7 @@ export default function HyperbolicGoL({ compact }: { compact?: boolean }) {
   }, []);
 
   useEffect(() => {
+    if (guard.paused) return; // off-screen / tab hidden → hentikan RAF loop
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
@@ -268,7 +272,7 @@ export default function HyperbolicGoL({ compact }: { compact?: boolean }) {
       cancelAnimationFrame(rafRef.current);
       ro.disconnect();
     };
-  }, [compact]);
+  }, [compact, guard.paused]);
 
   const onClick = useCallback(
     (e: React.MouseEvent<HTMLCanvasElement>) => {

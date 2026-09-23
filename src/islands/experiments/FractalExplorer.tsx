@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 const VERTEX_SHADER = `#version 300 es
 in vec2 a_position;
@@ -159,7 +160,10 @@ export default function FractalExplorer({ compact }: { compact?: boolean }) {
   const [cursorMode, setCursorMode] = useState<"pan" | "zoom">("pan");
   const [supportsGL, setSupportsGL] = useState(true);
 
+  const guard = useRafGuard(containerRef);
+
   useEffect(() => {
+    if (guard.paused) return; // off-screen / tab hidden / reduced-motion → hentikan loop
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
@@ -277,7 +281,7 @@ export default function FractalExplorer({ compact }: { compact?: boolean }) {
       const ext = gl.getExtension("WEBGL_lose_context");
       if (ext) ext.loseContext();
     };
-  }, [compact]);
+  }, [compact, guard.paused]);
 
   useEffect(() => {
     iterRef.current = maxIter;
@@ -429,6 +433,7 @@ export default function FractalExplorer({ compact }: { compact?: boolean }) {
   const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    if (guard.paused) return; // off-screen / tab hidden / reduced-motion → hentikan loop
     const oc = overlayCanvasRef.current;
     const container = containerRef.current;
     if (!oc || !container) return;
@@ -450,7 +455,7 @@ export default function FractalExplorer({ compact }: { compact?: boolean }) {
     drawOverlay();
 
     return () => cancelAnimationFrame(raf);
-  }, [compact]);
+  }, [compact, guard.paused]);
 
   const juliaSetRe = useCallback((v: number) => {
     setJuliaRe(v);

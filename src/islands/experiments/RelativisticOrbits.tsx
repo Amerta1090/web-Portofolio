@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 const G = 1;
 const C = 50;
@@ -212,6 +213,8 @@ export default function RelativisticOrbits({ compact }: { compact?: boolean }) {
   const prevNewtVr = useRef(0);
   const prevGrVr = useRef(0);
   const absorbedRef = useRef(false);
+
+  const guard = useRafGuard(containerRef);
 
   const [mass, setMass] = useState(1);
   const [speed, setSpeed] = useState(5);
@@ -429,9 +432,10 @@ export default function RelativisticOrbits({ compact }: { compact?: boolean }) {
   }, [compact]);
 
   useEffect(() => {
+    if (guard.paused) return; // off-screen / tab hidden → hentikan RAF loop
     rafRef.current = requestAnimationFrame(render);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [render]);
+  }, [render, guard.paused]);
 
   if (compact) {
     return (

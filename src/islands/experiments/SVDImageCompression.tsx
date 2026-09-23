@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 /* ───────── SVD – eigendecomposition via cyclic Jacobi ───────── */
 
@@ -264,6 +265,8 @@ export default function SVDImageCompression({ compact }: Props) {
   const animDirRef = useRef(1); // direction for sweep
   const autoRankRef = useRef(rank);
 
+  const guard = useRafGuard(containerRef);
+
   useEffect(() => {
     rankRef.current = rank;
   }, [rank]);
@@ -311,6 +314,7 @@ export default function SVDImageCompression({ compact }: Props) {
   // ── Canvas render loop ──
   // biome-ignore lint/correctness/useExhaustiveDependencies: values read via refs in animation loop
   useEffect(() => {
+    if (guard.paused) return; // off-screen / tab hidden / reduced-motion → hentikan loop
     const canvasEl = canvasRef.current;
     const containerEl = containerRef.current;
     if (!canvasEl || !containerEl) return;
@@ -501,7 +505,7 @@ export default function SVDImageCompression({ compact }: Props) {
       ro.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [compact]);
+  }, [compact, guard.paused]);
 
   // ── Sync auto-animate rank back to state for controls ──
   useEffect(() => {

@@ -1,4 +1,16 @@
-import { test, expect } from "@playwright/test";
+import { type Page, expect, test } from "@playwright/test";
+
+/**
+ * Robust card-open helper: scope to the experiments grid, scroll the card into
+ * view, click it, then wait for the modal — avoids the hydration race where a
+ * naive `getByText(...).click()` silently misses the card (see sprint detAIministic D4).
+ */
+async function openExperiment(page: Page, name: string) {
+  const grid = page.locator("[aria-label='Experiments']");
+  await grid.getByText(name).first().scrollIntoViewIfNeeded();
+  await grid.getByText(name).first().click();
+  await expect(page.locator("[data-modal-content]")).toBeVisible({ timeout: 10000 });
+}
 
 test.describe("Gallery page", () => {
   test("loads with experiment cards", async ({ page }) => {
@@ -19,7 +31,7 @@ test.describe("Gallery page", () => {
 
   test("clicking Fractal Explorer opens modal with controls", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Fractal Explorer").first().click();
+    await openExperiment(page, "Fractal Explorer");
     await expect(page.getByRole("button", { name: "Mandelbrot" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Julia" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Amber" })).toBeVisible();
@@ -28,7 +40,7 @@ test.describe("Gallery page", () => {
 
   test("Julia toggle shows Cx/Cy controls in modal", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Fractal Explorer").first().click();
+    await openExperiment(page, "Fractal Explorer");
     await page.getByRole("button", { name: "Julia" }).click();
     const modal = page.locator("[data-modal-content]");
     await expect(modal.getByText("Cx")).toBeVisible();
@@ -38,7 +50,7 @@ test.describe("Gallery page", () => {
 
   test("morph toggle works in Julia mode", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Fractal Explorer").first().click();
+    await openExperiment(page, "Fractal Explorer");
     await page.getByRole("button", { name: "Julia" }).click();
     await page.getByRole("button", { name: "Morph" }).click();
     await expect(page.getByRole("button", { name: "Morph On" })).toBeVisible();
@@ -47,7 +59,7 @@ test.describe("Gallery page", () => {
 
   test("palette buttons switch active state", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Fractal Explorer").first().click();
+    await openExperiment(page, "Fractal Explorer");
     await expect(page.getByRole("button", { name: "Amber" })).toBeVisible();
     await page.getByRole("button", { name: "Fire" }).click();
     await expect(page.getByRole("button", { name: "Fire" })).toBeVisible();
@@ -55,20 +67,20 @@ test.describe("Gallery page", () => {
 
   test("Pan and Zoom mode toggle exist", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Fractal Explorer").first().click();
+    await openExperiment(page, "Fractal Explorer");
     await expect(page.getByRole("button", { name: "Pan" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Zoom" })).toBeVisible();
   });
 
   test("Bookmark button is present in modal", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Fractal Explorer").first().click();
+    await openExperiment(page, "Fractal Explorer");
     await expect(page.getByRole("button", { name: "Bookmark" })).toBeVisible();
   });
 
   test("closes modal with Escape", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Fractal Explorer").first().click();
+    await openExperiment(page, "Fractal Explorer");
     await expect(page.getByRole("button", { name: "Mandelbrot" })).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(page.getByRole("button", { name: "Mandelbrot" })).not.toBeVisible();
@@ -81,7 +93,7 @@ test.describe("Gallery page", () => {
 
   test("Iter slider is adjustable", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Fractal Explorer").first().click();
+    await openExperiment(page, "Fractal Explorer");
     const slider = page.locator('label:has-text("Iter") input[type="range"]');
     await expect(slider).toBeVisible();
     expect(Number(await slider.inputValue())).toBe(256);
@@ -89,7 +101,7 @@ test.describe("Gallery page", () => {
 
   test("Shift slider is adjustable", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Fractal Explorer").first().click();
+    await openExperiment(page, "Fractal Explorer");
     const slider = page.locator('label:has-text("Shift") input[type="range"]');
     await expect(slider).toBeVisible();
     await slider.fill("50");
@@ -99,7 +111,10 @@ test.describe("Gallery page", () => {
   test("Interactive Canvas card is present", async ({ page }) => {
     await page.goto("/gallery");
     await expect(page.getByText("Interactive Canvas").first()).toBeVisible();
-    const card = page.locator('[role="listitem"]').filter({ hasText: "Interactive Canvas" }).first();
+    const card = page
+      .locator('[role="listitem"]')
+      .filter({ hasText: "Interactive Canvas" })
+      .first();
     await expect(card).toBeVisible();
     await expect(card.getByText("Canvas", { exact: true })).toBeVisible();
     await expect(card.getByText("Whiteboard", { exact: true })).toBeVisible();
@@ -107,7 +122,7 @@ test.describe("Gallery page", () => {
 
   test("Interactive Canvas modal shows toolbar with drawing tools", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Interactive Canvas").first().click();
+    await openExperiment(page, "Interactive Canvas");
     await expect(page.getByTitle("Pen (P)")).toBeVisible();
     await expect(page.getByTitle("Eraser (E)")).toBeVisible();
     await expect(page.getByTitle("Node (N)")).toBeVisible();
@@ -116,7 +131,7 @@ test.describe("Gallery page", () => {
 
   test("Interactive Canvas shows export and undo/redo buttons", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Interactive Canvas").first().click();
+    await openExperiment(page, "Interactive Canvas");
     await expect(page.getByRole("button", { name: "PNG" })).toBeVisible();
     await expect(page.getByRole("button", { name: "SVG" })).toBeVisible();
     await expect(page.getByRole("button", { name: "↶ Undo" })).toBeVisible();
@@ -126,7 +141,7 @@ test.describe("Gallery page", () => {
 
   test("Interactive Canvas switches tool by clicking toolbar buttons", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Interactive Canvas").first().click();
+    await openExperiment(page, "Interactive Canvas");
     await page.getByTitle("Eraser (E)").click();
     const eraserBtn = page.getByTitle("Eraser (E)");
     await expect(eraserBtn).toBeVisible();
@@ -148,7 +163,7 @@ test.describe("Gallery page", () => {
 
   test("Strange Attractor Zoo modal shows attractor toggles", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Strange Attractor Zoo").first().click();
+    await openExperiment(page, "Strange Attractor Zoo");
     await expect(page.getByRole("button", { name: "Lorenz" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Rössler" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
@@ -157,7 +172,7 @@ test.describe("Gallery page", () => {
 
   test("Strange Attractor switches attractor on click", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Strange Attractor Zoo").first().click();
+    await openExperiment(page, "Strange Attractor Zoo");
     await page.getByRole("button", { name: "Rössler" }).click();
     await expect(page.getByRole("button", { name: "Rössler" })).toBeVisible();
   });
@@ -171,21 +186,21 @@ test.describe("Gallery page", () => {
 
   test("Logistic Map modal shows controls", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Logistic Map").first().click();
+    await openExperiment(page, "Logistic Map");
     await expect(page.getByRole("button", { name: "Cobweb" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Auto Sweep" })).toBeVisible();
   });
 
   test("Logistic Map cobweb toggle works", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Logistic Map").first().click();
+    await openExperiment(page, "Logistic Map");
     await page.getByRole("button", { name: "Cobweb" }).click();
     await expect(page.getByRole("button", { name: "Cobweb" })).toBeVisible();
   });
 
   test("Logistic Map r slider is adjustable", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Logistic Map").first().click();
+    await openExperiment(page, "Logistic Map");
     const slider = page.locator('label:has-text("r") input[type="range"]');
     await expect(slider).toBeVisible();
     await slider.fill("3.8");
@@ -213,7 +228,7 @@ test.describe("Gallery page", () => {
 
   test("Noise Topography modal shows terrain controls", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Noise Topography").first().click();
+    await openExperiment(page, "Noise Topography");
     await expect(page.getByRole("button", { name: "Export STL" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Auto" })).toBeVisible();
     await expect(page.locator('label:has-text("Oct") input[type="range"]')).toBeVisible();
@@ -223,7 +238,7 @@ test.describe("Gallery page", () => {
 
   test("Noise Topography Auto toggle works", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Noise Topography").first().click();
+    await openExperiment(page, "Noise Topography");
     await expect(page.getByText("✦ Auto")).toBeVisible();
     await page.getByText("✦ Auto").click();
     await expect(page.getByText("◉ Manual")).toBeVisible();
@@ -231,7 +246,7 @@ test.describe("Gallery page", () => {
 
   test("Noise Topography Seed slider is adjustable", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Noise Topography").first().click();
+    await openExperiment(page, "Noise Topography");
     const slider = page.locator('label:has-text("Seed") input[type="range"]');
     await expect(slider).toBeVisible();
     await slider.fill("42");
@@ -254,14 +269,14 @@ test.describe("Gallery page", () => {
 
   test("Fourier Epicycles modal shows mode toggle and draw hint", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Fourier Epicycles").first().click();
+    await openExperiment(page, "Fourier Epicycles");
     await expect(page.getByText("Epicycles →")).toBeVisible();
     await expect(page.getByText("Draw a closed shape")).toBeVisible();
   });
 
   test("Fourier Epicycles toggles between draw and epicycles mode", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Fourier Epicycles").first().click();
+    await openExperiment(page, "Fourier Epicycles");
     await expect(page.getByText("Epicycles →")).toBeVisible();
     await page.getByText("Epicycles →").click();
     await expect(page.getByText("← Draw")).toBeVisible();
@@ -287,7 +302,7 @@ test.describe("Gallery page", () => {
 
   test("SVD Image Compression modal shows rank slider and file upload", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("SVD Image Compression").first().click();
+    await openExperiment(page, "SVD Image Compression");
     await expect(page.getByText("Upload Image")).toBeVisible();
     await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
   });
@@ -295,7 +310,9 @@ test.describe("Gallery page", () => {
   test("Tesseract Projection card is present", async ({ page }) => {
     await page.goto("/gallery");
     await expect(page.getByText("Tesseract Hypercube Projection")).toBeVisible();
-    const card = page.locator('[role="listitem"]').filter({ hasText: "Tesseract Hypercube Projection" });
+    const card = page
+      .locator('[role="listitem"]')
+      .filter({ hasText: "Tesseract Hypercube Projection" });
     await expect(card).toBeVisible();
     await expect(card.getByText("4D", { exact: true })).toBeVisible();
     await expect(card.getByText("Geometry", { exact: true })).toBeVisible();
@@ -303,7 +320,7 @@ test.describe("Gallery page", () => {
 
   test("Tesseract Projection modal shows rotation plane controls", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Tesseract Hypercube Projection").first().click();
+    await openExperiment(page, "Tesseract Hypercube Projection");
     await expect(page.getByText("Auto", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Wireframe" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Faces" })).toBeVisible();
@@ -320,7 +337,7 @@ test.describe("Gallery page", () => {
 
   test("PCA / t-SNE modal shows projection controls", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("PCA / t-SNE Visualization").first().click();
+    await openExperiment(page, "PCA / t-SNE Visualization");
     await expect(page.getByText("Generate New Data")).toBeVisible();
     await expect(page.getByText("Perplexity:")).toBeVisible();
   });
@@ -354,7 +371,7 @@ test.describe("Gallery page", () => {
 
   test("Spring Physics Sandbox modal shows preset buttons", async ({ page }) => {
     await page.goto("/gallery");
-    await page.getByText("Spring Physics Sandbox").first().click();
+    await openExperiment(page, "Spring Physics Sandbox");
     await expect(page.getByRole("button", { name: "Cloth" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Chain" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Jelly" })).toBeVisible();

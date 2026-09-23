@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                             */
@@ -319,6 +320,8 @@ const TSNE_COLOR = "#06b6d4";
 export default function PCATSNEViz({ compact }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
+
+  const guard = useRafGuard();
 
   // Data
   const [clusterCount, setClusterCount] = useState(3);
@@ -753,6 +756,7 @@ export default function PCATSNEViz({ compact }: Props) {
 
   /* ---- t-SNE iteration loop ---- */
   useEffect(() => {
+    if (guard.paused) return; // off-screen / tab hidden → hentikan loop
     if (!tsneRunning || !tsneData) return;
 
     let running = true;
@@ -792,7 +796,7 @@ export default function PCATSNEViz({ compact }: Props) {
       running = false;
       cancelAnimationFrame(animRef.current);
     };
-  }, [tsneRunning, tsneData, tsneSpeed]);
+  }, [tsneRunning, tsneData, tsneSpeed, guard.paused]);
 
   const handlePlayPause = useCallback(() => {
     if (tsneRunning) {
@@ -832,6 +836,7 @@ export default function PCATSNEViz({ compact }: Props) {
 
   return (
     <div
+      ref={guard.ref}
       className={`relative bg-[#0f0f11] rounded-xl overflow-hidden ${
         compact ? "w-full h-full" : "w-full max-w-4xl mx-auto"
       }`}

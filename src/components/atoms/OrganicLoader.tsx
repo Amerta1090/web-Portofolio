@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 interface OrganicLoaderProps {
   variant?: "breathing" | "pulsing" | "growing";
@@ -17,10 +18,11 @@ const sizeMap = {
 
 function BreathingBar({ size, color }: { size: "sm" | "md" | "lg"; color: string }) {
   const ref = useRef<HTMLDivElement>(null);
+  const guard = useRafGuard(ref);
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
+    if (!el || guard.paused) return;
     let start: number | null = null;
     let rafId: number;
 
@@ -35,7 +37,7 @@ function BreathingBar({ size, color }: { size: "sm" | "md" | "lg"; color: string
 
     rafId = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(rafId);
-  }, []);
+  }, [guard.paused]);
 
   return (
     <div
@@ -52,10 +54,11 @@ function BreathingBar({ size, color }: { size: "sm" | "md" | "lg"; color: string
 
 function PulsingBar({ size, color }: { size: "sm" | "md" | "lg"; color: string }) {
   const ref = useRef<HTMLDivElement>(null);
+  const guard = useRafGuard(ref);
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
+    if (!el || guard.paused) return;
     let start: number | null = null;
     let rafId: number;
 
@@ -65,13 +68,15 @@ function PulsingBar({ size, color }: { size: "sm" | "md" | "lg"; color: string }
       const pulse = 0.7 + 0.3 * Math.sin(t * 3);
       const glow = 0.1 + 0.9 * Math.abs(Math.sin(t * 2));
       el.style.transform = `scaleX(${pulse})`;
-      el.style.boxShadow = `0 0 ${8 + glow * 16}px ${color}${Math.floor(30 + glow * 50).toString(16).padStart(2, "0")}`;
+      el.style.boxShadow = `0 0 ${8 + glow * 16}px ${color}${Math.floor(30 + glow * 50)
+        .toString(16)
+        .padStart(2, "0")}`;
       rafId = requestAnimationFrame(animate);
     };
 
     rafId = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(rafId);
-  }, []);
+  }, [guard.paused]);
 
   return (
     <div
@@ -97,11 +102,12 @@ function GrowingBar({
   indeterminate?: boolean;
 }) {
   const innerRef = useRef<HTMLDivElement>(null);
+  const guard = useRafGuard(innerRef);
 
   useEffect(() => {
     if (!indeterminate) return;
     const el = innerRef.current;
-    if (!el) return;
+    if (!el || guard.paused) return;
     let start: number | null = null;
     let rafId: number;
 
@@ -116,7 +122,7 @@ function GrowingBar({
 
     rafId = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(rafId);
-  }, [indeterminate]);
+  }, [indeterminate, guard.paused]);
 
   return (
     <div
@@ -154,18 +160,11 @@ export default function OrganicLoader({
       aria-valuemin={0}
       aria-valuemax={100}
     >
-      {label && (
-        <span className="text-xs text-text-secondary font-medium">{label}</span>
-      )}
+      {label && <span className="text-xs text-text-secondary font-medium">{label}</span>}
       {variant === "breathing" && <BreathingBar size={size} color={color} />}
       {variant === "pulsing" && <PulsingBar size={size} color={color} />}
       {variant === "growing" && (
-        <GrowingBar
-          size={size}
-          color={color}
-          progress={progress}
-          indeterminate={indeterminate}
-        />
+        <GrowingBar size={size} color={color} progress={progress} indeterminate={indeterminate} />
       )}
     </div>
   );

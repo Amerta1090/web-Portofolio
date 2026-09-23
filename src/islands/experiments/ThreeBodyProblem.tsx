@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 interface BodyState {
   x: number;
@@ -152,6 +153,8 @@ export default function ThreeBodyProblem({ compact }: { compact?: boolean }) {
   const stepCountRef = useRef(0);
   const hudFrameRef = useRef(0);
 
+  const guard = useRafGuard(containerRef);
+
   const [preset, setPreset] = useState<Preset>("figure8");
   const [paused, setPaused] = useState(false);
   const [speed, setSpeed] = useState(5);
@@ -209,6 +212,7 @@ export default function ThreeBodyProblem({ compact }: { compact?: boolean }) {
   }, [compact]);
 
   useEffect(() => {
+    if (guard.paused) return; // off-screen / tab hidden → hentikan RAF loop
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
@@ -394,7 +398,7 @@ export default function ThreeBodyProblem({ compact }: { compact?: boolean }) {
       cancelAnimationFrame(rafRef.current);
       ro.disconnect();
     };
-  }, [compact]);
+  }, [compact, guard.paused]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

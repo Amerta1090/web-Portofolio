@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useRafGuard } from "../../lib/useRafGuard";
 
 const POINTS_PER_FRAME = 25000;
 const NUM_FUNCTIONS = 6;
@@ -151,6 +152,8 @@ export default function FractalFlameSync({ compact }: { compact?: boolean }) {
   useEffect(() => { speedRef.current = speed; }, [speed]);
   useEffect(() => { colorModeRef.current = colorMode; }, [colorMode]);
   useEffect(() => { baseWeightsStateRef.current = baseWeights; }, [baseWeights]);
+
+  const guard = useRafGuard(containerRef);
 
   const initBuffers = useCallback((w: number, h: number) => {
     dimsRef.current = { w, h };
@@ -355,6 +358,7 @@ export default function FractalFlameSync({ compact }: { compact?: boolean }) {
   }, [compact, processAudio, iteratePoints, renderFrame]);
 
   useEffect(() => {
+    if (guard.paused) return; // off-screen / tab hidden / reduced-motion → hentikan loop
     const container = containerRef.current;
     const canvas = canvasRef.current;
     if (!container || !canvas) return;
@@ -403,7 +407,7 @@ export default function FractalFlameSync({ compact }: { compact?: boolean }) {
         audioCtxRef.current = null;
       }
     };
-  }, [animate, initBuffers, generateFunctions]);
+  }, [animate, initBuffers, generateFunctions, guard.paused]);
 
   const initAudioCtx = useCallback(() => {
     if (!audioCtxRef.current) {
