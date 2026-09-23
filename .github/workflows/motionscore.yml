@@ -1,0 +1,18 @@
+# MotionScore Guard — audit perbaikan kinerja animasi per PR.
+# Mode GRATIS (comment-only): tanpa token & tanpa threshold, jadi tidak pernah
+# memblokir merge. Gate berbayar (`threshold:` + `MOTIONSCORE_TOKEN`) sengaja
+# TIDAK dipasang — keputusan user. Docs: https://score.motion.dev/docs/guard
+name: MotionScore Guard
+on: deployment_status
+permissions:
+  pull-requests: write
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: motiondivision/motionscore-guard@v1
+        with:
+          pages: |
+            /
+            /gallery
+            /observatory

@@ -304,18 +304,20 @@ test merah karena perubahan animasi — sesuaikan ekspektasi test bila diperluka
 pause-resume, atau devtools performance record baseline vs after); unit+e2e hijau;
 tidak menambah test merah; build tetap 45+ page.
 
-### Phase D — Opsional (butuh konfirmasi user)
-- [ ] **MotionScore Guard** (bebas biaya untuk comment): `.github/workflows/motionscore.yml`
+### Phase D — Opsional (butuh konfirmasi user) ✅ SELESAI (item gratis) / ✅ SKIP (berbayar)
+- [x] **MotionScore Guard** (bebas biaya untuk comment): `.github/workflows/motionscore.yml`
   dengan `on: deployment_status` + `motiondivision/motionscore-guard@v1`,
   `pages: | / /gallery /observatory`. Tanpa token = komentar grade per PR (gratis).
   Gate threshold hanya dengan token plan berbayar — jangan sampai memblokir merge
-  tanpa persetujuan.
-- [ ] **animateView** (morph shared-element): kandidat = buka kartu eksperimen di
+  tanpa persetujuan. **DONE 2026-09-23**: workflow comment-only dibuat persis docs resmi; gate TIDAK dipasang (keputusan user).
+- [x] **animateView** (morph shared-element): kandidat = buka kartu eksperimen di
   GalleryGrid → thumbnail membesar ke modal (`.add(".card")` + spring; fallback
   graceful bila View Transitions tak didukung — `mayViewTransition`/try-catch).
-- [ ] **Motion UI** / Motion+ (berbayar): evaluasi section (hero layering, carousel)
+  **DONE 2026-09-23**: `handleLaunch` → `animateView(() => flushSync(setActiveExperiment), { type: spring, duration: .55, bounce: .2 }).add(cardEl, "[data-modal-panel]")` + crossfade `.old/.new` + `.crop(false)`; guard bertingkat (no-VT / try-catch / deep-link tanpa kartu = crossfade polos); panel `initial={false}` via prop `vtMorph`; 3 unit test `src/islands/GalleryGrid.animateview.test.tsx`.
+- [x] **Motion UI** / Motion+ (berbayar): evaluasi section (hero layering, carousel)
   hanya bila user memegang Motion+; sesuaikan ke token CSS proyek (`--color-*`,
   `--font-display`, durasi `--dur-*`). Jangan pasang jika tidak ada lisensi.
+  **SKIP (keputusan user 2026-09-23: "kalau berbayar ga usah")** — item dapat dibuka lagi bila proyek klien butuh komponen Motion UI.
 
 **Verifikasi Phase D**: workflow Guard terbukti comment di satu PR dummy (atau
 dokumentasikan tak teruji kalau repo belum pakai GitHub Actions); animateView fallback

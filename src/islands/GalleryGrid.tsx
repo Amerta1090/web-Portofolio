@@ -1,4 +1,6 @@
+import { animateView, spring } from "motion";
 import { AnimatePresence, motion } from "motion/react";
+import { flushSync } from "react-dom";
 import {
   Activity,
   Atom,
@@ -538,9 +540,11 @@ const ExperimentCard = forwardRef<
 function ExperimentModal({
   experiment,
   onClose,
+  vtMorph = false,
 }: {
   experiment: Experiment | null;
   onClose: () => void;
+  vtMorph?: boolean;
 }) {
   useEffect(() => {
     if (experiment) {
@@ -565,7 +569,7 @@ function ExperimentModal({
     <AnimatePresence>
       {experiment && (
         <motion.div
-          initial={{ opacity: 0 }}
+          initial={{ opacity: vtMorph ? 1 : 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
@@ -576,7 +580,8 @@ function ExperimentModal({
         >
           <motion.div
             key={experiment.id}
-            initial={{ opacity: 0, scale: 0.92, y: 20 }}
+            data-modal-panel="true"
+            initial={vtMorph ? false : { opacity: 0, scale: 0.92, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 20 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
@@ -737,6 +742,7 @@ export default function GalleryGrid() {
   const [activeCategory, setActiveCategory] = useState<"All" | ExperimentCategory>("All");
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const lastOpenedRef = useRef<string | null>(null);
+  const vtActiveRef = useRef(false);
 
   const activeExp = experiments.find((e) => e.id === activeExperiment) || null;
   const visibleExperiments =
@@ -770,7 +776,48 @@ export default function GalleryGrid() {
 
   const handleLaunch = useCallback((id: string) => {
     lastOpenedRef.current = id;
-    setActiveExperiment(id);
+
+    const applyState = () => setActiveExperiment(id);
+
+    // animateView (motion) morphs the clicked card into the modal via the native
+    // View Transition API. In browsers without it (and in jsdom tests) the DOM
+    // update still runs un-animated, so this stays a graceful enhancement.
+    const canViewTransition =
+      typeof document !== "undefined" &&
+      typeof (document as { startViewTransition?: unknown }).startViewTransition === "function";
+
+    if (!canViewTransition) {
+      applyState();
+      return;
+    }
+
+    const fromEl = document.querySelector<HTMLElement>(`[data-exp-id="${id}"]`);
+    vtActiveRef.current = true;
+
+    try {
+      if (fromEl) {
+        // Shared-element morph: the card grows into the modal panel (spring).
+        animateView(() => flushSync(applyState), {
+          type: spring,
+          duration: 0.55,
+          bounce: 0.2,
+        })
+          .add(fromEl, "[data-modal-panel]")
+          .old({ opacity: 0 })
+          .new({ opacity: 1 })
+          .crop(false);
+      } else {
+        // Deep-link launch before cards settle: plain crossfade, no morph.
+        animateView(() => flushSync(applyState), { duration: 0.4 })
+          .old({
+            opacity: 0,
+            scale: 0.98,
+          })
+          .new({ opacity: 1, scale: 1 });
+      }
+    } catch {
+      applyState();
+    }
   }, []);
 
   const handleClose = useCallback(() => {
@@ -785,6 +832,7 @@ export default function GalleryGrid() {
     }
     setActiveExperiment(null);
     setFocusedIndex(-1);
+    vtActiveRef.current = false;
   }, []);
 
   // Keyboard navigation
@@ -961,7 +1009,7 @@ export default function GalleryGrid() {
         </div>
       </div>
 
-      <ExperimentModal experiment={activeExp} onClose={handleClose} />
+      <ExperimentModal experiment={activeExp} onClose={handleClose} vtMorph={vtActiveRef.current} />
     </>
   );
 }
