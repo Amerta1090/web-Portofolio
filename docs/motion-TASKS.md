@@ -40,6 +40,7 @@
 - [x] VERIFIKASI: unit `bun run test` ✓ **719/719 (59 file)** (+10 baru: useRafGuard 4, OrganicLoader +4, TopReposLeaderboard +2); build:fast ✓ **49 page**; typecheck (`bunx astro check`) error = identik HEAD (0 baru); biome 0 error baru di file disentuh; e2e: gallery **71/71 (3.2m)** — flake klik card diperbaiki via helper `openExperiment` (grid-scope + `scrollIntoViewIfNeeded` + `[data-modal-content]` timeout 10s, pola dari recommend.spec) + observatory **5/5**; re-audit MotionScore pasca-Phase C → baseline §8 (target A-tier terkonfirmasi).
 
 ## Phase D — Opsional (butuh konfirmasi user)
-- [ ] [BUTUH USER] MotionScore Guard: `.github/workflows/motionscore.yml` (deployment_status, pages / /gallery /observatory) — gratis utk comment; gate threshold berbayar, jangan pasang tanpa persetujuan.
-- [ ] [BUTUH USER] animateView: morph kartu→modal GalleryGrid (.add/.enter spring, fallback graceful).
-- [ ] [BUTUH USER] Motion UI / Motion+ (berbayar): hanya bila user punya lisensi; sesuaikan token tema.
+- [x] **[BUTUH USER] — DIPUTUSKAN: DEFERRED (2026-09-23, sprint ditutup)**. User: "untuk sekarang sprint selesai"; Phase D masih dikonsiderasi (menarik) — jangan hapus checklist ini. Item tetap valid bila sprint dilanjutkan:
+- [ ] MotionScore Guard: `.github/workflows/motionscore.yml` (deployment_status, pages / /gallery /observatory) — gratis utk comment; gate threshold berbayar, jangan pasang tanpa persetujuan.
+- [ ] animateView: morph kartu→modal GalleryGrid (.add/.enter spring, fallback graceful).
+- [ ] Motion UI / Motion+ (berbayar): hanya bila user punya lisensi; sesuaikan token tema.
