@@ -141,8 +141,9 @@ export const SkillsScreen: React.FC = () => {
               <div className="w-full h-1.5 bg-bg-primary rounded-full overflow-hidden">
                 <motion.div
                   className="h-full bg-brand rounded-full"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${((skill.proficiency || 0) / 5) * 100}%` }}
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: (skill.proficiency || 0) / 5 }}
+                  style={{ transformOrigin: "left" }}
                   transition={{
                     delay: duration.normal + idx * stagger.normal,
                     duration: duration.slow,

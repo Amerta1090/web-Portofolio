@@ -1,5 +1,5 @@
-import { motion, useReducedMotion } from "motion/react";
 import { ArrowRight } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
 import HeroAvatar from "../components/atoms/HeroAvatar";
 import RevealText from "../components/atoms/RevealText";
@@ -152,7 +152,7 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl }: Pr
         {!prefersReduced && (
           <motion.div
             className="w-px h-8 bg-border"
-            animate={{ height: [8, 24, 8] }}
+            animate={{ scaleY: [0.25, 0.75, 0.25] }}
             transition={{
               duration: duration.narrative + duration.deliberate,
               repeat: Number.POSITIVE_INFINITY,
