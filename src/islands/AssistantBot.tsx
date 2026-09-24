@@ -31,7 +31,7 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
         className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-3.5 py-2.5 text-sm ${
           isUser
             ? "rounded-br-sm bg-bg-secondary text-text-primary border border-border"
-            : "rounded-bl-sm bg-brand text-[#0c0d0b]"
+            : "rounded-bl-sm bg-brand text-on-brand"
         }`}
       >
         {isUser ? msg.text : msg.text.length > 0 ? msg.text : <span className="opacity-70">…</span>}
@@ -113,7 +113,7 @@ export default function AssistantBot() {
         initial={{ opacity: 0, scale: 0.6 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: duration.normal, ease: easing["ease-out-back"] }}
-        className="fixed bottom-5 right-5 z-[9997] flex h-14 w-14 items-center justify-center rounded-full bg-brand text-[#0c0d0b] shadow-lg shadow-black/40 transition-transform hover:scale-105 active:scale-95"
+        className="fixed bottom-5 right-5 z-[9997] flex h-14 w-14 items-center justify-center rounded-full bg-brand text-on-brand shadow-lg shadow-black/40 transition-transform hover:scale-105 active:scale-95"
         whileTap={{ scale: 0.9 }}
       >
         {open ? <X className="h-6 w-6" /> : <MessageSquare className="h-6 w-6" />}
@@ -135,7 +135,7 @@ export default function AssistantBot() {
             >
               {/* Header */}
               <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand text-[#0c0d0b]">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand text-on-brand">
                   <Sparkles className="h-5 w-5" />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -206,7 +206,7 @@ export default function AssistantBot() {
                 ))}
                 {isThinking && (
                   <div className="flex justify-start">
-                    <div className="rounded-2xl rounded-bl-sm bg-brand px-3.5 py-2.5 text-sm text-[#0c0d0b]">
+                    <div className="rounded-2xl rounded-bl-sm bg-brand px-3.5 py-2.5 text-sm text-on-brand">
                       <span className="inline-flex items-center gap-1">
                         <span className="inline-block h-1.5 w-1.5 animate-bounce rounded-full bg-current" />
                         <span className="inline-block h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:120ms]" />
@@ -239,7 +239,7 @@ export default function AssistantBot() {
                   type="submit"
                   aria-label="Kirim pesan"
                   disabled={!input.trim()}
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand text-[#0c0d0b] transition-opacity disabled:opacity-40"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand text-on-brand transition-opacity disabled:opacity-40"
                 >
                   <Send className="h-4 w-4" />
                 </button>
@@ -286,7 +286,7 @@ export default function AssistantBot() {
                       <button
                         type="button"
                         onClick={() => setEngineOpen(false)}
-                        className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-[#0c0d0b] transition-opacity hover:opacity-90"
+                        className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-on-brand transition-opacity hover:opacity-90"
                       >
                         Mengerti
                       </button>

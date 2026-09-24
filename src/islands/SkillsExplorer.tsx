@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { Input } from "../components/atoms/Input";
 import { InteractionCard } from "../components/atoms/InteractionCard";
 import { InteractionSkeleton } from "../components/atoms/InteractionSkeleton";
+import { Label } from "../components/atoms/Label";
 import SkillIcon from "../components/atoms/SkillIcon";
 
 interface Skill {
@@ -51,24 +53,23 @@ export default function SkillsExplorer({ skills }: Props) {
     <div>
       <div className="mb-6">
         <div className="relative max-w-md">
-          <input
+          <Label htmlFor="skills-search" srOnly>
+            Search skills
+          </Label>
+          <Input
+            id="skills-search"
             type="text"
             value={activeSkill ?? ""}
             onChange={(e) => setActiveSkill(e.target.value || null)}
             placeholder="Search skills..."
-            className="w-full px-4 py-3 bg-bg-secondary/50 border border-border text-text-primary placeholder:text-text-secondary/30 focus:outline-none focus:border-brand rounded-lg transition-colors text-sm"
+            className="px-4 py-3 bg-bg-secondary/50 placeholder:text-text-secondary/30 focus:border-brand transition-colors"
           />
         </div>
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filtered.map((category) => (
-          <InteractionCard
-            key={category.name}
-            variant="outlined"
-            lift={3}
-            glow={true}
-          >
+          <InteractionCard key={category.name} variant="outlined" lift={3} glow={true}>
             <div className="flex items-center gap-2 mb-4">
               <SkillIcon name={category.icon} size={18} className="text-brand" />
               <h3 className="text-sm font-semibold text-text-primary">{category.name}</h3>

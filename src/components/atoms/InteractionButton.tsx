@@ -22,7 +22,7 @@ export interface InteractionButtonProps extends ButtonHTMLAttributes<HTMLButtonE
 }
 
 const variantStyles: Record<string, string> = {
-  primary: "bg-brand text-white hover:bg-brand/90 active:bg-brand/80",
+  primary: "bg-brand text-on-brand hover:bg-brand/90 active:bg-brand/80",
   secondary: "bg-surface-secondary text-text-primary hover:bg-surface-tertiary border border-border",
   ghost: "text-text-secondary hover:text-text-primary hover:bg-surface-secondary",
   outline: "border border-border bg-transparent hover:bg-surface-secondary hover:text-text-primary",
@@ -186,7 +186,7 @@ export function InteractionButton({
               ease: easing["ease-out-expo"],
               x: { duration: 0.4 },
             }}
-            className="inline-flex items-center gap-2 text-red-500"
+            className="inline-flex items-center gap-2 text-danger"
           >
             {feedback?.error ?? (
               <>

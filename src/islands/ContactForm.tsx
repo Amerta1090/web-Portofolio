@@ -1,10 +1,20 @@
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { FormField } from "../components/atoms/FormField";
+import { Input } from "../components/atoms/Input";
 import { InteractionButton } from "../components/atoms/InteractionButton";
-import { contactSchema, type ContactFormValues } from "../lib/contact-schema";
+import { Textarea } from "../components/atoms/Textarea";
+import { type ContactFormValues, contactSchema } from "../lib/contact-schema";
 
 const ACCESS_KEY = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY || "YOUR_ACCESS_KEY_HERE";
+
+if (import.meta.env.DEV && !import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY) {
+  // Dev-only warning: tanpa key, submit akan gagal di production juga. Set PUBLIC_WEB3FORMS_ACCESS_KEY di .env.
+  console.error(
+    "[ContactForm] PUBLIC_WEB3FORMS_ACCESS_KEY tidak diset — memakai fallback placeholder. Set key di .env agar pesan benar-benar terkirim.",
+  );
+}
 
 export default function ContactForm() {
   const {
@@ -60,70 +70,40 @@ export default function ContactForm() {
         <input {...register("honeypot")} tabIndex={-1} autoComplete="off" />
       </div>
 
-      <div>
-        <label htmlFor="cf-name" className="block text-sm font-medium text-text-primary mb-1">
-          Name
-        </label>
-        <input
+      <FormField id="cf-name" label="Name" error={errors.name?.message}>
+        <Input
           id="cf-name"
           {...register("name")}
           placeholder="Your name"
-          aria-invalid={!!errors.name}
+          error={!!errors.name}
           aria-describedby={errors.name ? nameErrorId : undefined}
-          className={`w-full px-4 py-2.5 bg-bg-secondary border rounded-lg text-text-primary placeholder:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:border-transparent transition-all duration-200 ${
-            errors.name ? "border-red-500" : "border-border"
-          }`}
+          className="transition-all duration-200 focus-visible:border-transparent"
         />
-        {errors.name && (
-          <p id={nameErrorId} className="mt-1 text-sm text-red-500" role="alert">
-            {errors.name.message}
-          </p>
-        )}
-      </div>
+      </FormField>
 
-      <div>
-        <label htmlFor="cf-email" className="block text-sm font-medium text-text-primary mb-1">
-          Email
-        </label>
-        <input
+      <FormField id="cf-email" label="Email" error={errors.email?.message}>
+        <Input
           id="cf-email"
           type="email"
           {...register("email")}
           placeholder="your@email.com"
-          aria-invalid={!!errors.email}
+          error={!!errors.email}
           aria-describedby={errors.email ? emailErrorId : undefined}
-          className={`w-full px-4 py-2.5 bg-bg-secondary border rounded-lg text-text-primary placeholder:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:border-transparent transition-all duration-200 ${
-            errors.email ? "border-red-500" : "border-border"
-          }`}
+          className="transition-all duration-200 focus-visible:border-transparent"
         />
-        {errors.email && (
-          <p id={emailErrorId} className="mt-1 text-sm text-red-500" role="alert">
-            {errors.email.message}
-          </p>
-        )}
-      </div>
+      </FormField>
 
-      <div>
-        <label htmlFor="cf-message" className="block text-sm font-medium text-text-primary mb-1">
-          Message
-        </label>
-        <textarea
+      <FormField id="cf-message" label="Message" error={errors.message?.message}>
+        <Textarea
           id="cf-message"
           {...register("message")}
           rows={4}
           placeholder="Your message..."
-          aria-invalid={!!errors.message}
+          error={!!errors.message}
           aria-describedby={errors.message ? messageErrorId : undefined}
-          className={`w-full px-4 py-2.5 bg-bg-secondary border rounded-lg text-text-primary placeholder:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:border-transparent transition-all duration-200 resize-none ${
-            errors.message ? "border-red-500" : "border-border"
-          }`}
+          className="transition-all duration-200 resize-none focus-visible:border-transparent"
         />
-        {errors.message && (
-          <p id={messageErrorId} className="mt-1 text-sm text-red-500" role="alert">
-            {errors.message.message}
-          </p>
-        )}
-      </div>
+      </FormField>
 
       <InteractionButton
         type="submit"
