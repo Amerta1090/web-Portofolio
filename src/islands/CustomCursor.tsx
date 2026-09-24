@@ -52,6 +52,7 @@ export default function CustomCursor({ enableOnTouch = false }: CustomCursorProp
     let mouseY = 0;
     let ringX = 0;
     let ringY = 0;
+    let running = false;
 
     const onMove = (e: MouseEvent) => {
       mouseX = e.clientX;
@@ -90,30 +91,46 @@ export default function CustomCursor({ enableOnTouch = false }: CustomCursorProp
     document.addEventListener("mouseleave", onLeave);
 
     const hoverables = document.querySelectorAll<HTMLElement>("a, button, [data-cursor-hover]");
-    hoverables.forEach((el) => {
+    for (const el of hoverables) {
       el.addEventListener("mouseenter", onHoverableEnter);
       el.addEventListener("mouseleave", onHoverableLeave);
-    });
+    }
 
     const animate = () => {
+      if (!running) return;
       ringX += (mouseX - ringX) * 0.12;
       ringY += (mouseY - ringY) * 0.12;
-      cursor.style.left = `${mouseX}px`;
-      cursor.style.top = `${mouseY}px`;
-      ring.style.left = `${ringX}px`;
-      ring.style.top = `${ringY}px`;
+      // Compositor-only positioning (S/A tier): transform replaces left/top,
+      // which would trigger layout per frame. The base `translate(-50%, -50%)`
+      // from cssText keeps the elements centered on the pointer.
+      cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+      ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
       rafId = requestAnimationFrame(animate);
     };
+
+    const onVisibility = () => {
+      if (document.hidden) {
+        running = false;
+        if (rafId) cancelAnimationFrame(rafId);
+      } else if (!running) {
+        running = true;
+        rafId = requestAnimationFrame(animate);
+      }
+    };
+
+    running = true;
     rafId = requestAnimationFrame(animate);
+    document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
       cancelAnimationFrame(rafId);
       document.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseleave", onLeave);
-      hoverables.forEach((el) => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      for (const el of hoverables) {
         el.removeEventListener("mouseenter", onHoverableEnter);
         el.removeEventListener("mouseleave", onHoverableLeave);
-      });
+      }
       cursor.remove();
       ring.remove();
     };

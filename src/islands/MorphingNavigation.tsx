@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
+import { useCallback, useEffect, useState } from "react";
 
 interface NavItem {
   id: string;
@@ -31,34 +31,63 @@ export default function MorphingNavigation({
   anchor = "top-right",
 }: MorphingNavigationProps) {
   const [phase, setPhase] = useState<Phase>("dots");
-  const [scrollY, setScrollY] = useState(0);
   const [activeSection, setActiveSection] = useState("hero");
   const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
-      setScrollY(y);
-
-      if (y >= scrollThresholds.menu) setPhase("menu");
-      else if (y >= scrollThresholds.text) setPhase("text");
-      else setPhase("dots");
-
-      const sections = navItems.map((item) => document.getElementById(item.id));
-      let current = "hero";
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const el = sections[i];
-        if (el && el.getBoundingClientRect().top <= 200) {
-          current = navItems[i].id;
-          break;
-        }
-      }
-      setActiveSection(current);
+      // Discrete phase switch with bailout — React state only changes at
+      // threshold crossings, never per frame (Rule 8).
+      setPhase((prev) => {
+        const next: Phase =
+          y >= scrollThresholds.menu ? "menu" : y >= scrollThresholds.text ? "text" : "dots";
+        return prev === next ? prev : next;
+      });
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, [scrollThresholds]);
+
+  useEffect(() => {
+    // Active-section detection on the IntersectionObserver thread (no
+    // getBoundingClientRect per scroll event → no layout read per frame).
+    // rootMargin -200px from the top emulates the old `top <= 200px` rule.
+    if (typeof IntersectionObserver === "undefined") return;
+
+    const observed = new Map<string, boolean>();
+    const sections = navItems
+      .map((item) => document.getElementById(item.id))
+      .filter((el): el is HTMLElement => el !== null);
+    if (sections.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        let changed = false;
+        for (const entry of entries) {
+          const next = entry.isIntersecting;
+          if (observed.get(entry.target.id) !== next) {
+            observed.set(entry.target.id, next);
+            changed = true;
+          }
+        }
+        if (!changed) return;
+        let current = "hero";
+        for (let i = navItems.length - 1; i >= 0; i--) {
+          if (observed.get(navItems[i].id)) {
+            current = navItems[i].id;
+            break;
+          }
+        }
+        setActiveSection((prev) => (prev === current ? prev : current));
+      },
+      { rootMargin: "-200px 0px 0px 0px", threshold: 0 },
+    );
+
+    for (const el of sections) observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const scrollTo = useCallback((href: string) => {
     const id = href.replace("#", "");
@@ -76,7 +105,13 @@ export default function MorphingNavigation({
     "bottom-right": "bottom-6 right-6",
   };
 
-  const dotSize = phase === "dots" ? 8 : phase === "text" ? 6 : 0;
+  // Dots are a fixed 8px base; phase/active changes animate via scale
+  // (compositor-only) instead of width/height (would trigger layout).
+  const dotScale = (isActive: boolean): number => {
+    if (isActive) return 1.3;
+    if (phase === "text") return 0.75;
+    return 1;
+  };
   const showLabels = phase === "text" || phase === "menu";
 
   return (
@@ -97,13 +132,10 @@ export default function MorphingNavigation({
             {navItems.map((item) => (
               <div
                 key={item.id}
-                className="rounded-full transition-all duration-300"
+                className="w-2 h-2 rounded-full transition-transform duration-300"
                 style={{
-                  width: dotSize,
-                  height: dotSize,
-                  backgroundColor:
-                    activeSection === item.id ? "#f59e0b" : "rgba(255,255,255,0.25)",
-                  transform: activeSection === item.id ? "scale(1.3)" : "scale(1)",
+                  transform: `scale(${dotScale(activeSection === item.id)})`,
+                  backgroundColor: activeSection === item.id ? "#f59e0b" : "rgba(255,255,255,0.25)",
                 }}
               />
             ))}
@@ -122,6 +154,7 @@ export default function MorphingNavigation({
             {navItems.map((item) => (
               <button
                 key={item.id}
+                type="button"
                 onClick={() => scrollTo(item.href)}
                 className={`text-left text-sm transition-all duration-200 py-0.5 ${
                   activeSection === item.id
@@ -145,6 +178,7 @@ export default function MorphingNavigation({
           >
             <button
               onClick={() => setIsExpanded(!isExpanded)}
+              type="button"
               className="w-10 h-10 rounded-xl bg-bg-secondary/80 backdrop-blur-md border border-border/60 flex items-center justify-center hover:bg-bg-secondary transition-all"
               aria-label={isExpanded ? "Close menu" : "Open menu"}
             >
@@ -179,6 +213,7 @@ export default function MorphingNavigation({
                   {navItems.map((item, i) => (
                     <motion.button
                       key={item.id}
+                      type="button"
                       initial={{ opacity: 0, x: -8 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.04 }}

@@ -251,8 +251,18 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
           });
           window.__LENIS = lenis;
 
+          var hidden = false;
+          function onVisibility() {
+            hidden = document.hidden;
+          }
+          document.addEventListener("visibilitychange", onVisibility);
+
           function raf(time) {
-            lenis.raf(time);
+            // Don't drive Lenis while the tab is hidden (Rule 8: no 60fps
+            // work when it can't be seen). Lenis' own Animate.advance is
+            // already idle when not scrolling; this removes the per-frame
+            // call entirely while hidden.
+            if (!hidden) lenis.raf(time);
             requestAnimationFrame(raf);
           }
           requestAnimationFrame(raf);

@@ -1,6 +1,7 @@
 import { AdaptiveDpr, Float, PerformanceMonitor } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { useState } from "react";
+import useDocumentVisible from "../lib/useDocumentVisible";
 
 function SceneObjects() {
   return (
@@ -50,10 +51,13 @@ function SceneContentInner() {
 }
 
 export default function SceneContent() {
+  const documentVisible = useDocumentVisible();
+
   return (
     <Canvas
       camera={{ position: [0, 0, 6], fov: 60 }}
       dpr={[1, 1.5]}
+      frameloop={documentVisible ? "always" : "demand"}
       gl={{
         antialias: false,
         alpha: true,

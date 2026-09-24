@@ -1,4 +1,4 @@
-import { cleanup, render } from "@testing-library/react";
+import { act, cleanup, render } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import CustomCursor from "./CustomCursor";
 
@@ -39,7 +39,7 @@ function setTouchDevice(touch: boolean) {
       writable: true,
     });
   } else {
-    delete (window as Record<string, unknown>)["ontouchstart"];
+    Reflect.deleteProperty(window, "ontouchstart");
   }
 }
 
@@ -102,5 +102,60 @@ describe("CustomCursor", () => {
     expect(document.querySelector(".custom-cursor")).toBeNull();
     expect(document.querySelector(".custom-cursor-ring")).toBeNull();
     expect(vi.mocked(cancelAnimationFrame)).toHaveBeenCalled();
+  });
+
+  it("positions via transform (compositor) and pauses loop when tab hidden", () => {
+    const rafCalls: Array<(t: number) => void> = [];
+    const rafSpy = vi.fn((cb: (t: number) => void) => {
+      rafCalls.push(cb);
+      return rafCalls.length;
+    });
+    vi.stubGlobal("requestAnimationFrame", rafSpy);
+    const cancelSpy = vi.mocked(cancelAnimationFrame);
+
+    render(<CustomCursor />);
+    const cursor = document.querySelector(".custom-cursor") as HTMLElement | null;
+    const ring = document.querySelector(".custom-cursor-ring") as HTMLElement | null;
+    expect(cursor).toBeTruthy();
+    expect(ring).toBeTruthy();
+    if (!cursor || !ring) return;
+
+    const runFrames = (n: number) => {
+      for (let i = 0; i < n; i++) {
+        const cbs = rafCalls.splice(0);
+        for (const cb of cbs) cb(1);
+      }
+    };
+
+    act(() => {
+      document.dispatchEvent(new MouseEvent("mousemove", { clientX: 120, clientY: 80 }));
+    });
+    runFrames(3);
+
+    // Per-frame writes use transform, never layout-triggering left/top.
+    expect(cursor.style.left).toBe("");
+    expect(cursor.style.top).toBe("");
+    expect(cursor.style.transform).toContain("translate3d");
+    expect(ring.style.transform).toContain("translate3d");
+
+    // Tab hidden → cancel scheduled frame, no more transform writes.
+    const frozen = ring.style.transform;
+    act(() => {
+      Object.defineProperty(document, "hidden", {
+        configurable: true,
+        get: () => true,
+      });
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+    expect(cancelSpy).toHaveBeenCalled();
+
+    runFrames(3);
+    expect(ring.style.transform).toBe(frozen);
+
+    // Restore default so other suites aren't affected.
+    Object.defineProperty(document, "hidden", {
+      configurable: true,
+      get: () => false,
+    });
   });
 });

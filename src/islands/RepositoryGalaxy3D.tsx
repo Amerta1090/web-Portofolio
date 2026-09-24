@@ -1,16 +1,12 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { AdaptiveDpr, OrbitControls, PerformanceMonitor, Stars } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import {
-  OrbitControls,
-  AdaptiveDpr,
-  PerformanceMonitor,
-  Stars,
-} from "@react-three/drei";
+import { ExternalLink, GitFork, Star, X } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
-import { motion, AnimatePresence } from "motion/react";
-import { ExternalLink, Star, GitFork, X } from "lucide-react";
 import RepoPlanet from "../components/atoms/RepoPlanet";
-import type { GitHubRepo, GitHubData } from "../types/github";
+import useDocumentVisible from "../lib/useDocumentVisible";
+import type { GitHubData, GitHubRepo } from "../types/github";
 
 interface PlanetConfig {
   repo: GitHubRepo;
@@ -114,11 +110,7 @@ function ConnectionLines({ planets }: { planets: PlanetConfig[] }) {
 
   return (
     <lineSegments ref={lineRef} geometry={geometry}>
-      <lineBasicMaterial
-        vertexColors
-        transparent
-        opacity={0.15}
-      />
+      <lineBasicMaterial vertexColors transparent opacity={0.15} />
     </lineSegments>
   );
 }
@@ -233,18 +225,16 @@ function GalaxySceneInner({
   );
 }
 
-export default function RepositoryGalaxy3D({
-  planets,
-  repos,
-  gitHubData,
-}: Props) {
+export default function RepositoryGalaxy3D({ planets, repos, gitHubData }: Props) {
   const [selected, setSelected] = useState<GitHubRepo | null>(null);
+  const documentVisible = useDocumentVisible();
 
   return (
     <div className="relative w-full h-full">
       <Canvas
         camera={{ position: [0, 0, 12], fov: 50 }}
         dpr={[1, 1.5]}
+        frameloop={documentVisible ? "always" : "demand"}
         gl={{
           antialias: true,
           alpha: false,
@@ -262,9 +252,7 @@ export default function RepositoryGalaxy3D({
       </Canvas>
 
       <AnimatePresence>
-        {selected && (
-          <DetailCardOverlay repo={selected} onClose={() => setSelected(null)} />
-        )}
+        {selected && <DetailCardOverlay repo={selected} onClose={() => setSelected(null)} />}
       </AnimatePresence>
 
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 pointer-events-none">
@@ -286,15 +274,9 @@ function DetailCardOverlay({
   onClose: () => void;
 }) {
   const pushedDate = new Date(repo.pushed_at);
-  const daysSincePush = Math.floor(
-    (Date.now() - pushedDate.getTime()) / 86400000,
-  );
+  const daysSincePush = Math.floor((Date.now() - pushedDate.getTime()) / 86400000);
   const activeLabel =
-    daysSincePush === 0
-      ? "Today"
-      : daysSincePush === 1
-        ? "Yesterday"
-        : `${daysSincePush} days ago`;
+    daysSincePush === 0 ? "Today" : daysSincePush === 1 ? "Yesterday" : `${daysSincePush} days ago`;
 
   return (
     <motion.div
@@ -307,6 +289,7 @@ function DetailCardOverlay({
       <div className="relative bg-[#0e0f11]/95 backdrop-blur-xl border border-white/10 rounded-xl p-4 shadow-2xl">
         <button
           onClick={onClose}
+          type="button"
           className="absolute top-3 right-3 p-1 rounded-md hover:bg-white/5 transition-colors text-white/40 hover:text-white/70"
           aria-label="Close detail card"
         >
@@ -350,9 +333,7 @@ function DetailCardOverlay({
         </div>
 
         <div className="flex items-center justify-between text-xs">
-          <span className="text-white/30">
-            Updated {activeLabel}
-          </span>
+          <span className="text-white/30">Updated {activeLabel}</span>
           <a
             href={repo.url}
             target="_blank"
