@@ -140,8 +140,12 @@
 - Enumerasi aktual (probe wrap `addEventListener('scroll')`): 21 attach — 11–14 = **React 19 per-root wiring** (astro-island/body/html root; tak bisa dihapus tanpa merge radikal yg membunuh laziness hydrasi), 3 = **ScrollEntropy ×3 instance** (demo MicroInteractionsDemo — fitur), 1–2 = MorphingNavigation, sisa Lenis/touch.
 - Penalty skor `min(listeners×5, 25)` — **capped di 25 utk ≥5 listener**: merge root lebih lanjut tidak menaikkan skor (26 utk 41 listener = penalty sama). Menyingkirkan HIGH butuh rasio <0.8 → listener <0.8×jsScrollAnims — menambah jsScrollAnims (bukan mengurangi listener) juga menurunkan rasio = heuristik salah arah utk perf nyata.
 
-**Keputusan gap home B→A (untuk user)**: 2 HIGH sisa bertahan secara struktural;
-opsi lanjut (bila diambil): (a) rewrite ScrollEntropy/hero/CodeDNAHelix ke CSS scroll-driven (risiko UX + turunkan jsScrollAnims justru menaikkan rasio), (b) merge island radikal (bunuh laziness), (c) **terima B 56–58 sebagai hasil + dokumentasi** (preseden §8 #10) — rekomendasi. Progres M-1→M-4: 49→58 (skor), 41→26 listener, off-screen 6→3, thrashing S, GPU terbukti floor.
+**Keputusan gap home B→A (USER, 2026-09-24)**: gap **DITERIMA** — release B 56–58 + dokumentasi
+(bukti: A/B GPU byte-identik = floor env; listener = rasio heuristik dgn penalty capped).
+**Implementasi framer-motion/motion.dev selesai keseluruhan** — tidak ada sprint lanjutan motion.
+Opsi (yang tidak diambil): rewrite ScrollEntropy/hero/CodeDNAHelix ke CSS scroll-driven
+(kontraproduktif utk rasio — menurunkan jsScrollAnims menaikkan rasio) / merge island radikal.
+Progres M-1→M-4: 49→58 (skor), 41→26 listener, off-screen 6→3, thrashing S, GPU terbukti floor.
 
 ## Cara ulang audit
 ```
