@@ -27,6 +27,7 @@ import {
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import AmbientSound from "../components/atoms/AmbientSound";
 import { recordInteraction, setCurrent } from "../lib/recommend/session";
+import { useFocusTrap } from "../lib/useFocusTrap";
 import AudioVisualizer from "./experiments/AudioVisualizer";
 import BezierPlayground from "./experiments/BezierPlayground";
 import ConformalMapping from "./experiments/ConformalMapping";
@@ -546,6 +547,12 @@ function ExperimentModal({
   onClose: () => void;
   vtMorph?: boolean;
 }) {
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  // Focus trap: Tab/Shift+Tab cycle di dalam modal + focus tombol tutup
+  // pertama saat terbuka + return focus ke kartu pemicu saat ditutup.
+  useFocusTrap({ containerRef: modalRef, enabled: experiment != null });
+
   useEffect(() => {
     if (experiment) {
       document.body.style.overflow = "hidden";
@@ -573,23 +580,28 @@ function ExperimentModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
+          ref={modalRef}
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4"
           onClick={(e) => {
             if (e.target === e.currentTarget) onClose();
           }}
         >
-          <motion.div
+          <motion.dialog
             key={experiment.id}
             data-modal-panel="true"
+            open
+            aria-modal="true"
+            aria-label={experiment.title}
             initial={vtMorph ? false : { opacity: 0, scale: 0.92, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 20 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-6xl max-h-[90vh] bg-bg-primary/95 border border-border/60 rounded-2xl overflow-hidden shadow-[var(--shadow-3)]"
+            className="relative m-0 w-full max-w-6xl max-h-[90vh] p-0 bg-bg-primary/95 border border-border/60 rounded-2xl overflow-hidden shadow-[var(--shadow-3)]"
           >
             <div className="flex items-center justify-between px-6 py-4 border-b border-border/40 bg-bg-secondary/50">
               <div className="flex items-center gap-3">
                 <button
+                  type="button"
                   onClick={onClose}
                   className="p-1.5 rounded-lg hover:bg-bg-tertiary text-text-secondary hover:text-text-primary transition-all"
                 >
@@ -606,6 +618,7 @@ function ExperimentModal({
                 </div>
               </div>
               <button
+                type="button"
                 onClick={onClose}
                 className="p-1.5 rounded-lg hover:bg-bg-tertiary text-text-secondary hover:text-text-primary transition-all"
               >
@@ -646,7 +659,7 @@ function ExperimentModal({
               {experiment.id === "sentiment-gauge" && <SentimentGauge />}
               {experiment.id === "markov-generator" && <MarkovGenerator />}
             </div>
-          </motion.div>
+          </motion.dialog>
         </motion.div>
       )}
     </AnimatePresence>
@@ -976,26 +989,46 @@ export default function GalleryGrid() {
         </div>
       )}
 
-      <div
-        className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-        role="list"
-        aria-label="Experiments"
-      >
-        {visibleExperiments.map((exp, i) => (
-          <ExperimentCard
-            key={exp.id}
-            exp={exp}
-            index={i}
-            onLaunch={handleLaunch}
-            isFocused={focusedIndex === i}
-            onFocus={() => setFocusedIndex(i)}
-            ref={(el) => {
-              cardRefs.current[i] = el;
+      {visibleExperiments.length === 0 ? (
+        <output
+          className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-border/60 bg-bg-secondary/30 px-6 py-16 text-center"
+        >
+          <span className="text-sm text-text-secondary">
+            Tidak ada eksperimen di kategori ini.
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveCategory("All");
+              setFocusedIndex(-1);
             }}
-            cursorStyle={experimentCursor(exp.id)}
-          />
-        ))}
-      </div>
+            className="rounded-full border border-border/50 px-4 py-1.5 text-xs font-mono text-text-secondary transition-colors hover:border-accent/50 hover:text-text-primary"
+          >
+            Tampilkan semua ({experiments.length})
+          </button>
+        </output>
+      ) : (
+        <div
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+          role="list"
+          aria-label="Experiments"
+        >
+          {visibleExperiments.map((exp, i) => (
+            <ExperimentCard
+              key={exp.id}
+              exp={exp}
+              index={i}
+              onLaunch={handleLaunch}
+              isFocused={focusedIndex === i}
+              onFocus={() => setFocusedIndex(i)}
+              ref={(el) => {
+                cardRefs.current[i] = el;
+              }}
+              cursorStyle={experimentCursor(exp.id)}
+            />
+          ))}
+        </div>
+      )}
 
       <div className="text-center mt-12">
         <div className="flex justify-center gap-4 text-[11px] text-text-secondary/40 font-mono">

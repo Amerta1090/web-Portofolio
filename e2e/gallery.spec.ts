@@ -38,6 +38,31 @@ test.describe("Gallery page", () => {
     await expect(page.getByRole("button", { name: "Bookmark" })).toBeVisible();
   });
 
+  test("modal focus trap: fokus awal tombol tutup dan Tab berputar di dalam dialog", async ({
+    page,
+  }) => {
+    await page.goto("/gallery");
+    await openExperiment(page, "Fractal Explorer");
+    const dialog = page.getByRole("dialog", { name: "Fractal Explorer" });
+    await expect(dialog).toBeVisible();
+    // Initial focus → tombol tutup pertama (ChevronLeft) via useFocusTrap.
+    const firstClose = dialog.locator("button").first();
+    await expect(firstClose).toBeFocused();
+    // Setelah sebanyak focusables kali Tab, fokus kembali ke tombol pertama.
+    const focusableCount = await dialog
+      .locator(
+        'button:not([disabled]):not([tabindex="-1"]), input:not([disabled]), [href]:not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])',
+      )
+      .count();
+    for (let i = 0; i < focusableCount; i++) {
+      await page.keyboard.press("Tab");
+    }
+    await expect(firstClose).toBeFocused();
+    // Esc tetap menutup modal.
+    await page.keyboard.press("Escape");
+    await expect(page.locator("[data-modal-content]")).toHaveCount(0);
+  });
+
   test("Julia toggle shows Cx/Cy controls in modal", async ({ page }) => {
     await page.goto("/gallery");
     await openExperiment(page, "Fractal Explorer");

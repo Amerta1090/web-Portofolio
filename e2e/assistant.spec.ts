@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test.describe("AssistantBot (detAIministic)", () => {
   test("FAB appears on the page (all pages)", async ({ page }) => {
@@ -44,7 +44,9 @@ test.describe("AssistantBot (detAIministic)", () => {
     await page.getByLabel("Buka assistant detAIministic").click();
     const dialog = page.getByRole("dialog", { name: "detAIministic assistant" });
     await dialog.getByLabel("Buka engine").click();
-    await expect(page.getByRole("dialog", { name: "Mekanisme engine deterministik" })).toBeVisible();
+    await expect(
+      page.getByRole("dialog", { name: "Mekanisme engine deterministik" }),
+    ).toBeVisible();
     await expect(page.getByText("Cara kerja engine")).toBeVisible();
     await expect(page.getByText(/100% deterministik/i)).toBeVisible();
   });
@@ -55,5 +57,28 @@ test.describe("AssistantBot (detAIministic)", () => {
     await expect(page.getByRole("dialog", { name: "detAIministic assistant" })).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(page.getByRole("dialog", { name: "detAIministic assistant" })).toHaveCount(0);
+  });
+
+  test("focus trap: initial focus pada input dan Tab berputar di dalam drawer", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await page.getByLabel("Buka assistant detAIministic").click();
+    const dialog = page.getByRole("dialog", { name: "detAIministic assistant" });
+    const input = dialog.getByLabel("Pesan ke assistant");
+    // Initial focus → input (via useFocusTrap).
+    await expect(input).toBeFocused();
+    // Aktifkan tombol kirim agar ia ikut dalam siklus fokus.
+    await input.fill("halo");
+    const focusableCount = await dialog
+      .locator(
+        'button:not([disabled]):not([tabindex="-1"]), input:not([disabled]), [href]:not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])',
+      )
+      .count();
+    // Setelah sebanyak focusables kali Tab, fokus kembali ke input (wrap).
+    for (let i = 0; i < focusableCount; i++) {
+      await page.keyboard.press("Tab");
+    }
+    await expect(input).toBeFocused();
   });
 });

@@ -4,6 +4,7 @@ import { MessageSquare, Sparkles, X, Send, RotateCcw, Cpu, Code2 } from "lucide-
 import { useAssistantSession, type ChatMessage } from "../lib/assistant/useAssistantSession";
 import { getFaq } from "../lib/data";
 import { easing, duration } from "../lib/motion";
+import { useFocusTrap } from "../lib/useFocusTrap";
 
 const CHIP_IDS = ["skills", "projects", "experience", "location", "contact", "certifications"];
 
@@ -55,6 +56,15 @@ export default function AssistantBot() {
 
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
+
+  // Focus trap: Tab/Shift+Tab cycle + initial focus ke input + return focus
+  // ke FAB saat drawer ditutup (Role 9). Esc tetap ditangani komponen di bawah.
+  useFocusTrap({
+    containerRef: drawerRef,
+    enabled: open,
+    initialFocus: "input[aria-label='Pesan ke assistant']",
+  });
 
   // Auto-scroll to the latest message.
   useEffect(() => {
@@ -77,15 +87,6 @@ export default function AssistantBot() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open, engineOpen]);
-
-  // Focus the input when the drawer opens.
-  useEffect(() => {
-    if (open) {
-      // Slight delay so the drawer transition starts before focusing.
-      const t = window.setTimeout(() => inputRef.current?.focus(), 40);
-      return () => window.clearTimeout(t);
-    }
-  }, [open]);
 
   const submit = (text: string) => {
     const trimmed = text.trim();
@@ -124,8 +125,9 @@ export default function AssistantBot() {
         {open && (
           <>
             <motion.div
+              ref={drawerRef}
               role="dialog"
-              aria-modal="false"
+              aria-modal="true"
               aria-label="detAIministic assistant"
               className="fixed bottom-5 right-5 z-[9996] flex h-[min(560px,calc(100dvh-3.5rem))] w-[min(400px,calc(100vw-2.5rem))] flex-col overflow-hidden rounded-2xl border border-border bg-bg-primary shadow-2xl shadow-black/50"
               initial={{ opacity: 0, y: 48, scale: 0.96 }}

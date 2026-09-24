@@ -2,11 +2,13 @@
 import RecommendedRow from "../components/organisms/RecommendedRow";
 import GalleryGrid, { GALLERY_EXPERIMENTS } from "../islands/GalleryGrid";
 import BaseLayout from "../layouts/BaseLayout.astro";
+
+const experimentCount = GALLERY_EXPERIMENTS.length;
 ---
 
 <BaseLayout
   title="Creative Lab — Engineering Showcase"
-  description="25 interactive engines — fluid solvers, FFT visualizers, WebGL fractals, N-body gravity, and ML demos. Every simulation written from scratch."
+  description={`${experimentCount} interactive engines — fluid solvers, FFT visualizers, WebGL fractals, N-body gravity, and ML demos. Every simulation written from scratch.`}
   canonicalUrl="https://portfolio.abdulmajidr708.workers.dev/gallery"
   ogSlug="gallery"
 >
@@ -23,20 +25,18 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           </span>
         </h1>
         <p class="text-text-secondary text-lg max-w-2xl mx-auto">
-          25 interactive engines, each built from scratch — numerical integrators, shaders, solvers, and simulations that double as proof I can turn math into working software. Click any experiment to launch it.
+          {experimentCount} interactive engines, each built from scratch — numerical integrators, shaders, solvers, and simulations that double as proof I can turn math into working software. Click any experiment to launch it.
         </p>
       </header>
 
       <GalleryGrid client:load />
 
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <RecommendedRow
-          client:load
-          items={GALLERY_EXPERIMENTS}
-          current={GALLERY_EXPERIMENTS[0]}
-          limit={3}
-        />
-      </div>
+      <RecommendedRow
+        client:load
+        items={GALLERY_EXPERIMENTS}
+        current={GALLERY_EXPERIMENTS[0]}
+        limit={3}
+      />
     </div>
   </div>
 </BaseLayout>
