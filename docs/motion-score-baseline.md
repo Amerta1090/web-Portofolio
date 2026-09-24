@@ -102,6 +102,24 @@
 | 9 | **Root cause "Excess scroll listeners" home (41)** | **Bukan Lenis.** A/B probe headless: Lenis CDN **tidak pernah load** di env audit (`window.__LENIS=false`; blokir CDN → hitungan identik 207). 182 listener "native-code" = **React 19 per-root non-delegated event wiring**: tiap `astro-island` (33 di home) = satu React root, dan React attach `scroll`/`wheel`/`touchstart`/`touchmove` langsung di root container (bukan delegated). → Konsolidasi kode tidak mungkin; satu-satunya cara kurangi = **merge island** (refactor besar, di luar scope Phase C) — atau terima sebagai *tax* arsitektur (listener pasif no-op, false-positive MotionScore relatif ke biaya nyata). Lenis tetap jadi RAF ∞ global di BaseLayout (guard `visibilitychange` = kandidat tugas lanjutan, bukan blocker audit). |
 | 10 | **Keputusan gap home B→A** | PRD §3.5.1 target **A (≥70)** semua halaman; `/` = **53**. Penutupan butuh: (a) konsolidasi island (merge 33 → ~10 React root) utk scroll listener, (b) ganti sistem reveal (IO-based `data-reveal` + `whileInView`) ke native CSS scroll-driven animation, (c) redam GPU 605MB (canvas ambient/R3F layer besar). Semua = refactor UX berisiko, bukan perbaikan titik. **KEPUTUSAN USER (2026-09-23): TERIMA & DOKUMENTASI** — gap dicatat sebagai batasan sprint, dibuka sebagai **"Sprint Motion-II / Home Scroll Pass"** (usulan fase berikutnya). Gate keras DoD (nol temuan D/F) terpenuhi tanpa itu. |
 
+## §9. Re-audit M-3 (island merge, 2026-09-24) — Motion-II
+
+> Audit `npx motionscore http://localhost:4321 --no-upload` ×2 (variance ±10).
+
+| Item | Pasca-Phase C | Pasca-M-3 | Delta |
+|---|---|---|---|
+| Overall `/` | B 53 | **B 57 / B 59** (2 run) | +4–6 |
+| Scroll listeners desktop | 41 | **26** | **−15** |
+| Scroll listeners mobile | 37 | **23** | **−14** |
+| Scroll animations | C 73–76 det | C 73–76 det (14 scroll-linked / 62 triggered) | ~sama |
+| Thrashing | S | **S** (max concurrent rAF 5) | ✓ |
+| GPU desktop | B 605MB @2x (C) | B 606MB @2x (C) | ~sama (= floor env; R3F galaxy sudah lazy — peak saat audit scroll tetap mount, lihat bawah) |
+| Findings | 0 D/F | **0 D/F** (HIGH: High GPU memory, Off-screen animations, Excess scroll listeners ×2; LOW: layout-triggering, missing will-change, off-screen, JS scroll-linked) | off-screen muncul HIGH lagi (SceneContent frameloop `always` saat ter-scroll; hanya guard `visibilitychange`, bukan intersection) |
+
+- **Root count home 33 → 18** (M-3: 5 komposit). **Listener tax React per-root turun 41→26** — konsisten root cause §8 #9 (React attach scroll/wheel/touchstart/touchmove per root).
+- **GPU 606MB stabil** sejak 605MB pasca-C walau RepositoryGalaxy3D pindah load→visible: audit *men-scroll* (62 scroll-triggered), sehingga GitHubPhase3 tetap mount saat probe → galaxy ikut terukur. Kandidat tersisa utk turunkan: off-screen pause SceneContent (IO, bukan hanya document-visible) → baris M-4.
+- **Gap B→A (57→70)**: penekan = Excess scroll listeners (2 HIGH) + Off-screen animations (HIGH) + High GPU memory (HIGH). Aksi M-4: (a) SceneContent frameloop demand saat off-viewport (IO), (b) tentukan sumber 606MB via eksperimen A/B ambient-off (bila fallback tidak drop → terima sebagai floor env tetapkan di catatan), (c) audit LOW layout-triggering/missing will-change bila murah.
+
 ## Cara ulang audit
 ```
 bun run serve              # preview lokal :4321
