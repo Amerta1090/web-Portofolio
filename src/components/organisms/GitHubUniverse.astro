@@ -1,19 +1,14 @@
 ---
-import { Activity, Calendar, Flame, GitFork, Star } from "lucide-react";
+import { Activity, Calendar, Flame } from "lucide-react";
+import BootSequence from "../../islands/BootSequence";
+import CodeDNAHelix from "../../islands/CodeDNAHelix";
+import GitHubCommandCenter from "../../islands/GitHubCommandCenter";
+import GitHubPhase3 from "../../islands/GitHubPhase3";
+import PhaseIndicator from "../../islands/PhaseIndicator";
+import type { GitHubData } from "../../types/github";
 import Container from "../atoms/Container.astro";
 import DataFreshness from "../atoms/DataFreshness.astro";
 import Section from "../molecules/Section.astro";
-import ActivityWave from "../../islands/ActivityWave";
-import BootSequence from "../../islands/BootSequence";
-import CodeDNAHelix from "../../islands/CodeDNAHelix";
-import ContributionHeatmap from "../../islands/ContributionHeatmap";
-import LanguageNebula from "../../islands/LanguageNebula";
-import LanguageRadial from "../../islands/LanguageRadial";
-import MetricCard from "../../islands/MetricCard";
-import RepositoryGalaxy from "../../islands/RepositoryGalaxy";
-import TopReposLeaderboard from "../../islands/TopReposLeaderboard";
-import PhaseIndicator from "../../islands/PhaseIndicator";
-import type { GitHubData } from "../../types/github";
 
 export interface Props {
   gitHubData: GitHubData;
@@ -69,27 +64,7 @@ const buildTime = new Date().toISOString();
               <p class="text-text-secondary text-sm">Aggregated stats from all public repositories</p>
               <DataFreshness fetchedAt={buildTime} label="Built" />
             </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-              <MetricCard client:load icon={GitFork} value={gitHubData.total_repos} label="Repositories" index={0} />
-              <MetricCard client:load icon={Star} value={gitHubData.total_stars} label="Total Stars" index={1} />
-              <MetricCard client:load icon={GitFork} value={gitHubData.total_forks} label="Total Forks" index={2} />
-              <MetricCard client:load icon={Activity} value={gitHubData.contribution_count} label="Contributions" index={3} />
-            </div>
-            <div class="flex flex-col gap-6 mb-8">
-              <div class="bg-bg-secondary border border-border rounded-xl p-6">
-                <LanguageRadial client:load languages={gitHubData.languages} />
-              </div>
-              <div class="bg-bg-secondary border border-border rounded-xl p-6">
-                <ActivityWave client:load data={gitHubData.weekly_pattern} />
-              </div>
-            </div>
-            <div class="bg-bg-secondary border border-border rounded-xl p-6 mb-8">
-              <ContributionHeatmap
-                client:load
-                data={gitHubData.contributions}
-                longestStreak={gitHubData.derived_metrics.longest_streak}
-              />
-            </div>
+            <GitHubCommandCenter client:load gitHubData={gitHubData} />
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div class="group relative overflow-hidden rounded-xl border border-border/40 bg-gradient-to-br from-bg-secondary/80 to-bg-secondary/40 p-5 transition-all duration-300 hover:border-brand/30 hover:shadow-lg hover:shadow-brand/5">
                 <div class="flex items-start gap-4">
@@ -132,39 +107,14 @@ const buildTime = new Date().toISOString();
         </Section>
       </div>
 
-      <!-- Phase 3: Repository Galaxy + Language Nebula -->
-      <div data-phase="galaxy">
-        <Section title="Repository Galaxy" subtitle="Explore repos as orbiting planets in a 3D galaxy" variant="alt" ariaLabel="Repository galaxy">
-          <Container>
-            <div class="rounded-xl overflow-hidden">
-              <RepositoryGalaxy client:load repos={repos} gitHubData={gitHubData} />
-            </div>
-          </Container>
-        </Section>
-
-        <Section title="Language Nebula" subtitle="Flowing spectrum of your ecosystem" ariaLabel="Language nebula">
-          <Container>
-            <div class="bg-bg-secondary border border-border rounded-xl p-6">
-              <LanguageNebula client:visible languages={gitHubData.languages} allRepos={repos} />
-            </div>
-          </Container>
-        </Section>
-      </div>
-
-      <!-- Phase 4: Top Repos Leaderboard -->
-      <div data-phase="repos">
-        {gitHubData.top_repos.length > 0 && (
-          <Section title="Top Repositories" subtitle="Premium leaderboard by stars" variant="alt" ariaLabel="Top repositories">
-            <Container>
-              <TopReposLeaderboard
-                client:visible
-                topRepos={gitHubData.top_repos}
-                repoActivity={gitHubData.repo_activity}
-              />
-            </Container>
-          </Section>
-        )}
-      </div>
+      <!-- Phases 3+4: Repository Galaxy + Language Nebula + Top Repos leaderboard (composite island) -->
+      <GitHubPhase3
+        client:visible
+        repos={repos}
+        gitHubData={gitHubData}
+        topRepos={gitHubData.top_repos}
+        repoActivity={gitHubData.repo_activity}
+      />
     </div>
   )
 }

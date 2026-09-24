@@ -8,15 +8,11 @@ import Experience from "../components/organisms/Experience.astro";
 import GitHubUniverse from "../components/organisms/GitHubUniverse.astro";
 import Honors from "../components/organisms/Honors.astro";
 import Volunteering from "../components/organisms/Volunteering.astro";
-import CreativeLabPill from "../islands/CreativeLabPill";
 import CreativeLabTeaser from "../islands/CreativeLabTeaser";
-import EasterEgg from "../islands/EasterEgg";
-import ImpactMetrics from "../islands/ImpactMetrics";
 import JourneyTimeline from "../islands/JourneyTimeline";
 import MicroInteractionsDemo from "../islands/MicroInteractionsDemo";
-import MorphingNavigation from "../islands/MorphingNavigation";
+import PageTailOverlays from "../islands/PageTailOverlays";
 import ProjectCardGrid from "../islands/ProjectCardGrid";
-import SectionCounter from "../islands/SectionCounter";
 import SkillsExplorer from "../islands/SkillsExplorer";
 import TestimonialCarousel from "../islands/TestimonialCarousel";
 import TimeAwareHero from "../islands/TimeAwareHero";
@@ -132,8 +128,5 @@ const gitHubData = await fetchAllGitHubData();
     <Contact profile={profile} />
   </Section>
 
-  <MorphingNavigation client:load />
-  <EasterEgg client:load />
-  <SectionCounter client:load />
-  <CreativeLabPill client:visible />
+  <PageTailOverlays client:load />
 </BaseLayout>
