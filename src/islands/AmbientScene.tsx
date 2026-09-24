@@ -1,6 +1,6 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { useCapabilityStore } from "../lib/useCapabilityStore";
-import { useExperienceTier, getEffectiveTier } from "../lib/useExperienceTier";
+import { getEffectiveTier, useExperienceTier } from "../lib/useExperienceTier";
 
 const LazyScene = lazy(() => import("./SceneContent"));
 

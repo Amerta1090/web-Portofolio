@@ -120,6 +120,29 @@
 - **GPU 606MB stabil** sejak 605MB pasca-C walau RepositoryGalaxy3D pindah load→visible: audit *men-scroll* (62 scroll-triggered), sehingga GitHubPhase3 tetap mount saat probe → galaxy ikut terukur. Kandidat tersisa utk turunkan: off-screen pause SceneContent (IO, bukan hanya document-visible) → baris M-4.
 - **Gap B→A (57→70)**: penekan = Excess scroll listeners (2 HIGH) + Off-screen animations (HIGH) + High GPU memory (HIGH). Aksi M-4: (a) SceneContent frameloop demand saat off-viewport (IO), (b) tentukan sumber 606MB via eksperimen A/B ambient-off (bila fallback tidak drop → terima sebagai floor env tetapkan di catatan), (c) audit LOW layout-triggering/missing will-change bila murah.
 
+## §10. Re-audit M-4 (off-screen + GPU source, 2026-09-24) — Motion-II
+
+> A/B probe + pembacaan source motionscore untuk 3 HIGH tersisa home. Kesimpulan:
+> **gap B→A home = 2 HIGH struktural (GPU floor + listener ratio), bukan kode halaman.**
+
+| Item | Pasca-M-3 | Pasca-M-4 | Catatan |
+|---|---|---|---|
+| Overall `/` | B 57/59 | **B 56/58** (2 run) | flutuatif ±10 (variance normal) |
+| Off-screen animations | HIGH (6) | **LOW (3/4)** di run stabil (HIGH kadang muncul = variance scroll-sampling) | GitHubCommandCenter `client:visible` (dulu load) — 7 sumber animasi kontinu bawah-fold didefer |
+| Scroll listeners | 26/22 | 26/22 | net tak berubah (M-4.4 hapus *churn* re-attach, bukan count) — lihat rasio |
+| GPU desktop | 606MB @2x (C) | 606MB @2x (C) | **A/B: identik byte-per-byte saat AmbientScene dimatikan → floor env** |
+
+**M-4.2 A/B GPU 606MB (bukti floor lingkungan)**:
+- AmbientScene (`return null` paksa, tier-2) → build → audit: `Texture memory 606MB @2x / 156MB @3x` — **sama persis** dgn ambient aktif. Kontribusi halaman ≈ 0. Canvas ambient: dpr [1,1.5], antialias false, 4 mesh wireframe, `powerPreference: low-power` — alokasi ~25MB; sisanya = GPU process browser audit (@2x desktop) + binning/compositing environment. **Bukan kode halaman → terima & dokumentasi** (bukan gate umpan balik yang valid utk page-level).
+
+**M-4.3 "Excess scroll listeners" = rasio ≥0.8 (source `motionscore.js`)**:
+- `findings.push({severity:"high", …})` bila `scrollListenerCount / jsScrollAnims.length >= 0.8` (jsScrollAnims = animasi dengan source `js-scroll-linked`/`scroll-handler`).
+- Enumerasi aktual (probe wrap `addEventListener('scroll')`): 21 attach — 11–14 = **React 19 per-root wiring** (astro-island/body/html root; tak bisa dihapus tanpa merge radikal yg membunuh laziness hydrasi), 3 = **ScrollEntropy ×3 instance** (demo MicroInteractionsDemo — fitur), 1–2 = MorphingNavigation, sisa Lenis/touch.
+- Penalty skor `min(listeners×5, 25)` — **capped di 25 utk ≥5 listener**: merge root lebih lanjut tidak menaikkan skor (26 utk 41 listener = penalty sama). Menyingkirkan HIGH butuh rasio <0.8 → listener <0.8×jsScrollAnims — menambah jsScrollAnims (bukan mengurangi listener) juga menurunkan rasio = heuristik salah arah utk perf nyata.
+
+**Keputusan gap home B→A (untuk user)**: 2 HIGH sisa bertahan secara struktural;
+opsi lanjut (bila diambil): (a) rewrite ScrollEntropy/hero/CodeDNAHelix ke CSS scroll-driven (risiko UX + turunkan jsScrollAnims justru menaikkan rasio), (b) merge island radikal (bunuh laziness), (c) **terima B 56–58 sebagai hasil + dokumentasi** (preseden §8 #10) — rekomendasi. Progres M-1→M-4: 49→58 (skor), 41→26 listener, off-screen 6→3, thrashing S, GPU terbukti floor.
+
 ## Cara ulang audit
 ```
 bun run serve              # preview lokal :4321

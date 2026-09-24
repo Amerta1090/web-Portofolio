@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "motion/react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface NavItem {
   id: string;
@@ -34,21 +34,27 @@ export default function MorphingNavigation({
   const [activeSection, setActiveSection] = useState("hero");
   const [isExpanded, setIsExpanded] = useState(false);
 
+  // Read thresholds from a ref so the scroll effect deps stay stable:
+  // default object literal would otherwise be recreated per render and
+  // re-attach the scroll listener on every state change (remove+add churn).
+  const thresholdsRef = useRef(scrollThresholds);
+  thresholdsRef.current = scrollThresholds;
+
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
+      const t = thresholdsRef.current;
       // Discrete phase switch with bailout — React state only changes at
       // threshold crossings, never per frame (Rule 8).
       setPhase((prev) => {
-        const next: Phase =
-          y >= scrollThresholds.menu ? "menu" : y >= scrollThresholds.text ? "text" : "dots";
+        const next: Phase = y >= t.menu ? "menu" : y >= t.text ? "text" : "dots";
         return prev === next ? prev : next;
       });
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [scrollThresholds]);
+  }, []);
 
   useEffect(() => {
     // Active-section detection on the IntersectionObserver thread (no

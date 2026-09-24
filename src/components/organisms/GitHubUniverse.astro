@@ -64,7 +64,7 @@ const buildTime = new Date().toISOString();
               <p class="text-text-secondary text-sm">Aggregated stats from all public repositories</p>
               <DataFreshness fetchedAt={buildTime} label="Built" />
             </div>
-            <GitHubCommandCenter client:load gitHubData={gitHubData} />
+            <GitHubCommandCenter client:visible gitHubData={gitHubData} />
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div class="group relative overflow-hidden rounded-xl border border-border/40 bg-gradient-to-br from-bg-secondary/80 to-bg-secondary/40 p-5 transition-all duration-300 hover:border-brand/30 hover:shadow-lg hover:shadow-brand/5">
                 <div class="flex items-start gap-4">
