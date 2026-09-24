@@ -16,7 +16,6 @@ import JourneyTimeline from "../islands/JourneyTimeline";
 import MicroInteractionsDemo from "../islands/MicroInteractionsDemo";
 import MorphingNavigation from "../islands/MorphingNavigation";
 import ProjectCardGrid from "../islands/ProjectCardGrid";
-import ScrollAnimator from "../islands/ScrollAnimator.astro";
 import SectionCounter from "../islands/SectionCounter";
 import SkillsExplorer from "../islands/SkillsExplorer";
 import TestimonialCarousel from "../islands/TestimonialCarousel";
@@ -135,7 +134,6 @@ const gitHubData = await fetchAllGitHubData();
 
   <MorphingNavigation client:load />
   <EasterEgg client:load />
-  <ScrollAnimator />
   <SectionCounter client:load />
   <CreativeLabPill client:visible />
 </BaseLayout>

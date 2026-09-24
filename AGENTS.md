@@ -40,6 +40,7 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 ## Architecture
 - **Rendering**: SSG. No runtime API calls. GitHub data fetched at build time.
 - **Islands**: React only for interactivity (motion.dev `motion/react` — migrasi dari framer-motion, Sprint Motion; complex state). Astro for static content.
+- **Scroll reveal**: native CSS scroll-driven (`animation-timeline: view()`) via `src/lib/scroll-animations.css` global — no JS observer (ScrollAnimator.astro zombie dihapus di Motion-II M-2); fallback `@supports not` = konten statis utk browser lama.
 - **Data flow**: `scripts/fetch-data.mjs` → `.cache/github/*.json` → `src/lib/github.ts` → components
 - **Theme**: Dark-first (`#0f0f11`), warm amber accent (`#f59e0b`), light mode toggle via CSS vars.
 - **Pattern**: Atomic design (atoms/molecules/organisms/islands).
@@ -101,7 +102,6 @@ pinned-repos.json, all-repos.json, languages.json, commit-activity.json, contrib
 | ContactForm.tsx | `client:load` | |
 
 | SectionCounter.tsx | `client:load` | |
-| ScrollAnimator.astro | — | Astro island (no hydration) |
 | ScrollReveal.tsx | `client:visible` | |
 | SmoothScroll.tsx | `client:load` | |
 | TimeAwareHero.tsx | `client:idle` | |
