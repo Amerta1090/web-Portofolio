@@ -61,6 +61,18 @@ const navLinks = [
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
         </button>
+        <button
+          type="button"
+          class="grid lg:hidden place-items-center h-9 w-9 rounded-lg text-text-secondary hover:text-brand hover:bg-bg-secondary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          aria-label="Menu"
+          aria-controls="mobile-nav"
+          aria-expanded="false"
+          data-mobile-nav-trigger
+          data-cursor-hover="button"
+        >
+          <svg class="mobile-nav-icon-open" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
+          <svg class="mobile-nav-icon-close" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+        </button>
         <HeaderTools client:load />
         <div class="w-px h-5 bg-border mx-1"></div>
         <ThemeToggle />
@@ -68,3 +80,166 @@ const navLinks = [
     </nav>
   </Container>
 </header>
+
+<!--
+  Mobile sheet menu (G1 / 21st Δ1) — panel sebagai sibling dari <header>, BUKAN child:
+  header memakai backdrop-blur-md (containing-block untuk fixed descendants).
+  State = attribute `data-mobile-nav-open` pada <html> (pola ThemeToggle),
+  di-toggle oleh inline script di bawah — 0 React root, 0 scroll listener.
+-->
+<div
+  id="mobile-nav"
+  data-mobile-nav-panel
+  class="lg:hidden"
+  aria-hidden="true"
+>
+  <div data-mobile-nav-backdrop class="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm" tabindex="-1"></div>
+  <div
+    role="dialog"
+    aria-modal="true"
+    aria-label="Menu navigasi"
+    class="fixed inset-y-0 right-0 z-[70] flex w-72 max-w-[85vw] flex-col bg-bg-primary border-l border-border shadow-2xl"
+  >
+    <div class="flex items-center justify-between h-16 shrink-0 px-4 border-b border-border">
+      <span class="text-sm font-medium text-text-primary">Menu</span>
+      <button
+        type="button"
+        data-mobile-nav-close
+        class="grid place-items-center h-9 w-9 rounded-lg text-text-secondary hover:text-brand hover:bg-bg-secondary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        aria-label="Tutup menu"
+        data-cursor-hover="button"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+      </button>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-3 py-4" aria-label="Mobile">
+      <ul class="list-none flex flex-col gap-1">
+        {
+          navLinks.map((link) => (
+            <li>
+              <a
+                href={link.href}
+                data-mobile-nav-link
+                class="flex items-center rounded-lg px-3 py-2.5 text-sm text-text-secondary hover:text-brand hover:bg-bg-secondary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                aria-current={currentPath === link.href ? "page" : undefined}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<style>
+  /* Ikon trigger: Menu ↔ X mengikuti state <html> */
+  [data-mobile-nav-trigger] .mobile-nav-icon-close {
+    display: none;
+  }
+  html[data-mobile-nav-open] [data-mobile-nav-trigger] .mobile-nav-icon-close {
+    display: block;
+  }
+  html[data-mobile-nav-open] [data-mobile-nav-trigger] .mobile-nav-icon-open {
+    display: none;
+  }
+
+  /* Panel: default tertutup (visibility hidden → tak focusable), open via state <html> */
+  [data-mobile-nav-panel] [data-mobile-nav-backdrop],
+  [data-mobile-nav-panel] [role="dialog"] {
+    visibility: hidden;
+  }
+  [data-mobile-nav-panel] [data-mobile-nav-backdrop] {
+    opacity: 0;
+    transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+  }
+  [data-mobile-nav-panel] [role="dialog"] {
+    transform: translateX(100%);
+    transition: transform 0.3s ease, visibility 0s linear 0.3s;
+  }
+  html[data-mobile-nav-open] [data-mobile-nav-panel] [data-mobile-nav-backdrop],
+  html[data-mobile-nav-open] [data-mobile-nav-panel] [role="dialog"] {
+    visibility: visible;
+  }
+  html[data-mobile-nav-open] [data-mobile-nav-panel] [data-mobile-nav-backdrop] {
+    opacity: 1;
+    transition: opacity 0.2s ease, visibility 0s;
+  }
+  html[data-mobile-nav-open] [data-mobile-nav-panel] [role="dialog"] {
+    transform: translateX(0);
+    transition: transform 0.3s ease, visibility 0s;
+  }
+
+  /* reduced-motion: tanpa slide (presen instan) — tanpa JS guard */
+  @media (prefers-reduced-motion: reduce) {
+    [data-mobile-nav-panel] [data-mobile-nav-backdrop],
+    [data-mobile-nav-panel] [role="dialog"],
+    html[data-mobile-nav-open] [data-mobile-nav-panel] [data-mobile-nav-backdrop],
+    html[data-mobile-nav-open] [data-mobile-nav-panel] [role="dialog"] {
+      transition: none;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var root = document.documentElement;
+    var trigger = document.querySelector("[data-mobile-nav-trigger]");
+    var panel = document.querySelector("[data-mobile-nav-panel]");
+    if (!trigger || !panel) return;
+    var prevOverflow = "";
+    var lastFocused = null;
+
+    var isOpen = function () {
+      return root.hasAttribute("data-mobile-nav-open");
+    };
+
+    var open = function () {
+      lastFocused = document.activeElement;
+      prevOverflow = document.body.style.overflow;
+      root.setAttribute("data-mobile-nav-open", "");
+      trigger.setAttribute("aria-expanded", "true");
+      panel.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      var first = panel.querySelector("[data-mobile-nav-close]");
+      if (first && typeof first.focus === "function") first.focus();
+    };
+
+    var close = function () {
+      root.removeAttribute("data-mobile-nav-open");
+      trigger.setAttribute("aria-expanded", "false");
+      panel.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = prevOverflow;
+      if (lastFocused && typeof lastFocused.focus === "function") lastFocused.focus();
+      lastFocused = null;
+    };
+
+    trigger.addEventListener("click", function () {
+      if (isOpen()) {
+        close();
+      } else {
+        open();
+      }
+    });
+
+    var backdrop = panel.querySelector("[data-mobile-nav-backdrop]");
+    if (backdrop && typeof backdrop.addEventListener === "function") {
+      backdrop.addEventListener("click", close);
+    }
+    var closeBtn = panel.querySelector("[data-mobile-nav-close]");
+    if (closeBtn && typeof closeBtn.addEventListener === "function") {
+      closeBtn.addEventListener("click", close);
+    }
+    panel.querySelectorAll("[data-mobile-nav-link]").forEach(function (a) {
+      a.addEventListener("click", close);
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && isOpen()) {
+        e.preventDefault();
+        close();
+      }
+    });
+  })();
+</script>
