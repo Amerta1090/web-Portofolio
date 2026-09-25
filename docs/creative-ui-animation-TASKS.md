@@ -2,7 +2,7 @@
 
 > Spec: `docs/PRD-CREATIVE-UI-ANIMATION.md`.
 > Plan: `docs/SPRINT-PLAN-CREATIVE-UI-ANIMATION.md`.
-> Status: Phase 0 + Sprint 1 + L2.1 COMPLETE; L2.2 bounded SVG choreography active.
+> Status: Phase 0 + Sprint 1 + L2.1 + L2.2 COMPLETE; L2.3 visual/narrative pass active.
 > Rule: the first unchecked task is the only active task. Record evidence and deviations below each task.
 
 ## Phase 0 — Discovery and feasibility
@@ -19,7 +19,14 @@
 ## Sprint 2 — Signal Loom interaction and motion
 
 - [x] **L2.1 Implement selection states** — 2026-09-25: selection dipegang satu React island `src/islands/SignalLoom.tsx` (`client:visible`, per PRD A1) — pointer/touch/click via button, keyboard roving tabindex (Arrow/Home/End, `rovingTargetIndex`), deep link `#signal-<id>` + fallback default utk id invalid (`parseSignalHash`), `aria-pressed` + `aria-current`, status region `aria-live="polite"`, emphasis edge/point via `activeEdgeIds`/`connectedNodeIds`. Pure selection module `src/lib/creative/signal-loom-select.ts` (12 unit test) + komponen test (7). Inline `<script>` shell dihapus — `SignalLoom.astro` jadi copy block + mount island (no-JS fallback = SSR island markup). Interaction state (`selectedId`) terpisah bersih dari animation state (L2.2). Reduced-motion: L2.1 tanpa animasi → path selection identik/instant; CSS `motion-reduce:transition-none`/`motion-reduce:hover:translate-y-0` diterapkan sekarang; branch JS reduced-motion ditunda ke L2.2 tempat animasi eksis (deviation tercatat). Verifikasi: unit 813/813 (75 file, +19), build:fast 49 page ✓, astro check 109 (0 baru), biome 0 error file tersentuh, 0 scroll listener/RAF baru (1 keydown), root island home 9→10 (PRD ≤1). MotionScore tidak dijalankan (server env; baseline home B 56–58 tak tersentuh).
-- [ ] **L2.2 Implement bounded SVG choreography** — selected engine, cleanup, viewport guard, reduced motion, and tests.
+- [x] **L2.2 Implement bounded SVG choreography** — 2026-09-25: engine = **GSAP core** (keputusan C0.3; tanpa dependency baru — gsap sudah ada). Microtask 1–6 semua tuntas:
+  1. **Entry + path drawing**: GSAP timeline one-shot saat `hydrated` — edges `stroke-opacity` fade + nodes `translate/opacity` stagger (HINDARI `scale` karena butuh `getBBox` di jsdom — deviation testabilitas); active edges di-draw via `stroke-dashoffset` ke `edgeLength`.
+  2. **Signal travel + cap**: dots bepergian di edge aktif via `attr: {cx, cy}` (pure attr, no GETBBox); `signalDotEdges()` cap `SIGNAL_MAX_DOTS=3` (4 edges aktif → 3 dots), `SIGNAL_LOOPS=2`, `SIGNAL_TRAVEL_SECONDS=0.7`.
+  3. **Cleanup**: `gsap.context` revert di unmount; `useRafGuard` (viewport IO + `visibilitychange` hidden) → `tl.pause()/play()`; selection replacement → timeline di-`kill()` + rebuild (`selectedId` dep).
+  4. **No React state di RAF loop**: dots = pure DOM attr (GSAP), state hanya di event handler; loop guard `if (guard.paused) return`.
+  5. **Reduced-motion / low-power**: `choreographyMode()` pure — `prefers-reduced-motion` → `"none"` (immediate, 0 dots), `prefers-reduced-data` → `"static"` (emphasis saja, tanpa travel), else `"full"`.
+  6. **Tests**: pure module `src/lib/creative/signal-loom-choreo.ts` (+10 unit) + komponen `SignalLoom.test.tsx` (+6: mode fallback, dot cap/remount, reduced-motion → 0 dots; mock `motion/react` + `useGSAP` + `gsap`).
+  **Browser verification** (build:fast → preview :4321, Chromium repo 1.61): scroll section → `client:visible` hydrate, deep link `#signal-capability-machine-learning-ai` → `aria-current=true`, **dots=2** pada edge-nya dengan posisi **mid-tween GSAP** (`cx: 88.53…` — travel berjalan); klik `project-red-devil-…` → **dots=1**; emulasi `prefers-reduced-motion: reduce` → **0 dots**; emulasi `prefers-reduced-data: reduce` → **0 dots** (static). **A/B pre-existing**: React #418/#425/#423 + `Lenis is not a constructor` = IDENTIK base vs current (stash A/B) — sumber env: TimeAwareHero time-text mismatch + Lenis CDN jsdelivr gagal di env; SignalLoom hydrate + interaktif penuh. Verifikasi: unit **829/829 (76 file, +16)**, build:fast 49 page ✓, `astro check` 109 (0 baru), biome 0 error 4 file tersentuh, 0 scroll listener baru, RAF = GSAP ticker global terguard (paused off-screen/hidden).
 - [ ] **L2.3 Visual and narrative pass** — token, hierarchy, responsive, theme, and section-flow validation.
 
 ## Sprint 3 — Case Study Reactor
@@ -46,3 +53,5 @@
 - 2026-09-25: Working tree contains unrelated in-progress budget changes. C0.1 must record the boundary before implementation.
 - 2026-09-25: Phase 0 baseline cannot provide a clean build or MotionScore until external DNS/server permissions are available; these are baseline blockers, not creative implementation failures.
 - 2026-09-25: Anime.js adoption is deferred at Phase 0 because the package is absent and installing it would add a runtime dependency before a feature-level need is demonstrated.
+- 2026-09-25: L2.2 engine = GSAP core (not Anime.js). Choreography avoids `scale`/`getBBox` in favor of pure attr tweens (`cx`/`cy`, `stroke-dashoffset`, opacity/translate) so jsdom tests stay deterministic. Dots render only when the island has hydrated AND mode is `full` — SSR/initial client render identical (no hydration mismatch from L2.2).
+- 2026-09-25: Home-page env hydration warning recorded (A/B): React #418/#425/#423 + `Lenis is not a constructor` are pre-existing/environmental (identical base vs current build — TimeAwareHero time-greeting text mismatch + Lenis CDN jsdelivr unreachable offline). SignalLoom hydrates fully; not a creative regression.

@@ -95,7 +95,7 @@ Microtasks:
 
 AC: every interactive path reaches the same deterministic selected state.
 
-### L2.2 — Implement bounded SVG choreography
+### L2.2 — Implement bounded SVG choreography — ✅ COMPLETE 2026-09-25 (GSAP core; detail + bukti di TASKS.md)
 
 Microtasks:
 
