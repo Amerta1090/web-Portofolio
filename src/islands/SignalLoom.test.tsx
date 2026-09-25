@@ -1,8 +1,41 @@
 import { render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { SignalLoomGraph } from "../lib/creative/signal-loom";
 import SignalLoom from "./SignalLoom";
+
+let reducedMotion = false;
+
+vi.mock("motion/react", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("motion/react")>();
+  return {
+    ...actual,
+    useReducedMotion: () => reducedMotion,
+  };
+});
+
+// GSAP choreography is a visual enhancement: in jsdom we assert the DOM
+// contract (dots rendered/capped/remounted, immediate reduced state), not tween
+// frames. Registering ScrollTrigger needs window.matchMedia, which jsdom lacks,
+// so both modules are stubbed here instead of changing shared test infra.
+vi.mock("../lib/useGSAP", () => ({
+  useGSAP: () => {},
+}));
+
+vi.mock("../lib/gsap", () => ({
+  gsap: {
+    registerPlugin: () => {},
+    defaults: () => {},
+    timeline: () => {
+      const tl = { fromTo: () => tl, to: () => tl, play: () => {}, pause: () => {} };
+      return tl;
+    },
+    fromTo: () => {},
+    to: () => {},
+    set: () => {},
+  },
+  ScrollTrigger: class ScrollTrigger {},
+}));
 
 const GRAPH: SignalLoomGraph = {
   nodes: [
@@ -27,12 +60,63 @@ const GRAPH: SignalLoomGraph = {
   defaultNodeId: "project-a",
 };
 
+const WIDE_GRAPH: SignalLoomGraph = {
+  nodes: [
+    { id: "capability-a", label: "Cap A", kind: "capability", summary: "Cap A summary" },
+    { id: "capability-b", label: "Cap B", kind: "capability", summary: "Cap B summary" },
+    { id: "capability-c", label: "Cap C", kind: "capability", summary: "Cap C summary" },
+    { id: "capability-d", label: "Cap D", kind: "capability", summary: "Cap D summary" },
+    { id: "capability-e", label: "Cap E", kind: "capability", summary: "Cap E summary" },
+    { id: "project-z", label: "Project Z", kind: "project", summary: "Project Z summary" },
+  ],
+  edges: [
+    { id: "e1", from: "capability-a", to: "project-z", label: "one" },
+    { id: "e2", from: "capability-b", to: "project-z", label: "two" },
+    { id: "e3", from: "capability-c", to: "project-z", label: "three" },
+    { id: "e4", from: "capability-d", to: "project-z", label: "four" },
+    { id: "e5", from: "capability-e", to: "project-z", label: "five" },
+  ],
+  defaultNodeId: "project-z",
+};
+
 function statusText(container: HTMLElement): string {
   return container.querySelector("[data-signal-status-text]")?.textContent ?? "";
 }
 
+function dotIds(container: HTMLElement): string[] {
+  return Array.from(container.querySelectorAll("[data-signal-dot]"))
+    .map((dot) => dot.getAttribute("data-signal-dot"))
+    .filter((id): id is string => id !== null);
+}
+
+function mockReducedData(matches: boolean): () => void {
+  const original = window.matchMedia;
+  Object.defineProperty(window, "matchMedia", {
+    configurable: true,
+    writable: true,
+    value: (query: string) => ({
+      matches: query.includes("prefers-reduced-data") ? matches : false,
+      media: query,
+      onchange: null,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      addListener: () => {},
+      removeListener: () => {},
+      dispatchEvent: () => false,
+    }),
+  });
+  return () => {
+    Object.defineProperty(window, "matchMedia", {
+      configurable: true,
+      writable: true,
+      value: original,
+    });
+  };
+}
+
 afterEach(() => {
   window.location.hash = "";
+  reducedMotion = false;
 });
 
 describe("SignalLoom selection states (L2.1)", () => {
@@ -134,5 +218,86 @@ describe("SignalLoom selection states (L2.1)", () => {
 
     expect(container.querySelectorAll("[data-signal-node]")).toHaveLength(0);
     expect(statusText(container)).toBe("Select a capability or project.");
+  });
+});
+
+describe("SignalLoom bounded SVG choreography (L2.2)", () => {
+  it("renders travelling dots for the capped active edges once hydrated", async () => {
+    const { container } = render(<SignalLoom graph={GRAPH} />);
+
+    await waitFor(() => expect(dotIds(container)).toHaveLength(2));
+    expect(dotIds(container)).toEqual(["capability-ml->project-a", "capability-web->project-a"]);
+
+    // Dots start at the source node — project-a is the destination of both edges.
+    const dot = container.querySelector('[data-signal-dot="capability-ml->project-a"]');
+    expect(dot).toHaveAttribute("cx", "10");
+    expect(dot).toHaveAttribute("cy", "22");
+    expect(dot).toHaveAttribute("fill", "rgb(var(--color-brand-rgb) / 0.9)");
+  });
+
+  it("caps simultaneous animated paths at SIGNAL_MAX_DOTS", async () => {
+    const { container } = render(<SignalLoom graph={WIDE_GRAPH} />);
+
+    await waitFor(() => expect(dotIds(container)).toHaveLength(3));
+    expect(dotIds(container)).toEqual(["e1", "e2", "e3"]);
+  });
+
+  it("shows reduced motion an immediate stable state without dots", async () => {
+    reducedMotion = true;
+    const { container } = render(<SignalLoom graph={GRAPH} />);
+
+    await waitFor(() =>
+      expect(container.querySelector('[data-signal-node="project-a"]')).toBeTruthy(),
+    );
+    expect(container.querySelectorAll("[data-signal-dot]")).toHaveLength(0);
+
+    // Active edges are immediately emphasized (brand stroke), no draw trail.
+    const activeEdge = container.querySelector('[data-edge="capability-ml->project-a"]');
+    expect(activeEdge).toHaveAttribute("stroke", "rgb(var(--color-brand-rgb) / 0.95)");
+  });
+
+  it("keeps selection replacement deterministic under reduced motion", async () => {
+    reducedMotion = true;
+    const user = userEvent.setup();
+    const { container } = render(<SignalLoom graph={GRAPH} />);
+
+    const ml = container.querySelector<HTMLButtonElement>('[data-signal-node="capability-ml"]');
+    if (!ml) throw new Error("ml node button missing");
+    await user.click(ml);
+
+    await waitFor(() => expect(statusText(container)).toBe("ML capability summary"));
+    expect(container.querySelectorAll("[data-signal-dot]")).toHaveLength(0);
+  });
+
+  it("replaces old travel dots when the selection changes", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<SignalLoom graph={GRAPH} />);
+
+    await waitFor(() => expect(dotIds(container)).toHaveLength(2));
+
+    const ml = container.querySelector<HTMLButtonElement>('[data-signal-node="capability-ml"]');
+    if (!ml) throw new Error("ml node button missing");
+    await user.click(ml);
+
+    await waitFor(() => {
+      expect(dotIds(container)).toEqual(["capability-ml->project-a"]);
+    });
+    expect(
+      container.querySelectorAll('[data-signal-dot="capability-web->project-a"]'),
+    ).toHaveLength(0);
+  });
+
+  it("renders no travelling dots in low-power mode but keeps emphasis", async () => {
+    const restore = mockReducedData(true);
+    const { container } = render(<SignalLoom graph={GRAPH} />);
+
+    await waitFor(() =>
+      expect(container.querySelector('[data-signal-node="project-a"]')).toBeTruthy(),
+    );
+    expect(container.querySelectorAll("[data-signal-dot]")).toHaveLength(0);
+
+    const activeEdge = container.querySelector('[data-edge="capability-ml->project-a"]');
+    expect(activeEdge).toHaveAttribute("stroke", "rgb(var(--color-brand-rgb) / 0.95)");
+    restore();
   });
 });
