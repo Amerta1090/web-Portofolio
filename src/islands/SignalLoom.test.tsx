@@ -1,4 +1,4 @@
-import { render, waitFor } from "@testing-library/react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { SignalLoomGraph } from "../lib/creative/signal-loom";
@@ -219,6 +219,41 @@ describe("SignalLoom selection states (L2.1)", () => {
     expect(container.querySelectorAll("[data-signal-node]")).toHaveLength(0);
     expect(statusText(container)).toBe("Select a capability or project.");
   });
+
+  it("highlights a hovered node's point and incident edges without selecting it", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<SignalLoom graph={GRAPH} />);
+
+    const web = container.querySelector<HTMLButtonElement>('[data-signal-node="capability-web"]');
+    const ml = container.querySelector<HTMLButtonElement>('[data-signal-node="capability-ml"]');
+    if (!web || !ml) throw new Error("nodes missing");
+    await user.click(web); // active edge is now capability-web->project-a only
+
+    const mlEdge = container.querySelector('[data-edge="capability-ml->project-a"]');
+    expect(mlEdge).toHaveAttribute("stroke", "rgb(var(--color-border-rgb) / 0.8)");
+
+    fireEvent.pointerEnter(ml);
+    expect(mlEdge).toHaveAttribute("stroke", "rgb(var(--color-brand-rgb) / 0.95)");
+    expect(ml).not.toHaveAttribute("aria-current");
+    expect(statusText(container)).toBe("Web capability summary");
+
+    fireEvent.pointerLeave(ml);
+    expect(mlEdge).toHaveAttribute("stroke", "rgb(var(--color-border-rgb) / 0.8)");
+  });
+
+  it("clears hover emphasis when a focused node loses focus", () => {
+    const { container } = render(<SignalLoom graph={GRAPH} />);
+
+    const ml = container.querySelector<HTMLButtonElement>('[data-signal-node="capability-ml"]');
+    if (!ml) throw new Error("ml node button missing");
+
+    fireEvent.focus(ml);
+    const point = container.querySelector('[data-node-point="capability-ml"]');
+    expect(point).toHaveAttribute("fill", "rgb(var(--color-brand-rgb) / 0.9)");
+
+    fireEvent.blur(ml);
+    expect(point).toHaveAttribute("fill", "rgb(var(--color-brand-rgb) / 0.95)");
+  });
 });
 
 describe("SignalLoom bounded SVG choreography (L2.2)", () => {
@@ -228,10 +263,11 @@ describe("SignalLoom bounded SVG choreography (L2.2)", () => {
     await waitFor(() => expect(dotIds(container)).toHaveLength(2));
     expect(dotIds(container)).toEqual(["capability-ml->project-a", "capability-web->project-a"]);
 
-    // Dots start at the source node — project-a is the destination of both edges.
+    // Dots start at the source node — project-a is the destination of both
+    // edges, so both dots originate at capability-ml (top row, y=9).
     const dot = container.querySelector('[data-signal-dot="capability-ml->project-a"]');
     expect(dot).toHaveAttribute("cx", "10");
-    expect(dot).toHaveAttribute("cy", "22");
+    expect(dot).toHaveAttribute("cy", "9");
     expect(dot).toHaveAttribute("fill", "rgb(var(--color-brand-rgb) / 0.9)");
   });
 

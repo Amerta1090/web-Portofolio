@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEvent, RefCallback } from "react";
 import type { SignalLoomGraph, SignalLoomNode } from "../lib/creative/signal-loom";
 import { connectedNodeIds } from "../lib/creative/signal-loom";
-import { choreographyMode, edgeLength, signalDotEdges } from "../lib/creative/signal-loom-choreo";
+import { choreographyMode, signalDotEdges } from "../lib/creative/signal-loom-choreo";
 import { SIGNAL_LOOPS, SIGNAL_TRAVEL_SECONDS } from "../lib/creative/signal-loom-choreo";
 import {
   activeEdgeIds,
@@ -41,7 +41,7 @@ function nodePosition(
   const nodes = node.kind === "capability" ? capabilityNodes : projectNodes;
   const index = nodes.findIndex((candidate) => candidate.id === node.id);
   const x = nodes.length <= 1 ? 50 : 10 + (index / (nodes.length - 1)) * 80;
-  return { x, y: node.kind === "capability" ? 22 : 78 };
+  return { x, y: node.kind === "capability" ? 9 : 28 };
 }
 
 /**
@@ -55,6 +55,7 @@ function nodePosition(
  */
 export default function SignalLoom({ graph }: SignalLoomProps) {
   const [selectedId, setSelectedId] = useState(graph.defaultNodeId);
+  const [hoverId, setHoverId] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [lowPower, setLowPower] = useState(false);
   const prefersReduced = useReducedMotion() ?? false;
@@ -76,6 +77,10 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
   }, [graph]);
 
   const activeEdges = useMemo(() => activeEdgeIds(graph, selectedId), [graph, selectedId]);
+  const hoverEdges = useMemo(
+    () => (hoverId ? activeEdgeIds(graph, hoverId) : new Set<string>()),
+    [graph, hoverId],
+  );
   const connectedRoots = useMemo(() => connectedNodeIds(graph, selectedId), [graph, selectedId]);
   const selectedNode = graph.nodes.find((node) => node.id === selectedId) ?? null;
 
@@ -133,8 +138,10 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
     timelineRef.current = tl;
   }, [hydrated, prefersReduced, guard.paused]);
 
-  // Selection choreography: draw the capped active paths, then deliver a signal
-  // dot from the selected node to each connected target (finite deliveries).
+  // Selection choreography: deliver a finite signal dot from the selected node
+  // to each capped connected target. Edges themselves swap to the brand stroke
+  // instantly via React (no dashed "draw" trail), so selection reads as a solid
+  // emphasis change plus a travelling dot.
   useGSAP(() => {
     if (choreoMode !== "full") return;
     const svg = svgRef.current;
@@ -146,20 +153,9 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
       const to = positions.get(edge.to);
       if (!from || !to) return;
 
-      const line = svg.querySelector<SVGLineElement>(`[data-edge="${edge.id}"]`);
-      if (line) {
-        const length = edgeLength(from.x, from.y, to.x, to.y);
-        tl.fromTo(
-          line,
-          { strokeDasharray: length, strokeDashoffset: length, opacity: 0.35 },
-          { strokeDashoffset: 0, opacity: 1, duration: 0.45, ease: "power1.out" },
-          index * 0.08,
-        );
-      }
-
       const dot = svg.querySelector<SVGCircleElement>(`[data-signal-dot="${edge.id}"]`);
       if (!dot) return;
-      const start = index * 0.08 + 0.45;
+      const start = index * 0.08;
       const lapDuration = SIGNAL_TRAVEL_SECONDS + 0.35;
       for (let lap = 0; lap < SIGNAL_LOOPS; lap += 1) {
         const at = start + lap * lapDuration;
@@ -227,15 +223,33 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
   return (
     <div
       ref={containerRef}
-      className="relative mt-8 min-h-[27rem] overflow-hidden rounded-lg border border-border/70 bg-bg-primary/40"
+      className="relative mt-8 overflow-hidden rounded-lg border border-border/70 bg-bg-primary/40"
     >
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden md:block">
+      {/* Map band (desktop): the system graph on its own layer, below it the
+          cards act as an index. The band carries a legend (top row =
+          capabilities, bottom row = project evidence) and the travelling
+          signal dots. Never overlaps the cards. */}
+      <div
+        aria-hidden="true"
+        className="relative hidden border-b border-border/40 bg-bg-secondary/30 md:block"
+      >
+        <div className="pointer-events-none absolute left-4 top-2 z-10 flex flex-wrap items-center gap-x-5 gap-y-1.5">
+          <span className="section-label flex items-center gap-1.5 text-text-secondary">
+            <span aria-hidden="true" className="h-2 w-2 rounded-full bg-brand" />
+            Capability
+          </span>
+          <span className="section-label flex items-center gap-1.5 text-text-secondary">
+            <span aria-hidden="true" className="h-2 w-2 rounded-full bg-border" />
+            Project
+          </span>
+        </div>
         <svg
           ref={svgRef}
-          viewBox="0 0 100 100"
+          viewBox="0 0 100 30"
           role="presentation"
           focusable="false"
-          className="h-full w-full"
+          className="block h-auto w-full"
+          style={{ aspectRatio: "100 / 30" }}
         >
           <g>
             {graph.edges.map((edge) => {
@@ -243,6 +257,7 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
               const to = positions.get(edge.to);
               if (!from || !to) return null;
               const isActive = activeEdges.has(edge.id);
+              const isHoverShadow = hoverEdges.has(edge.id) && hoverId !== null;
               return (
                 <line
                   key={edge.id}
@@ -251,8 +266,8 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
                   y1={from.y}
                   x2={to.x}
                   y2={to.y}
-                  stroke={isActive ? BRAND_STROKE : MUTED_STROKE}
-                  strokeWidth={isActive ? 0.45 : 0.26}
+                  stroke={isActive || isHoverShadow ? BRAND_STROKE : MUTED_STROKE}
+                  strokeWidth={isActive ? 0.5 : isHoverShadow ? 0.42 : 0.3}
                   vectorEffect="non-scaling-stroke"
                 />
               );
@@ -263,17 +278,43 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
               const position = positions.get(node.id);
               if (!position) return null;
               const isSelected = node.id === selectedId;
+              const isHovered = node.id === hoverId;
               const isConnected = connectedRoots.has(node.id);
-              const emphasized = isSelected || isConnected;
+              const hot = isSelected || isHovered;
               return (
-                <circle
-                  key={node.id}
-                  data-node-point={node.id}
-                  cx={position.x}
-                  cy={position.y}
-                  r={isSelected ? 2.2 : node.kind === "capability" ? 1.7 : 1.3}
-                  fill={emphasized ? BRAND_STROKE : "rgb(var(--color-border-rgb) / 0.9)"}
-                />
+                <g key={node.id}>
+                  {hot && (
+                    <circle
+                      cx={position.x}
+                      cy={position.y}
+                      r={isSelected ? 3.2 : 2.6}
+                      fill="rgb(var(--color-brand-rgb) / 0.13)"
+                    />
+                  )}
+                  <circle
+                    data-node-point={node.id}
+                    cx={position.x}
+                    cy={position.y}
+                    r={
+                      isSelected
+                        ? 2.1
+                        : isHovered
+                          ? 1.9
+                          : isConnected
+                            ? 1.6
+                            : node.kind === "capability"
+                              ? 1.5
+                              : 1.1
+                    }
+                    fill={
+                      hot
+                        ? BRAND_FILL
+                        : isConnected
+                          ? BRAND_STROKE
+                          : "rgb(var(--color-border-rgb) / 0.9)"
+                    }
+                  />
+                </g>
               );
             })}
           </g>
@@ -300,7 +341,7 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
       <ul
         aria-label="Capabilities and project evidence"
         onKeyDown={handleKeyDown}
-        className="relative grid list-none grid-cols-1 gap-3 p-4 md:grid-cols-2 lg:grid-cols-3"
+        className="grid list-none grid-cols-1 gap-3 p-4 md:grid-cols-2 lg:grid-cols-3"
       >
         {graph.nodes.map((node) => {
           const isSelected = node.id === selectedId;
@@ -315,7 +356,11 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
                 aria-current={isSelected ? "true" : undefined}
                 tabIndex={isSelected ? 0 : -1}
                 onClick={() => handleSelect(node.id)}
-                className={`flex min-h-[5.5rem] flex-col items-start gap-1 rounded-md border p-3.5 text-left transition motion-reduce:transition-none hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-brand focus-visible:outline-offset-2 motion-reduce:hover:translate-y-0 md:min-h-28 ${
+                onPointerEnter={() => setHoverId(node.id)}
+                onPointerLeave={() => setHoverId(null)}
+                onFocus={() => setHoverId(node.id)}
+                onBlur={() => setHoverId(null)}
+                className={`flex h-32 flex-col items-start gap-1 rounded-md border p-3.5 text-left transition motion-reduce:transition-none hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-brand focus-visible:outline-offset-2 motion-reduce:hover:translate-y-0 ${
                   isSelected
                     ? "border-brand bg-brand/10 ring-1 ring-brand/40"
                     : "border-border/70 bg-bg-secondary/80 hover:border-brand hover:bg-brand/10 focus-visible:border-brand focus-visible:bg-brand/10"
@@ -324,10 +369,13 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
                 <span className="section-label text-brand">
                   {node.kind === "capability" ? "Capability" : "Evidence"}
                 </span>
-                <span className="font-display text-h4 leading-snug text-text-primary">
+                <span className="line-clamp-2 font-display text-h4 leading-snug text-text-primary">
                   {node.label}
                 </span>
-                <span className="text-xs leading-relaxed text-text-secondary" data-node-summary>
+                <span
+                  className="line-clamp-1 text-xs leading-relaxed text-text-secondary"
+                  data-node-summary
+                >
                   {node.summary}
                 </span>
               </button>
