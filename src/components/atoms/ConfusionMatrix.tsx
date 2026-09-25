@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { max, select, sum } from "d3";
 import { useReducedMotion } from "motion/react";
-import * as d3 from "d3";
+import { useEffect, useRef, useState } from "react";
 import { useThemeStore } from "../../lib/useThemeStore";
 
 interface Props {
@@ -98,7 +98,7 @@ export default function ConfusionMatrix({
   useEffect(() => {
     if (!svgRef.current || matrix.length === 0 || labels.length === 0) return;
 
-    const svg = d3.select(svgRef.current);
+    const svg = select(svgRef.current);
     const { width, height } = dimensions;
     const colors = themeColors(isDark);
     const margin = { top: 60, right: 40, bottom: 60, left: 80 };
@@ -112,7 +112,7 @@ export default function ConfusionMatrix({
 
     const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-    const maxVal = d3.max(matrix.flat()) ?? 1;
+    const maxVal = max(matrix.flat()) ?? 1;
 
     matrix.forEach((row, i) => {
       row.forEach((val, j) => {
@@ -145,8 +145,8 @@ export default function ConfusionMatrix({
       });
     });
 
-    const rowTotals = matrix.map((row) => d3.sum(row));
-    const colTotals = labels.map((_, j) => d3.sum(matrix.map((row) => row[j])));
+    const rowTotals = matrix.map((row) => sum(row));
+    const colTotals = labels.map((_, j) => sum(matrix.map((row) => row[j])));
 
     labels.forEach((label, i) => {
       g.append("text")
@@ -191,7 +191,7 @@ export default function ConfusionMatrix({
     const rowTotalsArr = rowTotals;
     const colTotalsArr = colTotals;
 
-    const tooltip = d3.select(tooltipRef.current);
+    const tooltip = select(tooltipRef.current);
 
     matrix.forEach((row, i) => {
       row.forEach((val, j) => {
@@ -268,8 +268,7 @@ export default function ConfusionMatrix({
     g.selectAll("rect")
       .filter(function () {
         return (
-          d3.select(this).attr("stroke") === "transparent" ||
-          d3.select(this).attr("stroke-width") === "0"
+          select(this).attr("stroke") === "transparent" || select(this).attr("stroke-width") === "0"
         );
       })
       .attr("class", "cell-highlight");

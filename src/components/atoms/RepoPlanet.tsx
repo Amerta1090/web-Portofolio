@@ -1,7 +1,8 @@
 import { useRef, useState } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
-import * as THREE from "three";
+import type { Mesh, Sprite } from "three";
+import { AdditiveBlending, DoubleSide } from "three";
 import type { GitHubRepo } from "../../types/github";
 
 export interface RepoPlanetProps {
@@ -59,9 +60,9 @@ export default function RepoPlanet({
   onClick,
   isSelected,
 }: RepoPlanetProps) {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const ringRef = useRef<THREE.Mesh>(null);
-  const glowRef = useRef<THREE.Sprite>(null);
+  const meshRef = useRef<Mesh>(null);
+  const ringRef = useRef<Mesh>(null);
+  const glowRef = useRef<Sprite>(null);
   const [hovered, setHovered] = useState(false);
   const angleRef = useRef(initialAngle);
   const [pos, setPos] = useState<[number, number, number]>(position);
@@ -134,7 +135,7 @@ export default function RepoPlanet({
           color={color}
           transparent
           opacity={hovered ? 0.6 : 0.2}
-          side={THREE.DoubleSide}
+          side={DoubleSide}
         />
       </mesh>
 
@@ -143,7 +144,7 @@ export default function RepoPlanet({
           color={color}
           transparent
           opacity={hovered ? 0.3 : 0.08}
-          blending={THREE.AdditiveBlending}
+          blending={AdditiveBlending}
         />
       </sprite>
 

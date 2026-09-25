@@ -31,10 +31,17 @@ const stubViewTransitions = () => {
 };
 
 const clearViewTransitions = () => {
-  (document as { startViewTransition?: unknown }).startViewTransition = undefined;
+  // defineProperty di stubViewTransitions tidak menyetel writable -> assignment
+  // `= undefined` melempar TypeError. delete aman karena configurable:true.
+  Reflect.deleteProperty(document, "startViewTransition");
 };
 
 const openCard = (id: string) => {
+  // Bersihkan hash dari test sebelumnya: deep-link effect GalleryGrid
+  // (setTimeout 300ms) auto-launch bila hash cocok -> call animateView kedua
+  // membuat asersi toHaveBeenCalledTimes flaky (bug laten yang terekspos
+  // lazy-loading: timing render modal berubah).
+  history.replaceState(null, "", window.location.pathname);
   const { container } = render(<GalleryGrid />);
   const card = container.querySelector(`[data-exp-id="${id}"]`);
   expect(card).not.toBeNull();

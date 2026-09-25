@@ -1,6 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
-import * as d3 from "d3";
+import {
+  drag,
+  forceCenter,
+  forceCollide,
+  forceLink,
+  forceManyBody,
+  forceSimulation,
+  select,
+  zoom,
+  type BaseType,
+  type Selection,
+  type Simulation,
+  type SimulationLinkDatum,
+  type SimulationNodeDatum,
+} from "d3";
 import { useThemeStore } from "../../lib/useThemeStore";
 
 export interface GraphNode {
@@ -24,8 +38,8 @@ interface Props {
   className?: string;
 }
 
-type SimNode = d3.SimulationNodeDatum & GraphNode;
-interface SimLink extends d3.SimulationLinkDatum<SimNode> {
+type SimNode = SimulationNodeDatum & GraphNode;
+interface SimLink extends SimulationLinkDatum<SimNode> {
   label?: string;
 }
 
@@ -64,7 +78,7 @@ export default function NetworkGraph({
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const simulationRef = useRef<d3.Simulation<SimNode, SimLink> | null>(null);
+  const simulationRef = useRef<Simulation<SimNode, SimLink> | null>(null);
   const [dimensions, setDimensions] = useState({
     width: propWidth ?? 600,
     height: propHeight ?? 400,
@@ -96,7 +110,7 @@ export default function NetworkGraph({
   useEffect(() => {
     if (!svgRef.current) return;
 
-    const svg = d3.select(svgRef.current);
+    const svg = select(svgRef.current);
     const { width, height } = dimensions;
     const colors = themeColors(isDark);
 
@@ -106,14 +120,13 @@ export default function NetworkGraph({
 
     const g = svg.append("g");
 
-    const zoom = d3
-      .zoom<SVGSVGElement, unknown>()
+    const zoomBehavior = zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.2, 5])
       .on("zoom", (event) => {
         g.attr("transform", event.transform);
       });
 
-    svg.call(zoom).on("dblclick.zoom", null);
+    svg.call(zoomBehavior).on("dblclick.zoom", null);
 
     const simNodes: SimNode[] = propNodes.map((n) => ({
       ...n,
@@ -159,13 +172,12 @@ export default function NetworkGraph({
       .attr("font-size", "10px")
       .attr("pointer-events", "none");
 
-    const dragBehavior = d3
-      .drag<SVGGElement, SimNode>()
+    const dragBehavior = drag<SVGGElement, SimNode>()
       .on("start", (event, d) => {
         if (!event.active) simulationRef.current?.alphaTarget(0.3).restart();
         d.fx = d.x;
         d.fy = d.y;
-        d3.select(event.sourceEvent.target as SVGGElement).style("cursor", "grabbing");
+        select(event.sourceEvent.target as SVGGElement).style("cursor", "grabbing");
       })
       .on("drag", (event, d) => {
         d.fx = event.x;
@@ -175,16 +187,16 @@ export default function NetworkGraph({
         if (!event.active) simulationRef.current?.alphaTarget(0);
         d.fx = null;
         d.fy = null;
-        d3.select(event.sourceEvent.target as SVGGElement).style("cursor", "grab");
+        select(event.sourceEvent.target as SVGGElement).style("cursor", "grab");
       });
 
     nodeGroup.call(
       dragBehavior as unknown as (
-        selection: d3.Selection<d3.BaseType, SimNode, d3.BaseType, unknown>,
+        selection: Selection<BaseType, SimNode, BaseType, unknown>,
       ) => void,
     );
 
-    const tooltipEl = d3.select(tooltipRef.current);
+    const tooltipEl = select(tooltipRef.current);
 
     nodeGroup
       .on("mouseenter", (event: MouseEvent, d: SimNode) => {
@@ -243,18 +255,16 @@ export default function NetworkGraph({
         tooltipEl.style("opacity", 0);
       });
 
-    const simulation = d3
-      .forceSimulation(simNodes)
+    const simulation = forceSimulation(simNodes)
       .force(
         "link",
-        d3
-          .forceLink<SimNode, SimLink>(simLinks)
+        forceLink<SimNode, SimLink>(simLinks)
           .id((d) => d.id)
           .distance(100),
       )
-      .force("charge", d3.forceManyBody().strength(-200))
-      .force("center", d3.forceCenter(width / 2, height / 2))
-      .force("collision", d3.forceCollide().radius(30))
+      .force("charge", forceManyBody().strength(-200))
+      .force("center", forceCenter(width / 2, height / 2))
+      .force("collision", forceCollide().radius(30))
       .alphaDecay(0.02);
 
     simulation.on("tick", () => {

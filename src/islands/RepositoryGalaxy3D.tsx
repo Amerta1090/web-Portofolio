@@ -3,7 +3,8 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ExternalLink, GitFork, Star, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useMemo, useRef, useState } from "react";
-import * as THREE from "three";
+import type { LineBasicMaterial, LineSegments } from "three";
+import { BufferAttribute, BufferGeometry, Color, Vector3 } from "three";
 import RepoPlanet from "../components/atoms/RepoPlanet";
 import useDocumentVisible from "../lib/useDocumentVisible";
 import type { GitHubData, GitHubRepo } from "../types/github";
@@ -68,7 +69,7 @@ function GalaxyCenter() {
 }
 
 function ConnectionLines({ planets }: { planets: PlanetConfig[] }) {
-  const lineRef = useRef<THREE.LineSegments>(null);
+  const lineRef = useRef<LineSegments>(null);
 
   const geometry = useMemo(() => {
     const pos: number[] = [];
@@ -85,23 +86,23 @@ function ConnectionLines({ planets }: { planets: PlanetConfig[] }) {
           pos.push(a.position[0], a.position[1], a.position[2]);
           pos.push(b.position[0], b.position[1], b.position[2]);
 
-          const c = new THREE.Color(a.color);
+          const c = new Color(a.color);
           col.push(c.r, c.g, c.b);
           col.push(c.r, c.g, c.b);
         }
       }
     }
 
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(pos), 3));
-    geo.setAttribute("color", new THREE.BufferAttribute(new Float32Array(col), 3));
+    const geo = new BufferGeometry();
+    geo.setAttribute("position", new BufferAttribute(new Float32Array(pos), 3));
+    geo.setAttribute("color", new BufferAttribute(new Float32Array(col), 3));
     return geo;
   }, [planets]);
 
   useFrame(({ clock }) => {
     if (lineRef.current) {
       const opacity = 0.15 + Math.sin(clock.elapsedTime * 0.5) * 0.1;
-      const material = lineRef.current.material as THREE.LineBasicMaterial;
+      const material = lineRef.current.material as LineBasicMaterial;
       material.opacity = Math.max(0.05, opacity);
     }
   });
@@ -122,7 +123,7 @@ function CameraFlythrough({ onComplete }: { onComplete: () => void }) {
   useFrame((_, delta) => {
     if (doneRef.current) return;
 
-    const target = new THREE.Vector3(0, 0, 8);
+    const target = new Vector3(0, 0, 8);
     if (camera.position.distanceTo(target) > 0.1) {
       camera.position.lerp(target, delta * 0.6);
       camera.lookAt(0, 0, 0);

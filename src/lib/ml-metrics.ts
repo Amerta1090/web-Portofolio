@@ -9,7 +9,7 @@ export interface MLMetrics {
 }
 
 const lossCurves: Record<string, LossCurveDatum[]> = {
-  "ijo-plis": Array.from({ length: 50 }, (_, i) => ({
+  "ijo-plis-ihsg-usd-idr-forecasting-platform": Array.from({ length: 50 }, (_, i) => ({
     epoch: i + 1,
     trainingLoss: 0.8 * Math.exp(-i / 15) + 0.05 * Math.random() + 0.02,
     validationLoss: 0.85 * Math.exp(-i / 12) + 0.06 * Math.random() + 0.04,
@@ -19,7 +19,7 @@ const lossCurves: Record<string, LossCurveDatum[]> = {
     validationLoss: Number(d.validationLoss.toFixed(4)),
   })),
 
-  "ai-quranic-tafsir-assistant": Array.from({ length: 30 }, (_, i) => ({
+  "ai-quranic-tafsir-assistant-hybrid-sparse-dense-retrieval-rag": Array.from({ length: 30 }, (_, i) => ({
     epoch: i + 1,
     trainingLoss: 0.95 * Math.exp(-i / 8) + 0.08 * Math.random() + 0.05,
     validationLoss: 1.0 * Math.exp(-i / 7) + 0.1 * Math.random() + 0.08,
@@ -29,7 +29,7 @@ const lossCurves: Record<string, LossCurveDatum[]> = {
     validationLoss: Number(d.validationLoss.toFixed(4)),
   })),
 
-  "predictive-analytics-for-real-estate": Array.from({ length: 40 }, (_, i) => ({
+  "predictive-analytics-for-real-estate-housing-price-estimation-in-south-tangerang": Array.from({ length: 40 }, (_, i) => ({
     epoch: i + 1,
     trainingLoss: 0.9 * Math.exp(-i / 12) + 0.03 * Math.random() + 0.01,
     validationLoss: 0.95 * Math.exp(-i / 10) + 0.05 * Math.random() + 0.03,
@@ -41,7 +41,7 @@ const lossCurves: Record<string, LossCurveDatum[]> = {
 };
 
 const networkGraphs: Record<string, { nodes: GraphNode[]; links: GraphLink[] }> = {
-  "ai-quranic-tafsir-assistant": {
+  "ai-quranic-tafsir-assistant-hybrid-sparse-dense-retrieval-rag": {
     nodes: [
       { id: "query", label: "User Query", group: "Input", size: 1.5 },
       { id: "bm25", label: "BM25 Sparse", group: "Retrieval", size: 1.2 },
@@ -67,7 +67,7 @@ const networkGraphs: Record<string, { nodes: GraphNode[]; links: GraphLink[] }> 
       { source: "query", target: "llama", label: "direct" },
     ],
   },
-  "red-devil-dynamics": {
+  "red-devil-dynamics-ai-goal-timing-predictor-for-manchester-united": {
     nodes: [
       { id: "match_data", label: "Match Context", group: "Input", size: 1.3 },
       { id: "shots", label: "Shot Data", group: "Input", size: 1.1 },
@@ -93,7 +93,7 @@ const networkGraphs: Record<string, { nodes: GraphNode[]; links: GraphLink[] }> 
 };
 
 const confusionMatrices: Record<string, { matrix: number[][]; labels: string[] }> = {
-  "sweetlife-mobile-app": {
+  "sweetlife-mobile-app-ai-powered-wellness-diabetes-friendly-lifestyle-companion": {
     labels: ["Healthy", "At Risk", "Diabetic"],
     matrix: [
       [142, 12, 3],
@@ -101,7 +101,7 @@ const confusionMatrices: Record<string, { matrix: number[][]; labels: string[] }
       [2, 11, 87],
     ],
   },
-  "student-retention-analysis": {
+  "student-retention-analysis-prediction-system-reducing-dropout-rates": {
     labels: ["Graduated", "Enrolled", "Dropped Out"],
     matrix: [
       [312, 28, 15],
@@ -109,7 +109,7 @@ const confusionMatrices: Record<string, { matrix: number[][]; labels: string[] }
       [8, 19, 178],
     ],
   },
-  "personalized-book-recommendation-system": {
+  "personalized-book-recommendation-system-multi-model-discovery-engine": {
     labels: ["Fiction", "Non-Fiction", "Science", "History"],
     matrix: [
       [245, 18, 12, 8],

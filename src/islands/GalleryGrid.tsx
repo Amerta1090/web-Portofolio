@@ -24,37 +24,46 @@ import {
   Wand2,
   X,
 } from "lucide-react";
-import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import { forwardRef, lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import AmbientSound from "../components/atoms/AmbientSound";
 import { recordInteraction, setCurrent } from "../lib/recommend/session";
 import { useFocusTrap } from "../lib/useFocusTrap";
-import AudioVisualizer from "./experiments/AudioVisualizer";
-import BezierPlayground from "./experiments/BezierPlayground";
-import ConformalMapping from "./experiments/ConformalMapping";
-import FourierEpicycles from "./experiments/FourierEpicycles";
-import FractalExplorer from "./experiments/FractalExplorer";
-import FractalFlameSync from "./experiments/FractalFlameSync";
-import GalaxyFormation from "./experiments/GalaxyFormation";
-import GradientDescent from "./experiments/GradientDescent";
-import HyperbolicGoL from "./experiments/HyperbolicGoL";
-import InteractiveCanvas from "./experiments/InteractiveCanvas";
-import LiquidDistortion from "./experiments/LiquidDistortion";
-import LogisticMap from "./experiments/LogisticMap";
-import MarkovGenerator from "./experiments/MarkovGenerator";
-import NeuralNetworkArt from "./experiments/NeuralNetworkArt";
-import NoiseTopography from "./experiments/NoiseTopography";
-import PCATSNEViz from "./experiments/PCATSNEViz";
-import PrisonersDilemma from "./experiments/PrisonersDilemma";
-import RelativisticOrbits from "./experiments/RelativisticOrbits";
-import SVDImageCompression from "./experiments/SVDImageCompression";
-import SentimentGauge from "./experiments/SentimentGauge";
-import SimulatedAnnealingTSP from "./experiments/SimulatedAnnealingTSP";
-import SpringPhysics from "./experiments/SpringPhysics";
-import StrangeAttractorZoo from "./experiments/StrangeAttractorZoo";
-import TesseractProjection from "./experiments/TesseractProjection";
-import ThreeBodyProblem from "./experiments/ThreeBodyProblem";
-import UlamSpiral from "./experiments/UlamSpiral";
-import VideoSequenceScroll from "./experiments/VideoSequenceScroll";
+
+/** Lazy per-experiment chunks: setiap eksperimen jadi split chunk sendiri,
+ *  dimuat hanya saat modal dibuka. Initial gallery page = tanpa kerangka
+ *  eksperimen (Budget JS B-4). */
+const experimentComponents: Record<
+  string,
+  React.LazyExoticComponent<React.ComponentType<{ compact?: boolean }>>
+> = {
+  "watch-demo": lazy(() => import("./experiments/VideoSequenceScroll")),
+  "liquid-distortion": lazy(() => import("./experiments/LiquidDistortion")),
+  "audio-visualizer": lazy(() => import("./experiments/AudioVisualizer")),
+  "fractal-explorer": lazy(() => import("./experiments/FractalExplorer")),
+  "interactive-canvas": lazy(() => import("./experiments/InteractiveCanvas")),
+  "strange-attractor": lazy(() => import("./experiments/StrangeAttractorZoo")),
+  "logistic-map": lazy(() => import("./experiments/LogisticMap")),
+  "noise-topography": lazy(() => import("./experiments/NoiseTopography")),
+  "fourier-epicycles": lazy(() => import("./experiments/FourierEpicycles")),
+  "tesseract-projection": lazy(() => import("./experiments/TesseractProjection")),
+  "svd-compression": lazy(() => import("./experiments/SVDImageCompression")),
+  "pca-tsne-viz": lazy(() => import("./experiments/PCATSNEViz")),
+  "spring-physics": lazy(() => import("./experiments/SpringPhysics")),
+  "ulam-spiral": lazy(() => import("./experiments/UlamSpiral")),
+  "hyperbolic-gol": lazy(() => import("./experiments/HyperbolicGoL")),
+  "conformal-mapping": lazy(() => import("./experiments/ConformalMapping")),
+  "bezier-playground": lazy(() => import("./experiments/BezierPlayground")),
+  "nn-art": lazy(() => import("./experiments/NeuralNetworkArt")),
+  "fractal-flame-sync": lazy(() => import("./experiments/FractalFlameSync")),
+  "prisoners-dilemma": lazy(() => import("./experiments/PrisonersDilemma")),
+  "gradient-descent": lazy(() => import("./experiments/GradientDescent")),
+  "simulated-annealing-tsp": lazy(() => import("./experiments/SimulatedAnnealingTSP")),
+  "three-body-problem": lazy(() => import("./experiments/ThreeBodyProblem")),
+  "galaxy-formation": lazy(() => import("./experiments/GalaxyFormation")),
+  "relativistic-orbits": lazy(() => import("./experiments/RelativisticOrbits")),
+  "sentiment-gauge": lazy(() => import("./experiments/SentimentGauge")),
+  "markov-generator": lazy(() => import("./experiments/MarkovGenerator")),
+};
 
 interface Experiment {
   id: string;
@@ -405,37 +414,9 @@ export const GALLERY_EXPERIMENTS: Array<{ id: string; title: string; tags: strin
   experiments.map(({ id, title, tags }) => ({ id, title, tags }));
 
 function LivePreview({ id }: { id: string }) {
-  return (
-    <>
-      {id === "watch-demo" && <VideoSequenceScroll compact />}
-      {id === "liquid-distortion" && <LiquidDistortion compact />}
-      {id === "audio-visualizer" && <AudioVisualizer compact />}
-      {id === "fractal-explorer" && <FractalExplorer compact />}
-      {id === "interactive-canvas" && <InteractiveCanvas compact />}
-      {id === "strange-attractor" && <StrangeAttractorZoo compact />}
-      {id === "logistic-map" && <LogisticMap compact />}
-      {id === "noise-topography" && <NoiseTopography compact />}
-      {id === "fourier-epicycles" && <FourierEpicycles compact />}
-      {id === "tesseract-projection" && <TesseractProjection compact />}
-      {id === "svd-compression" && <SVDImageCompression compact />}
-      {id === "pca-tsne-viz" && <PCATSNEViz compact />}
-      {id === "spring-physics" && <SpringPhysics compact />}
-      {id === "ulam-spiral" && <UlamSpiral compact />}
-      {id === "hyperbolic-gol" && <HyperbolicGoL compact />}
-      {id === "conformal-mapping" && <ConformalMapping compact />}
-      {id === "bezier-playground" && <BezierPlayground compact />}
-      {id === "nn-art" && <NeuralNetworkArt compact />}
-      {id === "fractal-flame-sync" && <FractalFlameSync compact />}
-      {id === "prisoners-dilemma" && <PrisonersDilemma compact />}
-      {id === "gradient-descent" && <GradientDescent compact />}
-      {id === "simulated-annealing-tsp" && <SimulatedAnnealingTSP compact />}
-      {id === "three-body-problem" && <ThreeBodyProblem compact />}
-      {id === "galaxy-formation" && <GalaxyFormation compact />}
-      {id === "relativistic-orbits" && <RelativisticOrbits compact />}
-      {id === "sentiment-gauge" && <SentimentGauge compact />}
-      {id === "markov-generator" && <MarkovGenerator compact />}
-    </>
-  );
+  const Component = experimentComponents[id];
+  if (!Component) return null;
+  return <Component compact />;
 }
 
 const ExperimentCard = forwardRef<
@@ -499,7 +480,9 @@ const ExperimentCard = forwardRef<
       <div className="h-48 bg-bg-tertiary overflow-hidden relative">
         {hovered ? (
           <div className="absolute inset-0">
-            <LivePreview id={exp.id} />
+            <Suspense fallback={null}>
+              <LivePreview id={exp.id} />
+            </Suspense>
           </div>
         ) : (
           <img
@@ -631,38 +614,31 @@ function ExperimentModal({
               style={{ height: "calc(90vh - 73px)" }}
               data-modal-content
             >
-              {experiment.id === "watch-demo" && <VideoSequenceScroll />}
-              {experiment.id === "liquid-distortion" && <LiquidDistortion />}
-              {experiment.id === "audio-visualizer" && <AudioVisualizer />}
-              {experiment.id === "fractal-explorer" && <FractalExplorer />}
-              {experiment.id === "interactive-canvas" && <InteractiveCanvas />}
-              {experiment.id === "strange-attractor" && <StrangeAttractorZoo />}
-              {experiment.id === "logistic-map" && <LogisticMap />}
-              {experiment.id === "noise-topography" && <NoiseTopography />}
-              {experiment.id === "fourier-epicycles" && <FourierEpicycles />}
-              {experiment.id === "tesseract-projection" && <TesseractProjection />}
-              {experiment.id === "svd-compression" && <SVDImageCompression />}
-              {experiment.id === "pca-tsne-viz" && <PCATSNEViz />}
-              {experiment.id === "spring-physics" && <SpringPhysics />}
-              {experiment.id === "ulam-spiral" && <UlamSpiral />}
-              {experiment.id === "hyperbolic-gol" && <HyperbolicGoL />}
-              {experiment.id === "conformal-mapping" && <ConformalMapping />}
-              {experiment.id === "bezier-playground" && <BezierPlayground />}
-              {experiment.id === "nn-art" && <NeuralNetworkArt />}
-              {experiment.id === "fractal-flame-sync" && <FractalFlameSync />}
-              {experiment.id === "prisoners-dilemma" && <PrisonersDilemma />}
-              {experiment.id === "gradient-descent" && <GradientDescent />}
-              {experiment.id === "simulated-annealing-tsp" && <SimulatedAnnealingTSP />}
-              {experiment.id === "three-body-problem" && <ThreeBodyProblem />}
-              {experiment.id === "galaxy-formation" && <GalaxyFormation />}
-              {experiment.id === "relativistic-orbits" && <RelativisticOrbits />}
-              {experiment.id === "sentiment-gauge" && <SentimentGauge />}
-              {experiment.id === "markov-generator" && <MarkovGenerator />}
+              {renderExperiment(experiment.id)}
             </div>
           </motion.dialog>
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+function ExperimentLoader() {
+  return (
+    <div className="flex flex-col items-center justify-center w-full h-full gap-3" aria-live="polite">
+      <div className="w-10 h-10 rounded-full border-2 border-border border-t-amber-500 animate-spin" />
+      <p className="text-xs text-text-secondary font-mono">memuat eksperimen…</p>
+    </div>
+  );
+}
+
+function renderExperiment(id: string): React.ReactNode {
+  const Component = experimentComponents[id];
+  if (!Component) return null;
+  return (
+    <Suspense fallback={<ExperimentLoader />}>
+      <Component />
+    </Suspense>
   );
 }
 

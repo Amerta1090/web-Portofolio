@@ -1,6 +1,19 @@
-import { useEffect, useRef, useState } from "react";
+import {
+  axisBottom,
+  axisLeft,
+  bisector,
+  curveMonotoneX,
+  easePolyOut,
+  extent,
+  format,
+  line,
+  max,
+  pointer,
+  scaleLinear,
+  select,
+} from "d3";
 import { useReducedMotion } from "motion/react";
-import * as d3 from "d3";
+import { useEffect, useRef, useState } from "react";
 import { useThemeStore } from "../../lib/useThemeStore";
 
 export interface LossCurveDatum {
@@ -73,7 +86,7 @@ export default function LossCurve({
   useEffect(() => {
     if (!svgRef.current || data.length < 2) return;
 
-    const svg = d3.select(svgRef.current);
+    const svg = select(svgRef.current);
     const { width, height } = dimensions;
     const margin = { top: 20, right: 20, bottom: 40, left: 50 };
     const innerWidth = width - margin.left - margin.right;
@@ -85,27 +98,25 @@ export default function LossCurve({
 
     const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-    const xScale = d3
-      .scaleLinear()
-      .domain(d3.extent(data, (d) => d.epoch) as [number, number])
+    const xScale = scaleLinear()
+      .domain(extent(data, (d) => d.epoch) as [number, number])
       .range([0, innerWidth]);
 
     const allValues = data.flatMap((d) => [d.trainingLoss, d.validationLoss]);
-    const yScale = d3
-      .scaleLinear()
-      .domain([0, (d3.max(allValues) ?? 1) * 1.1])
+    const yScale = scaleLinear()
+      .domain([0, (max(allValues) ?? 1) * 1.1])
       .range([innerHeight, 0]);
 
     g.append("g")
       .attr("transform", `translate(0,${innerHeight})`)
-      .call(d3.axisBottom(xScale).ticks(Math.min(data.length, 10)).tickFormat(d3.format("d")))
+      .call(axisBottom(xScale).ticks(Math.min(data.length, 10)).tickFormat(format("d")))
       .attr("font-size", "11px")
       .call((g) => g.selectAll("line").attr("stroke", colors.grid))
       .call((g) => g.selectAll("path").attr("stroke", colors.grid))
       .call((g) => g.selectAll("text").attr("fill", colors.text));
 
     g.append("g")
-      .call(d3.axisLeft(yScale).ticks(6))
+      .call(axisLeft(yScale).ticks(6))
       .attr("font-size", "11px")
       .call((g) => g.selectAll("line").attr("stroke", colors.grid))
       .call((g) => g.selectAll("path").attr("stroke", colors.grid))
@@ -128,17 +139,15 @@ export default function LossCurve({
       .attr("font-size", "11px")
       .text("Loss");
 
-    const lineGenerator = d3
-      .line<LossCurveDatum>()
+    const lineGenerator = line<LossCurveDatum>()
       .x((d) => xScale(d.epoch))
       .y((d) => yScale(d.trainingLoss))
-      .curve(d3.curveMonotoneX);
+      .curve(curveMonotoneX);
 
-    const valLineGenerator = d3
-      .line<LossCurveDatum>()
+    const valLineGenerator = line<LossCurveDatum>()
       .x((d) => xScale(d.epoch))
       .y((d) => yScale(d.validationLoss))
-      .curve(d3.curveMonotoneX);
+      .curve(curveMonotoneX);
 
     const trainPath = g
       .append("path")
@@ -165,7 +174,7 @@ export default function LossCurve({
         .attr("stroke-dashoffset", totalLength)
         .transition()
         .duration(1200)
-        .ease(d3.easePolyOut)
+        .ease(easePolyOut)
         .attr("stroke-dashoffset", 0);
 
       valPath
@@ -174,7 +183,7 @@ export default function LossCurve({
         .transition()
         .duration(1200)
         .delay(300)
-        .ease(d3.easePolyOut)
+        .ease(easePolyOut)
         .attr("stroke-dashoffset", 0);
     }
 
@@ -196,16 +205,16 @@ export default function LossCurve({
       .attr("font-weight", "600")
       .text("Validation");
 
-    const tooltip = d3.select(tooltipRef.current);
+    const tooltip = select(tooltipRef.current);
 
-    const bisect = d3.bisector((d: LossCurveDatum) => d.epoch).center;
+    const bisect = bisector((d: LossCurveDatum) => d.epoch).center;
 
     g.append("rect")
       .attr("width", innerWidth)
       .attr("height", innerHeight)
       .attr("fill", "transparent")
       .on("mousemove", (event: MouseEvent) => {
-        const [mx] = d3.pointer(event);
+        const [mx] = pointer(event);
         const epoch = Math.round(xScale.invert(mx));
         const idx = bisect(data, epoch);
         const d = data[idx];
