@@ -108,7 +108,7 @@ Microtasks:
 
 AC: interaction feels deliberate, no unbounded loop exists, and all motion has an off switch.
 
-### L2.3 — Visual and narrative pass
+### L2.3 — Visual and narrative pass — ✅ COMPLETE 2026-09-25 (token/hierarchy pass + data matcher fix; detail di TASKS.md)
 
 Microtasks:
 

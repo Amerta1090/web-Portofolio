@@ -48,11 +48,45 @@ function projectSummary(project: Project): string {
   return firstSentence || project.description.trim();
 }
 
-function matchingCategories(project: Project, categories: SkillCategory[]): SkillCategory[] {
-  const projectSkills = new Set(project.skills.map((skill) => skill.toLowerCase()));
+/**
+ * Normalise a skill label for relationship matching.
+ *
+ * Parenthetical qualifiers ("Python (Programming Language)") are stripped so the
+ * same underlying skill written differently in a project and a category still
+ * connects. Every decision stays deterministic — no randomness, no invented data.
+ */
+function normalizeSkill(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/\([^)]*\)/g, "")
+    .trim();
+}
 
+/**
+ * Decide whether a project skill and a category skill describe the same
+ * capability. Exact string wins, then one-side containment (so "web
+ * development" resolves against "Full-Stack Development"), then a shared
+ * significant token (so "Python (Programming Language)" → "Python"). This keeps
+ * the graph truthful to the declared skill data while avoiding the previous
+ * stale situation where a Python-first portfolio showed almost no edges.
+ */
+function skillMatches(projectSkill: string, categorySkill: string): boolean {
+  const project = normalizeSkill(projectSkill);
+  const category = normalizeSkill(categorySkill);
+  if (!project || !category) return false;
+  if (project === category) return true;
+  if (project.includes(category) || category.includes(project)) return true;
+  const tokens = (value: string) =>
+    new Set(value.split(/[^a-z0-9+#.]+/).filter((token) => token.length > 2));
+  const projectTokens = tokens(project);
+  return [...tokens(category)].some((token) => projectTokens.has(token));
+}
+
+function matchingCategories(project: Project, categories: SkillCategory[]): SkillCategory[] {
   return categories.filter((category) =>
-    category.skills.some((skill) => projectSkills.has(skill.name.toLowerCase())),
+    category.skills.some((categorySkill) =>
+      project.skills.some((projectSkill) => skillMatches(projectSkill, categorySkill.name)),
+    ),
   );
 }
 
@@ -63,12 +97,11 @@ function matchingCategories(project: Project, categories: SkillCategory[]): Skil
  * projects are the evidence. The source order is preserved so the result is deterministic
  * and stable for both SSR and tests.
  */
-export function buildSignalLoomGraph(
-  projects: Project[],
-  skills: SkillsData,
-): SignalLoomGraph {
+export function buildSignalLoomGraph(projects: Project[], skills: SkillsData): SignalLoomGraph {
   const categories = skills.categories;
-  const featuredProjects = projects.filter((project) => project.featured).slice(0, FEATURED_PROJECT_LIMIT);
+  const featuredProjects = projects
+    .filter((project) => project.featured)
+    .slice(0, FEATURED_PROJECT_LIMIT);
 
   const capabilityNodes: SignalLoomNode[] = categories.map((category) => ({
     id: categoryId(category),
@@ -94,7 +127,7 @@ export function buildSignalLoomGraph(
     for (const category of matched) {
       const source = categoryId(category);
       const matchedSkill = project.skills.find((projectSkill) =>
-        category.skills.some((skill) => skill.name.toLowerCase() === projectSkill.toLowerCase()),
+        category.skills.some((skill) => skillMatches(projectSkill, skill.name)),
       );
       edges.push({
         id: `${source}->${target}`,
@@ -106,9 +139,40 @@ export function buildSignalLoomGraph(
   }
 
   const nodes = [...capabilityNodes, ...projectNodes];
-  const defaultNodeId = projectNodes[0]?.id ?? capabilityNodes[0]?.id ?? "";
+  const defaultNodeId =
+    mostConnectedNodeId(nodes, edges) ?? projectNodes[0]?.id ?? capabilityNodes[0]?.id ?? "";
 
   return { nodes, edges, defaultNodeId };
+}
+
+/**
+ * The narrative first frame: pick the node with the most connected edges so the
+ * section opens on a small web of relationships instead of an isolated island.
+ * Tie-break is node order (capabilities first) so the choice is deterministic.
+ * Returns `null` for an edge-free graph so callers can fall back to the first
+ * project node.
+ */
+export function mostConnectedNodeId(
+  nodes: SignalLoomNode[],
+  edges: SignalLoomEdge[],
+): string | null {
+  const degree = new Map<string, number>();
+  for (const edge of edges) {
+    degree.set(edge.from, (degree.get(edge.from) ?? 0) + 1);
+    degree.set(edge.to, (degree.get(edge.to) ?? 0) + 1);
+  }
+
+  let best: string | null = null;
+  let bestDegree = -1;
+  for (const node of nodes) {
+    const nodeDegree = degree.get(node.id) ?? 0;
+    if (nodeDegree > bestDegree) {
+      best = node.id;
+      bestDegree = nodeDegree;
+    }
+  }
+
+  return bestDegree > 0 ? best : null;
 }
 
 export function connectedNodeIds(graph: SignalLoomGraph, nodeId: string): Set<string> {
@@ -121,4 +185,3 @@ export function connectedNodeIds(graph: SignalLoomGraph, nodeId: string): Set<st
 
   return connected;
 }
-

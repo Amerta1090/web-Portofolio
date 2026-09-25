@@ -118,6 +118,8 @@ Anime.js is most compelling here for SVG attributes and path choreography. The J
 
 **Complexity:** Medium-high. This is the primary signature experience.
 
+**Implementation status (2026-09-25):** L1.1–L1.2 + L2.1–L2.3 complete (see task log). Two recorded decisions: (1) the reachable-match fix — `skillMatches` normalises skill labels (strips parentheticals, containment, shared tokens) so truthful relationships such as "Python (Programming Language)" → "Python" resolve; the real graph grew 4→8 edges. (2) The default selected node is now the most-connected hub (`mostConnectedNodeId`, deterministic tie-break) so the section opens on a visible web instead of an isolated project island. Both remain strictly data-backed; no invented facts.
+
 ### A2 — Case Study Reactor
 
 **Concept:** A case study page has a fixed or sticky stage indicator while the content progresses through five technical stages. Each stage changes a small inline diagram, code-like label, metric, or relationship line. The visitor can click stages, use arrow keys, or read the same content as a normal ordered sequence.

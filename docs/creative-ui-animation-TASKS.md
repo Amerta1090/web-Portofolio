@@ -2,7 +2,7 @@
 
 > Spec: `docs/PRD-CREATIVE-UI-ANIMATION.md`.
 > Plan: `docs/SPRINT-PLAN-CREATIVE-UI-ANIMATION.md`.
-> Status: Phase 0 + Sprint 1 + L2.1 + L2.2 COMPLETE; L2.3 visual/narrative pass active.
+> Status: Phase 0 + Sprint 1 + Sprint 2 (L2.1–L2.3) COMPLETE; L3.1 Case Study Reactor content model active.
 > Rule: the first unchecked task is the only active task. Record evidence and deviations below each task.
 
 ## Phase 0 — Discovery and feasibility
@@ -27,7 +27,13 @@
   5. **Reduced-motion / low-power**: `choreographyMode()` pure — `prefers-reduced-motion` → `"none"` (immediate, 0 dots), `prefers-reduced-data` → `"static"` (emphasis saja, tanpa travel), else `"full"`.
   6. **Tests**: pure module `src/lib/creative/signal-loom-choreo.ts` (+10 unit) + komponen `SignalLoom.test.tsx` (+6: mode fallback, dot cap/remount, reduced-motion → 0 dots; mock `motion/react` + `useGSAP` + `gsap`).
   **Browser verification** (build:fast → preview :4321, Chromium repo 1.61): scroll section → `client:visible` hydrate, deep link `#signal-capability-machine-learning-ai` → `aria-current=true`, **dots=2** pada edge-nya dengan posisi **mid-tween GSAP** (`cx: 88.53…` — travel berjalan); klik `project-red-devil-…` → **dots=1**; emulasi `prefers-reduced-motion: reduce` → **0 dots**; emulasi `prefers-reduced-data: reduce` → **0 dots** (static). **A/B pre-existing**: React #418/#425/#423 + `Lenis is not a constructor` = IDENTIK base vs current (stash A/B) — sumber env: TimeAwareHero time-text mismatch + Lenis CDN jsdelivr gagal di env; SignalLoom hydrate + interaktif penuh. Verifikasi: unit **829/829 (76 file, +16)**, build:fast 49 page ✓, `astro check` 109 (0 baru), biome 0 error 4 file tersentuh, 0 scroll listener baru, RAF = GSAP ticker global terguard (paused off-screen/hidden).
-- [ ] **L2.3 Visual and narrative pass** — token, hierarchy, responsive, theme, and section-flow validation.
+- [x] **L2.3 Visual and narrative pass** — token, hierarchy, responsive, theme, and section-flow validation. Microtasks 1–5 selesai:
+  1. **Type/hierarchy/token pass**: chip label → `.section-label` (JetBrains Mono 11px, tracking 0.18em — konsisten eyebrow repo), node title → `.font-display text-h4` (Fraunces display scale, computed 17.28px), summary → `text-xs leading-relaxed`. Selected state dikuatkan: `border-brand + bg-brand/10 + ring-1 ring-brand/40`. SVG path weight dinaikkan 0.4/0.22 → 0.45/0.26 (non-scaling hairline agar tetap terlihat). Duplikat `min-h` container dibersihkan.
+  2. **Entry/exit flow**: About(alt) → Systems-in-Motion(default) → Experience(alt) — kontras bergantian benar; copy block organism + Section header tidak redundan.
+  3. **Decorative paths**: tidak ada — seluruh 8 edges adalah relasi data-truthful (setelah matcher diperbaiki). Isolated capability hubs (Data Science, IoT, DevOps, Cloud, Productivity) tetap tampil muted sebagai konteks, bukan path dekoratif.
+  4. **Kalimat interaksi**: copy organism + "Select any node to trace the link between a capability and the projects that use it."
+  5. **Theme/responsive validation** (Playwright, server :4321): dark → brand `rgb(122,140,111)`; light → adaptif identik; tablet 768px = 2 kolom (`md:grid-cols-2 lg:grid-cols-3`), mobile 375px = 1 kolom + SVG hidden, desktop 3 kolom; reduced-motion → 0 dots (immediate), reduced-data → 0 dots; keyboard roving Home→hub ML pertama / End→proyek terakhir, focus ikut.
+  **Data contract fix (naratif, deterministik)**: `skillMatches` baru — strip parenthetical + containment + shared significant token (mis. "Python (Programming Language)" → "Python", "Web Development" → "Full-Stack Development"). Graph real 4→**8 edges**, default node berubah dari project pertama (Retro, terisolasi 0 edge) → **hub paling terhubung** via `mostConnectedNodeId` (Web Development, degree 3) — frame pertama langsung menampilkan web koneksi (L2.3 microtask 1 hierarchy). Verifikasi: unit **833/833 (76 file, +4: parenthetical, containment, mostConnected×2)**, build:fast 49 page ✓, astro check 109 (0 baru di SignalLoom), biome 0 error 4 file, 0 scroll listener/RAF baru. Browser-verified: desktop hub `capability-web-development` → 3 brand edges + 3 dots terjaga di `SIGNAL_MAX_DOTS`; mobile/tablet/theme/keyboard di atas.
 
 ## Sprint 3 — Case Study Reactor
 
@@ -54,4 +60,5 @@
 - 2026-09-25: Phase 0 baseline cannot provide a clean build or MotionScore until external DNS/server permissions are available; these are baseline blockers, not creative implementation failures.
 - 2026-09-25: Anime.js adoption is deferred at Phase 0 because the package is absent and installing it would add a runtime dependency before a feature-level need is demonstrated.
 - 2026-09-25: L2.2 engine = GSAP core (not Anime.js). Choreography avoids `scale`/`getBBox` in favor of pure attr tweens (`cx`/`cy`, `stroke-dashoffset`, opacity/translate) so jsdom tests stay deterministic. Dots render only when the island has hydrated AND mode is `full` — SSR/initial client render identical (no hydration mismatch from L2.2).
+- 2026-09-25: L2.3 data-contract fix (naratif, tetap deterministik): `skillMatches` menormalkan label skill (strip `(...)`, containment, token overlap) sehingga relasi nyata yang tadinya tak terdeteksi kini muncul (graph real 4→8 edges). Default selection bergeser dari projectNodes[0] → `mostConnectedNodeId` (hub degree tertinggi, tie-break node order) agar frame pertama menampilkan koneksi; test data-contract di-update sesuai keputusan ini.
 - 2026-09-25: Home-page env hydration warning recorded (A/B): React #418/#425/#423 + `Lenis is not a constructor` are pre-existing/environmental (identical base vs current build — TimeAwareHero time-greeting text mismatch + Lenis CDN jsdelivr unreachable offline). SignalLoom hydrates fully; not a creative regression.

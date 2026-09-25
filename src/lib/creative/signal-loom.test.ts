@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Project } from "../../types/projects";
 import type { SkillsData } from "../../types/skills";
-import { buildSignalLoomGraph, connectedNodeIds } from "./signal-loom";
+import { buildSignalLoomGraph, connectedNodeIds, mostConnectedNodeId } from "./signal-loom";
 
 const skills: SkillsData = {
   categories: [
@@ -71,7 +71,67 @@ describe("buildSignalLoomGraph", () => {
         label: "React.js",
       },
     ]);
-    expect(graph.defaultNodeId).toBe("project-forecasting-system");
+    // L2.3 narrative first frame: default to the most-connected hub (tie-break
+    // by node order), so the section opens on a visible connection.
+    expect(graph.defaultNodeId).toBe("capability-machine-learning-ai");
+  });
+
+  it("resolves parenthetical project skills against plain category skills", () => {
+    const categories: SkillsData = {
+      categories: [
+        {
+          name: "Programming Languages",
+          icon: "terminal",
+          skills: [{ name: "Python", proficiency: 5 }],
+        },
+      ],
+    };
+    const pythonProject: Project = {
+      title: "Python Platform",
+      featured: true,
+      category: "ml",
+      period: "2026",
+      description: "Ships a Python pipeline.",
+      links: [],
+      skills: ["Python (Programming Language)"],
+    };
+
+    const graph = buildSignalLoomGraph([pythonProject], categories);
+
+    expect(graph.edges).toEqual([
+      {
+        id: "capability-programming-languages->project-python-platform",
+        from: "capability-programming-languages",
+        to: "project-python-platform",
+        label: "Python (Programming Language)",
+      },
+    ]);
+  });
+
+  it("links a broad project skill to a more specific category skill by shared token", () => {
+    const categories: SkillsData = {
+      categories: [
+        {
+          name: "Web Development",
+          icon: "code",
+          skills: [{ name: "Full-Stack Development", proficiency: 4 }],
+        },
+      ],
+    };
+    const webProject: Project = {
+      title: "Portfolio Site",
+      featured: true,
+      category: "web",
+      period: "2026",
+      description: "A static portfolio.",
+      links: [],
+      skills: ["Web Development"],
+    };
+
+    const graph = buildSignalLoomGraph([webProject], categories);
+
+    expect(graph.edges.map((edge) => edge.from)).toContain("capability-web-development");
+    expect(graph.edges[0]?.label).toBe("Web Development");
   });
 
   it("returns the selected node and its direct neighbors", () => {
@@ -89,3 +149,28 @@ describe("buildSignalLoomGraph", () => {
   });
 });
 
+describe("mostConnectedNodeId", () => {
+  it("picks the node with the most edges and breaks ties by node order", () => {
+    const nodes = [
+      { id: "hub", label: "Hub", kind: "capability" as const, summary: "" },
+      { id: "a", label: "A", kind: "project" as const, summary: "" },
+      { id: "b", label: "B", kind: "project" as const, summary: "" },
+    ];
+    const edges = [
+      { id: "hub->a", from: "hub", to: "a", label: "" },
+      { id: "hub->b", from: "hub", to: "b", label: "" },
+      { id: "a->b", from: "a", to: "b", label: "" },
+    ];
+
+    expect(mostConnectedNodeId(nodes, edges)).toBe("hub");
+  });
+
+  it("returns null for an edge-free graph so callers can fall back", () => {
+    const nodes = [
+      { id: "x", label: "X", kind: "capability" as const, summary: "" },
+      { id: "y", label: "Y", kind: "project" as const, summary: "" },
+    ];
+
+    expect(mostConnectedNodeId(nodes, [])).toBeNull();
+  });
+});
