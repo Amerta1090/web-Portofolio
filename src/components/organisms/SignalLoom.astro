@@ -1,0 +1,272 @@
+---
+import type { SignalLoomGraph, SignalLoomNode } from "../../lib/creative/signal-loom";
+
+interface Props {
+  graph: SignalLoomGraph;
+}
+
+const { graph } = Astro.props;
+const capabilityNodes = graph.nodes.filter((node) => node.kind === "capability");
+const projectNodes = graph.nodes.filter((node) => node.kind === "project");
+const nodePosition = (node: SignalLoomNode) => {
+  const nodes = node.kind === "capability" ? capabilityNodes : projectNodes;
+  const index = nodes.findIndex((candidate) => candidate.id === node.id);
+  const x = nodes.length <= 1 ? 50 : 10 + (index / (nodes.length - 1)) * 80;
+  return { x, y: node.kind === "capability" ? 22 : 78 };
+};
+
+const positions = new Map(graph.nodes.map((node) => [node.id, nodePosition(node)]));
+---
+
+<div class="signal-loom" data-signal-loom data-default-node={graph.defaultNodeId}>
+  <div class="signal-loom__copy">
+    <p class="section-label text-text-secondary">A connected practice</p>
+    <p class="mt-4 max-w-2xl text-lg leading-relaxed text-text-secondary">
+      Projects are evidence of a system: capabilities combine, constraints shape the build, and the result has to work in the world.
+    </p>
+  </div>
+
+  <div class="signal-loom__layout">
+    <div class="signal-loom__map" aria-hidden="true">
+      <svg viewBox="0 0 100 100" role="presentation" focusable="false">
+        <g class="signal-loom__edges">
+          {graph.edges.map((edge) => {
+            const from = positions.get(edge.from);
+            const to = positions.get(edge.to);
+            if (!from || !to) return null;
+            return <line data-edge={edge.id} x1={from.x} y1={from.y} x2={to.x} y2={to.y} />;
+          })}
+        </g>
+        <g class="signal-loom__points">
+          {graph.nodes.map((node) => {
+            const position = positions.get(node.id);
+            if (!position) return null;
+            return (
+              <circle
+                data-node-point={node.id}
+                cx={position.x}
+                cy={position.y}
+                r={node.kind === "capability" ? 1.7 : 1.3}
+              />
+            );
+          })}
+        </g>
+      </svg>
+    </div>
+
+    <div class="signal-loom__controls" role="list" aria-label="Capabilities and project evidence">
+      {graph.nodes.map((node) => (
+        <div role="listitem">
+          <button
+            type="button"
+            class:list={[
+              "signal-loom__node",
+              node.kind === "capability" && "signal-loom__node--capability",
+              node.id === graph.defaultNodeId && "is-selected",
+            ]}
+            data-signal-node={node.id}
+            data-node-kind={node.kind}
+            aria-pressed={node.id === graph.defaultNodeId}
+          >
+            <span class="signal-loom__node-kicker">{node.kind === "capability" ? "Capability" : "Evidence"}</span>
+            <span class="signal-loom__node-label">{node.label}</span>
+            <span class="signal-loom__node-summary" data-node-summary>{node.summary}</span>
+          </button>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <div class="signal-loom__status" data-signal-status aria-live="polite">
+    <span class="signal-loom__status-label">Selected signal</span>
+    <span data-signal-status-text>
+      {graph.nodes.find((node) => node.id === graph.defaultNodeId)?.summary ?? "Select a capability or project."}
+    </span>
+  </div>
+</div>
+
+<style>
+  .signal-loom {
+    --signal-line: rgb(var(--color-border-rgb) / 0.8);
+    --signal-point: rgb(var(--color-brand-rgb) / 0.9);
+    --signal-selected: var(--color-brand);
+  }
+
+  .signal-loom__layout {
+    position: relative;
+    margin-top: 2rem;
+    min-height: 27rem;
+    border: 1px solid rgb(var(--color-border-rgb) / 0.7);
+    border-radius: var(--radius);
+    background: rgb(var(--color-surface-primary-rgb) / 0.42);
+    overflow: hidden;
+  }
+
+  .signal-loom__map {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .signal-loom__map svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .signal-loom__edges line {
+    stroke: var(--signal-line);
+    stroke-width: 0.22;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .signal-loom__points circle {
+    fill: var(--signal-point);
+  }
+
+  .signal-loom__controls {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .signal-loom__node {
+    display: flex;
+    min-height: 7rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+    border: 1px solid rgb(var(--color-border-rgb) / 0.72);
+    border-radius: var(--radius-md);
+    background: rgb(var(--color-surface-secondary-rgb) / 0.8);
+    padding: 0.85rem;
+    text-align: left;
+    transition: border-color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+  }
+
+  .signal-loom__node:hover,
+  .signal-loom__node:focus-visible,
+  .signal-loom__node.is-selected {
+    border-color: var(--signal-selected);
+    background: rgb(var(--color-brand-rgb) / 0.09);
+  }
+
+  .signal-loom__node:focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 3px;
+  }
+
+  .signal-loom__node:hover {
+    transform: translateY(-2px);
+  }
+
+  .signal-loom__node-kicker,
+  .signal-loom__status-label {
+    color: var(--color-brand);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .signal-loom__node-label {
+    color: var(--color-text-primary);
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    line-height: 1.1;
+  }
+
+  .signal-loom__node-summary {
+    color: var(--color-text-secondary);
+    font-size: 0.75rem;
+    line-height: 1.45;
+  }
+
+  .signal-loom__status {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    color: var(--color-text-secondary);
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 767px) {
+    .signal-loom__layout {
+      min-height: auto;
+    }
+
+    .signal-loom__map {
+      display: none;
+    }
+
+    .signal-loom__controls {
+      grid-template-columns: 1fr;
+    }
+
+    .signal-loom__node {
+      min-height: 5.5rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .signal-loom__node {
+      transition: none;
+    }
+
+    .signal-loom__node:hover {
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>("[data-signal-loom]");
+
+  if (root) {
+    const nodes = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-signal-node]"));
+    const status = root.querySelector<HTMLElement>("[data-signal-status-text]");
+    const edges = Array.from(root.querySelectorAll<SVGLineElement>("[data-edge]"));
+
+    const selectNode = (id: string, updateHash = true) => {
+      const selected = nodes.find((node) => node.dataset.signalNode === id);
+      if (!selected) return;
+
+      nodes.forEach((node) => {
+        const isSelected = node === selected;
+        node.classList.toggle("is-selected", isSelected);
+        node.setAttribute("aria-pressed", String(isSelected));
+      });
+
+      edges.forEach((edge) => {
+        const edgeId = edge.dataset.edge ?? "";
+        edge.classList.toggle("is-active", edgeId.startsWith(`${id}->`) || edgeId.endsWith(`->${id}`));
+      });
+
+      if (status) {
+        status.textContent = selected.querySelector("[data-node-summary]")?.textContent ?? "";
+      }
+
+      if (updateHash) {
+        history.replaceState(null, "", `#signal-${id}`);
+      }
+    };
+
+    const deepLinkedId = window.location.hash.startsWith("#signal-")
+      ? window.location.hash.slice("#signal-".length)
+      : root.dataset.defaultNode;
+    if (deepLinkedId) selectNode(deepLinkedId, false);
+
+    nodes.forEach((node, index) => {
+      node.addEventListener("click", () => selectNode(node.dataset.signalNode ?? ""));
+      node.addEventListener("keydown", (event) => {
+        if (!["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp", "Home", "End"].includes(event.key)) return;
+        event.preventDefault();
+        const direction = event.key === "ArrowLeft" || event.key === "ArrowUp" ? -1 : 1;
+        const targetIndex = event.key === "Home" ? 0 : event.key === "End" ? nodes.length - 1 : (index + direction + nodes.length) % nodes.length;
+        nodes[targetIndex]?.focus();
+        selectNode(nodes[targetIndex]?.dataset.signalNode ?? "");
+      });
+    });
+  }
+</script>

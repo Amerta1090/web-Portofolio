@@ -8,6 +8,7 @@ import Experience from "../components/organisms/Experience.astro";
 import GitHubUniverse from "../components/organisms/GitHubUniverse.astro";
 import Honors from "../components/organisms/Honors.astro";
 import Volunteering from "../components/organisms/Volunteering.astro";
+import SignalLoom from "../components/organisms/SignalLoom.astro";
 import CreativeLabTeaser from "../islands/CreativeLabTeaser";
 import JourneyTimeline from "../islands/JourneyTimeline";
 import MicroInteractionsDemo from "../islands/MicroInteractionsDemo";
@@ -23,16 +24,19 @@ import {
   getFeaturedProjects,
   getHonors,
   getProfile,
+  getProjects,
   getSkills,
   getTestimonials,
   getVolunteering,
 } from "../lib/data";
+import { buildSignalLoomGraph } from "../lib/creative/signal-loom";
 import { fetchAllGitHubData } from "../lib/github";
 
 const profile = getProfile();
 const featuredProjects = getFeaturedProjects();
 const experiences = getExperience();
 const skills = getSkills();
+const signalLoom = buildSignalLoomGraph(getProjects(), skills);
 const certifications = getCertifications();
 const honors = getHonors();
 const volunteerings = getVolunteering();
@@ -56,6 +60,10 @@ const gitHubData = await fetchAllGitHubData();
     <div class="mt-10">
       <CapabilityGenerator client:load />
     </div>
+  </Section>
+
+  <Section data-reveal id="systems-in-motion" title="Systems in Motion" subtitle="A connected view of capabilities and the projects that put them to work" ariaLabel="Systems in motion">
+    <SignalLoom graph={signalLoom} />
   </Section>
 
   <Section data-reveal id="experience" title="Experience" variant="alt" ariaLabel="Work experience">

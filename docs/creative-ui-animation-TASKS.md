@@ -1,0 +1,48 @@
+# Creative UI & Animation — Task Log
+
+> Spec: `docs/PRD-CREATIVE-UI-ANIMATION.md`.
+> Plan: `docs/SPRINT-PLAN-CREATIVE-UI-ANIMATION.md`.
+> Status: PLANNING COMPLETE; implementation has not started.
+> Rule: the first unchecked task is the only active task. Record evidence and deviations below each task.
+
+## Phase 0 — Discovery and feasibility
+
+- [x] **C0.1 Resume and baseline** — 2026-09-25: dirty tree recorded; relevant homepage/work/data/motion files inspected. `bun run test` passed **791/791**. `bun run build:fast` reached bundling but failed during `/og/index.png` because DNS could not reach `api.fontsource.org`; Astro check reported **109 existing errors**, lint reported **726 existing diagnostics** including `.opencode`/`vitest.config.ts`; `bun run serve` could not bind `::1:4321` (`EPERM`), so MotionScore was not run. No creative source files changed.
+- [x] **C0.2 Reference audit** — 2026-09-25: reviewed 21st.dev animated/WebGL/background/hero collections and Shader Builder, plus Anime.js animation, SVG, `morphTo`, motion path, `onScroll`, WAAPI, and draggable docs. Findings and URLs are recorded in the PRD; selected patterns remain Signal Loom and Case Study Reactor.
+- [x] **C0.3 Anime.js spike and go/no-go** — 2026-09-25: `animejs` is not installed, no local cache is available, and no dependency was added because the repo rule requires a concrete measured need before adding runtime packages. Official docs confirm the needed SVG/scroll/WAAPI APIs, but local import and bundle measurement are deferred until a feature proves it needs Anime.js. **Decision: start implementation with existing Motion/GSAP/CSS; add Anime.js only through a later scoped dependency decision.**
+
+## Sprint 1 — Signal Loom foundation
+
+- [x] **L1.1 Define data contract** — 2026-09-25: added deterministic `src/lib/creative/signal-loom.ts` graph builder and selectors. Capability hubs derive from `data/skills.json`; evidence nodes derive from the first six featured projects; project URLs and summaries come from existing project data. Added 3 focused unit tests covering deterministic edges, neighbors, and empty input.
+- [x] **L1.2 Build static Astro/React shell** — 2026-09-25: added `SignalLoom.astro` and integrated it into the homepage between About and Experience. The shell includes semantic node controls, static SVG edges/points, selected status copy, token-based styling, mobile list fallback, and reduced-motion CSS. Targeted graph tests pass; Astro output showed no new SignalLoom/index diagnostics against the existing baseline.
+
+## Sprint 2 — Signal Loom interaction and motion
+
+- [ ] **L2.1 Implement selection states** — pointer, touch, keyboard, deep links, selected state, and tests.
+- [ ] **L2.2 Implement bounded SVG choreography** — selected engine, cleanup, viewport guard, reduced motion, and tests.
+- [ ] **L2.3 Visual and narrative pass** — token, hierarchy, responsive, theme, and section-flow validation.
+
+## Sprint 3 — Case Study Reactor
+
+- [ ] **L3.1 Add optional process stage content** — schema, truthful stage data, ordered fallback, and data tests.
+- [ ] **L3.2 Add stage controls and visual stage** — buttons, SVG/DOM stage, bounded scroll behavior, reduced motion, and E2E coverage.
+- [ ] **L3.3 Responsive case study composition** — desktop sticky stage, mobile stepper, keyboard focus, and viewport validation.
+
+## Sprint 4 — Integration and quality
+
+- [ ] **Q4.1 Performance and route loading** — payload deltas, hydration scope, loop/listener audit, budget, and MotionScore.
+- [ ] **Q4.2 Accessibility and browser behavior** — keyboard, reduced motion, semantics, fallback, theme, and zoom checks.
+- [ ] **Q4.3 Integration polish** — narrative continuity, restrained lab link if justified, and visual notes.
+
+## Phase Final — Validation and handoff
+
+- [ ] **F5.1 Full validation** — full build, unit, E2E, Astro check, lint, budget, MotionScore, and DoD review.
+- [ ] **F5.2 Documentation sync** — update PRD, plan, task log, prompt, AGENTS sprint log, and next-sprint state.
+
+## Decisions / blockers / deviations
+
+- 2026-09-25: Planning complete. Selected Signal Loom and Case Study Reactor. Motion Lab, shader hero, second 3D gallery, cursor trails, and voice orb are deferred or rejected per PRD.
+- 2026-09-25: Anime.js dependency is not yet approved for installation; C0.3 must measure modular imports before adoption.
+- 2026-09-25: Working tree contains unrelated in-progress budget changes. C0.1 must record the boundary before implementation.
+- 2026-09-25: Phase 0 baseline cannot provide a clean build or MotionScore until external DNS/server permissions are available; these are baseline blockers, not creative implementation failures.
+- 2026-09-25: Anime.js adoption is deferred at Phase 0 because the package is absent and installing it would add a runtime dependency before a feature-level need is demonstrated.
