@@ -2,7 +2,7 @@
 
 > Spec: `docs/PRD-CREATIVE-UI-ANIMATION.md`.
 > Plan: `docs/SPRINT-PLAN-CREATIVE-UI-ANIMATION.md`.
-> Status: PLANNING COMPLETE; implementation has not started.
+> Status: Phase 0 + Sprint 1 + L2.1 COMPLETE; L2.2 bounded SVG choreography active.
 > Rule: the first unchecked task is the only active task. Record evidence and deviations below each task.
 
 ## Phase 0 — Discovery and feasibility
@@ -18,7 +18,7 @@
 
 ## Sprint 2 — Signal Loom interaction and motion
 
-- [ ] **L2.1 Implement selection states** — pointer, touch, keyboard, deep links, selected state, and tests.
+- [x] **L2.1 Implement selection states** — 2026-09-25: selection dipegang satu React island `src/islands/SignalLoom.tsx` (`client:visible`, per PRD A1) — pointer/touch/click via button, keyboard roving tabindex (Arrow/Home/End, `rovingTargetIndex`), deep link `#signal-<id>` + fallback default utk id invalid (`parseSignalHash`), `aria-pressed` + `aria-current`, status region `aria-live="polite"`, emphasis edge/point via `activeEdgeIds`/`connectedNodeIds`. Pure selection module `src/lib/creative/signal-loom-select.ts` (12 unit test) + komponen test (7). Inline `<script>` shell dihapus — `SignalLoom.astro` jadi copy block + mount island (no-JS fallback = SSR island markup). Interaction state (`selectedId`) terpisah bersih dari animation state (L2.2). Reduced-motion: L2.1 tanpa animasi → path selection identik/instant; CSS `motion-reduce:transition-none`/`motion-reduce:hover:translate-y-0` diterapkan sekarang; branch JS reduced-motion ditunda ke L2.2 tempat animasi eksis (deviation tercatat). Verifikasi: unit 813/813 (75 file, +19), build:fast 49 page ✓, astro check 109 (0 baru), biome 0 error file tersentuh, 0 scroll listener/RAF baru (1 keydown), root island home 9→10 (PRD ≤1). MotionScore tidak dijalankan (server env; baseline home B 56–58 tak tersentuh).
 - [ ] **L2.2 Implement bounded SVG choreography** — selected engine, cleanup, viewport guard, reduced motion, and tests.
 - [ ] **L2.3 Visual and narrative pass** — token, hierarchy, responsive, theme, and section-flow validation.
 
