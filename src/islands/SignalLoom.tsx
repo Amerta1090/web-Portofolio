@@ -1,5 +1,5 @@
 import { useReducedMotion } from "motion/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEvent, RefCallback } from "react";
 import type { SignalLoomGraph, SignalLoomNode } from "../lib/creative/signal-loom";
 import { connectedNodeIds } from "../lib/creative/signal-loom";
@@ -33,31 +33,36 @@ const BRAND_STROKE = "rgb(var(--color-brand-rgb) / 0.95)";
 const MUTED_STROKE = "rgb(var(--color-border-rgb) / 0.8)";
 const BRAND_FILL = "rgb(var(--color-brand-rgb) / 0.9)";
 
-function nodePosition(
-  node: SignalLoomNode,
-  capabilityNodes: SignalLoomNode[],
-  projectNodes: SignalLoomNode[],
-): { x: number; y: number } {
-  const nodes = node.kind === "capability" ? capabilityNodes : projectNodes;
-  const index = nodes.findIndex((candidate) => candidate.id === node.id);
-  const x = nodes.length <= 1 ? 50 : 10 + (index / (nodes.length - 1)) * 80;
-  return { x, y: node.kind === "capability" ? 9 : 28 };
+interface EdgeCoords {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
 }
+type EdgeCoordMap = Partial<Record<string, EdgeCoords>>;
 
 /**
  * Signal Loom interaction island.
  *
+ * The CARDS are the graph nodes: capability cards on the left, project
+ * evidence cards on the right, and a connector plane draws an edge from each
+ * capability card's right edge to each connected project card's left edge
+ * (measured from the real DOM layout, refreshed on resize). There are no
+ * abstract node dots — the graph the user sees is exactly the card grid.
+ *
  * L2.1 owns the deterministic selected-node state (pointer, touch, keyboard,
- * deep link). L2.2 layers a bounded SVG choreography on top: a one-shot GSAP
- * entry, active-edge path drawing, and travelling signal dots (capped by
- * `SIGNAL_MAX_DOTS`). All animation is finite, cancellable, viewport/visibility
- * guarded, and reduced-motion safe — no React state is written inside any loop.
+ * deep link). L2.2 layers a bounded motion pass on top: a one-shot GSAP entry
+ * fade for the connector edges and travelling signal dots that pulse along a
+ * selected card-to-card edge (capped by `SIGNAL_MAX_DOTS`). All animation is
+ * finite, cancellable, viewport/visibility guarded, and reduced-motion safe —
+ * no React state is written inside any loop.
  */
 export default function SignalLoom({ graph }: SignalLoomProps) {
   const [selectedId, setSelectedId] = useState(graph.defaultNodeId);
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [lowPower, setLowPower] = useState(false);
+  const [edgeCoords, setEdgeCoords] = useState<EdgeCoordMap>({});
   const prefersReduced = useReducedMotion() ?? false;
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -68,13 +73,14 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
   const guard = useRafGuard(containerRef);
 
   const nodeIds = useMemo(() => graph.nodes.map((node) => node.id), [graph]);
-  const positions = useMemo(() => {
-    const capabilityNodes = graph.nodes.filter((node) => node.kind === "capability");
-    const projectNodes = graph.nodes.filter((node) => node.kind === "project");
-    return new Map(
-      graph.nodes.map((node) => [node.id, nodePosition(node, capabilityNodes, projectNodes)]),
-    );
-  }, [graph]);
+  const capabilityNodes = useMemo(
+    () => graph.nodes.filter((node) => node.kind === "capability"),
+    [graph],
+  );
+  const projectNodes = useMemo(
+    () => graph.nodes.filter((node) => node.kind === "project"),
+    [graph],
+  );
 
   const activeEdges = useMemo(() => activeEdgeIds(graph, selectedId), [graph, selectedId]);
   const hoverEdges = useMemo(
@@ -112,36 +118,62 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
     if (id !== graph.defaultNodeId) setSelectedId(id);
   }, [graph, nodeIds]);
 
-  // One-shot entry: edges fade in, then nodes slide/fade with a light stagger.
-  // Skipped entirely for reduced motion, before hydration, or while off-screen.
+  /**
+   * Measure the real card geometry so connector lines start exactly at each
+   * capability card's right edge and end at each project card's left edge.
+   * Pure layout read — no animation state lives here.
+   */
+  const measureEdges = useCallback(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const containerRect = container.getBoundingClientRect();
+    const next: EdgeCoordMap = {};
+    for (const edge of graph.edges) {
+      const fromEl = buttonRefs.current.get(edge.from);
+      const toEl = buttonRefs.current.get(edge.to);
+      if (!fromEl || !toEl) continue;
+      const from = fromEl.getBoundingClientRect();
+      const to = toEl.getBoundingClientRect();
+      next[edge.id] = {
+        x1: from.right - containerRect.left,
+        y1: from.top + from.height / 2 - containerRect.top,
+        x2: to.left - containerRect.left,
+        y2: to.top + to.height / 2 - containerRect.top,
+      };
+    }
+    setEdgeCoords(next);
+  }, [graph]);
+
+  // Measure after hydration and re-measure when the container resizes (cards
+  // are fixed height, but zone widths change with the viewport). Bounded: one
+  // ResizeObserver on the section container, disconnected on unmount.
+  useEffect(() => {
+    if (!hydrated) return;
+    measureEdges();
+    const container = containerRef.current;
+    if (!container || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(measureEdges);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [hydrated, measureEdges]);
+
+  // One-shot entry: connector edges fade in. Skipped entirely for reduced
+  // motion, before hydration, or while off-screen.
   useGSAP(() => {
     if (!hydrated || prefersReduced || guard.paused) return;
     const svg = svgRef.current;
-    if (!svg) return;
+    if (!svg || Object.keys(edgeCoords).length === 0) return;
     const tl = gsap.timeline({ delay: 0.06 });
     tl.fromTo(
       svg.querySelectorAll("[data-edge]"),
       { opacity: 0.3 },
       { opacity: 1, duration: duration.slow, stagger: 0.04, ease: "power1.out" },
-    ).fromTo(
-      svg.querySelectorAll("[data-node-point]"),
-      { opacity: 0, y: 5 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: duration.normal,
-        stagger: 0.06,
-        ease: "back.out(1.7)",
-      },
-      "-=0.35",
     );
     timelineRef.current = tl;
-  }, [hydrated, prefersReduced, guard.paused]);
+  }, [hydrated, prefersReduced, guard.paused, edgeCoords]);
 
-  // Selection choreography: deliver a finite signal dot from the selected node
-  // to each capped connected target. Edges themselves swap to the brand stroke
-  // instantly via React (no dashed "draw" trail), so selection reads as a solid
-  // emphasis change plus a travelling dot.
+  // Selection choreography: pulse a finite signal dot from the selected card
+  // to each capped connected target, travelling along the measured edge.
   useGSAP(() => {
     if (choreoMode !== "full") return;
     const svg = svgRef.current;
@@ -149,10 +181,8 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
     const tl = gsap.timeline();
 
     dottedEdges.forEach((edge, index) => {
-      const from = positions.get(edge.from);
-      const to = positions.get(edge.to);
-      if (!from || !to) return;
-
+      const coords = edgeCoords[edge.id];
+      if (!coords) return;
       const dot = svg.querySelector<SVGCircleElement>(`[data-signal-dot="${edge.id}"]`);
       if (!dot) return;
       const start = index * 0.08;
@@ -161,14 +191,14 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
         const at = start + lap * lapDuration;
         tl.fromTo(
           dot,
-          { attr: { cx: from.x, cy: from.y }, opacity: lap === 0 ? 0 : 0.75 },
-          { attr: { cx: from.x, cy: from.y }, opacity: 1, duration: 0.05 },
+          { attr: { cx: coords.x1, cy: coords.y1 }, opacity: lap === 0 ? 0 : 0.75 },
+          { attr: { cx: coords.x1, cy: coords.y1 }, opacity: 1, duration: 0.05 },
           at,
         )
           .to(
             dot,
             {
-              attr: { cx: to.x, cy: to.y },
+              attr: { cx: coords.x2, cy: coords.y2 },
               duration: SIGNAL_TRAVEL_SECONDS,
               ease: "power1.inOut",
             },
@@ -183,7 +213,7 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
     });
 
     timelineRef.current = tl;
-  }, [choreoMode, dottedEdges, positions]);
+  }, [choreoMode, dottedEdges, edgeCoords]);
 
   // Pause/resume the current choreography when the section leaves the viewport
   // or the tab hides (useRafGuard already observes both). Tweens are killed by
@@ -220,169 +250,144 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
     }
   };
 
+  const renderNode = (node: SignalLoomNode) => {
+    const isSelected = node.id === selectedId;
+    const isConnected = connectedRoots.has(node.id);
+    const isCapability = node.kind === "capability";
+    return (
+      <li key={node.id}>
+        <button
+          ref={captureButton(node.id)}
+          type="button"
+          data-signal-node={node.id}
+          data-node-kind={node.kind}
+          data-connected={isConnected ? "true" : undefined}
+          aria-pressed={isSelected}
+          aria-current={isSelected ? "true" : undefined}
+          tabIndex={isSelected ? 0 : -1}
+          onClick={() => handleSelect(node.id)}
+          onPointerEnter={() => setHoverId(node.id)}
+          onPointerLeave={() => setHoverId(null)}
+          onFocus={() => setHoverId(node.id)}
+          onBlur={() => setHoverId(null)}
+          className={`flex h-32 flex-col items-start justify-center gap-1 rounded-md border p-3.5 text-left transition motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-brand focus-visible:outline-offset-2 ${
+            isCapability ? "md:h-16 md:flex-row md:items-center md:gap-3" : ""
+          } ${
+            isSelected
+              ? "border-brand bg-brand/10 ring-1 ring-brand/40"
+              : isConnected
+                ? "border-brand/40 bg-bg-secondary/80 hover:border-brand hover:bg-brand/10 focus-visible:border-brand focus-visible:bg-brand/10"
+                : "border-border/70 bg-bg-secondary/80 hover:border-brand hover:bg-brand/10 focus-visible:border-brand focus-visible:bg-brand/10"
+          }`}
+        >
+          <span className="section-label shrink-0 text-brand">
+            {isCapability ? "Capability" : "Evidence"}
+          </span>
+          <span
+            className={`line-clamp-2 font-display text-h4 leading-snug text-text-primary ${
+              isCapability ? "md:line-clamp-1 md:min-w-0" : ""
+            }`}
+          >
+            {node.label}
+          </span>
+          {isCapability ? (
+            <span
+              className="line-clamp-1 text-xs leading-relaxed text-text-secondary md:hidden"
+              data-node-summary
+            >
+              {node.summary}
+            </span>
+          ) : (
+            <span
+              className="line-clamp-1 text-xs leading-relaxed text-text-secondary"
+              data-node-summary
+            >
+              {node.summary}
+            </span>
+          )}
+        </button>
+      </li>
+    );
+  };
+
   return (
     <div
       ref={containerRef}
       className="relative mt-8 overflow-hidden rounded-lg border border-border/70 bg-bg-primary/40"
     >
-      {/* Map band (desktop): the system graph on its own layer, below it the
-          cards act as an index. The band carries a legend (top row =
-          capabilities, bottom row = project evidence) and the travelling
-          signal dots. Never overlaps the cards. */}
-      <div
+      {/* Connector plane (md+): edges run from each capability card's right
+          edge to each connected project card's left edge. Coordinates are
+          measured from the real card layout, so the lines visibly join the
+          actual cards — no abstract node layer. */}
+      <svg
+        ref={svgRef}
         aria-hidden="true"
-        className="relative hidden border-b border-border/40 bg-bg-secondary/30 md:block"
+        focusable="false"
+        className="pointer-events-none absolute inset-0 z-0 hidden h-full w-full md:block"
       >
-        <div className="pointer-events-none absolute left-4 top-2 z-10 flex flex-wrap items-center gap-x-5 gap-y-1.5">
-          <span className="section-label flex items-center gap-1.5 text-text-secondary">
-            <span aria-hidden="true" className="h-2 w-2 rounded-full bg-brand" />
-            Capability
-          </span>
-          <span className="section-label flex items-center gap-1.5 text-text-secondary">
-            <span aria-hidden="true" className="h-2 w-2 rounded-full bg-border" />
-            Project
-          </span>
-        </div>
-        <svg
-          ref={svgRef}
-          viewBox="0 0 100 30"
-          role="presentation"
-          focusable="false"
-          className="block h-auto w-full"
-          style={{ aspectRatio: "100 / 30" }}
-        >
-          <g>
-            {graph.edges.map((edge) => {
-              const from = positions.get(edge.from);
-              const to = positions.get(edge.to);
-              if (!from || !to) return null;
-              const isActive = activeEdges.has(edge.id);
-              const isHoverShadow = hoverEdges.has(edge.id) && hoverId !== null;
-              return (
-                <line
-                  key={edge.id}
-                  data-edge={edge.id}
-                  x1={from.x}
-                  y1={from.y}
-                  x2={to.x}
-                  y2={to.y}
-                  stroke={isActive || isHoverShadow ? BRAND_STROKE : MUTED_STROKE}
-                  strokeWidth={isActive ? 0.5 : isHoverShadow ? 0.42 : 0.3}
-                  vectorEffect="non-scaling-stroke"
-                />
-              );
-            })}
-          </g>
-          <g>
-            {graph.nodes.map((node) => {
-              const position = positions.get(node.id);
-              if (!position) return null;
-              const isSelected = node.id === selectedId;
-              const isHovered = node.id === hoverId;
-              const isConnected = connectedRoots.has(node.id);
-              const hot = isSelected || isHovered;
-              return (
-                <g key={node.id}>
-                  {hot && (
-                    <circle
-                      cx={position.x}
-                      cy={position.y}
-                      r={isSelected ? 3.2 : 2.6}
-                      fill="rgb(var(--color-brand-rgb) / 0.13)"
-                    />
-                  )}
-                  <circle
-                    data-node-point={node.id}
-                    cx={position.x}
-                    cy={position.y}
-                    r={
-                      isSelected
-                        ? 2.1
-                        : isHovered
-                          ? 1.9
-                          : isConnected
-                            ? 1.6
-                            : node.kind === "capability"
-                              ? 1.5
-                              : 1.1
-                    }
-                    fill={
-                      hot
-                        ? BRAND_FILL
-                        : isConnected
-                          ? BRAND_STROKE
-                          : "rgb(var(--color-border-rgb) / 0.9)"
-                    }
-                  />
-                </g>
-              );
-            })}
-          </g>
-          <g>
-            {dottedEdges.map((edge) => {
-              const from = positions.get(edge.from);
-              const to = positions.get(edge.to);
-              if (!from || !to) return null;
-              return (
-                <circle
-                  key={`${selectedId}:${edge.id}`}
-                  data-signal-dot={edge.id}
-                  cx={from.x}
-                  cy={from.y}
-                  r={1.3}
-                  fill={BRAND_FILL}
-                />
-              );
-            })}
-          </g>
-        </svg>
-      </div>
+        <g>
+          {graph.edges.map((edge) => {
+            const coords = edgeCoords[edge.id];
+            if (!coords) return null;
+            const isActive = activeEdges.has(edge.id);
+            const isHoverShadow = hoverEdges.has(edge.id) && hoverId !== null;
+            return (
+              <line
+                key={edge.id}
+                data-edge={edge.id}
+                x1={coords.x1}
+                y1={coords.y1}
+                x2={coords.x2}
+                y2={coords.y2}
+                stroke={isActive || isHoverShadow ? BRAND_STROKE : MUTED_STROKE}
+                strokeWidth={isActive ? 2 : isHoverShadow ? 1.6 : 1.1}
+                strokeLinecap="round"
+                vectorEffect="non-scaling-stroke"
+              />
+            );
+          })}
+        </g>
+        <g>
+          {dottedEdges.map((edge) => {
+            const coords = edgeCoords[edge.id];
+            if (!coords) return null;
+            return (
+              <circle
+                key={`${selectedId}:${edge.id}`}
+                data-signal-dot={edge.id}
+                cx={coords.x1}
+                cy={coords.y1}
+                r={1.6}
+                fill={BRAND_FILL}
+              />
+            );
+          })}
+        </g>
+      </svg>
 
-      <ul
-        aria-label="Capabilities and project evidence"
-        onKeyDown={handleKeyDown}
-        className="grid list-none grid-cols-1 gap-3 p-4 md:grid-cols-2 lg:grid-cols-3"
-      >
-        {graph.nodes.map((node) => {
-          const isSelected = node.id === selectedId;
-          return (
-            <li key={node.id}>
-              <button
-                ref={captureButton(node.id)}
-                type="button"
-                data-signal-node={node.id}
-                data-node-kind={node.kind}
-                aria-pressed={isSelected}
-                aria-current={isSelected ? "true" : undefined}
-                tabIndex={isSelected ? 0 : -1}
-                onClick={() => handleSelect(node.id)}
-                onPointerEnter={() => setHoverId(node.id)}
-                onPointerLeave={() => setHoverId(null)}
-                onFocus={() => setHoverId(node.id)}
-                onBlur={() => setHoverId(null)}
-                className={`flex h-32 flex-col items-start gap-1 rounded-md border p-3.5 text-left transition motion-reduce:transition-none hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-brand focus-visible:outline-offset-2 motion-reduce:hover:translate-y-0 ${
-                  isSelected
-                    ? "border-brand bg-brand/10 ring-1 ring-brand/40"
-                    : "border-border/70 bg-bg-secondary/80 hover:border-brand hover:bg-brand/10 focus-visible:border-brand focus-visible:bg-brand/10"
-                }`}
-              >
-                <span className="section-label text-brand">
-                  {node.kind === "capability" ? "Capability" : "Evidence"}
-                </span>
-                <span className="line-clamp-2 font-display text-h4 leading-snug text-text-primary">
-                  {node.label}
-                </span>
-                <span
-                  className="line-clamp-1 text-xs leading-relaxed text-text-secondary"
-                  data-node-summary
-                >
-                  {node.summary}
-                </span>
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+      <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-[1fr_2.75rem_1fr] md:gap-3">
+        <section aria-label="Capability nodes" className="relative z-10 md:self-center">
+          <h3 className="section-label text-text-secondary">Capability groups</h3>
+          <ul
+            aria-label="Capabilities"
+            className="mt-3 grid list-none grid-cols-1 gap-3"
+            onKeyDown={handleKeyDown}
+          >
+            {capabilityNodes.map((node) => renderNode(node))}
+          </ul>
+        </section>
+        <div aria-hidden="true" className="hidden md:block" />
+        <section aria-label="Project evidence nodes" className="relative z-10">
+          <h3 className="section-label text-text-secondary">Project evidence</h3>
+          <ul
+            aria-label="Projects"
+            className="mt-3 grid list-none grid-cols-1 gap-3"
+            onKeyDown={handleKeyDown}
+          >
+            {projectNodes.map((node) => renderNode(node))}
+          </ul>
+        </section>
+      </div>
 
       <div
         data-signal-status

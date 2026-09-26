@@ -220,7 +220,7 @@ describe("SignalLoom selection states (L2.1)", () => {
     expect(statusText(container)).toBe("Select a capability or project.");
   });
 
-  it("highlights a hovered node's point and incident edges without selecting it", async () => {
+  it("highlights a hovered node's incident edges without selecting it", async () => {
     const user = userEvent.setup();
     const { container } = render(<SignalLoom graph={GRAPH} />);
 
@@ -241,18 +241,55 @@ describe("SignalLoom selection states (L2.1)", () => {
     expect(mlEdge).toHaveAttribute("stroke", "rgb(var(--color-border-rgb) / 0.8)");
   });
 
-  it("clears hover emphasis when a focused node loses focus", () => {
+  it("clears hover emphasis when a focused node loses focus", async () => {
+    const user = userEvent.setup();
     const { container } = render(<SignalLoom graph={GRAPH} />);
 
-    const ml = container.querySelector<HTMLButtonElement>('[data-signal-node="capability-ml"]');
-    if (!ml) throw new Error("ml node button missing");
+    // Select capability-web first so capability-ml's edge is muted at rest.
+    const web = container.querySelector<HTMLButtonElement>('[data-signal-node="capability-web"]');
+    if (!web) throw new Error("web node button missing");
+    await user.click(web);
+
+    const ml = container.querySelector('[data-signal-node="capability-ml"]');
+    const mlEdge = container.querySelector('[data-edge="capability-ml->project-a"]');
+    if (!ml || !mlEdge) throw new Error("ml node or edge missing");
+    expect(mlEdge).toHaveAttribute("stroke", "rgb(var(--color-border-rgb) / 0.8)");
 
     fireEvent.focus(ml);
-    const point = container.querySelector('[data-node-point="capability-ml"]');
-    expect(point).toHaveAttribute("fill", "rgb(var(--color-brand-rgb) / 0.9)");
+    expect(mlEdge).toHaveAttribute("stroke", "rgb(var(--color-brand-rgb) / 0.95)");
 
     fireEvent.blur(ml);
-    expect(point).toHaveAttribute("fill", "rgb(var(--color-brand-rgb) / 0.95)");
+    expect(mlEdge).toHaveAttribute("stroke", "rgb(var(--color-border-rgb) / 0.8)");
+  });
+
+  it("lays capability and project cards out as the two graph zones", () => {
+    const { container } = render(<SignalLoom graph={GRAPH} />);
+
+    const capabilityZone = container.querySelector(
+      'section[aria-label="Capability nodes"] ul[aria-label="Capabilities"]',
+    );
+    const projectZone = container.querySelector(
+      'section[aria-label="Project evidence nodes"] ul[aria-label="Projects"]',
+    );
+    expect(capabilityZone?.querySelectorAll("[data-signal-node]")).toHaveLength(2);
+    expect(projectZone?.querySelectorAll("[data-signal-node]")).toHaveLength(1);
+  });
+
+  it("marks the selected card and its connected cards for the card-to-card trace", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<SignalLoom graph={GRAPH} />);
+
+    const web = container.querySelector<HTMLButtonElement>('[data-signal-node="capability-web"]');
+    const project = container.querySelector('[data-signal-node="project-a"]');
+    const ml = container.querySelector('[data-signal-node="capability-ml"]');
+    if (!web || !project || !ml) throw new Error("nodes missing");
+
+    await user.click(web);
+
+    // Selected card and its connected card both carry the trace marker.
+    expect(web).toHaveAttribute("data-connected", "true");
+    expect(project).toHaveAttribute("data-connected", "true");
+    expect(ml).not.toHaveAttribute("data-connected");
   });
 });
 
@@ -263,12 +300,24 @@ describe("SignalLoom bounded SVG choreography (L2.2)", () => {
     await waitFor(() => expect(dotIds(container)).toHaveLength(2));
     expect(dotIds(container)).toEqual(["capability-ml->project-a", "capability-web->project-a"]);
 
-    // Dots start at the source node — project-a is the destination of both
-    // edges, so both dots originate at capability-ml (top row, y=9).
+    // Dots ride the measured card-to-card edges. jsdom has no layout, so the
+    // coordinates are zeros here — assert the DOM contract (presence, ids,
+    // fill), not pixel positions (real geometry is covered by E2E).
     const dot = container.querySelector('[data-signal-dot="capability-ml->project-a"]');
-    expect(dot).toHaveAttribute("cx", "10");
-    expect(dot).toHaveAttribute("cy", "9");
     expect(dot).toHaveAttribute("fill", "rgb(var(--color-brand-rgb) / 0.9)");
+  });
+
+  it("draws connector edges with measured coordinates once the layout is read", async () => {
+    const { container } = render(<SignalLoom graph={GRAPH} />);
+
+    await waitFor(() => {
+      expect(container.querySelector('[data-edge="capability-ml->project-a"]')).not.toBeNull();
+    });
+    const edge = container.querySelector('[data-edge="capability-ml->project-a"]');
+    expect(edge).toHaveAttribute("x1");
+    expect(edge).toHaveAttribute("y1");
+    expect(edge).toHaveAttribute("x2");
+    expect(edge).toHaveAttribute("y2");
   });
 
   it("caps simultaneous animated paths at SIGNAL_MAX_DOTS", async () => {
