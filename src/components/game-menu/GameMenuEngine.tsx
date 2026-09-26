@@ -25,7 +25,6 @@ import certificationsData from "../../../data/certifications.json";
 import experienceData from "../../../data/experience.json";
 import profileData from "../../../data/profile.json";
 import projectsData from "../../../data/projects.json";
-import { useHaptics } from "../../lib/useHaptics";
 import IconGitHub from "../atoms/IconGitHub";
 import IconLinkedIn from "../atoms/IconLinkedIn";
 import IconMail from "../atoms/IconMail";
@@ -225,8 +224,7 @@ const SidebarNavItem: React.FC<{
   depth: number;
   onSelect: (index: number) => void;
   onHover: (index: number) => void;
-  playHoverSound: () => void;
-}> = ({ item, index, activeIndex, depth, onSelect, onHover, playHoverSound }) => {
+}> = ({ item, index, activeIndex, depth, onSelect, onHover }) => {
   const isActive = activeIndex === index;
   const hasChildren = !!item.children;
   const isLeaf = !item.children;
@@ -236,7 +234,6 @@ const SidebarNavItem: React.FC<{
       className="relative cursor-pointer group"
       onMouseEnter={() => {
         if (activeIndex !== index) {
-          playHoverSound();
           onHover(index);
         }
       }}
@@ -278,7 +275,6 @@ const Sidebar: React.FC<{
   onSelect: (index: number) => void;
   onHover: (index: number) => void;
   onClose: () => void;
-  playHoverSound: () => void;
   prefersReduced?: boolean;
 }> = ({
   items,
@@ -287,7 +283,6 @@ const Sidebar: React.FC<{
   onSelect,
   onHover,
   onClose,
-  playHoverSound,
   prefersReduced,
 }) => {
   const shortcuts = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
@@ -314,7 +309,6 @@ const Sidebar: React.FC<{
               depth={depth}
               onSelect={onSelect}
               onHover={onHover}
-              playHoverSound={playHoverSound}
             />
             {idx < 9 && (
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-text-secondary/30 pointer-events-none">
@@ -433,7 +427,6 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
   isOpen,
   onClose,
 }) => {
-  const { playHoverSound, playSelectSound } = useHaptics();
   const prefersReduced = useReducedMotion();
   const [mounted, setMounted] = useState(false);
 
@@ -465,9 +458,8 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
 
       setMenuState(newState);
       setActiveIndex(0);
-      playSelectSound();
     },
-    [menuState, playSelectSound],
+    [menuState],
   );
 
   const navigateBack = useCallback(() => {
@@ -483,8 +475,7 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
     setHistory((prevH) => prevH.slice(0, -1));
     setMenuState(prev.state);
     setActiveIndex(0);
-    playHoverSound();
-  }, [history, menuState, playHoverSound]);
+  }, [history, menuState]);
 
   const handleSelectMainItem = useCallback(
     (index: number) => {
@@ -595,14 +586,13 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
             return prev === 0 ? itemsLength - 1 : prev - 1;
           });
         }
-        playHoverSound();
       };
       step();
       keyRepeatTimeoutRef.current = window.setTimeout(() => {
         keyRepeatRef.current = window.setInterval(step, 100);
       }, 250);
     },
-    [playHoverSound],
+    [],
   );
 
   const stopKeyRepeat = useCallback(() => {
@@ -689,7 +679,6 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
         if (num < mainItemsLength) {
           e.preventDefault();
           setActiveIndex(num);
-          playHoverSound();
           if (menuState.type === "main_menu" || menuState.type === "sub_menu") {
             const item = MENU_TREE[num];
             if (item?.children) {
@@ -738,8 +727,6 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
     subIndex,
     history,
     onClose,
-    playHoverSound,
-    playSelectSound,
     navigateBack,
     handleSelectMainItem,
     handleSelectSubItem,
@@ -886,7 +873,6 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
                 if (history.length > 0) navigateBack();
                 else onClose();
               }}
-              playHoverSound={playHoverSound}
             />
           )}
 
