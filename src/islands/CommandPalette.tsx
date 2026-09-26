@@ -202,7 +202,7 @@ export default function CommandPalette() {
         ref={dialogRef}
         open
         aria-label="Command palette"
-        className="m-0 block w-full max-w-xl overflow-hidden rounded-2xl border border-border bg-bg-primary p-0 shadow-2xl shadow-black/60"
+        className="relative m-0 block w-full max-w-xl overflow-hidden rounded-2xl border border-border bg-bg-primary p-0 shadow-2xl shadow-black/60"
       >
         <div className="flex items-center gap-3 border-b border-border px-4 py-3">
           <Search className="h-5 w-5 shrink-0 text-text-secondary" />
