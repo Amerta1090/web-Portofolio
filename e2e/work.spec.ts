@@ -1,6 +1,51 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
+// `/work` was fully orphaned: zero inbound links in the whole repo, so the
+// page was only reachable by typing the URL. These guard the entry points.
+test.describe("Work discoverability", () => {
+  test("home footer links to /work", async ({ page }) => {
+    await page.goto("/");
+    const link = page.locator('footer a[href="/work"]');
+    await expect(link).toHaveCount(1);
+    await expect(link).toBeVisible();
+  });
+
+  test("/projects links to /work with a data-derived count", async ({ page }) => {
+    await page.goto("/projects");
+    const link = page.locator('a[href="/work"]').first();
+    await expect(link).toBeVisible();
+    // Count comes from getCollection("caseStudies") — never hard-coded.
+    const cards = await page.evaluate(async () => {
+      const res = await fetch("/work");
+      return (await res.text()).match(/href="\/work\/[a-z-]+"/g)?.length ?? 0;
+    });
+    await expect(link).toContainText(String(cards));
+  });
+
+  test("following the /projects link lands on the listing", async ({ page }) => {
+    await page.goto("/projects");
+    await page.locator('a[href="/work"]').first().click();
+    await expect(page).toHaveURL(/\/work$/);
+    await expect(page.locator("h1")).toContainText("Work");
+  });
+
+  test("findable via the command palette (indexed from FOOTER_LINKS)", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __COMMAND_PALETTE_READY?: boolean }).__COMMAND_PALETTE_READY ===
+        true,
+    );
+    await page.keyboard.press("Control+k");
+    const input = page.getByRole("searchbox");
+    await input.fill("case");
+    // Scope to the result button: the footer link carries the same text, so a
+    // bare getByText() is a strict-mode violation (2 matches).
+    await expect(page.getByRole("button", { name: /Case Studies/ })).toBeVisible();
+  });
+});
+
 test.describe("Work listing page", () => {
   test("loads and displays case study cards", async ({ page }) => {
     await page.goto("/work");
@@ -45,7 +90,9 @@ test.describe("Work detail page", () => {
 
   test("back link navigates to work listing", async ({ page }) => {
     await page.goto("/work/ai-quranic-tafsir");
-    const backLink = page.locator('a[href="/work"]');
+    // Scope to the page body: the footer also links to /work (discoverability),
+    // so a bare a[href="/work"] matches 2 elements.
+    const backLink = page.locator('main a[href="/work"]').first();
     await expect(backLink).toBeVisible();
     await backLink.click();
     await expect(page).toHaveURL(/\/work\/?$/);

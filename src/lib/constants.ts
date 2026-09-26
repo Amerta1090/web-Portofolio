@@ -19,6 +19,7 @@ export const NAV_ITEMS = [
 
 export const FOOTER_LINKS = [
   { label: "Blog", href: "/blog" },
+  { label: "Case Studies", href: "/work" },
   { label: "Certifications", href: "/certifications" },
   { label: "GitHub", href: "/github" },
   { label: "Timeline", href: "/timeline" },

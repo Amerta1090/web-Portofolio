@@ -1,15 +1,28 @@
 ---
+import { getCollection } from "astro:content";
 import Section from "../../components/molecules/Section.astro";
 import ProjectFilter from "../../islands/ProjectFilter";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getProjects } from "../../lib/data";
 
 const projects = getProjects();
+// Derived, not hard-coded — a stale count here would be a Rule 7 violation.
+const caseStudyCount = (await getCollection("caseStudies")).length;
 ---
 
 <BaseLayout title="Projects — Abdul Majid Ridwan Tyastonoatmaja" description="Portfolio projects in ML, IoT, web development, and more." canonicalUrl="https://portfolio.abdulmajidr708.workers.dev/projects" ogSlug="projects">
   <Section title="All Projects" subtitle={projects.length > 0 ? `${projects.length} projects across ML, IoT, web, CLI, and DevOps` : ""}>
     <div class="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+      {
+        caseStudyCount > 0 && (
+          <p class="mb-6 text-sm text-text-secondary">
+            Want the engineering decisions behind them?{" "}
+            <a href="/work" class="text-brand hover:underline">
+              Read {caseStudyCount === 1 ? "the case study" : `all ${caseStudyCount} case studies`} &rarr;
+            </a>
+          </p>
+        )
+      }
       <ProjectFilter client:load projects={projects} baseUrl="/projects" />
     </div>
   </Section>
