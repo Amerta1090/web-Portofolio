@@ -134,18 +134,18 @@ Microtasks:
 
 AC: terpenuhi — case study tetap lengkap sebagai konten biasa (0 JS, urutan tetap tanpa JS) dan satu case study punya 5 stage truthful. Bukti: unit 868/868, build:fast 49 page, astro check 105 (baseline 109, 0 baru), biome bersih, e2e work 9/9, 0 listener/RAF/React root baru.
 
-### L3.2 — Add stage controls and visual stage
+### L3.2 — Add stage controls and visual stage — ✅ COMPLETE 2026-09-26 (stepper + per-stage flow diagram, no scroll-driven progress; detail di TASKS.md)
 
 Microtasks:
 
-1. Build a stage stepper with buttons, `aria-current`, focus styles, and deep-link ids.
-2. Add a scoped inline SVG or DOM diagram for the selected case study.
-3. Choose native CSS scroll progress, Anime.js `onScroll`, or existing GSAP only after checking the content shape.
-4. Keep scroll optional and avoid scroll hijacking.
-5. Add instant reduced-motion transitions.
-6. Add unit and E2E coverage for stage changes and direct links.
+1. Build a stage stepper with buttons, `aria-current`, focus styles, and deep-link ids. → island `CaseStudyReactor` (`client:visible`): `<ul aria-label="Process stages">` → `<button data-reactor-step aria-current="step" tabIndex={active?0:-1}>` (ordinal mono + label), roving tabindex via shared `src/lib/creative/roving.ts`, Arrow/Home/End memindah seleksi **dan** fokus. Stepper hanya render setelah hidrasi (tak ada tombol mati tanpa JS).
+2. Add a scoped inline SVG or DOM diagram for the selected case study. → inline SVG dari geometri pure (`flowDiagramGeometry`, longest-path Kahn + tie-break, viewBox 100 unit, alur vertikal, label/noto wrap + cap keras). 0 canvas, 0 pengukuran DOM, 0 RAF. Tanpa diagram → teks fallback jujur.
+3. Choose native CSS scroll progress, Anime.js `onScroll`, or existing GSAP only after checking the content shape. → **tidak ada yang dipilih**: bentuk konten (5 stage full-render + anchor) tak butuh scroll progress, dan switch saat scroll akan melawan pembaca + mendekati scroll hijacking. Nol scroll listener; 2 listener (`hashchange` + `click` delegat).
+4. Keep scroll optional and avoid scroll hijacking. → terpenuhi: tak ada scroll handling sama sekali; `handleSelect` memakai `history.replaceState` sehingga **tidak pernah** menggulir halaman saat pindah stage.
+5. Add instant reduced-motion transitions. → `useReducedMotion()` menghilangkan hook `data-reactor-animate`; `@media (prefers-reduced-motion: reduce)` mematikan animasi sebagai pengaman kedua. Animasi = CSS stagger 320ms/60ms per layer.
+6. Add unit and E2E coverage for stage changes and direct links. → 16 unit pure + 13 unit island + 7 e2e (`e2e/work.spec.ts` 9→16).
 
-AC: a visitor can read, navigate, and understand the case study with animation disabled.
+AC: terpenuhi — urutan kanonik tetap utuh tanpa JS (SSR), dan visitor bisa baca/pindah stage dengan animasi mati (probe: state diam = `opacity: 1`, `animationName` tak aktif). Bukti: unit 897/897 (79 file), build:fast 49 page, astro check 105 (0 baru), lint 726, biome bersih 9 file, e2e work 16/16, 0 scroll listener, 0 React root baru.
 
 ### L3.3 — Responsive case study composition
 

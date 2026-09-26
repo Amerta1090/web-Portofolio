@@ -1,8 +1,14 @@
 import type { SignalLoomGraph } from "./signal-loom";
 
-export const SIGNAL_HASH_PREFIX = "#signal-";
+/**
+ * Re-exported from `./roving` so the Signal Loom selection module keeps a single
+ * public surface while the shared helper stays available to other creative
+ * controls (Case Study Reactor stepper).
+ */
+export { ROVING_KEYS, rovingTargetIndex } from "./roving";
+export type { RovingKey } from "./roving";
 
-export type RovingKey = "ArrowLeft" | "ArrowRight" | "ArrowUp" | "ArrowDown" | "Home" | "End";
+export const SIGNAL_HASH_PREFIX = "#signal-";
 
 /**
  * Parse a deep link hash for a Signal Loom node id.
@@ -19,22 +25,6 @@ export function parseSignalHash(
   if (!hash.startsWith(SIGNAL_HASH_PREFIX)) return fallbackId;
   const id = hash.slice(SIGNAL_HASH_PREFIX.length);
   return validIds.includes(id) ? id : fallbackId;
-}
-
-/**
- * Compute the next node index for roving-tabindex arrow navigation.
- *
- * Left/Up move backward, Right/Down move forward (wrapping), Home and End jump
- * to the first and last node. An empty list or a missing current selection
- * resolves to the first node for directional keys.
- */
-export function rovingTargetIndex(currentIndex: number, length: number, key: RovingKey): number {
-  if (length <= 0) return -1;
-  if (key === "Home") return 0;
-  if (key === "End") return length - 1;
-  if (currentIndex < 0) return 0;
-  const direction = key === "ArrowLeft" || key === "ArrowUp" ? -1 : 1;
-  return (currentIndex + direction + length) % length;
 }
 
 /**

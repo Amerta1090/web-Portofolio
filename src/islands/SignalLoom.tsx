@@ -6,6 +6,7 @@ import { connectedNodeIds } from "../lib/creative/signal-loom";
 import { choreographyMode, signalDotEdges } from "../lib/creative/signal-loom-choreo";
 import { SIGNAL_LOOPS, SIGNAL_TRAVEL_SECONDS } from "../lib/creative/signal-loom-choreo";
 import {
+  ROVING_KEYS,
   activeEdgeIds,
   parseSignalHash,
   rovingTargetIndex,
@@ -19,15 +20,6 @@ import { useRafGuard } from "../lib/useRafGuard";
 interface SignalLoomProps {
   graph: SignalLoomGraph;
 }
-
-const ROVING_KEYS = new Set<string>([
-  "ArrowLeft",
-  "ArrowRight",
-  "ArrowUp",
-  "ArrowDown",
-  "Home",
-  "End",
-]);
 
 const BRAND_STROKE = "rgb(var(--color-brand-rgb) / 0.95)";
 const MUTED_STROKE = "rgb(var(--color-border-rgb) / 0.8)";

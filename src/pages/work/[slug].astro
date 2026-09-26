@@ -1,5 +1,6 @@
 ---
 import { type CollectionEntry, getCollection, render } from "astro:content";
+import CaseStudyReactor from "../../islands/CaseStudyReactor";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { buildStageViews, processStagesOf } from "../../lib/creative/case-study-reactor";
 
@@ -106,6 +107,7 @@ const nextEntry = currentIndex < allEntries.length - 1 ? allEntries[currentIndex
               stage keeps the evidence behind it — this reads as an ordered sequence, with or
               without JavaScript.
             </p>
+            <CaseStudyReactor client:visible stages={stageViews} />
             <ol class="space-y-8">
               {stageViews.map((stage) => (
                 <li id={stage.anchorId} data-reactor-stage={stage.id} class="scroll-mt-24">
@@ -250,5 +252,64 @@ const nextEntry = currentIndex < allEntries.length - 1 ? allEntries[currentIndex
     height: 1px;
     background: var(--border);
     margin: 2rem 0;
+  }
+
+  /* ── Case Study Reactor ──────────────────────────────────────────────
+     The ordered list above is the canonical content; the island below it is
+     the enhancement. Styling lives here (not in the island) so the page owns
+     both halves of the section, and everything stays token-based. */
+
+  /* The island marks the list item that the active stage describes. Emphasis
+     only: no hiding, no layout shift, same information either way. */
+  #process [data-reactor-stage][data-reactor-active="true"] h3 {
+    color: var(--accent);
+  }
+
+  #process [data-reactor-diagram] text {
+    font-family: inherit;
+  }
+
+  /* Bounded entry motion: boxes and edges resolve layer by layer so the flow
+     reads as a causal chain. `data-reactor-animate` is absent before hydration
+     and under prefers-reduced-motion, and the rule below is scoped to it, so
+     the resting state is plain static markup. */
+  #process [data-reactor-animate="true"] [data-reactor-node] {
+    animation: reactor-node-in 320ms cubic-bezier(0.22, 0.61, 0.36, 1) backwards;
+    animation-delay: calc(var(--reactor-order, 0) * 60ms);
+  }
+
+  #process [data-reactor-animate="true"] [data-reactor-edge] {
+    animation: reactor-edge-in 320ms ease-out backwards;
+    animation-delay: calc(var(--reactor-order, 0) * 60ms);
+  }
+
+  @keyframes reactor-node-in {
+    from {
+      opacity: 0;
+      transform: translateY(3px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes reactor-edge-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Belt and braces: the island already omits the animate hook when the
+     visitor prefers reduced motion, so a preference that changes after
+     hydration cannot start the sequence either. */
+  @media (prefers-reduced-motion: reduce) {
+    #process [data-reactor-animate="true"] [data-reactor-node],
+    #process [data-reactor-animate="true"] [data-reactor-edge] {
+      animation: none;
+    }
   }
 </style>
