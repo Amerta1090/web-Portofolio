@@ -132,144 +132,173 @@ export default function CaseStudyReactor({ stages }: CaseStudyReactorProps) {
       data-reactor=""
       data-reactor-active={active.id}
       {...(animate ? { "data-reactor-animate": "true" } : {})}
-      className="mt-8"
     >
       {hydrated && (
-        <ul
-          data-reactor-stepper=""
-          aria-label="Process stages"
-          className="m-0 flex list-none flex-wrap gap-2 p-0"
-          onKeyDown={handleKeyDown}
-        >
-          {stages.map((stage) => {
-            const isActive = stage.id === active.id;
-            return (
-              <li key={stage.id} className="m-0">
-                <button
-                  ref={(element) => {
-                    if (element) buttonRefs.current.set(stage.id, element);
-                    else buttonRefs.current.delete(stage.id);
-                  }}
-                  type="button"
-                  data-reactor-step={stage.id}
-                  aria-current={isActive ? "step" : undefined}
-                  tabIndex={isActive ? 0 : -1}
-                  onClick={() => handleSelect(stage.id)}
-                  className={`flex items-baseline gap-2 rounded-md border px-3 py-1.5 text-sm transition-colors motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-brand focus-visible:outline-offset-2 ${
-                    isActive
-                      ? "border-brand bg-brand/10 text-text-primary"
-                      : "border-border/70 text-text-secondary hover:border-brand hover:text-text-primary"
-                  }`}
-                >
-                  <span className="font-mono text-xs tabular-nums text-brand">{stage.ordinal}</span>
-                  {stage.label}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+        <>
+          <p id="reactor-stepper-hint" className="sr-only">
+            Use the arrow keys, Home, or End to move between stages.
+          </p>
+          <ul
+            data-reactor-stepper=""
+            aria-label="Process stages"
+            aria-describedby="reactor-stepper-hint"
+            className="m-0 flex list-none flex-wrap gap-2 p-0"
+            onKeyDown={handleKeyDown}
+          >
+            {stages.map((stage) => {
+              const isActive = stage.id === active.id;
+              return (
+                <li key={stage.id} className="m-0">
+                  <button
+                    ref={(element) => {
+                      if (element) buttonRefs.current.set(stage.id, element);
+                      else buttonRefs.current.delete(stage.id);
+                    }}
+                    type="button"
+                    data-reactor-step={stage.id}
+                    aria-current={isActive ? "step" : undefined}
+                    tabIndex={isActive ? 0 : -1}
+                    onClick={() => handleSelect(stage.id)}
+                    className={`flex items-baseline gap-2 rounded-md border px-3 py-1.5 text-sm transition-colors motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-brand focus-visible:outline-offset-2 ${
+                      isActive
+                        ? "border-brand bg-brand/10 text-text-primary"
+                        : "border-border/70 text-text-secondary hover:border-brand hover:text-text-primary"
+                    }`}
+                  >
+                    <span className="font-mono text-xs tabular-nums text-brand">
+                      {stage.ordinal}
+                    </span>
+                    {stage.label}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </>
       )}
 
       <section
         aria-label={`Active stage: ${active.positionLabel} — ${active.label}`}
         className="mt-4 rounded-lg border border-border/70 bg-bg-secondary/50 p-4"
       >
-        <div className="grid gap-5 md:grid-cols-[minmax(0,18rem)_minmax(0,1fr)] md:items-start">
-          <div className="mx-auto w-full max-w-[21rem] md:mx-0 md:w-full">
-            {geometry ? (
-              <svg
-                data-reactor-diagram=""
-                viewBox={`0 0 ${geometry.width} ${geometry.height}`}
-                preserveAspectRatio="xMidYMid meet"
-                role="img"
-                aria-labelledby={titleId}
-                className="h-auto w-full max-h-[22rem]"
-              >
-                <title id={titleId}>
-                  {active.label}
-                  {active.diagram?.caption ? `: ${active.diagram.caption}` : ""}
-                </title>
-                <g>
-                  {geometry.edges.map((edge) => (
-                    <line
-                      key={edge.id}
-                      data-reactor-edge={edge.id}
-                      x1={edge.x1}
-                      y1={edge.y1}
-                      x2={edge.x2}
-                      y2={edge.y2}
-                      stroke={EDGE_STROKE}
-                      strokeWidth={metrics.edgeStroke}
-                      strokeLinecap="round"
-                      style={orderStyle(edge.order)}
-                    />
+        {/* One column at every viewport: the island is either the full reading
+            width (below `lg`) or a narrow sticky column (from `lg`). The frame
+            reserves a stable height — sized to the tallest diagram at each
+            width — so switching stages never resizes the panel and never nudges
+            the list underneath it. */}
+        {/* Stable slots, sized from a real viewport probe (375/768/1024/1440
+            on the current stage data) so switching stages never resizes the
+            panel and never nudges the reading list underneath it. The frame
+            holds the tallest diagram (19rem below `lg`, 17.25rem from `lg`);
+            the text slot holds the tallest stage text. Editing the stage copy
+            means re-probing these. */}
+        <div
+          data-reactor-frame=""
+          className="flex min-h-[19rem] w-full max-w-[21rem] mx-auto items-center justify-center lg:min-h-[17.25rem] lg:max-w-[19rem]"
+        >
+          {geometry ? (
+            <svg
+              data-reactor-diagram=""
+              viewBox={`0 0 ${geometry.width} ${geometry.height}`}
+              preserveAspectRatio="xMidYMid meet"
+              role="img"
+              aria-labelledby={titleId}
+              className="h-auto w-full max-h-[22rem]"
+            >
+              <title id={titleId}>
+                {active.label}
+                {active.diagram?.caption ? `: ${active.diagram.caption}` : ""}
+              </title>
+              <g>
+                {geometry.edges.map((edge) => (
+                  <line
+                    key={edge.id}
+                    data-reactor-edge={edge.id}
+                    x1={edge.x1}
+                    y1={edge.y1}
+                    x2={edge.x2}
+                    y2={edge.y2}
+                    stroke={EDGE_STROKE}
+                    strokeWidth={metrics.edgeStroke}
+                    strokeLinecap="round"
+                    style={orderStyle(edge.order)}
+                  />
+                ))}
+              </g>
+              {geometry.nodes.map((node) => (
+                <g
+                  key={node.id}
+                  data-reactor-node={node.id}
+                  data-reactor-truncated={node.truncated ? "true" : undefined}
+                  style={orderStyle(node.order)}
+                >
+                  <rect
+                    x={node.x}
+                    y={node.y}
+                    width={node.width}
+                    height={node.height}
+                    rx={metrics.cornerRadius}
+                    fill={NODE_FILL}
+                    stroke={NODE_STROKE}
+                    strokeWidth={metrics.boxStroke}
+                  />
+                  {node.textLines.map((line) => (
+                    <text
+                      key={`${line.kind}-${line.baseline}`}
+                      x={node.x + node.width / 2}
+                      y={line.baseline}
+                      textAnchor="middle"
+                      fontSize={line.kind === "label" ? metrics.labelFont : metrics.noteFont}
+                      fontWeight={line.kind === "label" ? 500 : 400}
+                      fill={line.kind === "label" ? LABEL_FILL : NOTE_FILL}
+                    >
+                      {line.text}
+                    </text>
                   ))}
                 </g>
-                {geometry.nodes.map((node) => (
-                  <g
-                    key={node.id}
-                    data-reactor-node={node.id}
-                    data-reactor-truncated={node.truncated ? "true" : undefined}
-                    style={orderStyle(node.order)}
-                  >
-                    <rect
-                      x={node.x}
-                      y={node.y}
-                      width={node.width}
-                      height={node.height}
-                      rx={metrics.cornerRadius}
-                      fill={NODE_FILL}
-                      stroke={NODE_STROKE}
-                      strokeWidth={metrics.boxStroke}
-                    />
-                    {node.textLines.map((line) => (
-                      <text
-                        key={`${line.kind}-${line.baseline}`}
-                        x={node.x + node.width / 2}
-                        y={line.baseline}
-                        textAnchor="middle"
-                        fontSize={line.kind === "label" ? metrics.labelFont : metrics.noteFont}
-                        fontWeight={line.kind === "label" ? 500 : 400}
-                        fill={line.kind === "label" ? LABEL_FILL : NOTE_FILL}
-                      >
-                        {line.text}
-                      </text>
-                    ))}
-                  </g>
-                ))}
-              </svg>
-            ) : (
-              <p className="text-sm text-text-secondary">
-                This stage has no flow diagram in the case study data.
-              </p>
-            )}
-          </div>
+              ))}
+            </svg>
+          ) : (
+            <p className="text-sm text-text-secondary">
+              This stage has no flow diagram in the case study data.
+            </p>
+          )}
+        </div>
 
-          <div>
-            <p className="section-label text-brand">
-              {active.ordinal} · {active.positionLabel}
+        <div className="mt-5 min-h-[13.25rem] lg:min-h-[8.5rem]">
+          <p className="section-label text-brand">
+            {active.ordinal} · {active.positionLabel}
+          </p>
+          <p
+            data-reactor-stage-label=""
+            className="mt-1 font-display text-h3 leading-snug text-text-primary"
+          >
+            {active.label}
+          </p>
+          {active.diagram?.caption && (
+            <p data-reactor-caption="" className="mt-2 text-sm text-text-secondary">
+              {active.diagram.caption}
             </p>
-            <p
-              data-reactor-stage-label=""
-              className="mt-1 font-display text-h3 leading-snug text-text-primary"
-            >
-              {active.label}
-            </p>
-            {active.diagram?.caption && (
-              <p data-reactor-caption="" className="mt-2 text-sm text-text-secondary">
-                {active.diagram.caption}
-              </p>
-            )}
-            {active.metric && (
-              <dl data-reactor-metric="" className="mt-3 flex items-baseline gap-2">
-                <dt className="text-xs uppercase tracking-wide text-text-secondary">
-                  {active.metric.label}
-                </dt>
-                <dd className="font-mono text-sm tabular-nums text-brand">{active.metric.value}</dd>
-              </dl>
-            )}
-            <p className="mt-3 text-sm leading-relaxed text-text-secondary">{active.summary}</p>
-          </div>
+          )}
+          {active.metric && (
+            <dl data-reactor-metric="" className="mt-3 flex items-baseline gap-2">
+              <dt className="text-xs uppercase tracking-wide text-text-secondary">
+                {active.metric.label}
+              </dt>
+              <dd className="font-mono text-sm tabular-nums text-brand">{active.metric.value}</dd>
+            </dl>
+          )}
+          {/* Below `lg` the panel is the only place the active stage is
+              summarised near its diagram, so the sentence stays. From `lg` it
+              sits directly beside the canonical list, which carries the same
+              sentence for every stage — repeating it there would be noise in a
+              panel that has to stay short enough to be worth pinning. */}
+          <p
+            data-reactor-summary=""
+            className="mt-3 text-sm leading-relaxed text-text-secondary lg:hidden"
+          >
+            {active.summary}
+          </p>
         </div>
       </section>
 

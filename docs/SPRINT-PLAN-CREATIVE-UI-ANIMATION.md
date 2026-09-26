@@ -147,17 +147,19 @@ Microtasks:
 
 AC: terpenuhi — urutan kanonik tetap utuh tanpa JS (SSR), dan visitor bisa baca/pindah stage dengan animasi mati (probe: state diam = `opacity: 1`, `animationName` tak aktif). Bukti: unit 897/897 (79 file), build:fast 49 page, astro check 105 (0 baru), lint 726, biome bersih 9 file, e2e work 16/16, 0 scroll listener, 0 React root baru.
 
-### L3.3 — Responsive case study composition
+### L3.3 — Responsive case study composition — ✅ COMPLETE 2026-09-26 (sticky desktop column, stacked mobile flow, probe-derived stable slots; detail di TASKS.md)
 
 Microtasks:
 
-1. Implement sticky desktop stage layout.
-2. Implement mobile stepper and normal content flow.
-3. Check 375px, 768px, and wide desktop layouts.
-4. Verify keyboard focus remains visible and does not jump unexpectedly.
-5. Remove any interaction that requires horizontal drag or hover.
+1. Implement sticky desktop stage layout. → `#process` jadi grid 2 kolom dari `lg` (`lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)] lg:items-start`): kolom pertama `lg:sticky lg:top-24` membungkus island, `<ol>` kanonik jadi kolom kedua. Halaman dilebarkan dari `max-width:65ch` ke `max-w-[62rem]` + kelas baru `.work-measure` (`max-width:65ch; margin-inline:auto`) pada header/metrics/tech stack/MDX/prev-next + header section — **prose tetap piksel-identik**, hanya pita reactor yang lebar. Tidak ada ancestor `overflow`, header `fixed h-16` → `top-24` (96px) benar-benar menyisakan header.
+2. Implement mobile stepper and normal content flow. → di bawah `lg` grid jadi 1 kolom dan host **static** (`position: static` terukur, bukan asumsi): stepper (wrap, 2 baris di 375) → panel → `<ol>`. Nol drag, nol scroll-hijack; summary panel tetap tampil di mobile (`lg:hidden` murni CSS, tanpa JS) karena di mobile panel adalah satu-satunya ringkasan stage aktif di dekat diagramnya.
+3. Check 375px, 768px, and wide desktop layouts. → e2e geometris di 375/768/1440 (12 test baru, `e2e/work.spec.ts` 16→28): `docOverflow`/`sectionOverflow` 0 di semua, 2 kolom di 1440 (list di kanan host), 1 kolom static di 768/375, tinggi step ≥32px dan semua `right ≤ 375`, 5 stage utuh. Probe tambahan 320/900/1024/1920/2560: article ternapas 992px, header tetap 650px (65ch) di semua lebar, nol overflow.
+4. Verify keyboard focus remains visible and does not jump unexpectedly. → e2e: `outlineStyle ≠ none` + `outlineWidth ≥ 2px`, ArrowRight ×4 memindah seleksi **dan** fokus ke `Impact`, kontrol fokus tetap in-viewport, dan `window.scrollY` **tidak berubah** saat pindah stage. Ditambah sr-only hint (`aria-describedby`) untuk memberitahu Arrow/Home/End.
+5. Remove any interaction that requires horizontal drag or hover. → region `#process` diverifikasi `overflow-x` ∈ {visible, clip, hidden}, `cursor` bukan `grab`/`ew-resize`; satu-satunya kontrol interaktif = tombol stage, yang juga menjawab `Enter` (bukan hover-only).
 
-AC: mobile is a clear reading experience with the same evidence and controls.
+AC: terpenuhi — mobile tetap baca jelas dengan evidence & kontrol yang sama persis (SSR tanpa JS tetap 5 stage + metric, stepper 0 → tak ada kontrol mati). Bukti: unit **843/843** (74 file, 0 baru), build:fast 49 page, astro check **103** (0 baru), lint **689** (0 baru), biome bersih, e2e work **28/28**, 0 scroll listener/RAF/React root baru.
+
+**Keputusan tambahan (L3.3) — slot stabil di-probe, bukan tebakan**: ganti stage menggeser panel karena panjang caption/metric/summary tiap stage berbeda (spread terukur 32–74px) dan tinggi diagram terdalam (model, 5 kotak) beda dari yang lain. Dua slot direservasi: frame diagram `min-h-[19rem]` / `lg:min-h-[17.25rem]` (≥ tinggi diagram tertinggi di 336px/304px lebar svg) + slot teks `min-h-[13.25rem]` / `lg:min-h-[8.5rem]` (≥ tinggi teks stage tertinggi di 320/375 dan di ≥1024). Angka berasal dari probe nyata di 320/375/768/1024/1440 atas data stage saat ini — sama seperti `FLOW_DIAGRAM_METRICS` L3.2 yang disetel dari probe. **Konsekuensi yang harus diingat: mengubah copy stage berarti re-probe angka ini.** Trade-off: sisa ruang kosong di panel untuk stage yang copy-nya pendek (di `lg` panel jadi 558px tetap & summary disembunyikan justru agar panel pendekenough untuk di-pin).
 
 ## Sprint 4 — Integration and quality
 
