@@ -11,7 +11,6 @@ import Volunteering from "../components/organisms/Volunteering.astro";
 import SignalLoom from "../components/organisms/SignalLoom.astro";
 import CreativeLabTeaser from "../islands/CreativeLabTeaser";
 import JourneyTimeline from "../islands/JourneyTimeline";
-import MicroInteractionsDemo from "../islands/MicroInteractionsDemo";
 import PageTailOverlays from "../islands/PageTailOverlays";
 import ProjectCardGrid from "../islands/ProjectCardGrid";
 import SkillsExplorer from "../islands/SkillsExplorer";
@@ -127,10 +126,6 @@ const gitHubData = await fetchAllGitHubData();
       </Section>
     )
   }
-
-  <Section data-reveal id="micro-interactions" title="Micro-Interactions" subtitle="UI/UX micro-interaction library — magnetic buttons, organic loading, and smart tooltips" variant="alt" ariaLabel="Micro-interactions">
-    <MicroInteractionsDemo client:load />
-  </Section>
 
   <Section data-reveal id="contact" title="Contact" subtitle="Have a question or want to work together?" ariaLabel="Contact">
     <Contact profile={profile} />

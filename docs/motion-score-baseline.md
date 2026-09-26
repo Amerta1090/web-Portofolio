@@ -145,6 +145,11 @@
 **Implementasi framer-motion/motion.dev selesai keseluruhan** — tidak ada sprint lanjutan motion.
 Opsi (yang tidak diambil): rewrite ScrollEntropy/hero/CodeDNAHelix ke CSS scroll-driven
 (kontraproduktif utk rasio — menurunkan jsScrollAnims menaikkan rasio) / merge island radikal.
+
+> **Update 2026-09-26 (home narrative trim):** opsi rewrite ScrollEntropy moot — `ScrollEntropy`
+> beserta section `#micro-interactions` (consumer sole-nya) **dihapus** dari home, jadi 3 dari 21
+> attach scroll listener itu hilang. Sisa enumerasi: 11–14 React 19 per-root, 1–2 MorphingNavigation,
+> sisanya Lenis/touch. Angka baseline di atas tetap sebagai catatan historis (belum di-audit ulang).
 Progres M-1→M-4: 49→58 (skor), 41→26 listener, off-screen 6→3, thrashing S, GPU terbukti floor.
 
 ## Cara ulang audit

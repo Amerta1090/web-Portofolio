@@ -88,14 +88,14 @@
     "category": "meta",
     "keywords": ["portfolio", "website", "this", "site", "built with", "tech stack", "made"],
     "question": "Website portofolio ini dibuat dengan apa?",
-    "answer": "Website ini dibangun dengan Astro (SSG) + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.js/R3F + TypeScript + Bun. 53 eksperimen interaktif di Creative Lab, GitHub Universe visualization, micro-interactions library, dan tentu saja — aku, assistant bot deterministik tanpa backend."
+    "answer": "Website ini dibangun dengan Astro (SSG) + React islands + TailwindCSS + Motion (motion.dev) + GSAP + D3 + Three.js/R3F + TypeScript + Bun. 27 eksperimen interaktif di Creative Lab, GitHub Universe visualization, Observatory yang membaca portofolio ini sebagai dataset, dan tentu saja — aku, assistant bot deterministik tanpa backend."
   },
   {
     "id": "creative_lab",
     "category": "meta",
     "keywords": ["lab", "experiment", "creative", "interactive", "demo", "playground", "gallery"],
     "question": "Apa itu Creative Lab?",
-    "answer": "Creative Lab adalah kumpulan 53 eksperimen matematika, sains, dan interaktif — semuanya pure frontend. Termasuk: Strange Attractors, Fractal Explorer, Audio Visualizer, Quantum Circuit Builder, Neural Network Art, Math Escape Room, Galaxy Formation, dan banyak lagi. Setiap eksperimen menampilkan konsep kompleks secara visual dan interaktif. Cek di /gallery."
+    "answer": "Creative Lab adalah kumpulan 27 eksperimen matematika, sains, dan interaktif — semuanya pure frontend. Termasuk: Strange Attractors, Fractal Explorer, Audio Visualizer, Quantum Circuit Builder, Neural Network Art, Math Escape Room, Galaxy Formation, dan banyak lagi. Setiap eksperimen menampilkan konsep kompleks secara visual dan interaktif. Cek di /gallery."
   },
   {
     "id": "deterministic",
