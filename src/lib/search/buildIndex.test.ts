@@ -69,10 +69,27 @@ describe("buildSearchIndex", () => {
   it("indexes nav + footer pages", () => {
     const byType = groupByType(buildSearchIndex());
     const pages = byType["page"];
-    expect(pages.length).toBeGreaterThanOrEqual(9); // 5 nav + 5 footer
+    expect(pages.length).toBeGreaterThanOrEqual(11); // 6 nav + 8 footer - 1 deduped (observatory)
     for (const p of pages) {
       expect(p.target.startsWith("/")).toBe(true);
     }
+  });
+
+  // Page ids are `page-${slugify(label)}` and duplicates are skipped, so a
+  // footer label that repeats a NAV label is silently dropped from Ctrl+K.
+  // NAV owns "Skills" (→ /#skills), hence the footer uses "All Skills".
+  it("indexes both the /#skills anchor and the standalone /skills page", () => {
+    const pages = groupByType(buildSearchIndex()).page ?? [];
+    const byTitle = (t: string) => pages.find((p) => p.title === t);
+    expect(byTitle("Skills")?.target).toBe("/#skills");
+    expect(byTitle("All Skills")?.target).toBe("/skills");
+  });
+
+  it("drops duplicate page labels instead of indexing the same id twice", () => {
+    const pages = groupByType(buildSearchIndex()).page ?? [];
+    // /observatory sits in both NAV and FOOTER — one entry, first wins.
+    expect(pages.filter((p) => p.target === "/observatory")).toHaveLength(1);
+    expect(new Set(pages.map((p) => p.id)).size).toBe(pages.length);
   });
 
   it("every item has a unique id", () => {

@@ -17,9 +17,14 @@ export const NAV_ITEMS = [
   { label: "Contact", href: "/#contact" },
 ] as const;
 
+// NOTE for labels: the command palette indexes NAV + FOOTER keyed by
+// `page-${slugify(label)}` (buildIndex.ts) and skips duplicates. A footer label
+// that repeats a NAV label is therefore SILENTLY dropped from Ctrl+K — that is
+// why this is "All Skills" (-> /skills) while the nav keeps "Skills" (-> /#skills).
 export const FOOTER_LINKS = [
   { label: "Blog", href: "/blog" },
   { label: "Case Studies", href: "/work" },
+  { label: "All Skills", href: "/skills" },
   { label: "Certifications", href: "/certifications" },
   { label: "GitHub", href: "/github" },
   { label: "Timeline", href: "/timeline" },
