@@ -12,6 +12,121 @@ metrics:
   - { label: "Avg Latency", value: "5.93s" }
   - { label: "Volumes Indexed", value: "10" }
   - { label: "Pages Processed", value: "6,500+" }
+processStages:
+  - id: problem
+    label: Problem
+    summary: >-
+      Ten volumes of tafsir with no way to search them, and a model that answers
+      anyway.
+    evidence: >-
+      Existing digital copies are unstructured plain text with no semantic search
+      capability, so users get generic LLM answers that fabricate citations or
+      misattribute scholarly opinions.
+    diagram:
+      type: flow
+      caption: The failure the retrieval layer has to remove.
+      nodes:
+        - { id: question, label: Scholarly question }
+        - { id: plain_text, label: Unstructured text, note: 10 volumes }
+        - { id: unverified, label: Unverified answer, note: fabricated citation }
+      edges:
+        - [question, plain_text]
+        - [plain_text, unverified]
+  - id: data
+    label: Data
+    summary: >-
+      One corpus, two indexes: a dense FAISS index and a sparse BM25 index built
+      over the same chunks.
+    evidence: >-
+      PDF ingestion → text extraction → chunking → FAISS index (dense) + BM25
+      index (sparse).
+    metric:
+      label: Corpus indexed
+      value: "6,500+ pages"
+    diagram:
+      type: flow
+      caption: Ingestion to two parallel indexes.
+      nodes:
+        - { id: pdf, label: PDF volumes }
+        - { id: extract, label: Text extraction }
+        - { id: chunk, label: Chunking }
+        - { id: dense, label: FAISS index, note: dense }
+        - { id: sparse, label: BM25 index, note: sparse }
+      edges:
+        - [pdf, extract]
+        - [extract, chunk]
+        - [chunk, dense]
+        - [chunk, sparse]
+  - id: model
+    label: Model
+    summary: >-
+      Reciprocal rank fusion over BM25 and E5, re-ranked, then grounded by a
+      local LLaMA 3.2 3B generator.
+    evidence: >-
+      BM25 catches exact Arabic term matches that embeddings miss, dense
+      retrieval catches paraphrases; combining both paths via reciprocal rank
+      fusion outperformed either alone.
+    metric:
+      label: Generator
+      value: LLaMA 3.2 3B
+    diagram:
+      type: flow
+      caption: Two retrieval paths fused into one grounded prompt.
+      nodes:
+        - { id: bm25, label: BM25, note: sparse }
+        - { id: e5, label: E5 multilingual, note: dense }
+        - { id: fusion, label: Rank fusion }
+        - { id: rerank, label: Re-ranker }
+        - { id: llama, label: LLaMA 3.2 3B }
+      edges:
+        - [bm25, fusion]
+        - [e5, fusion]
+        - [fusion, rerank]
+        - [rerank, llama]
+  - id: system
+    label: System
+    summary: >-
+      The whole chain runs on one 4GB RAM machine and ships as a Streamlit
+      research tool.
+    evidence: >-
+      The 3B parameter model runs on consumer hardware (i3 processor, 4GB RAM),
+      and Streamlit was chosen for rapid prototyping in an academic context.
+    metric:
+      label: Hardware budget
+      value: i3 / 4GB RAM
+    diagram:
+      type: flow
+      caption: Research interface over retrieval, generation, and citation.
+      nodes:
+        - { id: ui, label: Streamlit UI }
+        - { id: retrieval, label: Hybrid retrieval }
+        - { id: generation, label: Local generation }
+        - { id: citation, label: Volume + page reference }
+      edges:
+        - [ui, retrieval]
+        - [retrieval, generation]
+        - [generation, citation]
+  - id: impact
+    label: Impact
+    summary: >-
+      Answers that trace back to a volume and page — or an honest refusal.
+    evidence: >-
+      A Context Relevance score of 0.972 effectively eliminates hallucinated
+      answers: the system either retrieves relevant tafsir passages or says it
+      cannot find an answer.
+    metric:
+      label: Context Relevance
+      value: "0.972"
+    diagram:
+      type: flow
+      caption: Grounding the answer in a checkable source.
+      nodes:
+        - { id: passage, label: Retrieved passage }
+        - { id: reference, label: Volume + page }
+        - { id: answer, label: Grounded answer }
+      edges:
+        - [passage, reference]
+        - [reference, answer]
 ---
 
 ## Problem

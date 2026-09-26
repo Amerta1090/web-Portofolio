@@ -122,17 +122,17 @@ AC: the section reads as a curated explanation, not a generic animated backgroun
 
 ## Sprint 3 — Case Study Reactor
 
-### L3.1 — Add optional process stage content
+### L3.1 — Add optional process stage content — ✅ COMPLETE 2026-09-26 (content model + 1 staged case study; detail di TASKS.md)
 
 Microtasks:
 
-1. Inspect the work content schema and one representative case study.
-2. Define optional `processStages` with id, label, summary, evidence, metric, and diagram metadata.
-3. Populate stages only from existing case study evidence.
-4. Render a normal ordered stage sequence with headings and links.
-5. Add schema or pure-data tests for missing and complete stage sets.
+1. Inspect the work content schema and one representative case study. → `/work/[slug]` = Astro collection `caseStudies`; schema duplikat di `src/content.config.ts` + `src/content/schema.ts` (sekarang config mengimpor schema yang sama).
+2. Define optional `processStages` with id, label, summary, evidence, metric, and diagram metadata. → `processStageSchema` (zod, wajib: id/label/summary/evidence; opsional: `metric{label,value}`, `diagram{type:"flow",caption,nodes[],edges[[from,to]]}`).
+3. Populate stages only from existing case study evidence. → satu case study (`ai-quranic-tafsir`, order 1, featured), 5 stage problem→data→model→system→impact; setiap summary/evidence/metric di-trace ke body mdx atau metrics frontmatter yang sudah ada. Stage `problem` sengaja **tanpa** metric (tidak ada angka truthful untuk masalahnya).
+4. Render a normal ordered stage sequence with headings and links. → `<ol>` + `li[id=stage-<id>][data-reactor-stage]` di `/work/[slug]`, h3 heading, summary, evidence, `<dl>` metric, deep-link anchor; section di-skip total bila `processStages` absen (ordered fallback `src/lib/creative/case-study-reactor.ts`).
+5. Add schema or pure-data tests for missing and complete stage sets. → 20 unit pure (`case-study-reactor.test.ts`) + 10 unit schema (`process-stages.test.ts`) + 3 e2e statis `e2e/work.spec.ts`.
 
-AC: the case study remains complete as ordinary content and the first selected project has five truthful stages.
+AC: terpenuhi — case study tetap lengkap sebagai konten biasa (0 JS, urutan tetap tanpa JS) dan satu case study punya 5 stage truthful. Bukti: unit 868/868, build:fast 49 page, astro check 105 (baseline 109, 0 baru), biome bersih, e2e work 9/9, 0 listener/RAF/React root baru.
 
 ### L3.2 — Add stage controls and visual stage
 

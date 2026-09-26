@@ -1,6 +1,7 @@
 import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
+import { caseStudySchema } from "./content/schema";
 
 const blog = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/blog" }),
@@ -20,22 +21,9 @@ const blog = defineCollection({
 
 const caseStudies = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/case-studies" }),
-  schema: z.object({
-    title: z.string(),
-    summary: z.string(),
-    role: z.string(),
-    stack: z.array(z.string()),
-    period: z.string(),
-    category: z.enum(["ai-ml", "iot", "web", "systems"]).optional(),
-    metrics: z.array(
-      z.object({
-        label: z.string(),
-        value: z.string(),
-      }),
-    ),
-    featured: z.boolean().optional().default(false),
-    order: z.number().optional().default(0),
-  }),
+  // Shared with `src/content/schema.ts` so the collection and the unit tests can
+  // never disagree about what a case study may declare.
+  schema: caseStudySchema,
 });
 
 export const collections = { blog, caseStudies };
