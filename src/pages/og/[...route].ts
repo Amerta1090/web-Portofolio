@@ -44,17 +44,26 @@ const pages: Record<string, { title: string; description: string }> = {
     title: "Certifications",
     description: `${AUTHOR} — Verified credentials`,
   },
-  "work/index": {
+  // Key = output slug, NOT the page route. `astro-og-canvas` rewrites a trailing
+  // `/index` (`path.replace(/\/index\.(png|jpeg|webp)$/, extension)`), so a key of
+  // "work/index" is emitted as "work.png" and anything asking for
+  // `/og/work/index.png` 404s. Routes are flat (/work, /resume, /timeline, /blog)
+  // so the keys must be flat too.
+  work: {
     title: "Work — Case Studies",
     description: `${AUTHOR} — Deep dives into AI/ML engineering projects`,
   },
-  "resume/index": {
+  resume: {
     title: "Resume",
     description: `${AUTHOR} — Professional resume`,
   },
-  "timeline/index": {
+  timeline: {
     title: "Timeline",
     description: `${AUTHOR} — Career timeline`,
+  },
+  blog: {
+    title: "Blog",
+    description: `${AUTHOR} — Notes on ML systems, IoT, and engineering practice`,
   },
 };
 

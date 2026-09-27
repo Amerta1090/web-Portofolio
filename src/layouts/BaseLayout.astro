@@ -31,6 +31,12 @@ const {
 } = Astro.props;
 
 const canonical = canonicalUrl ?? SITE.url;
+// `ogSlug` is the key in src/pages/og/[...route].ts (NOT a route path — that
+// generator strips a trailing `/index`, so "work" emits /og/work.png).
+// Every page now resolves to a generated /og/*.png, which astro-og-canvas
+// renders at a fixed 1200x630 (checked in the dist output), so the declared
+// og:image:width/height/type below are accurate. If a page ever overrides
+// `ogImage` with a differently-sized asset, those four tags must change too.
 const ogImageUrl = ogImage
   ? ogImage.startsWith("http")
     ? ogImage
@@ -57,10 +63,20 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:alt" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={SITE.author} />
+    <meta property="og:locale" content="en_US" />
+
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:image:alt" content={description} />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" id="favicon" />
     <link rel="canonical" href={canonical} />
