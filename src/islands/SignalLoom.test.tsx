@@ -1,4 +1,4 @@
-import { fireEvent, render, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { SignalLoomGraph } from "../lib/creative/signal-loom";
@@ -111,6 +111,32 @@ function mockReducedData(matches: boolean): () => void {
       writable: true,
       value: original,
     });
+  };
+}
+
+/**
+ * Replace the jsdom ResizeObserver stub with one the test can fire, so the
+ * "one read pass per layout change" contract is observable.
+ */
+function mockResizeObserver(): { notify: () => void; restore: () => void } {
+  const original = globalThis.ResizeObserver;
+  let callback: ResizeObserverCallback | null = null;
+  class ControllableResizeObserver {
+    constructor(cb: ResizeObserverCallback) {
+      callback = cb;
+    }
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+  globalThis.ResizeObserver = ControllableResizeObserver as unknown as typeof ResizeObserver;
+  return {
+    notify: () => {
+      callback?.([], {} as ResizeObserver);
+    },
+    restore: () => {
+      globalThis.ResizeObserver = original;
+    },
   };
 }
 
@@ -337,7 +363,13 @@ describe("SignalLoom bounded SVG choreography (L2.2)", () => {
     expect(container.querySelectorAll("[data-signal-dot]")).toHaveLength(0);
 
     // Active edges are immediately emphasized (brand stroke), no draw trail.
-    const activeEdge = container.querySelector('[data-edge="capability-ml->project-a"]');
+    // Measured edges land one frame after hydration by design (the island keeps
+    // layout reads out of the hydration write frame), so wait for the read pass.
+    const activeEdge = await waitFor(() => {
+      const edge = container.querySelector('[data-edge="capability-ml->project-a"]');
+      expect(edge).not.toBeNull();
+      return edge;
+    });
     expect(activeEdge).toHaveAttribute("stroke", "rgb(var(--color-brand-rgb) / 0.95)");
   });
 
@@ -381,8 +413,40 @@ describe("SignalLoom bounded SVG choreography (L2.2)", () => {
     );
     expect(container.querySelectorAll("[data-signal-dot]")).toHaveLength(0);
 
-    const activeEdge = container.querySelector('[data-edge="capability-ml->project-a"]');
+    const activeEdge = await waitFor(() => {
+      const edge = container.querySelector('[data-edge="capability-ml->project-a"]');
+      expect(edge).not.toBeNull();
+      return edge;
+    });
     expect(activeEdge).toHaveAttribute("stroke", "rgb(var(--color-brand-rgb) / 0.95)");
     restore();
+  });
+
+  it("reads layout once per pass: one hydration pass, one pass per real resize (Q4.1)", async () => {
+    const ro = mockResizeObserver();
+    const rect = vi.spyOn(Element.prototype, "getBoundingClientRect");
+    const readsPerPass = 1 + 2 * GRAPH.edges.length;
+
+    const { container, unmount } = render(<SignalLoom graph={GRAPH} />);
+    await waitFor(() => {
+      expect(container.querySelector('[data-edge="capability-ml->project-a"]')).not.toBeNull();
+    });
+    await waitFor(() => expect(rect).toHaveBeenCalledTimes(readsPerPass));
+
+    // The observer's first notification is the same layout as the deferred
+    // hydration pass, so it must not measure again (read-after-write thrash).
+    act(() => ro.notify());
+    expect(rect).toHaveBeenCalledTimes(readsPerPass);
+
+    // A genuine resize does measure — exactly one more batched pass.
+    act(() => ro.notify());
+    expect(rect).toHaveBeenCalledTimes(readsPerPass * 2);
+
+    unmount();
+    act(() => ro.notify());
+    expect(rect).toHaveBeenCalledTimes(readsPerPass * 2);
+
+    rect.mockRestore();
+    ro.restore();
   });
 });

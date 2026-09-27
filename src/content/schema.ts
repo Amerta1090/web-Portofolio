@@ -1,17 +1,9 @@
 import { z } from "zod";
 
-/**
- * Canonical Case Study Reactor stage ids, in narrative order.
- *
- * A case study may use these ids (the common problem → data → model → system →
- * impact shape) or its own ids; the ordering helper in
- * `src/lib/creative/case-study-reactor.ts` keeps the canonical five first and
- * appends custom stages in their authored order, so the schema never has to
- * reject honest, case-specific naming.
- */
-export const PROCESS_STAGE_IDS = ["problem", "data", "model", "system", "impact"] as const;
-
-export type ProcessStageId = (typeof PROCESS_STAGE_IDS)[number];
+// The canonical stage ids live in a zod-free module so the client bundle never
+// has to load the validator; re-exported here to keep one public import path.
+export { PROCESS_STAGE_IDS } from "../lib/creative/process-stage-ids";
+export type { ProcessStageId } from "../lib/creative/process-stage-ids";
 
 const stageMetricSchema = z.object({
   label: z.string().min(1),

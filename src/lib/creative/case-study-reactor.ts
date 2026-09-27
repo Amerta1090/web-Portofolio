@@ -1,10 +1,10 @@
-import {
-  PROCESS_STAGE_IDS,
-  type ProcessStage,
-  type ProcessStageDiagram,
-  type ProcessStageDiagramNode,
-  type ProcessStageMetric,
+import type {
+  ProcessStage,
+  ProcessStageDiagram,
+  ProcessStageDiagramNode,
+  ProcessStageMetric,
 } from "../../content/schema";
+import { PROCESS_STAGE_IDS } from "./process-stage-ids";
 
 export type { ProcessStage, ProcessStageDiagram, ProcessStageMetric };
 

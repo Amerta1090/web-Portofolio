@@ -152,13 +152,105 @@ Opsi (yang tidak diambil): rewrite ScrollEntropy/hero/CodeDNAHelix ke CSS scroll
 > sisanya Lenis/touch. Angka baseline di atas tetap sebagai catatan historis (belum di-audit ulang).
 Progres M-1→M-4: 49→58 (skor), 41→26 listener, off-screen 6→3, thrashing S, GPU terbukti floor.
 
+## §11. Audit Q4.1 (2026-09-27) — payload per-route + A/B home, dan pengukuran ulang
+
+> Sprint Creative UI & Animation, task Q4.1. Berbeda dari §9–§10 (yang fokusnya
+> optimasi listener/GPU), task ini mengukur **payload per-route** dan menjalankan
+> A/B home dua build (baseline `fbd079d` vs current) dengan probe runtime.
+
+### 11.1 Metrik baru: payload per-route (`scripts/measure-route-payload.mjs`)
+
+`check-performance-budget.mjs` menjumlahkan **semua** JS di dist (graf yang
+saling lepas), jadi 680 KB itu bukan beban halaman mana pun — struktur gap DEV-1
+yang sudah didokumentasikan. Q4.1 memakai usulan metrik baru dari sprint budget:
+**initial** (eager + island `client:load/only` + renderer, static import closure)
+vs **reachable** (closure dari eager + island `client:visible/idle/media` + dynamic
+import) per route. Tool: `bun run measure:routes` (`--json`, `--files`, `--dist`).
+Validasi: setiap file JS yang benar-benar di-load browser **ada di dalam** reachable
+(probe runtime) → batas atasnya benar; satu-satunya yang di luar = script CDN
+(ditampilkan terpisah, tidak diukur).
+
+| Route (gzip) | baseline `fbd079d` | current | delta |
+|---|---|---|---|
+| `/` initial | 208.9 KB / 44f | **204.3 KB / 42f** | −4.6 KB |
+| `/` reachable | 566.6 KB / 74f | **565.4 KB / 75f** | −1.2 KB |
+| `/work/ai-quranic-tafsir` initial | 152.3 KB / 32f | 151.7 KB / 32f | −0.6 KB |
+| `/work/ai-quranic-tafsir` reachable | 390.9 KB / 37f | **394.1 KB / 39f** | +3.2 KB |
+| `/gallery` initial / reachable | 181.5 / 506.8 KB | 180.9 / 506.2 KB | −0.6 KB |
+| HTML gzip `/` · `/work` | 62.8 · 14.1 KB | 64.6 · 17.1 KB | +1.8 · +3.0 KB |
+| Total dist JS (metrik lama, informasional) | 678.1 KB | 680.6 KB | +2.5 KB |
+
+### 11.2 Temuan nyata: kebocoran zod ke client `/work/[slug]` (fixed)
+
+`src/lib/creative/case-study-reactor.ts` meng-import **nilai** `PROCESS_STAGE_IDS`
+dari `src/content/schema.ts` (modul zod) → bundler menarik seluruh validator ke
+chunk island. Terukur: `schemas.js` **18.5 KB gzip** zod di route `/work/[slug]`
+(`ContactForm` sudah menariknya di home, jadi home tak berubah). Fix: konstanta
+pindah ke modul bebas-zod `src/lib/creative/process-stage-ids.ts` (schema
+re-export, satu sumber), import di island jadi `import type` (terhapus). Delta
+reachable `/work`: **+21.9 KB → +3.2 KB**. Pelajaran: **tipe** di-erase compiler,
+**nilai** tidak — satu konstanta string bisa menarik seluruh validator.
+
+### 11.3 A/B home: skor home tidak bisa dibedakan, listener bisa
+
+Tiga run per build, interleaved (current → baseline → current → baseline), mesin
+yang sama, build served di :4321 vs :4323:
+
+| build | run | overall | thrash desktop | thrash mobile | scroll listener (desktop) | findings |
+|---|---|---|---|---|---|---|
+| baseline `fbd079d` | 1 / 2 / 3 | **59 / 52 / 56** | S / A / S | S / C / C | **26 / 26 / 26** | 10 / 12 / 11 |
+| current (pre-fix) | 1 / 2 | 63 / 56 | S / C | S / A | 23 / 23 | 10 / 12 |
+| current (final) | 1 / 2 | 58 / 58 | S / C | C / S | 23 / 23 | 12 / 12 |
+
+- **Stabil & membaik**: scroll listener desktop **26 → 23** di semua run (home trim
+  menghapus `ScrollEntropy`; probe runtime juga 20 → 16 setelah scroll penuh).
+- **Tidak stabil (noise)**: skor (52–63 untuk kode yang sama) dan tier thrashing
+  (S↔C di kedua build). Maka **tidak ada klaim selisih skor** dari sprint ini —
+  rentang B 52–63 di mesin ini konsisten dengan "B 56–58" yang tercatat historis.
+  Probe runtime menunjukkan angka yang sama: dua run build identik beda ±40 frame.
+- Karena itu perbaikan di §11.4 **tidak** mengklaim perbaikan skor; dikunci unit test.
+
+### 11.4 Fix: pemisahan baca/tulis pada Signal Loom (prinsip, bukan skor)
+
+Hydrasi menulis ke DOM lalu `measureEdges()` langsung membaca 14
+`getBoundingClientRect` di frame yang sama (read-after-write = "mount thrashing"
+menurut saran tool sendiri), dan notifikasi pertama `ResizeObserver` mengulang
+pass yang sama. Fix: baca pertama dijeda satu `requestAnimationFrame`, notifikasi
+pertama observer di-skip → **satu pass baca per perubahan layout** (deterministik,
+dipin unit test "reads layout once per pass"). Tidak ada listener/RAF/canvas baru.
+
+### 11.5 Route `/work/[slug]`: S-tier, dengan 1 HIGH yang adalah heuristik
+
+Overall **S 87** (desktop S, mobile S; animasi S, scroll animations A, thrashing S,
+GPU A/S). 6 findings: 1 HIGH "Excess scroll listeners" + 5 LOW. Route ini hanya
+punya **4 scroll listener** (2 island eager + island reactor) — HIGH-nya adalah
+rasio §M-4.3 (listener/jsScrollAnims ≥ 0.8, penalty capped), bukan masalah nyata;
+menggabungkan listener di sini justru akan mematikan hidrasi `client:visible`.
+
+### 11.6 Pengecualian struktural yang tetap berlaku (bounded)
+
+1. **High GPU memory (601 MB @2x)** — floor lingkungan, terbukti A/B byte-identik
+   dengan AmbientScene dimatikan (§M-4.2).
+2. **Excess scroll listeners ×2 (home)** — rasio React 19 per-root, penalty capped
+   25 (§M-4.3); sudah turun 26 → 23.
+3. **Frame thrashing (HIGH, mobile/desktop bergantian)** — muncul di kedua build
+   pada run tertentu; setelah §11.4 pass baca SignalLoom keluar dari frame
+   hidrasi, tapi flag tetap bisa muncul dari sumber lain (canvas/R3F bawah-fold).
+   Diperlakukan sebagai **noise terukur** yang perlu A/B multi-run, bukan blocker.
+
 ## Cara ulang audit
 ```
 bun run serve              # preview lokal :4321
 npx motionscore http://localhost:4321 --no-upload          # home
 npx motionscore http://localhost:4321/gallery --no-upload
 npx motionscore http://localhost:4321/observatory --no-upload
+npx motionscore http://localhost:4321/work/ai-quranic-tafsir --no-upload
+bun run measure:routes              # payload per-route dari dist
+node scripts/measure-route-runtime.mjs http://localhost:4321 current   # probe browser
 ```
 > CLI menerima SATU URL per pemanggilan (multi-URL tidak didukung). Chrome puppeteer
 > di-download sekali (butuh ~100–200MB; timeout di jaringan lambat — retry saja).
 > Error "Failed to launch browser" di CI → set `MOTIONSCORE_NO_SANDBOX=1`.
+> **Audit `/` selalu ≥2 run**: variance skor ±10 dan tier thrashing S↔C pada kode
+> yang sama (lihat §11.3). Angka stabil yang bisa dipakai: scroll listener count,
+> findings tier D/F, dan payload per-route.

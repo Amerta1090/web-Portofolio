@@ -139,14 +139,29 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
   // Measure after hydration and re-measure when the container resizes (cards
   // are fixed height, but zone widths change with the viewport). Bounded: one
   // ResizeObserver on the section container, disconnected on unmount.
+  //
+  // The first read waits one frame and the observer's own initial notification
+  // is skipped: hydration has just written to the DOM, so measuring in that same
+  // frame would interleave layout reads with those writes — the read-after-write
+  // pattern MotionScore reports as mount thrashing. One read per layout pass.
   useEffect(() => {
     if (!hydrated) return;
-    measureEdges();
     const container = containerRef.current;
     if (!container || typeof ResizeObserver === "undefined") return;
-    const observer = new ResizeObserver(measureEdges);
+    let initialNotification = true;
+    const observer = new ResizeObserver(() => {
+      if (initialNotification) {
+        initialNotification = false;
+        return;
+      }
+      measureEdges();
+    });
     observer.observe(container);
-    return () => observer.disconnect();
+    const frame = requestAnimationFrame(measureEdges);
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(frame);
+    };
   }, [hydrated, measureEdges]);
 
   // One-shot entry: connector edges fade in. Skipped entirely for reduced

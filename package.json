@@ -17,6 +17,8 @@
     "validate-data": "node scripts/validate-data.mjs",
     "fetch-data": "bun scripts/fetch-data.mjs",
     "check-budget": "bun run build && node scripts/check-performance-budget.mjs",
+    "measure:routes": "node scripts/measure-route-payload.mjs",
+    "measure:runtime": "node scripts/measure-route-runtime.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
