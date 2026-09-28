@@ -1,34 +1,113 @@
 ---
+import { ArrowRight } from "lucide-react";
 import Container from "../components/atoms/Container.astro";
-import Section from "../components/molecules/Section.astro";
-import SkillConstellation from "../islands/SkillConstellation";
+import CapabilityArchitecture from "../components/organisms/CapabilityArchitecture.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { getSkills } from "../lib/data";
+import { getProfile, getProjects, getSkills } from "../lib/data";
+import { buildCapabilityArchitecture } from "../lib/skills/architecture";
 
-const skills = getSkills();
-const allSkills = skills.categories.flatMap((c) => c.skills);
+const profile = getProfile();
+const architecture = buildCapabilityArchitecture(getSkills(), getProjects());
+
+const areaCount = architecture.stages.reduce((sum, stage) => sum + stage.areas.length, 0);
+
+/**
+ * Where to go next. Each claim is a question a visitor reaches this page with and
+ * cannot answer from it — the projects themselves, the full text/certification
+ * inventory, and the page that reads the same data as a dataset.
+ */
+const nextSteps = [
+  {
+    href: "/projects",
+    title: "See the projects",
+    body: "Twenty-two of them, each with its own skill list — the evidence behind every count above.",
+  },
+  {
+    href: "/observatory",
+    title: "Read it as a dataset",
+    body: "The same record under derived metrics: timeline, technology frequency, co-occurring pairs, rules.",
+  },
+  {
+    href: "/certifications",
+    title: "Check the certifications",
+    body: "Fifty-plus vendor certificates, with issuers and dates, for the areas above.",
+  },
+];
 ---
 
-<BaseLayout title="Skills — Abdul Majid Ridwan Tyastonoatmaja" description="Technical skills across ML, data science, web development, IoT, DevOps, and more." canonicalUrl="https://portfolio.abdulmajidr708.workers.dev/skills" ogSlug="skills">
-  <Section title="Skills" subtitle="Technologies and tools I work with">
-    <Container>
-      <SkillConstellation client:visible skills={allSkills} />
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
-        {skills.categories.map((category) => (
-          <div>
-            <h3 class="text-sm font-semibold text-brand mb-4">
-              {category.name}
-            </h3>
-            <div class="flex flex-wrap gap-2">
-              {category.skills.map((skill) => (
-                <span class="inline-flex items-center px-3 py-1.5 text-sm bg-bg-tertiary text-text-secondary rounded-full hover:bg-accent-muted/20 hover:text-accent transition-colors duration-200">
-                  {skill.name}
-                </span>
-              ))}
-            </div>
-          </div>
-        ))}
+<BaseLayout
+  title="Skills — Abdul Majid Ridwan Tyastonoatmaja"
+  description="How Abdul's skills fit together: 51 capabilities arranged as one pipeline, from sensing physical data through modelling, shipping, and operating production ML systems."
+  canonicalUrl="https://portfolio.abdulmajidr708.workers.dev/skills"
+  ogSlug="skills"
+>
+  <div class="pt-24 pb-16">
+    <Container size="xl">
+      <header class="max-w-3xl" data-reveal>
+        <p class="section-label text-text-secondary">Skills</p>
+        <h1 class="text-display font-display text-text-primary mt-4">{profile.headline}</h1>
+        <p class="text-lg text-text-secondary mt-5 leading-relaxed">{profile.tagline}</p>
+        <p class="text-base text-text-secondary/80 mt-4 leading-relaxed">{profile.summary}</p>
+      </header>
+
+      <dl
+        class="mt-12 grid grid-cols-2 gap-x-6 gap-y-8 border-y border-border py-8 sm:grid-cols-4"
+        data-reveal
+      >
+        <div>
+          <dd class="font-display text-h2 text-text-primary tabular-nums">{architecture.totalSkills}</dd>
+          <dt class="section-label text-text-secondary mt-2">Skills</dt>
+        </div>
+        <div>
+          <dd class="font-display text-h2 text-text-primary tabular-nums">{architecture.stages.length}</dd>
+          <dt class="section-label text-text-secondary mt-2">Stages</dt>
+        </div>
+        <div>
+          <dd class="font-display text-h2 text-text-primary tabular-nums">{areaCount}</dd>
+          <dt class="section-label text-text-secondary mt-2">Capability areas</dt>
+        </div>
+        <div>
+          <dd class="font-display text-h2 text-text-primary tabular-nums">
+            {architecture.coveredProjects}<span class="text-text-secondary/50 text-h4">/{architecture.totalProjects}</span>
+          </dd>
+          <dt class="section-label text-text-secondary mt-2">Projects covered</dt>
+        </div>
+      </dl>
+
+      <p class="mt-10 max-w-2xl text-text-secondary leading-relaxed" data-reveal>
+        A list of tools answers "what is installed", not "what does this person do". The
+        {architecture.totalSkills} capabilities below are grouped the way the work actually runs —
+        read top to bottom, each stage takes the previous one's output and makes it usable. Every
+        figure is counted from the same files that fill the rest of this site; the only judgement
+        call is the grouping itself.
+      </p>
+
+      <div class="mt-16">
+        <CapabilityArchitecture architecture={architecture} />
       </div>
+
+      <nav class="mt-20 border-t border-border pt-10" aria-labelledby="skills-next">
+        <h2 class="section-label text-text-secondary" id="skills-next">Where the evidence is</h2>
+        <ul class="mt-6 grid gap-x-10 gap-y-8 md:grid-cols-3">
+          {
+            nextSteps.map((step) => (
+              <li>
+                <a class="group block" href={step.href}>
+                  <span class="flex items-center gap-1.5 text-text-primary group-hover:text-brand transition-colors duration-200">
+                    <span class="font-display text-h4">{step.title}</span>
+                    <ArrowRight
+                      size={15}
+                      aria-hidden="true"
+                      className="shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
+                    />
+                  </span>
+                  <span class="mt-2 block text-sm text-text-secondary leading-relaxed">{step.body}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
     </Container>
-  </Section>
+  </div>
 </BaseLayout>

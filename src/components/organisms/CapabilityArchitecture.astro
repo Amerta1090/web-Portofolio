@@ -1,0 +1,563 @@
+---
+import {
+  Brain,
+  ChartColumn,
+  Cloud,
+  Code,
+  Cog,
+  Cpu,
+  type LucideIcon,
+  Terminal,
+  Zap,
+} from "lucide-react";
+import type {
+  CapabilityArchitecture,
+  CapabilityStage,
+  StageId,
+} from "../../lib/skills/architecture";
+import { MAX_DEPTH, MIN_DEPTH, stageName } from "../../lib/skills/architecture";
+
+export interface Props {
+  architecture: CapabilityArchitecture;
+}
+
+const { architecture } = Astro.props;
+
+/**
+ * The category icons declared in `skills.json`. `SkillIcon` only knows six of the
+ * eight and silently falls back to a code glyph, which made four areas on this
+ * page share one icon; mapping them here keeps each area identifiable.
+ */
+const ICONS: Record<string, LucideIcon> = {
+  brain: Brain,
+  chart: ChartColumn,
+  code: Code,
+  chip: Cpu,
+  gear: Cog,
+  terminal: Terminal,
+  cloud: Cloud,
+  zap: Zap,
+};
+
+const levels = Array.from({ length: MAX_DEPTH - MIN_DEPTH + 1 }, (_, i) => MAX_DEPTH - i);
+
+function levelTone(level: number): string {
+  return `rgb(var(--color-brand-rgb) / ${[0.9, 0.62, 0.4, 0.24, 0.14][level - 1] ?? 0.14})`;
+}
+
+function meterWidth(depth: number): string {
+  return `${Math.round((depth / MAX_DEPTH) * 100)}%`;
+}
+
+function stageLabel(stage: CapabilityStage): string {
+  return `${stage.skillCount} ${stage.skillCount === 1 ? "skill" : "skills"}`;
+}
+
+function plural(count: number, word: string): string {
+  return `${count} ${word}${count === 1 ? "" : "s"}`;
+}
+
+/**
+ * Screen-reader text for the stage's depth bar. The bar is decorative geometry —
+ * its segments encode counts, which a non-visual reader needs as words.
+ */
+function depthSummary(stage: CapabilityStage): string {
+  const used = levels.filter((level) => (stage.depthCounts[level] ?? 0) > 0);
+  if (used.length === 0) return "No skills in this stage";
+  return `Self-assessed depth of ${stageLabel(stage)}: ${used
+    .map((level) => `${stage.depthCounts[level]} at ${level} of ${MAX_DEPTH}`)
+    .join(", ")}`;
+}
+
+function path(stages: StageId[]): string {
+  return stages.map((id) => stageName(id)).join(" → ");
+}
+---
+
+<div class="cap-arc">
+  <ol class="cap-stages" data-reveal data-reveal-stagger>
+    {
+      architecture.stages.map((stage) => (
+        <li class="cap-stage" id={stage.id}>
+          <div class="cap-node" aria-hidden="true" />
+
+          <div class="cap-stage-body">
+            <header class="cap-stage-head">
+              <div class="min-w-0">
+                <p class="cap-ordinal">
+                  <span class="cap-ordinal-num">{String(stage.index).padStart(2, "0")}</span>
+                  <span>{stage.name}</span>
+                </p>
+                <p class="cap-role">{stage.role}</p>
+              </div>
+
+              <dl class="cap-figures">
+                <div class="cap-figure">
+                  <dt class="cap-figure-key">Skills</dt>
+                  <dd class="cap-figure-val">{stageLabel(stage)}</dd>
+                </div>
+                <div class="cap-figure">
+                  <dt class="cap-figure-key">In projects</dt>
+                  <dd class="cap-figure-val">
+                    {stage.projectCount}<span class="cap-figure-of">/{architecture.totalProjects}</span>
+                  </dd>
+                </div>
+              </dl>
+            </header>
+
+            {/* Depth shape for the whole stage. One bar, five segments, one rule:
+                the same self-assessed 1–5 scale the rest of the portfolio uses. */}
+            <div class="cap-depth">
+              <div class="cap-depth-bar" role="img" aria-label={depthSummary(stage)}>
+                {levels.map((level) => {
+                  const count = stage.depthCounts[level] ?? 0;
+                  if (count === 0) return null;
+                  return (
+                    <span
+                      class="cap-depth-seg"
+                      style={`flex-grow:${count};background:${levelTone(level)}`}
+                    />
+                  );
+                })}
+              </div>
+              <p class="cap-depth-key">
+                {levels
+                  .filter((level) => (stage.depthCounts[level] ?? 0) > 0)
+                  .map((level) => `${stage.depthCounts[level]}×${level}`)
+                  .join("  ")}
+              </p>
+            </div>
+
+            <div class="cap-areas">
+              {stage.areas.map((area) => {
+                const Icon = ICONS[area.icon] ?? Code;
+                return (
+                  <section class="cap-area" id={`area-${area.id}`} aria-labelledby={`h-${area.id}`}>
+                    <h4 class="cap-area-name" id={`h-${area.id}`}>
+                      <Icon size={15} aria-hidden="true" />
+                      <span>{area.name}</span>
+                      <span class="cap-area-count">{area.skills.length}</span>
+                    </h4>
+
+                    <p class="cap-area-summary">{area.summary}</p>
+
+                    {area.deepest.length > 0 && (
+                      <p class="cap-area-deepest">
+                        <span class="cap-area-deepest-key">Deepest</span>
+                        {area.deepest.map((skill) => skill.name).join(", ")}
+                      </p>
+                    )}
+
+                    <ul class="cap-skills">
+                      {area.skills.map((skill) => (
+                        <li class="cap-skill">
+                          <span class="cap-skill-name">{skill.name}</span>
+                          {skill.projectCount > 0 && (
+                            <span class="cap-skill-projects">
+                              {plural(skill.projectCount, "project")}
+                            </span>
+                          )}
+                          <span class="cap-skill-meter" aria-hidden="true">
+                            <span class="cap-skill-fill" style={`width:${meterWidth(skill.depth)}`} />
+                          </span>
+                          <span class="sr-only">self-assessed depth {skill.depth} of {MAX_DEPTH}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                );
+              })}
+            </div>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+
+  {
+    architecture.crossings.length > 0 && (
+      <section class="cap-crossings" aria-labelledby="cap-crossings-title">
+        <p class="section-label text-text-secondary">Where the stages overlap</p>
+        <h3 class="cap-crossings-title" id="cap-crossings-title">
+          {plural(architecture.crossingProjects, "project")} draw on more than one stage
+        </h3>
+        <p class="cap-crossings-lead">
+          The stages above are not separate shelves. These are the shipped projects whose own skill
+          lists reach across more than one of them.
+        </p>
+        <ol class="cap-crossing-list">
+          {architecture.crossings.map((crossing) => (
+            <li class="cap-crossing">
+              <a class="cap-crossing-link" href={`/projects/${crossing.slug}`}>
+                <span class="cap-crossing-title">{crossing.title}</span>
+                <span class="cap-crossing-path">{path(crossing.stages)}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )
+  }
+</div>
+
+<style is:global>
+  /* ── The arc ─────────────────────────────────────────────────────────────
+     One hairline runs the full height of the list with a node per stage, so
+     four grouped areas read as a single ordered system. This is the one
+     graphic on the page; it replaces a ring graph whose edges joined each
+     skill to the next entry in an array and therefore meant nothing. */
+  .cap-stages {
+    position: relative;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .cap-stages::before {
+    content: "";
+    position: absolute;
+    top: 1.5rem;
+    bottom: 1.5rem;
+    left: 0.6875rem;
+    width: 1px;
+    background: var(--color-border);
+  }
+
+  .cap-stage {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.375rem minmax(0, 1fr);
+    column-gap: 1rem;
+    padding-block: 1.75rem;
+  }
+
+  .cap-stage + .cap-stage {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .cap-node {
+    position: relative;
+    z-index: 1;
+    width: 0.6875rem;
+    height: 0.6875rem;
+    margin-top: 0.5rem;
+    margin-inline: auto;
+    border-radius: 9999px;
+    background: var(--color-surface-primary);
+    border: 1px solid var(--color-brand);
+    box-shadow: 0 0 0 3px var(--color-surface-primary);
+  }
+
+  /* ── Stage header ─────────────────────────────────────────────────────── */
+  .cap-stage-head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .cap-ordinal {
+    display: flex;
+    align-items: baseline;
+    gap: 0.625rem;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .cap-ordinal-num {
+    color: var(--color-brand);
+  }
+
+  .cap-ordinal span:last-child {
+    /* The stage name is the page's real heading level; the h3 lives below. */
+    font-family: var(--font-display);
+    font-size: var(--text-h3);
+    letter-spacing: var(--tracking-display);
+    line-height: 1.1;
+    text-transform: none;
+    color: var(--color-text-primary);
+  }
+
+  .cap-role {
+    margin-top: 0.5rem;
+    max-width: 46ch;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+  }
+
+  .cap-figures {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .cap-figure-key {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+  }
+
+  .cap-figure-val {
+    margin-top: 0.125rem;
+    font-family: var(--font-mono);
+    font-size: 1.25rem;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-primary);
+  }
+
+  .cap-figure-of {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+  }
+
+  /* ── Depth shape ──────────────────────────────────────────────────────── */
+  .cap-depth {
+    margin-top: 1.25rem;
+    max-width: 26rem;
+  }
+
+  .cap-depth-bar {
+    display: flex;
+    gap: 2px;
+    height: 0.375rem;
+  }
+
+  .cap-depth-seg {
+    border-radius: 1px;
+    min-width: 3px;
+  }
+
+  .cap-depth-key {
+    margin-top: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--color-text-secondary);
+  }
+
+  /* ── Areas ────────────────────────────────────────────────────────────── */
+  .cap-areas {
+    margin-top: 1.75rem;
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .cap-area {
+    border-left: 1px solid var(--color-border);
+    padding-left: 1rem;
+  }
+
+  .cap-area-name {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--color-text-primary);
+  }
+
+  .cap-area-name svg {
+    flex-shrink: 0;
+    color: var(--color-brand);
+  }
+
+  .cap-area-count {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--color-text-secondary);
+  }
+
+  .cap-area-count::before {
+    content: "·";
+    margin-right: 0.375rem;
+  }
+
+  .cap-area-summary {
+    margin-top: 0.375rem;
+    max-width: 54ch;
+    font-size: 0.8125rem;
+    line-height: 1.65;
+    color: var(--color-text-secondary);
+  }
+
+  .cap-area-deepest {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--color-text-primary);
+  }
+
+  .cap-area-deepest-key {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    margin-right: 0.5rem;
+  }
+
+  /* ── Skill index ──────────────────────────────────────────────────────── */
+  .cap-skills {
+    margin-top: 0.875rem;
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 0.375rem 1.5rem;
+  }
+
+  .cap-skill {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+
+  .cap-skill-name {
+    color: var(--color-text-primary);
+  }
+
+  .cap-skill-projects {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+  }
+
+  .cap-skill-projects::before {
+    content: "·";
+    margin-right: 0.375rem;
+  }
+
+  .cap-skill-meter {
+    margin-left: auto;
+    flex-shrink: 0;
+    width: 2rem;
+    height: 0.25rem;
+    border-radius: 1px;
+    background: var(--color-border);
+    overflow: hidden;
+  }
+
+  .cap-skill-fill {
+    display: block;
+    height: 100%;
+    background: var(--color-brand);
+  }
+
+  /* ── Crossings ────────────────────────────────────────────────────────── */
+  .cap-crossings {
+    margin-top: 3.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .cap-crossings-title {
+    margin-top: 0.5rem;
+    font-family: var(--font-display);
+    font-size: var(--text-h3);
+    line-height: 1.15;
+    letter-spacing: var(--tracking-display);
+  }
+
+  .cap-crossings-lead {
+    margin-top: 0.5rem;
+    max-width: 60ch;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+  }
+
+  .cap-crossing-list {
+    margin-top: 1.5rem;
+    list-style: none;
+    padding: 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .cap-crossing {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .cap-crossing-link {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem 1rem;
+    padding-block: 0.75rem;
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  .cap-crossing-link:hover .cap-crossing-title {
+    color: var(--color-brand);
+  }
+
+  .cap-crossing-title {
+    font-size: 0.875rem;
+    min-width: 0;
+  }
+
+  .cap-crossing-path {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--color-brand);
+    white-space: nowrap;
+  }
+
+  @media (min-width: 640px) {
+    .cap-skills {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .cap-stage {
+      grid-template-columns: 1.375rem minmax(0, 1fr);
+      column-gap: 2rem;
+      padding-block: 2.5rem;
+    }
+
+    .cap-stage-head {
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .cap-figures {
+      flex-shrink: 0;
+      gap: 2.25rem;
+      padding-top: 0.25rem;
+    }
+
+    .cap-areas {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 2.5rem;
+    }
+
+    /* The Model and Operate stages hold three areas between them; let a lone
+       area use the full width rather than sit in a half-empty column. */
+    .cap-areas:has(> .cap-area:only-child) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .cap-skills {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .cap-skills {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>
