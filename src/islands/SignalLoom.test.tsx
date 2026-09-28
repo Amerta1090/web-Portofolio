@@ -1,5 +1,6 @@
 import { act, fireEvent, render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { SignalLoomGraph } from "../lib/creative/signal-loom";
 import SignalLoom from "./SignalLoom";
@@ -448,5 +449,94 @@ describe("SignalLoom bounded SVG choreography (L2.2)", () => {
 
     rect.mockRestore();
     ro.restore();
+  });
+});
+
+describe("SignalLoom fallback without hydration (Q4.2)", () => {
+  const LINKED_GRAPH: SignalLoomGraph = {
+    ...GRAPH,
+    nodes: GRAPH.nodes.map((node) =>
+      node.kind === "project" ? { ...node, href: `/projects/${node.id}` } : node,
+    ),
+  };
+
+  // `render()` flushes effects, which flips the island to hydrated. The
+  // server render is the only way to observe the pre-hydration contract.
+  const serverHtml = (graph: SignalLoomGraph = LINKED_GRAPH) =>
+    renderToStaticMarkup(<SignalLoom graph={graph} />);
+
+  it("renders no interactive card before hydration — no dead controls", () => {
+    const html = serverHtml();
+    expect(html).not.toContain("<button");
+    expect(html).not.toContain('tabindex="-1"');
+    // Every card is still a list item, so the content and the reading order hold.
+    expect(html.match(/data-signal-node=/g)).toHaveLength(LINKED_GRAPH.nodes.length);
+    expect(html.match(/<li/g)).toHaveLength(LINKED_GRAPH.nodes.length);
+  });
+
+  it("keeps every card's text in the server render", () => {
+    const html = serverHtml();
+    for (const node of LINKED_GRAPH.nodes) {
+      expect(html).toContain(node.label);
+      expect(html).toContain(node.summary);
+    }
+    // The selected node's summary is still what the status region reports.
+    expect(html).toContain("Project A summary");
+  });
+
+  it("makes project evidence a real link so the fallback navigates somewhere true", () => {
+    const html = serverHtml();
+    expect(html).toContain('href="/projects/project-a"');
+    // Capabilities have no destination, so they stay non-interactive content.
+    expect(html).toContain('data-node-kind="capability"');
+    expect(html).not.toContain('data-node-kind="capability" data-connected="true"><a');
+  });
+
+  it("names the fallback link exactly as it names the hydrated control", () => {
+    const html = serverHtml();
+    // Without this the link's name would come from its content — the 30-word
+    // summary — and then shorten once the island upgrades.
+    expect(html).toContain('aria-label="Evidence: Project A"');
+  });
+
+  it("leaves the fallback capability card as unnamed content", () => {
+    const html = serverHtml();
+    // The name-stability rule only covers elements the user can activate: a
+    // capability has no destination, so it stays a plain list item and is read
+    // as its own text. Naming it would be invalid — aria-label is prohibited on
+    // role=generic — and it would hide the summary that is its whole reason for
+    // being in the server render.
+    const startTags = html.match(/<div data-signal-node="capability-[^"]*"[^>]*>/g) ?? [];
+    expect(startTags).toHaveLength(2);
+    for (const tag of startTags) {
+      expect(tag).not.toContain("aria-label");
+    }
+    // Content, not a control: the fallback capability still carries its summary.
+    expect(html).toContain("Web capability summary");
+  });
+
+  it("keeps the selected and connected emphasis without a control to toggle", () => {
+    const html = serverHtml();
+    // defaultNodeId is project-a, so it is the current item and its neighbours connected.
+    expect(html).toMatch(/data-signal-node="project-a"[^>]*aria-current="true"/);
+    expect(html).toMatch(/data-signal-node="capability-ml"[^>]*data-connected="true"/);
+  });
+
+  it("turns the cards into selectable controls once hydrated", () => {
+    const { container } = render(<SignalLoom graph={LINKED_GRAPH} />);
+    const project = container.querySelector('[data-signal-node="project-a"]');
+    expect(project?.tagName).toBe("BUTTON");
+    // The enhancement replaces the fallback link rather than nesting one.
+    expect(container.querySelector('a[href="/projects/project-a"]')).toBeNull();
+  });
+
+  it("names each control by kind and label, not by its 30-word summary", () => {
+    const { container } = render(<SignalLoom graph={LINKED_GRAPH} />);
+    const project = container.querySelector('[data-signal-node="project-a"]');
+    expect(project).toHaveAttribute("aria-label", "Evidence: Project A");
+    const capability = container.querySelector('[data-signal-node="capability-web"]');
+    expect(capability).toHaveAttribute("aria-label", "Capability: Web Systems");
+    // The summary is still reachable for browsing, and still announced once.
+    expect(project?.querySelector("[data-node-summary]")?.textContent).toBe("Project A summary");
   });
 });

@@ -165,9 +165,12 @@ export default function CaseStudyReactor({ stages }: CaseStudyReactorProps) {
                         : "border-border/70 text-text-secondary hover:border-brand hover:text-text-primary"
                     }`}
                   >
+                    {/* The explicit space is load-bearing: the visual gap comes
+                        from `gap-2`, which does not survive name computation, so
+                        without it the accessible name is "01Problem". */}
                     <span className="font-mono text-xs tabular-nums text-brand">
                       {stage.ordinal}
-                    </span>
+                    </span>{" "}
                     {stage.label}
                   </button>
                 </li>

@@ -261,6 +261,79 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
     const isSelected = node.id === selectedId;
     const isConnected = connectedRoots.has(node.id);
     const isCapability = node.kind === "capability";
+    const kindLabel = isCapability ? "Capability" : "Evidence";
+    const cardClass = `flex h-32 flex-col items-start justify-center gap-1 rounded-md border p-3.5 text-left transition motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-brand focus-visible:outline-offset-2 ${
+      isCapability ? "md:h-16 md:flex-row md:items-center md:gap-3" : ""
+    } ${
+      isSelected
+        ? "border-brand bg-brand/10 ring-1 ring-brand/40"
+        : isConnected
+          ? "border-brand/40 bg-bg-secondary/80 hover:border-brand hover:bg-brand/10 focus-visible:border-brand focus-visible:bg-brand/10"
+          : "border-border/70 bg-bg-secondary/80 hover:border-brand hover:bg-brand/10 focus-visible:border-brand focus-visible:bg-brand/10"
+    }`;
+
+    const content = (
+      <>
+        <span className="section-label shrink-0 text-brand">{kindLabel}</span>
+        <span
+          className={`line-clamp-2 font-display text-h4 leading-snug text-text-primary ${
+            isCapability ? "md:line-clamp-1 md:min-w-0" : ""
+          }`}
+        >
+          {node.label}
+        </span>
+        <span
+          className={`line-clamp-1 text-xs leading-relaxed text-text-secondary ${
+            isCapability ? "md:hidden" : ""
+          }`}
+          data-node-summary
+        >
+          {node.summary}
+        </span>
+      </>
+    );
+
+    // Before hydration there is nothing to select with, so a card must not be a
+    // control: a roving-tabindex button is unreachable for 12 of the 13 cards and
+    // inert for all of them when scripts are off. Render the same content as
+    // static list items, and turn project evidence into a real link to the page
+    // it describes — the fallback then navigates somewhere true instead of
+    // swallowing a click. This mirrors the reactor stepper: the enhancement owns
+    // the controls, the server render owns the content.
+    if (!hydrated) {
+      return (
+        <li key={node.id}>
+          {node.href ? (
+            <a
+              href={node.href}
+              data-signal-node={node.id}
+              data-node-kind={node.kind}
+              data-connected={isConnected ? "true" : undefined}
+              aria-current={isSelected ? "true" : undefined}
+              // Same concise name as the hydrated control below, so activating
+              // the fallback link and then the upgraded button announce the
+              // same thing rather than the whole summary first and a short
+              // label afterwards.
+              aria-label={`${kindLabel}: ${node.label}`}
+              className={cardClass}
+            >
+              {content}
+            </a>
+          ) : (
+            <div
+              data-signal-node={node.id}
+              data-node-kind={node.kind}
+              data-connected={isConnected ? "true" : undefined}
+              aria-current={isSelected ? "true" : undefined}
+              className={cardClass}
+            >
+              {content}
+            </div>
+          )}
+        </li>
+      );
+    }
+
     return (
       <li key={node.id}>
         <button
@@ -269,6 +342,11 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
           data-signal-node={node.id}
           data-node-kind={node.kind}
           data-connected={isConnected ? "true" : undefined}
+          // The name stays short: the project summaries run to 30+ words, and a
+          // roving arrow keypress already re-announces the node. The summary is
+          // still in the subtree for browsing, and the live region below announces
+          // it once per selection.
+          aria-label={`${kindLabel}: ${node.label}`}
           aria-pressed={isSelected}
           aria-current={isSelected ? "true" : undefined}
           tabIndex={isSelected ? 0 : -1}
@@ -277,41 +355,9 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
           onPointerLeave={() => setHoverId(null)}
           onFocus={() => setHoverId(node.id)}
           onBlur={() => setHoverId(null)}
-          className={`flex h-32 flex-col items-start justify-center gap-1 rounded-md border p-3.5 text-left transition motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-brand focus-visible:outline-offset-2 ${
-            isCapability ? "md:h-16 md:flex-row md:items-center md:gap-3" : ""
-          } ${
-            isSelected
-              ? "border-brand bg-brand/10 ring-1 ring-brand/40"
-              : isConnected
-                ? "border-brand/40 bg-bg-secondary/80 hover:border-brand hover:bg-brand/10 focus-visible:border-brand focus-visible:bg-brand/10"
-                : "border-border/70 bg-bg-secondary/80 hover:border-brand hover:bg-brand/10 focus-visible:border-brand focus-visible:bg-brand/10"
-          }`}
+          className={cardClass}
         >
-          <span className="section-label shrink-0 text-brand">
-            {isCapability ? "Capability" : "Evidence"}
-          </span>
-          <span
-            className={`line-clamp-2 font-display text-h4 leading-snug text-text-primary ${
-              isCapability ? "md:line-clamp-1 md:min-w-0" : ""
-            }`}
-          >
-            {node.label}
-          </span>
-          {isCapability ? (
-            <span
-              className="line-clamp-1 text-xs leading-relaxed text-text-secondary md:hidden"
-              data-node-summary
-            >
-              {node.summary}
-            </span>
-          ) : (
-            <span
-              className="line-clamp-1 text-xs leading-relaxed text-text-secondary"
-              data-node-summary
-            >
-              {node.summary}
-            </span>
-          )}
+          {content}
         </button>
       </li>
     );

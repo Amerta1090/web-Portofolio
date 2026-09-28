@@ -197,6 +197,14 @@ Microtasks:
 
 AC: semantic content and controls remain complete in every fallback path.
 
+**Result (2026-09-28): 5 microtask probed in a real browser first, 4 real defects found and fixed** (3 owned by this sprint, 1 pre-existing and site-wide). The AC held only after the fixes — microtask 4 was failing it outright.
+
+1. **Keyboard — clean.** Signal Loom is **one tab stop** (roving tabindex); Arrow/Shift+Arrow/Home/End move focus and selection together and cross the capability→project zone boundary (the island walks one combined order, so the two lists don't trap the arrow keys); arrow keys never scroll the page. Reactor stepper is one tab stop with arrows moving the active stage. Both show a visible focus ring (2px brand outline, 2px offset).
+2. **Reduced motion — clean.** `emulateMedia reducedMotion: reduce` → 0 signal dots, with the 8 connector edges, emphasis, and keyboard control all intact; reactor diagram fully opaque immediately with no entry animation. `prefers-reduced-data: reduce` also gives 0 dots. Note: `test.use({ reducedMotion })` is **silently ignored** in this Playwright version (verified by reading `matchMedia` back), so the spec emulates per test before hydration.
+3. **Names/descriptions/state/reading order — 2 defects fixed.** Project card names ran **30–40 words** and duplicated what the live region announces → now `aria-label="<Kind>: <label>"` (label in name, WCAG 2.5.3), with the summary left in the subtree and announced once. Reactor stepper names read **`"01Problem"`** because the visual gap came from `gap-2`, which doesn't survive name computation → explicit `{" "}`. Selected state, both labelled regions, and reading order (capability → evidence → status) verified.
+4. **No JavaScript — 1 defect fixed, the serious one.** SSR emitted **13 `<button>`s, 12 of them `tabindex="-1"`**: unreachable by keyboard and inert with scripts off, with 0 edges. Pre-hydration now renders static list items, and project nodes become **real links** to the pages they describe (5/5 HTTP 200), so the fallback navigates somewhere true instead of swallowing a click. Same rule as the reactor stepper: the enhancement owns the controls, the server render owns the content.
+5. **Dark/light + 200% zoom — 1 pre-existing site-wide defect fixed.** The theme store wrote the **default accent as an inline style on `<html>`**, and an inline style outranks `:root` and `.dark`, so light mode kept the dark palette's brand (`122 140 111` instead of `93 107 84`) and its weaker contrast while every other token correctly resolved to the light palette. The default accent is now treated as "not an override", so each theme keeps its own palette; a genuinely custom accent still overrides. 200% zoom (640×400) and 400% reflow (320×640) hold with **0 horizontal overflow**, all 13 cards, both zones, the status region, and the full reactor stepper/panel/list.
+
 ### Q4.3 — Integration polish
 
 Microtasks:

@@ -279,3 +279,17 @@ describe("CaseStudyReactor", () => {
     expect(container).toBeEmptyDOMElement();
   });
 });
+
+describe("CaseStudyReactor accessible names (Q4.2)", () => {
+  it("keeps a word boundary between the ordinal and the stage label", () => {
+    // The visual gap comes from `gap-2`, which name computation does not see:
+    // without an explicit space the name reads "01Problem".
+    const html = renderToStaticMarkup(<CaseStudyReactor stages={STAGES} />);
+    expect(html).not.toContain("01Problem");
+    const { container } = render(<CaseStudyReactor stages={STAGES} />);
+    const labels = [...container.querySelectorAll("[data-reactor-step]")].map(
+      (el) => el.textContent,
+    );
+    expect(labels).toEqual(["01 Problem", "02 Data", "03 Impact"]);
+  });
+});

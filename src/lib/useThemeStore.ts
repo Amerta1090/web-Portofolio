@@ -63,8 +63,18 @@ function applyCSSVariables(config: ThemeConfig) {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
 
-  root.style.setProperty("--color-brand", config.accentColor);
-  root.style.setProperty("--color-brand-rgb", hexToRgb(config.accentColor));
+  // The default accent is the theme's own value, not a user override. Pinning it
+  // as an inline style beats `:root` and `.dark`, which left light mode stuck on
+  // the dark palette's brand (and its lower-contrast accent) the moment this
+  // store rehydrated. Only a genuinely different accent overrides, and then it
+  // applies in both themes on purpose.
+  if (config.accentColor.toLowerCase() === DEFAULT_CONFIG.accentColor.toLowerCase()) {
+    root.style.removeProperty("--color-brand");
+    root.style.removeProperty("--color-brand-rgb");
+  } else {
+    root.style.setProperty("--color-brand", config.accentColor);
+    root.style.setProperty("--color-brand-rgb", hexToRgb(config.accentColor));
+  }
 
   if (config.density === "compact") {
     root.style.setProperty("--section-padding-y", "3rem");
