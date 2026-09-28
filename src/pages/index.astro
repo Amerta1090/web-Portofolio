@@ -7,8 +7,8 @@ import Contact from "../components/organisms/Contact.astro";
 import Experience from "../components/organisms/Experience.astro";
 import GitHubUniverse from "../components/organisms/GitHubUniverse.astro";
 import Honors from "../components/organisms/Honors.astro";
-import Volunteering from "../components/organisms/Volunteering.astro";
 import SignalLoom from "../components/organisms/SignalLoom.astro";
+import Volunteering from "../components/organisms/Volunteering.astro";
 import CreativeLabTeaser from "../islands/CreativeLabTeaser";
 import JourneyTimeline from "../islands/JourneyTimeline";
 import PageTailOverlays from "../islands/PageTailOverlays";
@@ -41,6 +41,28 @@ const honors = getHonors();
 const volunteerings = getVolunteering();
 const testimonials = getTestimonials();
 const gitHubData = await fetchAllGitHubData();
+
+/**
+ * Section ids in document order, owned here because the page owns the markup.
+ * Mirrors the section order below and skips the conditional ones that did not
+ * render, so the page-tail position readout counts what is actually on screen.
+ */
+const sectionIds = [
+  "hero",
+  "about",
+  "systems-in-motion",
+  "experience",
+  "journey",
+  "projects",
+  "creative-lab",
+  "skills",
+  ...(certifications.length > 0 ? ["certifications"] : []),
+  ...(honors.length > 0 ? ["honors"] : []),
+  ...(volunteerings.length > 0 ? ["volunteering"] : []),
+  "github",
+  ...(testimonials.length > 0 ? ["testimonials"] : []),
+  "contact",
+];
 ---
 
 <BaseLayout ogSlug="index">
@@ -131,5 +153,5 @@ const gitHubData = await fetchAllGitHubData();
     <Contact profile={profile} />
   </Section>
 
-  <PageTailOverlays client:load />
+  <PageTailOverlays client:load sectionIds={sectionIds} />
 </BaseLayout>

@@ -1,37 +1,43 @@
 import { useSectionInView } from "../lib/useSectionInView";
 
-const SECTION_IDS = [
-  "about",
-  "experience",
-  "journey",
-  "projects",
-  "creative-lab",
-  "skills",
-  "certifications",
-  "honors",
-  "volunteering",
-  "github",
-  "contact",
-];
+interface SectionCounterProps {
+  /**
+   * Section ids in document order, supplied by the page. Required rather than
+   * defaulted: a default list is a second source of truth that silently
+   * disagrees with the markup the page actually rendered.
+   */
+  sectionIds: string[];
+}
 
-export default function SectionCounter() {
-  const { currentIndex, currentId, sectionCount } = useSectionInView(SECTION_IDS);
-  const current = currentIndex + 1;
+/**
+ * Passive "where am I" readout. Not a navigation: `pointer-events-none` here and
+ * in the markup, so the header nav stays the single interactive nav. Marked
+ * `aria-hidden` because the site already exposes the same information properly
+ * (header anchor links + `<section>` landmarks) — naming each dot would only
+ * duplicate the section headings, and `aria-label` is prohibited on the
+ * `role=generic` divs these dots are.
+ */
+export default function SectionCounter({ sectionIds }: SectionCounterProps) {
+  const { currentIndex, sectionCount } = useSectionInView(sectionIds);
 
   return (
-    <div className="fixed right-4 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-center gap-3 pointer-events-none select-none">
+    <div
+      data-section-counter
+      aria-hidden="true"
+      className="fixed right-4 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-center gap-3 pointer-events-none select-none"
+    >
       <span className="text-xs font-medium text-brand tabular-nums">
-        {String(current).padStart(2, "0")}
+        {String(currentIndex + 1).padStart(2, "0")}
         <span className="text-text-secondary"> / {String(sectionCount).padStart(2, "0")}</span>
       </span>
       <div className="flex flex-col gap-1.5">
-        {SECTION_IDS.map((id) => (
+        {sectionIds.map((id, index) => (
           <div
             key={id}
+            data-section-dot
             className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-              SECTION_IDS.indexOf(id) < current ? "bg-brand" : "bg-bg-tertiary"
+              index <= currentIndex ? "bg-brand" : "bg-bg-tertiary"
             }`}
-            aria-label={currentId === id ? `Current section: ${id}` : id}
           />
         ))}
       </div>

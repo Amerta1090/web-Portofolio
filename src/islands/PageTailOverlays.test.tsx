@@ -9,29 +9,38 @@ vi.mock("motion/react", async (importOriginal) => {
   return { ...actual, useReducedMotion: () => false };
 });
 
-describe("PageTailOverlays (composite: MorphingNavigation + EasterEgg + SectionCounter + CreativeLabPill)", () => {
-  it("renders the morphing navigation in dots phase (7 section dots) at scroll 0", () => {
-    const { container } = render(<PageTailOverlays />);
-    const nav = container.querySelector("nav");
-    expect(nav).not.toBeNull();
-    // At scroll 0 the nav shows dot indicators only (text phase needs real scroll).
-    expect(nav?.querySelectorAll(".w-2.h-2").length).toBe(7);
+const sectionIds = ["hero", "about", "experience", "contact"];
+
+describe("PageTailOverlays (composite: EasterEgg + SectionCounter + CreativeLabPill)", () => {
+  it("mounts without throwing (EasterEgg renders null, pill naik tanpa error)", () => {
+    expect(() => render(<PageTailOverlays sectionIds={sectionIds} />)).not.toThrow();
   });
 
-  it("mounts without throwing (EasterEgg renders null, pill naik tanpa error)", () => {
-    expect(() => render(<PageTailOverlays />)).not.toThrow();
+  it("renders no second nav — the page keeps exactly one primary navigation", () => {
+    const { container } = render(<PageTailOverlays sectionIds={sectionIds} />);
+    // The morphing dots/text/hamburger nav is gone from the markup, not hidden.
+    expect(container.querySelector("nav")).toBeNull();
+  });
+
+  it("renders the position readout for the ids the page declares", () => {
+    const { container } = render(<PageTailOverlays sectionIds={sectionIds} />);
+    const counter = container.querySelector("[data-section-counter]");
+    expect(counter).not.toBeNull();
+    // One dot per declared section, and a matching total in the readout.
+    expect(counter?.querySelectorAll("[data-section-dot]")).toHaveLength(sectionIds.length);
+    expect(counter?.textContent).toContain(`01 / ${String(sectionIds.length).padStart(2, "0")}`);
+  });
+
+  it("keeps the readout out of the accessibility tree (it duplicates section landmarks)", () => {
+    const { container } = render(<PageTailOverlays sectionIds={sectionIds} />);
+    const counter = container.querySelector("[data-section-counter]");
+    expect(counter?.getAttribute("aria-hidden")).toBe("true");
+    // The old markup put aria-label on role-less dots, which ARIA 1.2 prohibits.
+    expect(counter?.querySelectorAll("[aria-label]")).toHaveLength(0);
   });
 
   it("renders creative-lab pill linking to /gallery on non-gallery paths", () => {
-    const { container } = render(<PageTailOverlays />);
+    const { container } = render(<PageTailOverlays sectionIds={sectionIds} />);
     expect(container.querySelector("a[href='/gallery']")).not.toBeNull();
-  });
-
-  it("renders section progress markers (aria-labeled by section id)", () => {
-    const { container } = render(<PageTailOverlays />);
-    const markers = container.querySelectorAll(
-      '[aria-label^="Current section"], [aria-label="about"], [aria-label="contact"]',
-    );
-    expect(markers.length).toBeGreaterThan(0);
   });
 });
