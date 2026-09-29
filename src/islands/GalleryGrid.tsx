@@ -292,7 +292,7 @@ const experiments: Experiment[] = [
     description:
       "A 2-6-1 MLP learning XOR, circle, and spiral live — activation particles flow along weights each forward pass.",
     longDescription:
-      "Watch a 2-6-1 neural network learn XOR, circle, and spiral classification in real-time. Activation particles flow along weighted connections during each forward pass, the loss curve drops as gradient descent优化, and a decision boundary evolves in the scatter plot below.",
+      "Watch a 2-6-1 neural network learn XOR, circle, and spiral classification in real-time. Activation particles flow along weighted connections during each forward pass, the loss curve drops as gradient descent optimizes it, and a decision boundary evolves in the scatter plot below.",
     tags: ["Neural Network", "Machine Learning", "Backprop", "Visualization"],
     icon: <CircuitBoard className="w-5 h-5" />,
     gradient: "from-purple-500 to-cyan-500",

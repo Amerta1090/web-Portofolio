@@ -294,7 +294,7 @@ test.describe("F5.1 — touch input", () => {
     // read once at mount with no `hashchange` listener, so it cannot change the
     // selection later at all. So this test pins the observable outcome rather than
     // a hypothetical leak, and the mutation experiment is recorded in
-    // docs/creative-ui-animation-TASKS.md.
+    // docs/archive/creative-ui-animation-TASKS.md.
   });
 
   test("Signal Loom controls are large enough to hit with a finger", async ({ page }) => {

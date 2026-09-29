@@ -2,7 +2,7 @@
 
 > Status: PLANNING COMPLETE (2026-09-25).
 > Scope: curated new portfolio experiences inspired by 21st.dev patterns and Anime.js capabilities.
-> Implementation plan: `docs/SPRINT-PLAN-CREATIVE-UI-ANIMATION.md`.
+> Implementation plan: `docs/archive/SPRINT-PLAN-CREATIVE-UI-ANIMATION.md`.
 
 ## Overview
 
@@ -290,5 +290,5 @@ Checked against evidence in F5.1 (2026-09-28). Each line names where the evidenc
 
 - [x] Research, decisions, rejected ideas, and measured tradeoffs remain documented. — Anime.js rejected after a spike (C0.3), scroll-driven progress rejected (L3.2), 21st.dev adopted as pattern reference only, MorphingNavigation deleted rather than hidden (Q4.3), and the zod-to-client leak plus the read/write split measured in Q4.1.
 - [x] Every selected feature has an implementation status and a recorded blocker or deviation when applicable. — Deviations are recorded in this PRD and in the task log; the one standing blocker is the pre-existing `check-budget` red (DEV-1), which sums every chunk in `dist` across routes that no single page reaches and is superseded as a gate by the per-route metric.
-- [x] `docs/SPRINT-PLAN-CREATIVE-UI-ANIMATION.md`, this PRD, `prompt.txt`, and the sprint log are synchronized. — Done in F5.2 (2026-09-28): plan status → implementation complete; this DoD re-read against evidence with a re-verifiable reference on every line; `prompt.txt` line 1 advanced to "sprint complete" carrying the F5.1 findings forward; `AGENTS.md` Sprint State + sprint log updated.
+- [x] `docs/archive/SPRINT-PLAN-CREATIVE-UI-ANIMATION.md`, this PRD, `prompt.txt`, and the sprint log are synchronized. — Done in F5.2 (2026-09-28): plan status → implementation complete; this DoD re-read against evidence with a re-verifiable reference on every line; `prompt.txt` line 1 advanced to "sprint complete" carrying the F5.1 findings forward; `AGENTS.md` Sprint State + sprint log updated.
 

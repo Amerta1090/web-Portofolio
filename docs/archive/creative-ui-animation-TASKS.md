@@ -1,7 +1,7 @@
 # Creative UI & Animation — Task Log
 
-> Spec: `docs/PRD-CREATIVE-UI-ANIMATION.md`.
-> Plan: `docs/SPRINT-PLAN-CREATIVE-UI-ANIMATION.md`.
+> Spec: `docs/archive/PRD-CREATIVE-UI-ANIMATION.md`.
+> Plan: `docs/archive/SPRINT-PLAN-CREATIVE-UI-ANIMATION.md`.
 > Status: Phase 0 + Sprint 1 + Sprint 2 (L2.1–L2.3) + Sprint 3 (L3.1–L3.3) + Sprint 4 (Q4.1–Q4.3) COMPLETE; Phase Final (F5.1 full validation, F5.2 documentation sync) next.
 > Rule: the first unchecked task is the only active task. Record evidence and deviations below each task.
 
@@ -94,9 +94,9 @@
   - **Coverage yang ditambahkan F5.1**: `e2e/pointer-touch.spec.ts` (baru, **9 test**) — dua baris DoD ("selection works with pointer, touch, keyboard, deep link" / "stage selection works with buttons, keyboard, touch, deep links") **tidak punya bukti apa pun untuk pointer & touch**: grep `hasTouch` / `pointerType` / `tap(` di seluruh suite = 0 match, dan Signal Loom tak pernah dikendalikan klik/hover (hanya `focus()` + panah). Sekarang: klik mouse menyeleksi, hover menandai tanpa menyeleksi, tap sentuh asli menyeleksi, tap tak meninggalkan bayangan, target ≥ 24px (WCAG 2.2 SC 2.5.8) untuk 13 kartu + 5 step, dan tap tak menggeser halaman (koordinat ruang-dokumen, bukan `window.scrollY`).
   - **Verifikasi DoD**: seluruh baris DoD PRD dibaca ulang **terhadap bukti, bukan niat** dan diberi rujukan bukti; `docs` disinkronkan ditandai sebagai F5.2. Prinsip: **baris DoD yang di-tick harus bisa diverifikasi ulang pembacanya** — tiga baris di atas sengaja tidak ditandai lengkap karena tidak punya bukti saat ditemukan.
 - [x] **F5.2 Documentation sync** — ✅ 2026-09-28. Sprint Creative UI & Animation **SELESAI**; seluruh task checklist `- [x]`.
-  - **`docs/PRD-CREATIVE-UI-ANIMATION.md`**: setiap baris DoD diberi rujukan bukti yang bisa diverifikasi ulang pembacanya (bukan sekadar centang); baris DoD Reactor diisi total e2e (**246/246, 5.0 mnt, `--workers=1`**); baris terakhir (sinkronisasi docs) ditutup. Seksi "Final audit result (F5.1)" memuat tiga temuan: pointer/touch belum pernah diuji, asersi scroll-y yang salah oleh harness, dan kegagalan senyap `fetch-data.mjs`.
+  - **`docs/archive/PRD-CREATIVE-UI-ANIMATION.md`**: setiap baris DoD diberi rujukan bukti yang bisa diverifikasi ulang pembacanya (bukan sekadar centang); baris DoD Reactor diisi total e2e (**246/246, 5.0 mnt, `--workers=1`**); baris terakhir (sinkronisasi docs) ditutup. Seksi "Final audit result (F5.1)" memuat tiga temuan: pointer/touch belum pernah diuji, asersi scroll-y yang salah oleh harness, dan kegagalan senyap `fetch-data.mjs`.
   - **`docs/motion-score-baseline.md`**: §12 F5.1 ditambahkan (angka MotionScore, listener count, payload per-route, dan catatan bahwa skor home **bukan gate** beserta alasannya).
-  - **`docs/SPRINT-PLAN-CREATIVE-UI-ANIMATION.md`**: status Phase Final → implementasi selesai.
+  - **`docs/archive/SPRINT-PLAN-CREATIVE-UI-ANIMATION.md`**: status Phase Final → implementasi selesai.
   - **`prompt.txt`** baris 1: di-carry-forward dari "Sprint 4 selesai, F5.1/F5.2 berikutnya" → **"Sprint Creative UI & Animation SELESAI"**, lengkap dengan ringkasan hasil F5.1, seluruh temuan/lesson yang harus diingat sesi berikutnya, dan kandidat fase berikutnya (belum diputuskan — perlu usulan ke user).
   - **`AGENTS.md`**: Sprint State + baris ringkasan sprint; section sprint diubah ke `✅ COMPLETE`; entri log **Phase Final F5.1** (7 sub-bullet: defect produk + 3 defect test + eksperimen mutasi + coverage) dan **F5.2**, plus blok **Pelajaran F5.1** (7 poin).
   - **Catatan proses**: entri ini pertama kali ditulis lewat shell heredoc dan korup (fragmen CJK + baris terpotong) — diperbaiki dengan memindai setiap karakter non-ASCII per baris, lalu menyisipkan ulang blok lewat berkas sementara. Pelajaran tambahan: **verifikasi konten berkarakter panjang secara mekanis (pindai per baris), jangan hanya membaca ulang** — mata manusia bisa saja melewatkan karakter asing yang tertanam di tengah kalimat yang secara tata bahasa masih terbaca.
