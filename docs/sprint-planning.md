@@ -1,0 +1,630 @@
+# Sprint Plan — "Prove It": Portofolio yang Terasa Sistem, Bukan Dekorasi
+
+> **Status**: SIAP DIJALANKAN — implementasi belum dimulai
+> **Tanggal**: 2026-09-29
+> **PRD**: `docs/prd.md` (otoritatif untuk tujuan/batasan/AC)
+> **Eksekutor**: `prompt.txt` baris 1 (state) + STANDING RULES
+> **Preseden**: `docs/archive/SPRINT-PLAN-CREATIVE-UI-ANIMATION.md` (sprint sebelumnya, selesai)
+
+---
+
+## 0. Cara Pakai Dokumen Ini
+
+1. Baca `docs/prd.md` §4 (Objective), §5 (Non-Goals), §6 (Prinsip), §12 (AC Global).
+2. Ambil **sprint pertama yang punya microtask `- [ ]` pertama**.
+3. Kerjakan **satu microtask** → verifikasi → centang → lanjut. Janganengerjakan 2 microtask tanpa verifikasi di antaranya.
+4. Stop di **checkpoint** (akhir tiap sprint) → update tabel progres §7 → update `prompt.txt` baris 1.
+5. Kalau implementasi menunjukkan solusi lebih baik, **ubah plan ini dan catat alasannya** — plan ini bukan doktrin.
+
+### 0.1 Status Legenda
+
+| Penanda | Arti |
+|---|---|
+| `- [ ]` | Belum dikerjakan |
+| `- [x]` | Selesai **dan** terverifikasi (bukti ada di log sprint) |
+| `- [!]` | **BLOCKER** — hentikan sprint, laporkan ke user |
+| `→ B` | Pindah ke branch/merge/PR |
+
+### 0.2 Aturan yang Tidak Boleh Dilanggar (dari PRD §6)
+
+| | Prinsip | Dampak pelanggaran |
+|---|---|---|
+| P1 | Interaksi harus menjawab pertanyaan rekruiter |=dekorasi → **ditolak** |
+| P2 | Data dulu, motion kedua | tak ada sumber data → tak ada interaksi |
+| P3 | Boleh upgrade, jangan ganti | island baru = listener baru |
+| P4 | Deterministik untuk output dibaca manusia | angka palsu = teulang C2 |
+| P5 | Fallback harus berguna, bukan pasif | dead control = teulang Q4.2 D2 |
+| P6 | Bukti > klaim | angka basi = ulang C3 |
+| P7 | Nol biaya default | 0 listener/RAF/root baru tanpa catatan |
+| P8 | Satu = satu sumber (`SiteFacts`) | data drift = ulang C3 |
+
+### 0.3 Baseline Gates (jalankan **sebelum** Sprint 0, catat angkanya)
+
+| Gate | Perintah | Baseline 2026-09-29 |
+|---|---|---|
+| Unit | `bun run test` | **875/875** (75 file) |
+| Build | `bun run build` | **49 halaman** |
+| Type | `bunx astro check` | **103** error (pre-existing) |
+| Lint | `bun run lint` | **681** |
+| Data | `bun run validate-data` | OK |
+| Payload | `bun run measure:routes` | `/` 203.1 / 564.3 KB · `/work/…` 151.8 / 394.2 · `/gallery` 181.0 / 506.2 |
+| Runtime | `bun run measure:runtime` | `/` scroll listener **16** (Q4.1) |
+| e2e | `bunx playwright test --workers=1` | **245 test / 22 spec** |
+
+> **Aturan diff**: untuk `astro check` / `lint`, yang dibandingkan adalah **daftar** error (sorted + diff), bukan jumlahnya saja — nomor baris bergeser saat file tumbuh (pelajaran L3.1 #6). Jalankan `astro check 2>&1 | sed 's/\x1b\[[0-9;]*m//g' | sort` sebelum & sesudah.
+
+### 0.4 Dependency Graph
+
+```
+Sprint 0 (Truth)  ──┬─→ Sprint 1 (Career Spine)  ──┐
+   [BLOCKING]       │                                ├─→ Sprint 4 (Craft) ─→ Sprint 5 (Final)
+                    └─→ Sprint 2 (Evidence)  ───────┤
+                             └─→ Sprint 3 (Capability Map) ┘
+```
+
+- **Sprint 0 memblokir semuanya.** SiteFacts adalah sumber angka untuk Sprint 1, 2, 3.
+- Sprint 1, 2, 3 **saling independen** setelah Sprint 0 (cuma berbagi SiteFacts). Kalau Sprint 1 molor, 2 & 3 tetap valuable.
+- Sprint 4 memakai hasil 1–3 (BorderGlow applied ke kartu, spotlight ke kartu proyek, dsb).
+- Sprint 5 = validasi + arsip. Tidak menambah fitur.
+
+---
+
+## SPRINT 0 — Truth & Integrity ✅ WAJIB DULUAN
+
+**Objective**: Hapus seluruh klaim yang tak bisa ditelusuri, dan buat mustahil terjadi lagi.
+**Depends on**: —
+**Why first**: PRD §1 — motion-nya sudah bagus; kredibilitasnya yang rusak. Menambah interaksi di atas angka palsu = membangun di atas tanah yang rapuh.
+**Expected files** (baru): `src/lib/facts.ts`, `src/lib/facts.test.ts`, `scripts/validate-facts.mjs` (atau integrasi `validate-data`)
+**Expected files** (diubah): `data/testimonials.json` (dihapus), `data/profile.json`, `src/lib/ml-metrics.ts`, `src/pages/projects/[slug].astro`, `src/lib/useGSAP.ts`, `scripts/fetch-data.mjs`, `src/pages/index.astro`, `package.json`
+
+### Task 0.1 — `SiteFacts`: satu sumber angka
+
+- [ ] **M0.1.1** Baca `src/lib/data.ts` (`getTimeline`, dll) + `src/lib/observatory/index.ts` untuk memastikan tidak menduplikasi logika yang sudah pure.
+- [ ] **M0.1.2** Tulis tipe `SiteFacts` (PRD §10) di `src/lib/facts.ts`. Field: `projects{count,featured,withMedia,withAssociation,byCategory}`, `certifications{count,byIssuer}`, `timeline{count,byKind}`, `lab{count,byCategory}`, `github{repos,stars,forks,contributions,longestStreak,mostActiveDay,busiestMonth}`, `profile{yearsExperience,languages}`.
+- [ ] **M0.1.3** Implementasikan `buildSiteFacts(): SiteFacts` — **pure**, deterministik, tanpa `Date.now()`/`Math.random()`, **tanpa fetch baru** (hanya `data/*.json` + `getCachedGitHubData()`).
+- [ ] **M0.1.4** Toleransi FieldOps: `buildSiteFacts` HARUS tahan terhadap data GitHub yang kosong/degenerat (mengembalikan `null`, bukan `NaN`/`0` yang menyesatkan) — karena `.cache` bisa tidak ada di build `build:fast`.
+- [ ] **M0.1.5** Helper presentasi `formatCount()` (digit grouping) + pemformat Bahasa Indonesia.
+- [ ] **M0.1.6** Unit test: setiap field terkunci terhadap fixture nyata (22 proyek, 62 sertifikasi, 7 penerbit, 7 pengalaman, 15 sertifikasi bertanggal, 3 honors, 1 volunteering, 27 lab).
+- [ ] **M0.1.7** Unit test: `buildSiteFacts()` dua kali berturut-turut → hasil identik (determinisme).
+
+**Verify**: `bun run test src/lib/facts.test.ts` hijau; `grep -rn "Math.random\|Date.now" src/lib/facts.ts` = 0.
+
+### Task 0.2 — Validasi build-time yang GAGAL KERAS
+
+- [ ] **M0.2.1** Cek `scripts/validate-data.mjs` (atau `bun run validate-data`) — Understand exit code & cara melapor.
+- [ ] **M0.2.2** Tambahkan assert: `profile.json` **tidak boleh** punya `metrics.projects_shipped` / `metrics.certifications` (field dihapus di T0.6). Kalau masih ada → **gagal**, jangan diam-diam.
+- [ ] **M0.2.3** Tambahkan assert: `data/testimonials.json` **harus tidak ada atau array kosong**. Kalau terisi → gagal.
+- [ ] **M0.2.4** Tambahkan assert: `src/lib/ml-metrics.ts` **tidak boleh** mengandung `Math.random` (grep gate,Pattern sama seperti gate hex/framer-motion yang sudah ada).
+- [ ] **M0.2.5** Tambahkan assert: hitungan nyata `projects.json`/`certifications.json` harus cocok dengan yang dipakai `buildSiteFacts()`.
+- [ ] **M0.2.6** Uji negatif: temporarily kembalikan `18` ke `profile.json` → validator **HARUS gagal** → pulihkan. (Bukti tes punya gigi — pelajaran F5.1 #3.)
+- [ ] **M0.2.7** Hook ke `package.json` script yang sudah ada + dokumentasikan di AGENTS.md.
+
+**Verify**: validator hijau pada state final; **uji negatif lulus** (M0.2.6); tidak ada angka yang bisa basi tanpa build-time failure.
+
+### Task 0.3 — Hapus testimonial fiktif
+
+- [ ] **M0.3.1** Audit **seluruh** konsumen: `rg -rn 'testimonial' src data e2e` — termasuk `TestimonialCarousel.tsx`, `data/faq.json`, `buildFaqLd()`, `buildIndex.ts` (command palette), `og/[...route].ts`, sitemap.
+- [ ] **M0.3.2** Hapus `data/testimonials.json`.
+- [ ] **M0.3.3** Hapus section `#testimonials` dari `src/pages/index.astro` **dan** `sectionIds` (→ 13 section).
+- [ ] **M0.3.4** Hapus `TestimonialCarousel.tsx` + unit test-nya; lepas dari semua mount.
+- [ ] **M0.3.5** Bersihkan `data/faq.json` (intent + jawaban yang menyebut testimonial/social proof) dan `buildIndex.ts` bila ia mengindeks testimonials.
+- [ ] **M0.3.6** Cek JSON-LD: `rg -n 'Trump|Prabowo|Jokowi' src data dist` = **0** (termasuk `buildFaqLd`).
+- [ ] **M0.3.7** `dist/` rebuild → `rg -c 'testimonial' dist` = 0.
+
+**Verify**: `bun run build` sukses; grep 0 match di `src`/`data`/`dist`; tidak ada consumer tersisa.
+
+### Task 0.4 — Hapus metrik ML sintetis
+
+- [ ] **M0.4.1** Baca `src/lib/ml-metrics.ts` penuh; petakan semua yang di-generate (`Math.random()`, bobot graph hardcoded, confusion matrix) vs yang berasal data.
+- [ ] **M0.4.2** Keputusan: **hapus** blok "ML Metrics" dari `src/pages/projects/[slug].astro` bila tak ada sumber nyata. **Jangan** menggantinya dengan angka baru yang juga sintetis.
+- [ ] **M0.4.3** Hapus `getMLMetrics` / dependensinya dari jalur render. (Catatan pelajaran B-3: 7 key `getMLMetrics` short-slug pernah tak resolve — pastikan penghapusan tidak meninggalkan import yatim di `NetworkGraph`/`LossCurve`/`ConfusionMatrix`.)
+- [ ] **M0.4.4** `rg -n 'getMLMetrics' src` → hanya tersisa di `__tests__` yang relevan, atau 0. Tentukan & catat.
+- [ ] **M0.4.5** Tambah regression test: `renderToStaticMarkup` halaman `/projects/<slug>` **tidak boleh** memuat string yang mengklaim akurasi/loss training.
+
+**Verify**: `rg -n 'Math.random' src/lib/ml-metrics.ts` = 0 (file terhapus) atau tidak ada file itu; e2e `/projects/<slug>` hijau.
+
+### Task 0.5 — Perbaiki kontrol mati
+
+- [ ] **M0.5.1** `src/pages/projects/[slug].astro:198-206` — konfirmasi ulang: `onClick` memanggil `.lightbox-overlay` yang tak pernah di-render. (Sudah terverifikasi di audit; **re-verifikasi** di sprint ini per P2.)
+- [ ] **M0.5.2** **Pilih satu** dan catat alasannya di commit: (a) implementasikan lightbox sungguhan, atau (b) **hapus** blok tombol `data-lightbox` sampai ada lightbox. Default: **(b)**, karena PRD §9.5 postpone lightbox ke Sprint 2 dan "0 dead controls" lebih penting daripada tombol.
+- [ ] **M0.5.3** Hapus `onClick` inline (inline handler =emsp yang tidak di-escape Astro & bertentangan dengan aturan repo).
+- [ ] **M0.5.4** Unit/assert: markup SSR `/projects/<slug>` tidak punya `data-lightbox` tanpa implementasi.
+
+**Verify**: grep `data-lightbox` = 0 di `dist`; tidak ada `onClick=` inline di file itu.
+
+### Task 0.6 — Hapus angka basi
+
+- [ ] **M0.6.1** Hapus `metrics.projects_shipped` dan `metrics.certifications` dari `data/profile.json` (bukan diperbarui — sumber tunggal jadi `SiteFacts`).
+- [ ] **M0.6.2** Audit semua pembaca field itu: `rg -rn 'projects_shipped|metrics.certifications' src data`.
+- [ ] **M0.6.3** Ganti setiap pemakaian dengan `SiteFacts` (atau hapus komponen yang jadi tak bermakna).
+- [ ] **M0.6.4** `data/capability-grammars.json` sudah bilang 22 — konfirmasi konsisten setelah perubahan (harus jadi **satu** sumber).
+
+**Verify**: `rg -rn 'projects_shipped' src data` = 0; semua angka di homepage traced ke `SiteFacts` (grep gate).
+
+### Task 0.7 — Perbaiki `useGSAP` global kill
+
+- [ ] **M0.7.1** Baca `src/lib/useGSAP.ts` penuh. Konfirmasi `ScrollTrigger.getAll().forEach(st => st.kill())` di cleanup (sudah terverifikasi, re-verifikasi).
+- [ ] **M0.7.2** Ganti jadi **scoped kill**: kumpulkan instance milik komponen ini saja (`gsap.context()` sudah memberi scoping; atau catat trigger yang dibuat di `onEnter`/refs).
+- [ ] **M0.7.3** Unit test yang **harus punya gigi**: mount 2 island yang sama-sama pakai ScrollTrigger → unmount salah satu → **ScrollTrigger milik yang lain masih hidup** (assert `ScrollTrigger.getAll().length` tidak turun ke 0, dan progress trigger yang tersisa masih ter-update).
+- [ ] **M0.7.4** Uji mutasi: kembalikan ke `getAll().forEach(kill)` → test HARUS gagal → pulihkan. (pelajaran F5.1 #3)
+
+**Verify**: unit hijau; mutasi test gagal seperti seharusnya.
+
+### Task 0.8 — GitHub data non-degenerate
+
+- [ ] **M0.8.1** Baca `scripts/fetch-data.mjs` bagian `fetchGraphQL` + transform `pinnedItems`. Konfirmasi 3 lapis fix F5.1 masih ada (separator koma, `throw` bila `data.errors`, transform menolak array kosong).
+- [ ] **M0.8.2** Tambah assert build-time: bila `total_repos == 0` atau `languages` kosong → **gagal keras**. (Pola: situs pernah tampak sehat sambil render 0 pinned repo karena fallback ke `top_repos` — pelajaran F5.1 #2.)
+- [ ] **M0.8.3** Pastikan `build:fast` (tanpa fetch) tetap bisa jalan → `SiteFacts.github` boleh `null`, tapi **UI harus gracefully degrade**, bukan render `NaN`/`0` yang menyesatkan. (Sudah jadi syarat M0.1.4 — verifikasi di UI.)
+
+**Verify**: `bun run build` penuh OK; `bun run build:fast` OK; UI saat GitHub kosong tidak menampilkan angka palsu.
+
+### DoD Sprint 0
+
+- [ ] Semua microtask `- [x]`.
+- [ ] `bun run test` **≥ 875** (naik, tidak turun).
+- [ ] `bun run build` (penuh) 49 halaman OK.
+- [ ] `bunx astro check` = 103, 0 baru (diff daftar, bukan jumlah).
+- [ ] `bun run lint` ≤ 681, 0 baru di file tersentuh.
+- [ ] `bun run validate-data` + validator SiteFacts hijau; **uji negatif lulus**.
+- [ ] `rg -n 'Trump|Prabowo|Jokowi' src data dist` = 0.
+- [ ] `rg -n 'Math.random' src/lib/ml-metrics.ts` = 0 (file terhapus).
+- [ ] `rg -n 'projects_shipped' src data` = 0.
+- [ ] `rg -n 'data-lightbox' dist` = 0.
+- [ ] `git diff --stat src/` = hanya file yangtho yang dimaksud.
+- [ ] **Checkpoint**: laporkan ke user, update §7 + `prompt.txt`.
+
+---
+
+## SPRINT 1 — Career Spine
+
+**Objective**: Ganti 2 section duplikat dengan **satu** narasi karier yang bisa di-scrub dan tetap terbaca tanpa JS.
+**Depends on**: Sprint 0
+**PRD ref**: §9.4, §10 (`SiteFacts.timeline`)
+**Expected files** (baru): `src/lib/creative/career-spine.ts` (pure) + test, `src/islands/CareerSpine.tsx` + test, `src/components/organisms/CareerSpine.astro` (static fallback)
+**Expected files** (dihapus): `src/components/organisms/Experience.astro`, `src/islands/JourneyTimeline.tsx` + test
+**Expected files** (diubah): `src/pages/index.astro` (`#experience` + `#journey` → `#career`; 13 → 12 section), `src/lib/constants.ts` (kalau ada anchor nav), `e2e/*.spec.ts` yang mengacu ke section lama
+
+### Task 1.1 — Kontrak data spine
+
+- [ ] **M1.1.1** Baca `getTimeline()` di `src/lib/data.ts` — petakan `TimelineItem` (7 pengalaman + 15 sertifikasi bertanggal) dan apakah `honors.json`/`volunteering.json` punya periode.
+- [ ] **M1.1.2** Tulis helper pure `src/lib/creative/career-spine.ts`:
+  - `parseCareerDate(raw): { year, month?, iso? } | null` — reusing **`parsePeriod` dari `src/lib/observatory/parsePeriod.ts`** kalau cocok (P3: jangan duplikasi parser yang sudah ada & teruji 22/22).
+  - `buildCareerEvents(): CareerEvent[]` — menggabungkan pengalaman + sertifikasi bertanggal + honors + volunteering, **diurutkan** (tie-break: `periodParsed` lalu `kind` lalu `title`).
+  - `careerEventKinds` = `['experience','certification','honor','volunteering']` (satu definisi, dipakai schema + UI + test).
+  - `groupEventsByYear` / `yearTicks` untuk spine.
+- [ ] **M1.1.3** Semua event wajib punya `kind`, `title`, `org?`, `periodParsed` — event tanpa tanggal **di-drop** (bukan_rendered tanpa posisi), dan jumlahnya dilaporkan di test.
+- [ ] **M1.1.4** Unit test: hitungan known (7 experience, 15 cert bertanggal, 3 honor, 1 volunteering = **26**, atau fewer kalau honors/volunteering tak bertanggal — **tulis angka nyata di test setelah verifikasi, jangan menebak**).
+- [ ] **M1.1.5** Unit test: urutan deterministik; 2× build identik.
+
+**Verify**: unit hijau; angka yang tertulis di test = angka di `dist` (dicek di M1.2.4).
+
+### Task 1.2 — Bentuk statis dulu (0 JS)
+
+- [ ] **M1.2.1** `CareerSpine.astro` — render **seluruh** event sebagai `<ol>` chronological, **tanpa JS**. Ini bentuk yang benar untuk mobile & no-JS; bukan fallback.
+- [ ] **M1.2.2** `<li>` per event: `data-career-kind`, ordinal mono, `<h3>` title, `<p>` org, `periodParsed` sebagai `<time datetime>` (WAJIB ada `datetime` yang valid — bukan teks bebas).
+- [ ] **M1.2.3** Grup per tahun dengan heading tahun (`<h4>` + `aria-labelledby`), supaya screen reader punya konteks.
+- [ ] **M1.2.4** `bun run build` → hitung `li[data-career-kind]` di `dist/home/index.html`; **tulis angka itu ke test unit** M1.1.4.
+- [ ] **M1.2.5** Cek overflow horizontal di 320/375/768.
+
+**Verify**: build OK; `dist` memuat N event; 0 JS untuk section ini.
+
+### Task 1.3 — Island scrub (desktop)
+
+- [ ] **M1.3.1** `CareerSpine.tsx` — **satu** island. Menggantikan 2 (`Experience` tak punya island; `JourneyTimeline` ada) → **1 React root**.
+- [ ] **M1.3.2** Stepper/kontrol **hanya render setelah hidrasi** (pola L3.2 — "0 dead controls" hanya berlaku setelah hidrasi; pra-hidrasi harus statis & berguna, P5).
+- [ ] **M1.3.3** Scroll-scrub via `ScrollTrigger` yang **sudah ada** (`src/lib/gsap.ts`) — **bukan** `onScroll` baru, **bukan** rAF manual. 0 scroll listener baru.
+- [ ] **M1.3.4** Peta event → posisi di spine **dari geometri terukur** (1 pass baca, `requestAnimationFrame` tertunda 1 frame, 1× `ResizeObserver` pada container — pelajaran Q4.1 #5 & L2.3-revII).
+- [ ] **M1.3.5** `@media (prefers-reduced-motion: reduce)` → **spine penuh tanpa scrub**, dan `@media (prefers-reduced-data: reduce)` → statis.
+- [ ] **M1.3.6** **Guard E1**: pakai `ScrollTrigger.create` yang di-ref secara lokal; **dilarang** `ScrollTrigger.getAll().forEach(kill)` di cleanup (T0.7 sudah diperbaiki — jangan balikin).
+- [ ] **M1.3.7** `useRafGuard` kalau ada rAF; kalau tak ada, **jangan tambahkan**.
+- [ ] **M1.3.8** Unit test: SSR render (tanpa stepper) → hidrasi → klik/keyboard ganti event → deep link `#career-<id>` → `reducedMotion` → spine penuh.
+- [ ] **M1.3.9** Roving tabindex + `aria-live` untuk event yang aktif (pola `roving.ts` yang sudah diekstrak di L3.2).
+
+**Verify**: unit ≥ 12 baru; `measure:runtime` `/` scroll listener **tidak naik**.
+
+### Task 1.4 — Fold honors & volunteering
+
+- [ ] **M1.4.1** Pindahkan `#honors` + `#volunteering` ke spine sebagai `kind: 'honor' | 'volunteering'` (13 → 12 section).
+- [ ] **M1.4.2** Verifikasi `honors.json`/`volunteering.json` punya periode yang bisa diparse; kalau tidak → **jangan dipaksa**, tetap di luar spine (catat alasannya).
+- [ ] **M1.4.3** Update `sectionIds` di `index.astro` (pemilik daftar = halaman, pelajaran Q4.3 #2) → SectionCounter jujur.
+
+**Verify**: `sectionIds.length` = 12; counter di DOM = `NN / 12`.
+
+### Task 1.5 — Pensiunkan yang lama
+
+- [ ] **M1.5.1** Hapus `Experience.astro` (102 baris) + `JourneyTimeline.tsx` (99 baris) + test-nya.
+- [ ] **M1.5.2** Hapus import/mount di `index.astro`; `Experience`/`Journey` tak boleh tersisa di `NAV_ITEMS`/anchor manapun.
+- [ ] **M1.5.3** `rg -n 'Experience\.astro|JourneyTimeline|#journey|#experience' src e2e` = 0.
+- [ ] **M1.5.4** Audit e2e yang mengacu section lama; **perbarui** (jangan dihapus kalau masih menguji hal yang nyata).
+- [ ] **M1.5.5** Hapus anchor `#journey` dari mana pun + tambah redirect/alias kalau ada link eksternal (cek `og/`, sitemap, RSS).
+
+**Verify**: grep 0; `dist` tak punya `id="journey"`/`id="experience"`.
+
+### Task 1.6 — Hero & nav
+
+- [ ] **M1.6.1** Hero: angka "22 projects / 62 certifications" (dari `SiteFacts`) **link** ke `#career`/`#certifications` — satisfies I6/O3.
+- [ ] **M1.6.2** `NAV_ITEMS`/`FOOTER_LINKS`: pastikan anchor `#career` ada konsisten dengan `sectionIds`.
+
+**Verify**: klik dari hero mendarat di spine; counter konsisten.
+
+### DoD Sprint 1
+
+- [ ] Semua microtask `- [x]`.
+- [ ] `bun run test` **≥ 875 + 12**.
+- [ ] `bun run build` 49 halaman; **section homepage 14 → 12** (13 setelah T0.3, lalu 12 setelah T1.4).
+- [ ] `astro check` 0 baru; `lint` 0 baru di file tersentuh.
+- [ ] `measure:routes`: `/` initial & reachable **tidak naik**; island count **turun/tetap**.
+- [ ] `measure:runtime`: scroll listener `/` **tidak naik**; 0 React root baru.
+- [ ] `dist/home/index.html`: N event, semua punya `<time datetime>` valid.
+- [ ] Probe 320/375/768/1024/1440/1920/2560: **0 overflow horizontal**.
+- [ ] Reduced motion: spine **penuh**, tanpa scrub.
+- [ ] No-JS: seluruh 26 event tetap terbaca & berurutan.
+- [ ] e2e `work`/home suite hijau `--workers=1`.
+- [ ] **Checkpoint**: laporkan, update §7 + `prompt.txt`.
+
+---
+
+## SPRINT 2 — Evidence Surface
+
+**Objective**: Buat setiap klaim di homepage **bisa ditelusuri**, dan hapus bobot visual section yang kosong.
+**Depends on**: Sprint 0 (SiteFacts). Bebas jalan paralel dengan Sprint 1.
+**PRD ref**: §9.1, §9.5, §9.6, §9.8, §9.10
+**Expected files**: `src/islands/ProjectCardGrid.tsx` (upgrade), `src/components/organisms/CreativeLabShowcase.astro` (baru, statis), `src/components/organisms/Certifications.astro` (upgrade), `src/components/organisms/Hero.astro` (upgrade), `src/lib/creative/lab-showcase.ts` (pure, optional)
+
+### Task 2.1 — Hero metrik dari `derived_metrics`
+
+- [ ] **M2.1.1** Hero: baris metrik dari `SiteFacts.github` — `contribution_count`, `longestStreak`, `mostActiveDay` + `busiestMonth`. Tanpa data → **hilangkan metrik itu**, jangan tampilkan `0`/`NaN` (P6).
+- [ ] **M2.1.2** Tiap angka = `<a>` ke section yang menjelaskannya; `aria-label` ringkas `Kind: value` (Q4.2 D3, dan **jangan** uji dengan ambang jumlah kata — lessons Q4.2 #8).
+- [ ] **M2.1.3** Render full dari SiteFacts; nol literal.
+- [ ] **M2.1.4** Reduced motion: metrik **statis** (tak ada counter). `prefers-reduced-data`: tampilkan teks, bukan animasi.
+
+**Verify**: grep literal angka di `Hero.astro` = 0; probe light/dark.
+
+### Task 2.2 — Kartu proyek berbasis bukti
+
+- [ ] **M2.2.1** Baca `ProjectCardGrid.tsx` (78 baris) + `data/projects.json` (field `title, featured, category, period, description, links, skills, image, images, media, association`).
+- [ ] **M2.2.2** Tampilkan di kartu: `skills[]` (chip), `category`, `period`, `links[]` (repo/live/demo sebagai link nyata dengan `rel`), `association` (badge) bila ada, jumlah `media` bila ada.
+- [ ] **M2.2.3** **Tentukan** peran `media` (T0.5 menghapusnya): bila harus live → postpone ke Sprint 4 dengan lightbox yang benar; bila tidak → hapus field dariconsideration dan catat. **Jangan**_render tombol mati.
+- [ ] **M2.2.4** Hover/focus: **spotlight 1-RAF** via CSS custom property — **bukan** pointer→React state→re-render (21st.dev). Nol React root/RAF baru; satu rAF batch, di-guard `useRafGuard`, berhenti saat `pointerleave`/hidden/reduced-motion.
+- [ ] **M2.2.5** `BorderGlow` (React Bits) pada kartu — 0 JS biaya (CSS `mask-composite: subtract` + 2 custom property).
+- [ ] **M2.2.6** Unit: setiap field yang dirender berasal dari data; kartu tanpa `skills`/`links` **tak crash** dan menampilkan fallback jujur.
+- [ ] **M2.2.7** Unit: pra-hidrasi tak punya kontrol mati (P5).
+
+**Verify**: unit ≥ 10 baru; `measure:runtime` `/` RAF tak naik.
+
+### Task 2.3 — Filter proyek (bukan tab)
+
+- [ ] **M2.3.1** Filter kategori dengan `aria-pressed` button di dalam `<fieldset>` + `<legend class="sr-only">` (biome `useSemanticElements` — jangan suppress; pelajaran C3 #2). **Bukan** `role="tab"` (category error untuk filter, 21st.dev).
+- [ ] **M2.3.2** State filter harus bisa di-share lewat URL (`?f=`/hash) → deep link, dan konsisten dengan `buildIndex.ts`/command palette.
+- [ ] **M2.3.3** Empty state → `<output>` (live region, preseden pelajaran C3) + tombol reset — **bukan** grid kosong.
+- [ ] **M2.3.4** Filter **tidak boleh** menggeser layout secara jarring; counts di-collapse dengan `Flip` (GSAP, sudah terpasang) atau transisi CSS sederhana.
+- [ ] **M2.3.5** Unit: filter → jumlah kartu; keyboard (Tab/Enter/Space); `aria-pressed` sinkron; reset.
+
+**Verify**: unit ≥ 6; e2e filter (pakai `waitForIslandHydration`).
+
+### Task 2.4 — Cross-link (M6a): skill chip → Capability Map
+
+- [ ] **M2.4.1** Skill chip di kartu proyek = `<a href="/#systems-in-motion#signal-<id>">` (pola deep link yang sudah ada di Signal Loom: `parseSignalHash` + fallback).
+- [ ] **M2.4.2** Pastikan ID node Capability Map **stabil** & diturunkan dari data (bukan indeks) — Sprint 3 bergantung pada ini.
+- [ ] **M2.4.3** Kalau node belum ada (skill tanpa proyek) → chip tetap link tapi ke `#systems-in-motion` tanpa seleksi, **dan** ada fallback yang jujur.
+
+**Verify**: e2e klik chip → Capability Map ter-scroll → node terpilih (akan diuji penuh di Sprint 3).
+
+### Task 2.5 — Creative Lab: 4 → 27, statis
+
+- [ ] **M2.5.1** `GALLERY_EXPERIMENTS` (27, diekspor `GalleryGrid.tsx:413`) + `EXPERIMENT_CATEGORIES` (`:685`) — pakai **angka & kategori yang sama**, jangan hitung ulang.
+- [ ] **M2.5.2** Ganti `src/lib/experiments.ts` (4 entri) dengan **contact-sheet strip** dari 27 thumbnail → deep link `/gallery#<id>`.
+- [ ] **M2.5.3** Tampilkan angka **truthfully** (dari `GALLERY_EXPERIMENTS.length`, bukan hardcode — pelajaran home-trim #3: grep angka ke `data/*.json` setiap kali jumlah berubah).
+- [ ] **M2.5.4** 6 kategori dengan `role="filter"`/`<details>` — **0 JS** (Astro statis).
+- [ ] **M2.5.5** Lazy-load thumbnail (`loading="lazy"`, `decoding="async"`) — 27 gambar baru tak boleh menaikkan payload inisial.
+- [ ] **M2.5.6** Hapus `src/lib/experiments.ts` yang lama bila tak ada consumer lain (`rg` dulu).
+
+**Verify**: `dist/home/index.html` punya 27 link; `measure:routes` `/` initial **tidak naik** (> 1 KB = gagal, thumbnail lazy).
+
+### Task 2.6 — Sertifikasi: 7 penerbit (bento)
+
+- [ ] **M2.6.1** Dari `data/certifications.json` (62 item, 7 penerbit) → `SiteFacts.certifications.byIssuer`.
+- [ ] **M2.6.2** `<details>`/`<summary>` native per penerbit (**0 JS**), dengan count di `<summary>`.
+- [ ] **M2.6.3** 15 yang bertanggal **tak boleh diduplikasi** sebagai daftar penuh — rujuk ke spine (`#career`). Tampilkan sisanya sebagai daftar ringkas di dalam bento.
+- [ ] **M2.6.4** Kontras & hierarki bento: penerbit teratas (Dicoding 23, DeepLearning.AI 19) dominan secara visual **karena angkanya**, bukan karena hardcode.
+- [ ] **M2.6.5** Verified di 320/375/768.
+
+**Verify**: jumlah di `dist` = 62; 7 group; 0 JS.
+
+### Task 2.7 — Contact: pakai `phone`
+
+- [ ] **M2.7.1** Tampilkan `profile.contact.phone` yang sekarang tak dipakai, dengan `tel:` + label aksesibel yang benar.
+- [ ] **M2.7.2** Pastikan `mailto:` tetap ada & utama (P1: jangan alihkan fokus konversi ke kanal yang lebih lemah).
+
+**Verify**: e2e contact hijau.
+
+### DoD Sprint 2
+
+- [ ] Semua microtask `- [x]`.
+- [ ] `bun run test` **≥ 875 + 30** (kumulatif Sprint 0–2).
+- [ ] `bun run build` 49 halaman.
+- [ ] `astro check` 0 baru; `lint` 0 baru di file tersentuh; `biome check` bersih di file tersentuh.
+- [ ] `validate-data` + validator SiteFacts hijau.
+- [ ] `measure:routes` `/`: initial & reachable **tidak naik**; island count tak naik.
+- [ ] `measure:runtime` `/`: 0 scroll listener / 0 RAF / 0 React root **baru** yang tak tercatat.
+- [ ] 27 link lab di `dist`; 7 issuer group; `N` Projects chips; semua angka dari `SiteFacts`.
+- [ ] Probe 320–2560: 0 overflow.
+- [ ] e2e `--workers=1` hijau (contact, craft, typography, mobile-nav, gallery subset).
+- [ ] **Checkpoint**: laporkan, update §7 + `prompt.txt`.
+
+---
+
+## SPRINT 3 — Capability Map (Signal Loom rebuild)
+
+**Objective**: Ubah dekorasi 8-edge/13-node (5 node terisolasi, 38%; **5 dari 8 kategori kemampuan berdegree 0**) menjadi peta kemampuan **padat**, di mana tiap node punya bukti.
+**Depends on**: Sprint 0 (SiteFacts) + Task 2.4 (ID stabil).
+**PRD ref**: §9.3, I1, R3
+**Verified baseline (2026-09-29, menjalankan `buildSignalLoomGraph` terhadap `data/*.json` nyata)**: 13 node (8 kapabilitas + 5 proyek) · 8 edge · **5 node terisolasi (38%)** · kategori berdegree 0 = `data-science-analytics`, `iot-embedded-systems`, `devops-mlops`, `cloud-infrastructure`, `productivity-automation` · `buildSignalLoomGraph` memfilter ke `featured` **di dalam builder** (mengoper 22 proyek memberi hasil identik).
+**Expected files**: `src/lib/creative/signal-loom.ts` (rewrite) + test, `src/islands/SignalLoom.tsx` (rewrite) + test, `src/components/organisms/SignalLoom.astro` (shell/fallback)
+
+### Task 3.1 — Kontrak graf baru
+
+- [ ] **M3.1.1** Sumber: kategori dari `data/skills.json` (`.categories`) + 22 proyek dari `data/projects.json`.
+- [ ] **M3.1.2** Fungsi bobot: normalisasi nama skill (pakai lagi normalizer yang sudah ada di `signal-loom.ts` L2.3 — **jangan buat ulang**), lalu **edge = `project.skills[] ∩ category.skills[]`**, bobot = jumlah overlap.
+- [ ] **M3.1.3** **Normalisasi skill** yang sama juga dipakai Task 2.4 (chip) — satu fungsi, dua pemakai (P8).
+- [ ] **M3.1.4** Determinisme total: urutan node/edge stabil, tanpa `Math.random()`.
+- [ ] **M3.1.5** Unit test dengan **angka nyata**: hitung dulu, tulis angkanya ke test. **Target: ≥ 60 edge dan 0 node terisolasi.** Kalau target tak tercapai, **laporkan & koreksi plan** (R3) — jangan kirim graf spars dengan narasi bagus.
+
+**Verify**: unit hijau; angka tertulis = angka di `dist`.
+
+### Task 3.2 — Island rebuild
+
+- [ ] **M3.2.1** Pertahankan geometri **edge terukur dari tepi kartu** (`getBoundingClientRect`, 1 pass baca, `rAF` tertunda 1 frame, 1× RO) — pelajaran L2.3-revII + Q4.1 #5. **Bukan** node-point abstrak (sudah dihapus sekali, jangan dikembalikan).
+- [ ] **M3.2.2** Edge **solid** (bukan dash-draw) — pelajaran L2.3 rev #1: dash-draw membuat garis tampak putus.
+- [ ] **M3.2.3** Bobot edge → ketebalan (`strokeWidth`) yang terukur, bukan estetika.
+- [ ] **M3.2.4** 0 node terisolasi = **hapus `data-connected`** yang sekarang menandai 4 dari 14 (karteks itu jadi tak jujur).
+- [ ] **M3.2.5** Skala: `hidden md:block` untuk SVG, stacked list di mobile (pola teruji L2.3-revII).
+- [ ] **M3.2.6** GSAP dot travel **bounded** yang sudah ada (cap 3, loops 2, 0.7s) — pertahankan, jangan tambah; `useRafGuard` tetap.
+
+**Verify**: probe Playwright — semua edge ter-anchor ke tepi kartu, 0 midpoint di dalam kartu, 0 dashed, 0 overlap.
+
+### Task 3.3 — Detail proyek di node
+
+- [ ] **M3.3.1** Klik/pilih node proyek → tampilkan `links`, `association`, `media` (kalau T2.2 tegaskannya), `skills`.
+- [ ] **M3.3.2** Pra-hidrasi: node proyek = **`<a href>` sungguhan** ke `/projects/<slug>` (Q4.2 D2 — kontrak data sudah punya `href` sejak L1.1, jangan biarkan tak terpakai). Capability node = `<div>` (tanpa `aria-label`, prohibited pada `role=generic` — Q4.2 #7).
+- [ ] **M3.3.3** Nama aksesibel **sama persis** sebelum & sesudah hidrasi: `` `Kind: ${title}` ``; `summary` tetap di subtree (Q4.2 D3 + #7).
+- [ ] **M3.3.4** Roving tabindex (`roving.ts` yang sudah diekstrak) + `aria-pressed`/`aria-current`; keyboard `Arrow/Home/End`; focus ikut.
+- [ ] **M3.3.5** Touch: `tap` menyeleksi & **tak menggeser halaman** (pola `pointer-touch.spec.ts`).
+- [ ] **M3.3.6** `useReducedMotion()` → 0 dots; `prefers-reduced-data` → statis.
+
+**Verify**: unit ≥ 15 baru; e2e pointer/touch (positive control, lessons F5.1 #3).
+
+### Task 3.4 — Deep-link masuk (M6b)
+
+- [ ] **M3.4.1** Dari `#skills` (Capability Stack) → Capability Map dengan node terpilih.
+- [ ] **M3.4.2** Dari chip skill di kartu proyek (Task 2.4) → Capability Map dengan node terpilih.
+- [ ] **M3.4.3** Dari Capability Map → `/projects/<slug>` dan balik lagi; scroll position & state pulih.
+- [ ] **M3.4.4** `<ClientRouter/>` membatalkan `hashchange` (pelajaran L3.2 #1) — pakai 1 listener `click` delegat + `hashchange` untuk edit URL manual.
+
+**Verify**: e2e 2 arah; state pulih setelah `back()`.
+
+### Task 3.5 — Reviews
+
+- [ ] **M3.5.1** Review: dengan >40 edge, apakah peta masih **terbaca**? Kalau tidak → kurangi node (bukan perkecil font). Catat hasilnya.
+- [ ] **M3.5.2** `measure:routes` `/`: reachable tak naik >1% (probe `measureEdges` satu pass).
+
+### DoD Sprint 3
+
+- [ ] Semua microtask `- [x]`.
+- [ ] `bun run test` **≥ 875 + 45** (kumulatif).
+- [ ] `bun run build` 49 halaman.
+- [ ] `astro check` 0 baru; `lint` 0 baru; `biome` bersih.
+- [ ] **Target densitas terpenuhi: ≥ 60 edge, 0 node terisolasi** — atau ada catatan tertulis+R3 yang menjelaskan penyimpangan.
+- [ ] Probe geometri: semua edge ter-anchor, 0 overlap, 0 dashed, 0 node-point.
+- [ ] A11y: nama aksesibel identik pra/post hidrasi; tak ada `aria-label` pada `role=generic`.
+- [ ] Reduced motion → 0 dots; reduced data → statis.
+- [ ] `measure:runtime`: 0 listener/RAF/root baru.
+- [ ] e2e `--workers=1` hijau.
+- [ ] **Checkpoint**: laporkan, update §7 + `prompt.txt`.
+
+---
+
+## SPRINT 4 — Craft & Hardening
+
+**Objective**: Polish +QVUE yang sudah ada; **tidak menambah fitur baru**.
+**Depends on**: Sprint 1, 2, 3
+**PRD ref**: §8.2, §8.4, E1–E5, I5, D3
+**Prinsip dominan**: **P7 — nol biaya default**
+
+### Task 4.1 — BorderGlow (React Bits)
+
+- [ ] **M4.1.1** Implementasi `mask-composite: subtract` + mesh gradient + `conic-gradient` cursor mask di **CSS** (utility/component, bukan JS).
+- [ ] **M4.1.2** Kursor → 2 custom property (`--glow-x`, `--glow-y`) ditulis di **1 rAF batch**, **tanpa React state**.
+- [ ] **M4.1.3** Guard: berhenti saat `pointerleave`, tab hidden, `prefers-reduced-motion` (jawaban harus statis/full), dan `prefers-reduced-data`.
+- [ ] **M4.1.4** Terapkan ke: kartu proyek, kartu section, hero. **Bukan** header sticky (path scroll termahal).
+- [ ] **M4.1.5** Probe light/dark: kontras border **terukur**, bukan "kelihatan bagus".
+
+**Verify**: `measure:runtime` — RAF tak naik (>1 batch terdokumentasi); probe 0 overflow; probe kontras.
+
+### Task 4.2 — Scroll lock & `scrollbar-gutter`
+
+- [ ] **M4.2.1** Audit 3 situs: `GalleryGrid.tsx:541`, `GameMenuEngine.tsx:715`, `Header.astro` inline script.
+- [ ] **M4.2.2** `scrollbar-gutter: stable` global (21st.dev) → 0 layout shift saat sheet/overlay buka-tutup.
+- [ ] **M4.2.3** Semua scroll lock harus **window-scoped**: `if (document.body.dataset.scrollLocked) return;` + counter, supaya 2 overlay tak saling lepaskan lock (bug laten yang nyata).
+- [ ] **M4.2.4** **A/B probe**: ukur `documentElement.clientWidth` sebelum/sesudah buka overlay di 3 tempat. Target: **0px** delta.
+
+**Verify**: e2e mengukur delta = 0; test mutual-exclusion lock.
+
+### Task 4.3 — Mobile nav: focus trap + `inert`
+
+- [ ] **M4.3.1** Audit `Header.astro` (~L184-255): tanpa focus trap, tanpa `inert`, `body.style.overflow` tak bersyarat.
+- [ ] **M4.3.2** Pakai `src/lib/useFocusTrap.ts` **yang sudah ada** (Δ3) — jangan tulis ulang.
+- [ ] **M4.3.3** `inert` pada konten di belakang sheet saat terbuka; hapus saat tertutup.
+- [ ] **M4.3.4** Scroll lock jadi window-scoped (M4.2.3).
+- [ ] **M4.3.5** Fokus kembali ke pemicu saat ditutup; Esc/backdrop/link close tetap jalan.
+- [ ] **M4.3.6** e2e: Tab tidak pernah mendarat di luar sheet; `inert` presence/absence.
+
+**Verify**: e2e `mobile-nav` diperluas, hijau `--workers=1`.
+
+### Task 4.4 — DrawSVG via `pathLength="1"` (fix jebakan L3.2)
+
+- [ ] **M4.4.1** Audit semua pemakaian API path-length (`getTotalLength`, `getBBox`, `pathLength`) di `src`.
+- [ ] **M4.4.2** Ganti dengan pola `pathLength="1"` + `strokeDashoffset` (atribut biasa → **bisa diuji di jsdom tanpa mock**; React Bits `Stepper`).
+- [ ] **M4.4.3** Kalau ada yang tak bisa dihindari, **pindahkan testnya ke e2e** dan tulis alasannya (preseden L3.2 #3).
+- [ ] **M4.4.4** `DrawSVGPlugin` (terpasang) boleh dipakai untuk progress bar diskontinu, **dengan** `pathLength` fix di atas.
+
+**Verify**: grep `getTotalLength` di jalur unit = 0 (atau terdokumentasi); unit hijau tanpa mock canvas.
+
+### Task 4.5 — DriftWall damping
+
+- [ ] **M4.5.1** Audit island parallax/magnet yang masih pakai lerp mentah per-frame (`rg -n 'lerp|\* 0\.[0-9]' src/islands src/components/atoms`).
+- [ ] **M4.5.2** Ganti ke `1 - Math.exp(-dt/0.12)` (frame-rate independent) di mana relevan.
+- [ ] **M4.5.3** `dt` dari timestamp RAF, **dibatasi clamp** (tab-switch dt besar tak boleh melompat).
+
+**Verify**: unit untuk formula; probe tidak ada lompatan saat tab kembali aktif.
+
+### Task 4.6 — Tokenisasi warna (8 file)
+
+- [ ] **M4.6.1** Baseline: `rg -c` per file — GalleryGrid 61, CommandPalette 17, RepoGlowCard 14, CreativeLabPill 11, CreativeLabTeaser 8, EasterEgg 4, ContributionHeatmap 1, InteractionButton 1.
+- [ ] **M4.6.2** Konversi ke token CSS var (`--color-brand`, `--color-danger`, dst) — **satu file per commit**.
+- [ ] **M4.6.3** **Jalankan TERAKHIR di sprint ini** (R6): probe light/dark tiap commit, `measure:runtime`, e2e gallery subset.
+- [ ] **M4.6.4** Gate: `rg -n 'red-500|amber-500|emerald-|bg-amber' src` = 0 (kalau memang gate yang ada).
+
+**Verify**: probe light/dark 0 regresi; e2e gallery hijau.
+
+### Task 4.7 — Chart + tabel tersembunyi (21st.dev)
+
+- [ ] **M4.7.1** Audit setiap SVG chart di `/observatory`, `/projects/[slug]`, `/github`: apakah ada `<table>`/`<dl>` HTML yang bisa dibaca screen reader & di-crawl mesin pencari?
+- [ ] **M4.7.2** Tambahkan yang hilang (statis, `class="sr-only"`), **tanpa** island baru.
+- [ ] **M4.7.3** Pastikan tabel = **data yang sama** dengan SVG (bukan ringkasan terpisah yang bisa drift).
+
+**Verify**: `dist` punya tabel untuk tiap chart;axe/e2e a11y hijau.
+
+### Task 4.8 — `star_history`: pakai atau hapus
+
+- [ ] **M4.8.1** `.cache/github/star_history-{name}.json` sudah dibayar tapi **0 konsumen** — `rg -n 'star_history' src` = type + fetch + test saja.
+- [ ] **M4.8.2** **Pakai** jadi sparkline di `TopReposLeaderboard`/`RepoGlowCard` (statis SVG, 0 island baru), **atau** hapus fetch-nya dari `fetchAllGitHubData()` + `.cache` (hemat build time).
+- [ ] **M4.8.3** **Putuskan satu**, jangan dua-duanya. Catat alasannya.
+
+**Verify**: `rg -n 'star_history' src` konsisten dengan keputusan; build OK.
+
+### Task 4.9 — SplitText: **tepat satu** penggunaan
+
+- [ ] **M4.9.1** Terapkan `SplitText` (GSAP, sudah terpasang) pada **headline hero saja**, `accessible: true`.
+- [ ] **M4.9.2** `@media (prefers-reduced-motion: reduce)` → split **dimatikan**, teks utuh.
+- [ ] **M4.9.3** **Jangan** terapkan ke body text, nav, atau daftar (P1/PRD §14 restraint).
+
+**Verify**: `rg -c 'SplitText' src` = 1; reduced-motion e2e.
+
+### Task 4.10 — `useGSAP` L2: audit plugin lain
+
+- [ ] **M4.10.1** Verifikasi tak ada cleanup global lain di pola `getAll().forEach(kill)` / `gsap.globalTimeline.clear()`.
+- [ ] **M4.10.2** `gsap.context()` scoping dipakai konsisten di island yang pakai GSAP.
+
+**Verify**: `rg -n 'getAll\(\)\.forEach|globalTimeline\.clear' src` = 0.
+
+### DoD Sprint 4
+
+- [ ] Semua microtask `- [x]`.
+- [ ] `bun run test` **≥ 925** (= baseline 875 + 50 test baru; lihat PRD §12 gate 1).
+- [ ] `bun run build` 49 halaman.
+- [ ] `astro check` 0 baru; `lint` 0 baru; `biome` bersih.
+- [ ] `measure:routes`: **tak ada route yang payload-nya naik**.
+- [ ] `measure:runtime`: 0 listener/RAF/root baru yang tak tercatat; scroll lock delta **0px**.
+- [ ] `rg -n 'getAll\(\)\.forEach' src` = 0; `getTotalLength` di jalur unit = 0.
+- [ ] Probe kontras light/dark: 0 regresi.
+- [ ] e2e `--workers=1` hijau penuh.
+- [ ] **Checkpoint**: laporkan, update §7 + `prompt.txt`.
+
+---
+
+## SPRINT 5 — Final Validation & Archive
+
+**Objective**: Buktikan tidak ada yang regresi, lalu arsipkan.
+**Depends on**: Sprint 1–4
+**Tidak menambah fitur.**
+
+### Task 5.1 — Gate penuh
+
+- [ ] **M5.1.1** `bun run test` (target ≥ 875 + 50).
+- [ ] **M5.1.2** `bun run build` **penuh** (bukan `build:fast`) — 49 halaman. **Penting**: pelajaran F5.1 — `fetch-data.mjs` gagal diam-diam hanya ketahuan di build penuh.
+- [ ] **M5.1.3** `bunx astro check` → diff **daftar** vs baseline 103.
+- [ ] **M5.1.4** `bun run lint` → ≤ 681.
+- [ ] **M5.1.5** `bunx biome check` bersih di semua file tersentuh.
+- [ ] **M5.1.6** `bun run validate-data` + validator SiteFacts; **uji negatif diulang**.
+- [ ] **M5.1.7** `bun run measure:routes` — bandingkan **rentang**, bukan delta tunggal.
+- [ ] **M5.1.8** `bun run measure:runtime` — bandingkan vs Sprint 0.
+
+### Task 5.2 — A11y
+
+- [ ] **M5.2.1** Perluas `e2e/accessibility.spec.ts` (24 test) dengan asersi yang dipin ke defect yang benar-benar diukur di sprint ini.
+- [ ] **M5.2.2** `prefers-reduced-motion` — **WAJIB** `page.emulateMedia()`, **JANGAN** `test.use({ reducedMotion })` (terbukti diabaikan di versi Playwright repo ini; pelajaran Q4.2 #1).
+- [ ] **M5.2.3** No-JS: `javaScriptEnabled: false` → **semua** konten karier/bukti/sertifikasi tetap terbaca & berurutan (AC microtask 4 Q4.2 yang semula gagal total).
+- [ ] **M5.2.4** Nama aksesibel diuji dengan **bentuknya** (`name === \`${kind}: ${title}\``), bukan ambang jumlah kata (Q4.2 #8).
+
+### Task 5.3 — Responsive
+
+- [ ] **M5.3.1** Probe **320 / 375 / 768 / 1024 / 1440 / 1920 / 2560** di `/`, `/gallery`, `/work/<slug>`, `/observatory`.
+- [ ] **M5.3.2** Target **0 horizontal overflow** di semua; **koordinat dokumen** untuk pengukuran lintas-waktu (pelajaran L3.3 #1/#2).
+- [ ] **M5.3.3** Capability Map: `hidden md:block` SVG + stacked di mobile.
+- [ ] **M5.3.4** Career Spine: sticky di `lg+`, `<ol>` statis di bawah.
+
+### Task 5.4 — MotionScore
+
+- [ ] **M5.4.1** Jalankan di `/`, `/gallery`, `/observatory`, `/work/<slug>` (mode `--no-upload`).
+- [ ] **M5.4.2** Gate: **nol temuan D/F** di semua route.
+- [ ] **M5.4.3** `/` hopeless: **≥2 run** (rentang noise 52–63 pada kode identik sudah terdokumentasi). Tulis **rentang**, jangan delta tunggal (pelajaran Q4.1 #6).
+- [ ] **M5.4.4** `/gallery` & `/observatory`: harus **≥ S 84** & **≥ A 76**.
+
+### Task 5.5 — Docs & arsip
+
+- [ ] **M5.5.1** Update `docs/motion-score-baseline.md` §12 (hasil audit sprint ini) — dokumen ini **tak diarsipkan** (konvensi).
+- [ ] **M5.5.2** Update `AGENTS.md`: Sprint State + log sprint + Key Files baru.
+- [ ] **M5.5.3** Update `prompt.txt` baris 1 ke state final + ringkasan temuan.
+- [ ] **M5.5.4** Pindahkan dokumen sprint ke `docs/archive/` (bukan `motion-score-baseline.md`), update `docs/archive/README.md`.
+- [ ] **M5.5.5** Tulis **Pelajaran** — minimal 5, berbasis bukti yang benar-benar diukur (bukan nasihat). Format sama dengan entri AGENTS.md yang ada.
+
+### DoD Sprint 5 (= DoD Global, PRD §12)
+
+- [ ] Ke-12 gate PRD §12 semuanya hijau.
+- [ ] e2e `--workers=1`: **0 gagal**.
+- [ ] `git status` bersih; semua commit punya pesan yang menyebut `prove:` + scope.
+- [ ] Output ke user: **"SPRINT SUDAH SELESAI SEMUA"** — **hanya** bila semua benar-benar selesai.
+
+---
+
+## 7. Tabel Progres
+
+> Di-update di setiap checkpoint. **Jangan** mengisi di luar bukti.
+
+| Sprint | Status | Unit | Section | e2e | Catatan |
+|---|---|---|---|---|---|
+| Baseline 2026-09-29 | ✅ tercatat | 875/875 | 14 | 245 | `astro check` 103 · `lint` 681 |
+| 0 — Truth & Integrity | ⬜ | — | 14→13 | — | |
+| 1 — Career Spine | ⬜ | — | 13→12 | — | |
+| 2 — Evidence Surface | ⬜ | — | 12 | — | |
+| 3 — Capability Map | ⬜ | — | 12 | — | |
+| 4 — Craft & Hardening | ⬜ | — | 12 | — | |
+| 5 — Final Validation | ⬜ | — | 12 | — | |
+
+---
+
+## 8. Rekap Keputusan Arsitektur (rujukan cepat)
+
+| Keputusan | Alasan | PRD |
+|---|---|---|
+| **Tidak tambah dependency** (animejs ditolak) | GSAP 3.15 di `node_modules` sudah punya semua plugin yang persis; `onScroll` anime.js lebih buruk untuk budget listener; fitur utamanya rusak di jsdom | §8.3 |
+| **`SiteFacts` = satu sumber angka** | Membuat C3 (angka basi) mustahil secara struktural, bukan diperbaiki sekali | §10 |
+| **14 → 12 section** | Menambah bobot pada konten yang sudah ada, bukan menambah halaman baru | §5 N4 |
+| **Nginx route** | Semua kerja di halaman & data yang sudah ada | §5 N3 |
+| **Timeline dibuang** | 22 proyek + 62 sertifikasi + GitHub data sudah ada; 4 dari 27 eksperimen lab tak pernah ditampilkan | §9.5, §9.6 |
+| **Naik trunk, bukan bikin island baru** | P3 + P7; island baru = listener baru | §6 P3/P7 |
+| **Reduced-motion jadi DEFAULT, bukan opsional** | Q4.2 #1: `test.use({reducedMotion})` terbukti diam-diam diabaikan | §11 |
+| **e2e `--workers=1`** | 4-core/3 GB; `--workers=4` = 23 gagal pada kode identik | §0.3 |
+
+---
+
+## 9. Rujukan
+
+| Dokumen | Isi |
+|---|---|
+| `docs/prd.md` | Tujuan, non-goals, temuan audit, keputusan teknologi, acceptance criteria |
+| `prompt.txt` | Execution controller |
+| `docs/motion-score-baseline.md` | Audit MotionScore kanonik (tak diarsipkan) |
+| `AGENTS.md` | Sprint log, key files, conventions repo |
+| `docs/archive/README.md` | Indeks sprint selesai |
