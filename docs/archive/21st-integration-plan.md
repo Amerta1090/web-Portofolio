@@ -3,7 +3,7 @@
 > Investigation pemakaian 21st.dev sebagai pola referensi untuk gap terverifikasi di portfolio.
 > Dokumen ini adalah **spec / AC autoritatif**. Saat lanjut via `prompt.txt`, verifikasi setiap item
 > **[VERIFY]** terhadap working tree; apapun yang tidak cocok adalah gap untuk diperbaiki.
-> PRD / analisis: `docs/PRD-21ST-DEV-INTEGRATION.md`. Checklist: `docs/21st-TASKS.md`.
+> PRD / analisis: `docs/archive/PRD-21ST-DEV-INTEGRATION.md`. Checklist: `docs/archive/21st-TASKS.md`.
 > Commit format: `21st: <ringkasan>`.
 
 ## Keputusan (resolved — jangan di-re-litigasi)
@@ -43,7 +43,7 @@ Task:
   (C1 navbar-02, C2 shadcn input/textarea/field, C3 dialog, C4 testimonials) — catat URL yang dibaca
   di TASKS. **Dilarang install via CLI tanpa key/user approval (D1).**
 
-Output: baseline tercatat di `docs/21st-TASKS.md` header.
+Output: baseline tercatat di `docs/archive/21st-TASKS.md` header.
 
 ---
 
@@ -56,7 +56,7 @@ aksesibel, tanpa React root baru, tanpa dependency baru.
 
 ### Task 1.1 — Desain & keputusan implementasi
 - Objective: tentukan markup/state final sebelum menulis kode.
-- Files: `docs/21st-integration-plan.md` (update), `docs/21st-TASKS.md`.
+- Files: `docs/archive/21st-integration-plan.md` (update), `docs/archive/21st-TASKS.md`.
 - Microtasks:
   1. Baca `Header.astro` (nav ul `hidden lg:flex`, tombol Cari mobile, `HeaderTools`, `ThemeToggle`)
      dan `ThemeToggle.astro` (pola inline script).
@@ -242,7 +242,7 @@ Task:
   ter-dokumentasi; `framer-motion` tetap 0; tidak ada import baru di luar plan.
 - [VERIFY opsional] MotionScore `/` spot (`bun run serve` + `npx motionscore :4321 --no-upload`):
   grade tidak turun dari B 56–58.
-- Update: `docs/21st-TASKS.md` semua `- [x]` dengan catatan; `docs/PRD-21ST-DEV-INTEGRATION.md` §10
+- Update: `docs/archive/21st-TASKS.md` semua `- [x]` dengan catatan; `docs/archive/PRD-21ST-DEV-INTEGRATION.md` §10
   checklist; `prompt.txt` line 1 dirotasi ke sprint berikut / status selesai; `AGENTS.md` tambah
   sprint log (state complete, komponen baru, pelajaran).
 - Output penutup (persis): **"implementasi sprint integrasi 21st.dev sudah selesai secara keseluruhan"**
@@ -251,7 +251,7 @@ Task:
 ## Aturan eksekusi (berlaku selalu)
 
 1. **Repository-first**: sebelum tiap task, baca file yang akan disentuh — jangan percaya deskripsi
-   lama; bila state berubah dan proposal tidak lagi tepat → tulis discrepancy ke `docs/21st-TASKS.md`,
+   lama; bila state berubah dan proposal tidak lagi tepat → tulis discrepancy ke `docs/archive/21st-TASKS.md`,
    reassess keputusan, update plan ini, lanjut dengan revisi (jangan implementasi buta).
 2. **Empat jenis kerja terpisah**: investigation → decision → implementation → validation. Jangan
    mencampur; validation wajib dijalankan, bukan dikonfigurasi.

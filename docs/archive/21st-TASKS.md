@@ -1,7 +1,7 @@
 # 21st.dev Integration — TASK Checklist
 
-> Checklist task sprint. Spec/AC: `docs/21st-integration-plan.md` (autoritatif). PRD/analisis:
-> `docs/PRD-21ST-DEV-INTEGRATION.md`.
+> Checklist task sprint. Spec/AC: `docs/archive/21st-integration-plan.md` (autoritatif). PRD/analisis:
+> `docs/archive/PRD-21ST-DEV-INTEGRATION.md`.
 > Status terakhir disinkronkan: 2026-09-24 (Phase 0 ✅ + Task 1.1 ✅ — eksekusi Sprint 1 dimulai).
 
 ## Phase 0 — Discovery & Baseline

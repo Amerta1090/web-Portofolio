@@ -1,11 +1,11 @@
 # Observatory — Task Checklist
 
-> Companion to `docs/observatory-plan.md` (authoritative spec). Checkboxes reflect the
+> Companion to `docs/archive/observatory-plan.md` (authoritative spec). Checkboxes reflect the
 > actual working-tree state as of this handoff. Anything marked `[ ]` is remaining work.
 
 ## Phase A — Verify & reconcile in-tree work
 - [x] Audit uncommitted Observatory files against spec; kept-and-fixed as baseline.
-- [x] Delete 4 stale docs (`wow-audit`, `lab-audit`, `prd-detAIministic`, `sprint_planning_detAIministic`). `docs/` now holds only `observatory-plan.md` + this file.
+- [x] Delete 4 stale docs (`wow-audit`, `lab-audit`, `prd-detAIministic`, `sprint_planning_detAIministic`). `docs/` now holds only `docs/archive/observatory-plan.md` + this file.
 
 ## Phase B — Data layer (foundation, unit-tested first)
 - [x] `parsePeriod.ts` — `Mon YYYY – …` parser; en/em/hyphen dash, `Present`/`Now`; `ParsedPeriod | null`; `periodSortKey`, `pointIndex`. 22/22 projects parse, 2 ongoing.

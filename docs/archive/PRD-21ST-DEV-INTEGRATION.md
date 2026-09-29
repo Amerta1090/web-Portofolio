@@ -1,7 +1,7 @@
 # PRD — 21st.dev Portfolio Evaluation & Implementation Plan
 
 > Status: PLANNING COMPLETE (2026-09-24) — audit selesai, keputusan terkunci, sprint plan siap dieksekusi.
-> Executable planning: `docs/21st-integration-plan.md` (spec otoritatif) + `docs/21st-TASKS.md` (checklist).
+> Executable planning: `docs/archive/21st-integration-plan.md` (spec otoritatif) + `docs/archive/21st-TASKS.md` (checklist).
 > Entry point untuk agent: `prompt.txt`.
 
 ## 1. Overview
@@ -43,8 +43,8 @@ blog resmi) per 2026-09-24.
 - Menghapus duplikasi terverifikasi (class-chain form ×3, konvensi warna tombol ×3) tanpa perubahan arsitektur.
 - Mempertahankan semua constraint yang ada: SSG murni, deterministik, Motion tier S/A, reduced-motion,
   budget JS `300_000` B gzip, tidak menambah React root per halaman, warna hanya lewat token.
-- Menghasilkan planning yang executable oleh agent (PRD ini + `docs/21st-integration-plan.md` +
-  `docs/21st-TASKS.md` + `prompt.txt` ter-update).
+- Menghasilkan planning yang executable oleh agent (PRD ini + `docs/archive/21st-integration-plan.md` +
+  `docs/archive/21st-TASKS.md` + `prompt.txt` ter-update).
 
 ## 3. Non-Goals
 
@@ -229,7 +229,7 @@ Per task & sprint (wajib dijalankan, bukan sekadar dikonfigurasi):
 
 Semua kondisi berikut harus terpenuhi sebelum sprint dinyatakan selesai:
 
-1. Semua task di `docs/21st-TASKS.md` = `- [x]` (tidak ada `- [ ]` tersisa).
+1. Semua task di `docs/archive/21st-TASKS.md` = `- [x]` (tidak ada `- [ ]` tersisa).
 2. **Mobile nav** aktif di semua halaman (e2e di halaman non-index + keyboard + reduced-motion),
    tanpa React root baru dan tanpa listener scroll baru.
 3. **Form primitives** ada di `src/components/atoms/`, dipakai ContactForm + SkillsExplorer,
@@ -240,7 +240,7 @@ Semua kondisi berikut harus terpenuhi sebelum sprint dinyatakan selesai:
    empty-state filter 0 hasil.
 7. `bun run build` (full) + `bun run test` + `bun run test:e2e` hijau; tidak ada test merah;
    `astro check` & Biome 0 error baru; `check-budget` lulus.
-8. `docs/21st-integration-plan.md`, `docs/21st-TASKS.md`, `prompt.txt`, dan `AGENTS.md`
+8. `docs/archive/21st-integration-plan.md`, `docs/archive/21st-TASKS.md`, `prompt.txt`, dan `AGENTS.md`
    (sprint log) ter-update; commit berformat `21st: <ringkasan>`.
 9. Tidak ada keputusan yang diambil diam-diam: setiap deviasi dari plan dicatat di TASKS
    (blocker/discrepancy) dan plan di-update sebelum lanjut (Rule Phase 8).

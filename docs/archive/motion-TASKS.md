@@ -1,6 +1,6 @@
 # Motion (motion.dev) Upgrade & MotionScore — TASK Checklist
 
-> Checklist task sprint. Spec/AC: `docs/motion-upgrade-plan.md` (autoritatif).
+> Checklist task sprint. Spec/AC: `docs/archive/motion-upgrade-plan.md` (autoritatif).
 > Status terakhir disinkronkan: 2026-09-23 (sesi analisis + PRD).
 
 ## 0. State audit (hasil verifikasi awal — jangan ulangi tanpa alasan)

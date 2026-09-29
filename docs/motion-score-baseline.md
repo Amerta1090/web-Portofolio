@@ -60,7 +60,7 @@
 8. **Overlap-promoted layers** — kurangi overlay elemen composited (z-index).
 9. **Mount thrashing** — baca nilai awal sekali, tulis sesudahnya (batch read→write / `frame.read`-`frame.update`).
 
-## Pemetaan ke sprint (docs/motion-upgrade-plan.md)
+## Pemetaan ke sprint (docs/archive/motion-upgrade-plan.md)
 | Temuan | Phase | Aksi |
 |---|---|---|
 | F-tier Animations gallery + off-screen (6) | C.0 | Guard viewport RAF eksperimen (terbesar) — pause off-screen/statis/hidden |
