@@ -240,6 +240,12 @@ The Case Study Reactor is a page-level experience rather than a new homepage sec
 - 200% zoom (640×400) and 400% reflow (320×640) hold with zero horizontal overflow, all 13 cards, both labelled zones, the status region, and the full stepper/panel/list. Verified by `e2e/accessibility.spec.ts` (24 tests, grouped per microtask) and 12 unit tests. No new scroll listener, frame loop, canvas, or React root.
 - One tooling caveat is recorded in the task log because it invalidates a test rather than a feature: `test.use({ reducedMotion })` is silently ignored in this Playwright version, so the spec emulates the preference per test before hydration and verifies it by reading `matchMedia` back.
 
+**Final audit result (2026-09-28, F5.1 — full validation):** re-reading the DoD against evidence, rather than against intent, found two input modalities that the strategy above claims but nothing measured.
+
+- **Touch had never been run at all, and pointer had never been run on Signal Loom.** The DoD line "selection works with pointer, touch, keyboard, and deep link" was pinned for keyboard and deep links only; a grep for `hasTouch` / `pointerType` / `tap(` across the suite returned nothing. `e2e/pointer-touch.spec.ts` now runs both modalities as real input: a mouse click selects a card and emits that card's own summary, hover traces the incident edges at `stroke-width 1.6` **without** changing the selection, and a genuine touch tap selects, advances the reactor, and leaves no hover shadow stuck behind (a touch pointer fires `pointerenter`, so residue would be a state a finger cannot clear). All 13 cards and all 5 reactor steps measure above the WCAG 2.2 SC 2.5.8 minimum of 24×24 CSS px.
+- **The only failing assertion was mine, not the feature's.** A "a tap must not scroll the page" check compared `window.scrollY` across a `tap()`, and `tap()` scrolls its target into view by design — the page had not moved, the harness had. The check now compares a document-space coordinate, which is invariant to viewport scrolling. Recorded because it is the third time this suite has confused harness movement with page movement (Q4.3 lessons 1 and 2).
+- **A silent data-pipeline failure surfaced from running the full build, not from testing a feature.** `bun run build` runs `fetch-data`, whose pinned-repositories GraphQL query separated fields with semicolons; GraphQL treats only commas as insignificant, so the API answered HTTP 200 with an `errors` array, the script cached that payload, printed `✓ pinned-repos (transformed)`, and every build since has rendered zero pinned repositories. The site never looked broken — `GitHubUniverse` falls back to `top_repos` — which is precisely why a broken query and an account with no pins are indistinguishable downstream. The query is fixed, `fetchGraphQL` now fails on an `errors` payload instead of caching it, and the transform refuses to write an array it cannot tell from "no pins". Measured after the fix: the query parses and returns `pinnedItems.nodes: []`, so the account genuinely has none and the rendered output is unchanged. A build step that cannot fail is a build step nobody watches.
+
 ## Responsive Strategy
 
 - Desktop: spatial diagram and sticky stage choreography.
@@ -258,29 +264,31 @@ The Case Study Reactor is a page-level experience rather than a new homepage sec
 
 ## Definition of Done
 
+Checked against evidence in F5.1 (2026-09-28). Each line names where the evidence lives, so a future reader can re-verify instead of trusting the tick.
+
 ### Signal Loom
 
-- [ ] Static heading, node labels, descriptions, and links render without JavaScript.
-- [ ] Selection works with pointer, touch, keyboard, and deep link.
-- [ ] Connected paths and explanation state are correct and use real portfolio data.
-- [ ] Animation is bounded, cancellable, viewport-aware, and reduced-motion safe.
-- [ ] Desktop, tablet, mobile, 200% zoom, and keyboard paths are validated.
-- [ ] No new unnecessary React root, RAF loop, scroll listener, or runtime API exists.
-- [ ] Bundle and MotionScore deltas are recorded and acceptable.
+- [x] Static heading, node labels, descriptions, and links render without JavaScript. — Server HTML holds 8 capability `<div>`s and **5 real `<a href="/projects/…">`** cards, each with its summary, plus the live status region, and **zero** roving-tabindex controls or connector lines (verified in `dist/index.html` and in a JS-disabled browser context in `e2e/accessibility.spec.ts`). Fixed in Q4.2 D2, which found the line already failing.
+- [x] Selection works with pointer, touch, keyboard, and deep link. — Keyboard and deep link (`#signal-<id>`) in `e2e/accessibility.spec.ts`; pointer click and hover-without-selection in `e2e/pointer-touch.spec.ts`; a real touch tap that selects and announces the tapped card in the same file.
+- [x] Connected paths and explanation state are correct and use real portfolio data. — 8 edges derived from `data/skills.json` + 6 featured projects, anchored to measured card geometry (unit: measured edge coordinates), and the status region is the tapped node's own summary rather than invented copy.
+- [x] Animation is bounded, cancellable, viewport-aware, and reduced-motion safe. — GSAP timelines with `gsap.context` revert on unmount and kill/rebuild on selection change (L2.2), dot count capped at 3, `useRafGuard` pauses off-screen and on `visibilitychange`, and `prefers-reduced-motion` / `prefers-reduced-data` both render 0 dots with selection intact.
+- [x] Desktop, tablet, mobile, 200% zoom, and keyboard paths are validated. — Geometry probed at 375 / 768 / 1440 and across 320–2560 for overflow; WCAG reflow pinned at 640×400 (200% zoom) and 320×640 (400%) with 0 horizontal overflow; touch exercised at 390×844 and 834×1112.
+- [x] No new unnecessary React root, RAF loop, scroll listener, or runtime API exists. — One `client:visible` island on `/` only; its chunk contains 0 RAF loops, 0 canvases, 0 scroll listeners, 1 `ResizeObserver`; home off-screen animations 3 and desktop scroll listeners 22 (was 23 at Q4.3).
+- [x] Bundle and MotionScore deltas are recorded and acceptable. — `bun run measure:routes`: `/` initial 203.1 KB / reachable 564.3 KB gzip (was 204.3 / 565.4 at Q4.1, so −1.2 / −1.1); MotionScore `/` measured 63 and 56 on two runs of identical code (the documented 52–63 noise band), `/work` S 87, `/gallery` S 84, **zero D/F findings on any route**.
 
 ### Case Study Reactor
 
-- [ ] At least one real work detail page has structured five-stage content.
-- [ ] All stage content is present in the normal document order.
-- [ ] Stage selection works with buttons, keyboard, touch, and deep links.
-- [ ] Scroll choreography does not hijack navigation or require smooth scrolling.
-- [ ] Reduced motion and no-animation fallback preserve the full case study.
-- [ ] Mobile layout is readable without horizontal drag.
-- [ ] Relevant type, build, lint, unit, E2E, and performance checks pass.
+- [x] At least one real work detail page has structured five-stage content. — `src/content/case-studies/ai-quranic-tafsir.mdx`, five stages (problem → data → model → system → impact) with evidence and per-stage metrics traceable to the body and the existing metrics.
+- [x] All stage content is present in the normal document order. — `dist/work/ai-quranic-tafsir/index.html` lists `problem, data, model, system, impact` in document order; the diagram is server-rendered pure SVG geometry, so the page is complete with scripts off.
+- [x] Stage selection works with buttons, keyboard, touch, and deep links. — Buttons and deep links (`#stage-<id>`, with a `click` delegate because `<ClientRouter>` cancels `hashchange`) in `e2e/work.spec.ts` (32 tests); a real touch tap in `e2e/pointer-touch.spec.ts` that changes stage, keeps the list order, and moves nothing on the page.
+- [x] Scroll choreography does not hijack navigation or require smooth scrolling. — The island has no scroll listener at all (one `hashchange` plus one delegated `click`); the L3.2 plan offered a scroll-driven progress bar and it was rejected in favour of zero, recorded as a deviation.
+- [x] Reduced motion and no-animation fallback preserve the full case study. — `prefers-reduced-motion` disables the CSS stagger and the summary panel, and the stepper still renders after hydration; the server HTML contains no stepper at all, so there is no dead control to fall back from.
+- [x] Mobile layout is readable without horizontal drag. — Stepper → panel → list in normal flow below `lg`, sticky panel from `lg` up, 0 horizontal overflow at 320 / 375 / 640 / 768 / 900 / 1024 / 1440 / 1920 / 2560.
+- [x] Relevant type, build, lint, unit, E2E, and performance checks pass. — `bun run build` 49 pages, `bun run test` 875/875 (75 files), `astro check` 103 (= baseline, 0 new), `bun run lint` 681 (= 685 baseline − 4, 0 new), `measure:routes` `/work` 151.8 KB initial / 394.2 KB reachable (flat vs Q4.1), MotionScore S 87 identical to Q4.1, e2e `--workers=1` **246/246 (5.0 min)** with 0 failed — full detail in the task log.
 
 ### Project
 
-- [ ] Research, decisions, rejected ideas, and measured tradeoffs remain documented.
-- [ ] `docs/SPRINT-PLAN-CREATIVE-UI-ANIMATION.md`, this PRD, `prompt.txt`, and the sprint log are synchronized.
-- [ ] Every selected feature has an implementation status and a recorded blocker or deviation when applicable.
+- [x] Research, decisions, rejected ideas, and measured tradeoffs remain documented. — Anime.js rejected after a spike (C0.3), scroll-driven progress rejected (L3.2), 21st.dev adopted as pattern reference only, MorphingNavigation deleted rather than hidden (Q4.3), and the zod-to-client leak plus the read/write split measured in Q4.1.
+- [x] Every selected feature has an implementation status and a recorded blocker or deviation when applicable. — Deviations are recorded in this PRD and in the task log; the one standing blocker is the pre-existing `check-budget` red (DEV-1), which sums every chunk in `dist` across routes that no single page reaches and is superseded as a gate by the per-route metric.
+- [x] `docs/SPRINT-PLAN-CREATIVE-UI-ANIMATION.md`, this PRD, `prompt.txt`, and the sprint log are synchronized. — Done in F5.2 (2026-09-28): plan status → implementation complete; this DoD re-read against evidence with a re-verifiable reference on every line; `prompt.txt` line 1 advanced to "sprint complete" carrying the F5.1 findings forward; `AGENTS.md` Sprint State + sprint log updated.
 

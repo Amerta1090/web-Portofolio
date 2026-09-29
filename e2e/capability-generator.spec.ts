@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { waitForIslandHydration } from "./hydration";
 
 test.describe("CapabilityGenerator (tracery)", () => {
   test("renders in the About section with a deterministic label", async ({ page }) => {
@@ -45,7 +46,12 @@ test.describe("CapabilityGenerator (tracery)", () => {
 
   test("toggle reveals and hides the grammar source", async ({ page }) => {
     await page.goto("/");
+    // The toggle only acts once the generator island has hydrated, and a click
+    // before then is dropped — the panel would simply never appear. `output` is the
+    // generator's own element (plain CSS: the helper runs in the page, so no
+    // Playwright selector-engine syntax here).
     const reveal = page.getByRole("button", { name: "Lihat grammar" });
+    await waitForIslandHydration(page, "output");
     await reveal.click();
     const pre = page.locator("pre");
     await expect(pre).toBeVisible();

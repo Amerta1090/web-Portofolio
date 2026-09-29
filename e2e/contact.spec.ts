@@ -1,4 +1,18 @@
 import { expect, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
+import { waitForIslandHydration } from "./hydration";
+
+/**
+ * The contact form is a `client:load` island. Waiting for hydration is what stops
+ * this file from intermittently reporting `Received: 0` alerts: a submit click
+ * that lands before React attaches runs no validation, so no error node is ever
+ * rendered. See `e2e/hydration.ts` for why the `ssr` attribute is the signal.
+ */
+const waitForFormHydration = (page: Page) => waitForIslandHydration(page, "form");
+
+const submitEmpty = async (page: Page) => {
+  await page.getByRole("button", { name: "Send Message", exact: true }).click();
+};
 
 test.describe("Contact form (21st Δ2 — form primitives retheme)", () => {
   test("render 3 field berlabel yang terhubung ke form", async ({ page }) => {
@@ -18,8 +32,9 @@ test.describe("Contact form (21st Δ2 — form primitives retheme)", () => {
 
   test("submit kosong → 3 error role=alert dengan pesan zod", async ({ page }) => {
     await page.goto("/contact");
+    await waitForFormHydration(page);
 
-    await page.getByRole("button", { name: "Send Message", exact: true }).click();
+    await submitEmpty(page);
 
     const alerts = page.getByRole("alert");
     await expect(alerts).toHaveCount(3);
@@ -39,7 +54,8 @@ test.describe("Contact form (21st Δ2 — form primitives retheme)", () => {
     page,
   }) => {
     await page.goto("/contact");
-    await page.getByRole("button", { name: "Send Message", exact: true }).click();
+    await waitForFormHydration(page);
+    await submitEmpty(page);
     await expect(page.getByRole("alert")).toHaveCount(3);
 
     await page.getByLabel("Name").fill("Abdul Majid");
@@ -47,7 +63,7 @@ test.describe("Contact form (21st Δ2 — form primitives retheme)", () => {
     await expect(page.getByRole("alert")).toHaveCount(3);
     await expect(page.getByLabel("Name")).toHaveAttribute("aria-invalid", "true");
 
-    await page.getByRole("button", { name: "Send Message", exact: true }).click();
+    await submitEmpty(page);
     await expect(page.getByRole("alert")).toHaveCount(2);
     await expect(page.getByLabel("Name")).not.toHaveAttribute("aria-invalid", "true");
     await expect(page.getByLabel("Name")).not.toHaveAttribute("aria-describedby");

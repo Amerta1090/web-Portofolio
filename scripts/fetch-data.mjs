@@ -58,6 +58,12 @@ async function fetchGraphQL(query, name) {
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
 
     const data = await res.json();
+    // GraphQL answers 200 with an `errors` array instead of failing the request.
+    // Caching that payload used to report success and yield an empty result, so a
+    // broken query looked like a healthy build that simply has no pinned repos.
+    if (data?.errors?.length) {
+      throw new Error(`GraphQL: ${data.errors[0]?.message ?? "unknown error"}`);
+    }
     const filePath = resolve(cacheDir, `${name}.json`);
     writeFileSync(filePath, JSON.stringify(data, null, 2));
     results.success.push(name);
@@ -75,11 +81,11 @@ const pinnedQuery = `{
     pinnedItems(first: 6, types: REPOSITORY) {
       nodes {
         ... on Repository {
-          name; description; url
-          stargazerCount; forkCount
+          name, description, url
+          stargazerCount, forkCount
           primaryLanguage { name }
           repositoryTopics(first: 10) { nodes { topic { name } } }
-          updatedAt; createdAt; pushedAt; isFork; diskUsage
+          updatedAt, createdAt, pushedAt, isFork, diskUsage
         }
       }
     }
@@ -108,6 +114,13 @@ await fetchGraphQL(pinnedQuery, "pinned-repos-raw");
 try {
   const rawPath = resolve(cacheDir, "pinned-repos-raw.json");
   const rawData = JSON.parse(readFileSync(rawPath, "utf-8"));
+  if (rawData?.errors?.length || !rawData?.data?.user) {
+    // An empty array here is indistinguishable from "no pinned repositories",
+    // and the site renders identically either way — so refuse to cache it.
+    throw new Error(
+      `pinned-repos-raw.json has no user payload: ${rawData?.errors?.[0]?.message ?? "missing data.user"}`,
+    );
+  }
   const nodes = rawData.data?.user?.pinnedItems?.nodes ?? [];
   const now = Date.now();
   const mapped = nodes.map((n) => {

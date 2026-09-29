@@ -238,6 +238,61 @@ menggabungkan listener di sini justru akan mematikan hidrasi `client:visible`.
    hidrasi, tapi flag tetap bisa muncul dari sumber lain (canvas/R3F bawah-fold).
    Diperlakukan sebagai **noise terukur** yang perlu A/B multi-run, bukan blocker.
 
+## 12. F5.1 — audit final (2026-09-28, setelah commit `e4b82e0`)
+
+Audit dijalankan terhadap `dist` hasil **`bun run build` penuh** (bukan `build:fast`),
+setelah `Q4.3` (hapus `MorphingNavigation`) dan setelah commit redesign `/skills`.
+
+### 12.1 Skor
+
+| Route | Overall | Desktop | Mobile | Scroll listener (desktop / mobile) | Temuan |
+|-------|---------|---------|--------|------------------------------------|--------|
+| `/` run 1 | **A 63** | A | A | 22 / 18 | 2×HIGH "Excess scroll listeners" + 1×LOW off-screen |
+| `/` run 2 | **B 56** | B | B | 22 / 18 | idem; thrashing flip S→C (mobile) |
+| `/work/ai-quranic-tafsir` | **S 87** | S | S | 4 / 4 | 1×HIGH rasio listener + 5×LOW |
+| `/gallery` | **S 84** | S | S | 5 / 5 | — |
+
+Baseline pembanding: `/` B 56–58 (§M-4), rentang terukur Q4.1 52–63, `/work` S 87,
+`/gallery` S 85–86. **Nol temuan tier D/F di ketiga route** (gate keras DoD).
+
+Kesimpulan yang boleh diklaim: `/work` **identik** (S 87, 6 findings, 4 listener),
+`/gallery` datar (−1 dalam noise), `/` **tidak turun** — run 1 mencapai A 63, run 2
+B 56, danlistener turun 23 → 22 desktop / 18 mobile. Skor home **tetap bukan gate**
+(§11.3): dua run kode identik menghasilkan 63 vs 56 dan tier thrashing bergantian.
+
+### 12.2 Payload per-route (`bun run measure:routes`)
+
+| Route | Initial | Reachable | HTML |
+|-------|---------|-----------|------|
+| `/` | **203.1 KB** | **564.3 KB** | 64.6 KB |
+| `/work/ai-quranic-tafsir` | 151.8 KB | 394.2 KB | 17.2 KB |
+| `/gallery` | 181.0 KB | 506.2 KB | 18.8 KB |
+
+vs gate Q4.1 (`/` 204.3 / 565.4 · `/work` 151.7 / 394.1 · `/gallery` 180.9 / 506.2):
+home **−1.2 / −1.1 KB**, `/work` & `/gallery` datar. Total dist JS 678.5 KB gzip
+(bersifat informasional; `check-budget` tetap merah = gap DEV-1 yang sudah
+dokumentasi, karena metrik itu menjumlahkan seluruh chunk lintas route).
+
+### 12.3 Temuan di luar audit: `fetch-data` gagal diam-diam
+
+`bun run build` (memakai `fetch-data`) membongkar defect yang tidak terlihat dari
+halaman mana pun: query GraphQL pinned-repos memisahkan field dengan titik koma
+(`name; description; url`). GraphQL hanya memperlakukan **koma** sebagai token
+diabaikan, jadi API menjawab **HTTP 200 dengan array `errors`**, skrip menyimpan
+payload itu ke cache, mencetak `✓ pinned-repos (transformed)`, dan situs merender
+**nol pinned repository** pada setiap build sejak itu. `GitHubUniverse` jatuh ke
+`top_repos`, jadi halaman tidak pernah tampak rusak — itu sebabnya query rusak dan
+"akun memang tidak punya pin" tak dapat dibedakan dari sisi hilir.
+
+Perbaikan: koma; `fetchGraphQL` melemgalkan error bila `data.errors` terisi (tidak
+lagi menyimpan payload gagal); transform menolak menulis `[]` bila `data.user` tidak
+ada. Terukur sesudahnya: query valid, `pinnedItems.nodes: []` — akun memang tidak
+ punya pin, jadi output render **tidak berubah** (delta halaman nol).
+
+**Pelajaran**: "langkah build yang tidak bisa gagal = langkah build yang tidak
+diawasi orang". Skrip yang menandai `✓` pada payload error menghapus satu-satunya
+sinyal; dan hasil yang benar-benar nol terlihat identik dengan hasil yang salah.
+
 ## Cara ulang audit
 ```
 bun run serve              # preview lokal :4321
