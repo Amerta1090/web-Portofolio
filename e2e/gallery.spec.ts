@@ -1,24 +1,20 @@
 import { type Page, expect, test } from "@playwright/test";
+import { waitForExperimentReady } from "./hydration";
 
 /**
  * Robust card-open helper: scope to the experiments grid, scroll the card into
  * view, click it, then wait for the modal — avoids the hydration race where a
  * naive `getByText(...).click()` silently misses the card (see sprint detAIministic D4).
  *
- * Waiting on `[data-modal-content]` alone is not enough, and that gap was measured:
- * the modal shell appears in ~200ms while the experiment itself is still resolving
- * its lazy chunk behind `ExperimentLoader` ("memuat eksperimen…"). A probe caught
- * the shell and its controls visible with the experiment's own content not yet in
- * the DOM. Every caller asserts on experiment content, so the helper waits for the
- * loader to disappear — the condition that actually means "this experiment is open",
- * for all 27 experiments without naming any of them.
+ * The "is it really open" condition lives in `./hydration` so that this helper and
+ * the 13 deep-link `beforeEach` blocks cannot drift apart again; see
+ * `waitForExperimentReady` for the measurement that forced the change.
  */
 async function openExperiment(page: Page, name: string) {
   const grid = page.locator("[aria-label='Experiments']");
   await grid.getByText(name).first().scrollIntoViewIfNeeded();
   await grid.getByText(name).first().click();
-  await expect(page.locator("[data-modal-content]")).toBeVisible({ timeout: 10000 });
-  await expect(page.getByText("memuat eksperimen…")).toHaveCount(0, { timeout: 30000 });
+  await waitForExperimentReady(page);
 }
 
 test.describe("Gallery page", () => {
@@ -424,7 +420,7 @@ test.describe("Gallery page", () => {
   test.describe("Ulam Spiral", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto("/gallery#ulam-spiral");
-      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+      await waitForExperimentReady(page);
     });
 
     test.afterEach(async ({ page }) => {
@@ -448,7 +444,7 @@ test.describe("Gallery page", () => {
   test.describe("Hyperbolic Game of Life", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto("/gallery#hyperbolic-gol");
-      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+      await waitForExperimentReady(page);
     });
 
     test.afterEach(async ({ page }) => {
@@ -478,7 +474,7 @@ test.describe("Gallery page", () => {
   test.describe("Conformal Mapping", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto("/gallery#conformal-mapping");
-      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+      await waitForExperimentReady(page);
     });
 
     test.afterEach(async ({ page }) => {
@@ -509,7 +505,7 @@ test.describe("Gallery page", () => {
   test.describe("Bézier Playground", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto("/gallery#bezier-playground");
-      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+      await waitForExperimentReady(page);
     });
 
     test.afterEach(async ({ page }) => {
@@ -548,7 +544,7 @@ test.describe("Gallery page", () => {
   test.describe("Neural Network Art", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto("/gallery#nn-art");
-      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+      await waitForExperimentReady(page);
     });
 
     test.afterEach(async ({ page }) => {
@@ -583,7 +579,7 @@ test.describe("Gallery page", () => {
   test.describe("Fractal Flame Sync", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto("/gallery#fractal-flame-sync");
-      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+      await waitForExperimentReady(page);
     });
 
     test.afterEach(async ({ page }) => {

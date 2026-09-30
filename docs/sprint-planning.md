@@ -79,15 +79,59 @@ Sprint 0 (Truth)  ──┬─→ Sprint 1 (Career Spine)  ──┐
 
 ### Task 0.1 — `SiteFacts`: satu sumber angka
 
-- [ ] **M0.1.1** Baca `src/lib/data.ts` (`getTimeline`, dll) + `src/lib/observatory/index.ts` untuk memastikan tidak menduplikasi logika yang sudah pure.
-- [ ] **M0.1.2** Tulis tipe `SiteFacts` (PRD §10) di `src/lib/facts.ts`. Field: `projects{count,featured,withMedia,withAssociation,byCategory}`, `certifications{count,byIssuer}`, `timeline{count,byKind}`, `lab{count,byCategory}`, `github{repos,stars,forks,contributions,longestStreak,mostActiveDay,busiestMonth}`, `profile{yearsExperience,languages}`.
-- [ ] **M0.1.3** Implementasikan `buildSiteFacts(): SiteFacts` — **pure**, deterministik, tanpa `Date.now()`/`Math.random()`, **tanpa fetch baru** (hanya `data/*.json` + `getCachedGitHubData()`).
-- [ ] **M0.1.4** Toleransi FieldOps: `buildSiteFacts` HARUS tahan terhadap data GitHub yang kosong/degenerat (mengembalikan `null`, bukan `NaN`/`0` yang menyesatkan) — karena `.cache` bisa tidak ada di build `build:fast`.
-- [ ] **M0.1.5** Helper presentasi `formatCount()` (digit grouping) + pemformat Bahasa Indonesia.
-- [ ] **M0.1.6** Unit test: setiap field terkunci terhadap fixture nyata (22 proyek, 62 sertifikasi, 7 penerbit, 7 pengalaman, 15 sertifikasi bertanggal, 3 honors, 1 volunteering, 27 lab).
-- [ ] **M0.1.7** Unit test: `buildSiteFacts()` dua kali berturut-turut → hasil identik (determinisme).
+- [x] **M0.1.1** Baca `src/lib/data.ts` (`getTimeline`, dll) + `src/lib/observatory/index.ts` untuk memastikan tidak menduplikasi logika yang sudah pure.
+- [x] **M0.1.2** Tulis tipe `SiteFacts` (PRD §10) di `src/lib/facts.ts`. Field: `projects{count,featured,withMedia,withAssociation,byCategory}`, `certifications{count,byIssuer}`, `timeline{count,byKind}`, `lab{count,byCategory}`, `github{repos,stars,forks,contributions,longestStreak,mostActiveDay,busiestMonth}`, `profile{yearsExperience,languages}`.
+- [x] **M0.1.3** Implementasikan `buildSiteFacts(): SiteFacts` — **pure**, deterministik, tanpa `Date.now()`/`Math.random()`, **tanpa fetch baru** (hanya `data/*.json` + `getCachedGitHubData()`).
+- [x] **M0.1.4** Toleransi FieldOps: `buildSiteFacts` HARUS tahan terhadap data GitHub yang kosong/degenerat (mengembalikan `null`, bukan `NaN`/`0` yang menyesatkan) — karena `.cache` bisa tidak ada di build `build:fast`.
+- [x] **M0.1.5** Helper presentasi `formatCount()` (digit grouping) + pemformat Bahasa Indonesia.
+- [x] **M0.1.6** Unit test: setiap field terkunci terhadap fixture nyata (22 proyek, 62 sertifikasi, 7 penerbit, 7 pengalaman, 15 sertifikasi bertanggal, 3 honors, 1 volunteering, 27 lab).
+- [x] **M0.1.7** Unit test: `buildSiteFacts()` dua kali berturut-turut → hasil identik (determinisme).
 
 **Verify**: `bun run test src/lib/facts.test.ts` hijau; `grep -rn "Math.random\|Date.now" src/lib/facts.ts` = 0.
+
+**Hasil 2026-09-30** — `src/lib/facts.ts` (317 baris) + `src/lib/facts.test.ts` (28 test) + `src/lib/facts.no-cache.test.ts` (9 test) + `src/lib/useTimeOfDay.test.tsx` (3 test). Semua gate hijau: unit **936/936** (80 file, floor 875 · target PRD ≥925 dilewati di microtask pertama), `astro check` **103** (= baseline; diff sorted bersih — 2 error lama GalleryGrid hanya **geser baris** 454→165 & 908→548 dengan kode & kolom identik), `lint` **676** (↓5 dari 681), **0 error baru di 17 file tersentuh** (biome di `GalleryGrid.tsx`: HEAD 10 → kini 8), `validate-data` OK, `build:fast` 49 halaman, payload `/` **202.6 / 563.7** KB (↓0.5/↓0.6 dari baseline 203.1/564.3 — gate "tak naik" terpenuhi tanpa tradeoff), `/work` 151.2/393.6 datar, `/gallery` 179.9/505.1 (+0.1 KB initial = noise, jauh di bawah ambang 1 KB), runtime `/` scroll listener **15** (baseline 16), e2e `--workers=1` **LIHAT §7**. 0 listener/RAF/React root baru.
+
+Nilai nyata yang terkunci: proyek 22 (featured 5, withMedia 4, withAssociation 6) · sertifikasi 62 (61 bertanggal, 7 penerbit) · timeline 22 = 7 pengalaman + 15 sertifikasi · honors 3 · volunteering 1 · lab 27 (Physics 6, Mathematics 8, ML 8, Generative & Audio 3, Interaction & Tools 2) · `yearsExperience` **2** · bahasa `["English","Indonesian"]`.
+
+#### Prasyarat: ekstraksi lab registry (bukan di plan, tapi blocking)
+
+`SiteFacts.lab.{count,byCategory}` butuh daftar eksperimen, dan daftar itu **tidak terbaca dari luar island**: `GalleryGrid.tsx` memegang `experiments[]` berisi JSX icon, jadi tak ada modul lain yang bisa membacanya. Duplikat yang sudah ada karena itu: `buildIndex.ts` punya "lean registry" sendiri (**25 dari 27** → 2 eksperimen tak terjangkau dari Ctrl+K) dan `src/lib/experiments.ts` punya salinan ketiga (4 entri, dipakai `CreativeLabTeaser.tsx` — sengaja dibiarkan untuk M2.5.6). Tiga salinan = kelas drift yang justru harus dihapus (P8), jadi ekstraksi jadi prasyarat Task 0.1, bukan scope tambahan.
+
+- `src/lib/lab-registry.ts` (baru) — identitas yang bisa dicari saja: `id, title, tags, category` + `LAB_CATEGORIES`/`LAB_CATEGORY_ORDER`/`labCategory`.
+- `src/lib/lab-gallery.ts` (baru) — half yang hanya dirender grid: `description, longDescription, gradient, thumbnail, cursor, featured?` di peta `PRESENTATION` + join-nya (`LAB_GALLERY_EXPERIMENTS`).
+- `src/islands/GalleryGrid.tsx` 1024 → ~660 baris, `src/lib/search/buildIndex.ts` 318 → ~150 baris (duplikat 25 entri dihapus).
+
+**DEVIASI (batas modul pakai A/B, bukan tebakan).** Aturannya satu kalimat: **sebuah field milik modul yang consumer-nya benar-benar membacanya.** Diukur, bukan diasumsikan — dengan semua field inline, payload initial `/` naik **203.1 → 207.4** KB gzip (A/B lewat `git stash` + build penuh terpisah). Setelah `description` dipindah ke `lab-gallery.ts`, sisanya 1.4 KB, dan hasil akhir justru **0.6 KB di bawah baseline** karena duplikat 25 entri di `buildIndex.ts` ikut hilang. Konsekuensi yang harus diingat: **27 literal gradien Tailwind pindah dari `GalleryGrid.tsx` ke `lab-gallery.ts`** — gate palette M4.6.1 harus menunjuk file yang baru.
+
+**DEVIASI — `formatCount()` pakai `en-US`, bukan Bahasa Indonesia.** Bukti: `<html lang="en">`, `og:locale en_US`, dan satu formatter yang sudah ada di repo (`observatory/insights.ts`) memakai `en-US`. Mengelompokkan digit dalam satu locale dan prosa dalam locale lain adalah bug, bukan lokalisasi.
+
+**DEVIASI — `timeline.byKind` hanya 2 key, bukan 4 seperti PRD §10.** PRD mencantumkan `experience/certification/honor/volunteering`. Honors (3) dan volunteering (1) **bukan event timeline sama sekali** — `getTimeline()` hanya menghasilkan pengalaman + sertifikasi bertanggal — jadi menghitungnya di bawah `timeline` membuat field yang bagian-bagiannya **tidak berjumlah dengan totalnya sendiri** (7+15+3+1 = 26 melawan `timeline.count` 22). Ringkasan yang tak bisa dijumlahkan adalah kelas defect yang sama dengan angka basi, hanya lebih pelan. Honornya pindah ke `honors.count`/`volunteering.count`, dan invarian `byKind.experience + byKind.certification === timeline.count` jadi bisa diuji.
+
+**Cap sertifikasi diekspos jujur.** `getTimeline()` menyimpan 15 sertifikasi bertanggal terbaru dan membuang sisanya karena tulang 53-entri lebih buruk dibaca daripada 22-entri. Itu keputusan produk, bukan fakta data, jadi keduanya dipisah: `timeline.byKind.certification` = 15 (yang ditampilkan) vs `certifications.dated` = 61 (yang dimiliki data), dengan konstanta `TIMELINE_CERTIFICATION_LIMIT` diekspor.
+
+**`yearsExperience` diturunkan, bukan dibaca.** Dari `data/experience.json`: rentang mulai paling awal → selesai tertutup terakhir. Perjalanan yang masih berjalan menyumbang mulai tapi **bukan** akhirnya, jadi angkanya under-report, bukan over-report (P6). Tidak ada "hari ini" — wall clock membuat angka berubah tiap build dan merusak determinisme. Hasilnya **2**, cocok dengan `metrics.years_experience: 2` yang ditulis tangan.
+
+**GitHub = `null`, bukan `0`.** `.cache/` gitignored, jadi CI dan `build:fast` tak punya cache sama sekali; data degenerat juga pernah nyata (`fetch-data.mjs` gagal diam-diam dan tiap build render 0 pinned repo). `toGithubFacts()` mengembalikan `null` untuk cache hilang, `total_repos <= 0`, `languages: []`, angka non-finite, dan `derived_metrics` yang hilang/aneh. Angka GitHub **tidak dipin** di test karena tak reproducible di CI — ia diuji lewat fixture `healthyCache()` + fixture degenerat.
+
+**Tambahan scope (wajib, untuk gerbang e2e): harness gallery.** Jalankan e2e penuh pertama keluar dengan **1 gagal** — `gallery.spec.ts:440` Ulam Spiral, `beforeEach` timeout 5 detik. A/B terisolasi: **2/2 hijau**, jadi bukan regresi. Penyebabnya adalah F5.1 DEFECT TEST 3 yang **hanya diperbaiki di satu tempat**: `openExperiment` sudah menunggu loader hilang, tapi **13 `beforeEach` blok** masih `waitForSelector("[data-modal-content]")` — menunggu **cangkang**, bukan isi. Di mesin 3 GB setelah 13 menit run, chunk lazy belum resolve dalam 5 detik. Diperbaiki di akar, bukan dicatat sebagai flake: `data-experiment-loader` di `ExperimentLoader` + helper bersama `waitForExperimentReady()` di `e2e/hydration.ts` yang dipakai 13 blok **dan** `openExperiment`, supaya keduanya tak bisa melenceng lagi.
+
+#### DEFECT PRODUK 2 (ketemu oleh gerbang, bukan oleh feature test) — jam build bocor ke markup
+
+Run e2e penuh kedua keluar **1 gagal lagi, di test yang berbeda**: `craft.spec.ts:4` "selection is brand-colored…", dengan `expect(light.bg).toBe("rgb(93, 107, 84)")` menerima **`""`**. `Received: ""` bukan timeout dan bukan "nilai salah" — itu tanda yang berbeda, jadi tidak bisa langsung dimasukkan ke keranjang "flake". A/B terisolasi **4/4 hijau**, dan probe siklus tema 7× membaca dark/light **sempurna** (tema bukan penyebabnya). Yang dipetakan:
+
+- `""` ⇔ **node detached**. Dibuktikan langsung: node `attached` → nilai; `display:none` → **nilai**; `visibility:hidden` → **nilai**; `detached` → **`""`**. Tidak ada kondisi "tak ter-render" lain yang menghasilkannya.
+- `main p` pertama milik **`TimeAwareHero`** (`client:idle`) — masih `ssr: true` saat dibaca, lalu pada **t≈1050 ms** (tepat saat island hydrate) **seluruh subtree dilepas dan dibangun ulang**: `<h1>` dan `<p>` ikut terlepas (`detached` 42/42 node).
+- Penyebabnya `useTimeOfDay()` mengembalikan jam **build** saat `typeof window === "undefined"`. Situs ini **SSG**, jadi "tidak ada window" bukan edge case langka — itu yang dilihat mesin build untuk **setiap** halaman yang di-emit, dan `"Good afternoon"` jadi tertanam di HTML. Saat hidrasi klien menghitung jam **pengunjung** ("Good morning") → teks beda → React #425 → React membuang DOM server untuk seluruh island. AGENTS.md sudah lama mencatat "TimeAwareHero time-text mismatch" sebagai error konsol pre-existing **tanpa akibat terukur**; sekarang akibatnya terukur.
+- Efeknya bukan cuma sia-sia: setiap node yang diambil dari markup server menjadi detached, dan `getComputedStyle` pada node detached melaporkan `""` untuk **setiap** properti. Itulah yang membuat asersi computed-style gagal — dan grep menunjukkan **dua** spec Affected (`craft.spec.ts:6`, `typography.spec.ts:6` `#hero h1`), bukan satu.
+
+Diperbaiki **di akar produk**, bukan dengan menunggu hidrasi di test (menunggu hidrasi hanya menyembunyikan defect di balik gerbang yang dibuat hijau): `useTimeOfDay()` jadi `useState(SSR_TIME)` + `useEffect`, jadi render klien pertama **sama persis** dengan server dan greeting asli datang satu frame setelahnya — bentuk yang sama dengan `loaded`/`isReturning` di komponen itu sendiri. Terukur sesudah fix: subtree hero **tidak pernah** terlepas dalam 28 s (`first detach: null`), 3 error hidrasi React (#418/#423/#425) **hilang**, greeting tetap hidup ("Good afternoon" → "Good morning"), `ThemeCustomizer` (konsumen lain) tidak berubah karena sudah `return null` sampai mounted. 0 listener/RAF/React root/payload baru.
+
+Test-nya mengunci **properti yang rusak** (markup tak boleh bergantung pada apakah `window` ada — di jsdom `window` **ada**, jadi implementasi lama membaca jam pengunjung juga saat server-render dan asersi ini merah), bukan string hardcode. Mutasi ke implementasi lama → 1 merah, dipulihkan & `md5sum` cocok.
+
+**Koreksi atas catatan sendiri — mutasi yang "tidak tertangkap" ternyata tidak pernah dijalankan.** Catatan M0.1 sebelumnya mengklaim menghapus guard `repos <= 0` menghasilkan **0 merah**. Faktanya `facts.test.ts:265` sudah memegangnya, dan mutasi yang diulang dengan verifikasi pola (`assert pola ditemukan` sebelum menulis) memberi **2 merah**. Kemungkinan besar penggantian teksnya gagal diam-diam sehingga tes yang dijalankan memang tidak memuat file itu. Pelajaran yang dipakai: **mutasi tanpa verifikasi "pola benar-benar berubah" bukan bukti apa pun** — F5.1 #3 sudah mengajari langkahnya, tapi hanya separuh; separuh lagi adalah memastikan mutasinya benar-benar mendarat. Dan tetap ada celah nyata yang tidak tertangkap: guard hanya diuji lewat `toGithubFacts` langsung, padahal jalur produknya `buildSiteFacts()` — jadi `facts.no-cache.test.ts` ditambah 4 test untuk cache yang **ada tapi tak dipercaya** (nol repo, languages kosong), dan mutasi yang sama kini **2 merah** di jalur itu juga.
+
+**DEVIASI — tambahan scope produk di luar Task 0.1.** `useTimeOfDay` tidak ada dalam plan 0.1. Tetap dikerjakan karena (a) gerbang e2e wajib hijau dan (b) akarnya **produk**, bukan harness: menutupnya di test berarti gerbang hijau untuk kode yang masih salah. Dicatat di sini + §8 sesuai aturan.
+
 
 ### Task 0.2 — Validasi build-time yang GAGAL KERAS
 
@@ -595,7 +639,7 @@ Sprint 0 (Truth)  ──┬─→ Sprint 1 (Career Spine)  ──┐
 | Sprint | Status | Unit | Section | e2e | Catatan |
 |---|---|---|---|---|---|
 | Baseline 2026-09-29 | ✅ tercatat | 875/875 | 14 | 245 | `astro check` 103 · `lint` 681 |
-| 0 — Truth & Integrity | ⬜ | — | 14→13 | — | |
+| 0 — Truth & Integrity | 🔄 1/8 task | 936/936 | 14 | LIHAT §7 catatan | **Task 0.1 `SiteFacts` ✅** (M0.1.1–M0.1.7). `astro check` 103 (= baseline, 0 baru) · `lint` 676 (↓5) · payload `/` 202.6/563.7 KB (↓0.5) · listener 15 (↓1). Prasyarat: ekstraksi lab registry (2 modul) menghapus **3 salinan** daftar eksperimen. **2 defect produk dari gerbang**: harness gallery (13 blok) + jam build bocor ke markup (`useTimeOfDay` → subtree hero dibongkar saat hidrasi). Berikutnya: **Task 0.2 / M0.2.1** |
 | 1 — Career Spine | ⬜ | — | 13→12 | — | |
 | 2 — Evidence Surface | ⬜ | — | 12 | — | |
 | 3 — Capability Map | ⬜ | — | 12 | — | |
@@ -610,12 +654,16 @@ Sprint 0 (Truth)  ──┬─→ Sprint 1 (Career Spine)  ──┐
 |---|---|---|
 | **Tidak tambah dependency** (animejs ditolak) | GSAP 3.15 di `node_modules` sudah punya semua plugin yang persis; `onScroll` anime.js lebih buruk untuk budget listener; fitur utamanya rusak di jsdom | §8.3 |
 | **`SiteFacts` = satu sumber angka** | Membuat C3 (angka basi) mustahil secara struktural, bukan diperbaiki sekali | §10 |
+| **Lab registry jadi 2 modul** | Aturan satu kalimat: field milik modul yang consumer-nya membacanya. Diukur A/B — inline = payload `/` 203.1→207.4 KB | §10 |
 | **14 → 12 section** | Menambah bobot pada konten yang sudah ada, bukan menambah halaman baru | §5 N4 |
 | **Nginx route** | Semua kerja di halaman & data yang sudah ada | §5 N3 |
 | **Timeline dibuang** | 22 proyek + 62 sertifikasi + GitHub data sudah ada; 4 dari 27 eksperimen lab tak pernah ditampilkan | §9.5, §9.6 |
 | **Naik trunk, bukan bikin island baru** | P3 + P7; island baru = listener baru | §6 P3/P7 |
 | **Reduced-motion jadi DEFAULT, bukan opsional** | Q4.2 #1: `test.use({reducedMotion})` terbukti diam-diam diabaikan | §11 |
 | **e2e `--workers=1`** | 4-core/3 GB; `--workers=4` = 23 gagal pada kode identik | §0.3 |
+| **`Received: ""` di computed style = node detached** | Dipetakan, bukan ditebak: `display:none` & `visibility:hidden` tetap mengembalikan nilai, hanya node detached yang mengembalikan `""`. Tanda ini yang membedakan "flake" dari defect produk | §12 |
+| **`useTimeOfDay` diperbaiki di produk, bukan testnya** | Gerbang e2e wajib hijau, dan akarnya produk. Menunggu hidrasi di test hanya menyembunyikan defect di balik gerbang yang dibuat hijau — preseden F5.1 (fallback terlalu longgar menyembunyikan kegagalan) | §12 |
+| **`astro check` & mutasi selalu via diff sorted / verifikasi pola** | Baseline Comparing daftar, bukan nomor baris (baris bergeser saat file tumbuh); mutasi tanpa `assert pola ditemukan` bisa gagal mendarat diam-diam lalu dilaporkan "tidak tertangkap" | §0.3 |
 
 ---
 

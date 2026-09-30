@@ -1,6 +1,3 @@
-import { animateView, spring } from "motion";
-import { AnimatePresence, motion } from "motion/react";
-import { flushSync } from "react-dom";
 import {
   Activity,
   Atom,
@@ -8,10 +5,10 @@ import {
   CircuitBoard,
   Dices,
   Droplets,
+  Gauge,
   GitBranch,
   GitFork,
   Globe,
-  Gauge,
   Hexagon,
   Layers,
   LayoutGrid,
@@ -24,8 +21,23 @@ import {
   Wand2,
   X,
 } from "lucide-react";
-import { forwardRef, lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { animateView, spring } from "motion";
+import { AnimatePresence, motion } from "motion/react";
+import { Suspense, forwardRef, lazy, useCallback, useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import AmbientSound from "../components/atoms/AmbientSound";
+import {
+  LAB_GALLERY_EXPERIMENTS,
+  type LabGalleryExperiment,
+  labCursor,
+  labLongDescription,
+} from "../lib/lab-gallery";
+import {
+  LAB_CATEGORY_ORDER,
+  LAB_EXPERIMENTS,
+  type LabCategory,
+  labCategory,
+} from "../lib/lab-registry";
 import { recordInteraction, setCurrent } from "../lib/recommend/session";
 import { useFocusTrap } from "../lib/useFocusTrap";
 
@@ -65,353 +77,52 @@ const experimentComponents: Record<
   "markov-generator": lazy(() => import("./experiments/MarkovGenerator")),
 };
 
-interface Experiment {
-  id: string;
-  title: string;
-  description: string;
-  longDescription: string;
-  tags: string[];
+interface Experiment extends LabGalleryExperiment {
   icon: React.ReactNode;
-  gradient: string;
-  thumbnail: string;
-  featured?: boolean;
 }
 
-const experiments: Experiment[] = [
-  {
-    id: "watch-demo",
-    title: "Cinematic Watch Product Demo",
-    description:
-      "Scroll-driven 4K frame-sequence engine with momentum decay, bookmarking, and PNG export.",
-    longDescription:
-      "A real video-to-frame-sequence showcase. 302 frames from a cinematic watch product commercial featuring Rolex, Omega, and more.",
-    tags: ["4K", "Image Sequence", "Video", "Cinematic"],
-    icon: <Monitor className="w-5 h-5" />,
-    gradient: "from-sky-500 to-indigo-600",
-    thumbnail: "/images/experiments/watch-demo.svg",
-  },
-  {
-    id: "liquid-distortion",
-    title: "Liquid Distortion",
-    description:
-      "Real-time Navier-Stokes fluid solver on Canvas 2D — advect dye with your cursor, click to spawn vortices.",
-    longDescription:
-      "A simplified Navier-Stokes fluid solver running in real-time. Move your mouse to push the fluid, click to spawn swirling vortices, and watch colored dye blend and flow.",
-    tags: ["Canvas", "Fluid Simulation", "Interactive", "Physics"],
-    icon: <Droplets className="w-5 h-5" />,
-    gradient: "from-cyan-500 to-teal-500",
-    thumbnail: "/images/experiments/liquid-distortion.svg",
-    featured: true,
-  },
-  {
-    id: "audio-visualizer",
-    title: "Audio Visualizer",
-    description:
-      "Live FFT visualizer with five render modes, mic/file input, and WebM recording via MediaRecorder.",
-    longDescription:
-      "A Web Audio API-powered audio visualizer with 5 visualization modes: frequency bars, circular ring, time-domain waveform, frequency-reactive particles, and hex grid. Supports live microphone input and MP3/WAV file upload. Export recordings as WebM video.",
-    tags: ["Audio", "Web Audio API", "FFT", "Canvas"],
-    icon: <Music className="w-5 h-5" />,
-    gradient: "from-green-500 to-emerald-500",
-    thumbnail: "/images/experiments/audio-visualizer.svg",
-    featured: true,
-  },
-  {
-    id: "fractal-explorer",
-    title: "Fractal Explorer",
-    description:
-      "WebGL2 Mandelbrot/Julia explorer with smooth iteration shading, palette editor, and shareable bookmark URLs.",
-    longDescription:
-      "A WebGL 2.0-powered fractal explorer featuring Mandelbrot and Julia sets with infinite zoom capability. Drag to zoom into any region, tweak color palettes, morph Julia parameters in real-time, and bookmark your favorite fractal coordinates as shareable URLs.",
-    tags: ["WebGL", "Fractal", "GLSL", "Interactive"],
-    icon: <Hexagon className="w-5 h-5" />,
-    gradient: "from-amber-500 to-yellow-500",
-    thumbnail: "/images/experiments/fractal-explorer.svg",
-    featured: true,
-  },
-  {
-    id: "interactive-canvas",
-    title: "Interactive Canvas",
-    description:
-      "Infinite whiteboard: DOMMatrix pan/zoom, node-graph editor, pressure-sensitive brushes, undo timeline, SVG export.",
-    longDescription:
-      "A full-featured infinite canvas whiteboard. Pan/zoom infinitely, draw with pressure-sensitive pen/marker/spray/eraser tools, paint with settling particles, build connected node graphs with draggable edges, undo/redo through history with a visual timeline scrubber, and export your creation as PNG or SVG.",
-    tags: ["Canvas", "Whiteboard", "Drawing", "Node Graph", "Tools"],
-    icon: <Paintbrush className="w-5 h-5" />,
-    gradient: "from-purple-500 to-cyan-500",
-    thumbnail: "/images/experiments/interactive-canvas.svg",
-    featured: true,
-  },
-  {
-    id: "strange-attractor",
-    title: "Strange Attractor Zoo",
-    description:
-      "Five chaotic attractors integrated in real time — Lorenz, Rössler, Aizawa, Thomas, Chen — as glowing particle trails.",
-    longDescription:
-      "Explore four strange attractors — Lorenz, Rössler, Aizawa, and Thomas — rendered as 3D particle trails projected onto 2D canvas. Toggle between attractors, adjust parameters (σ, ρ, β), and watch how tiny differences in initial conditions produce wildly divergent butterfly-wing patterns.",
-    tags: ["Canvas", "Chaos", "3D", "Dynamical Systems"],
-    icon: <CircuitBoard className="w-5 h-5" />,
-    gradient: "from-amber-500 to-red-500",
-    thumbnail: "/images/experiments/strange-attractor.svg",
-  },
-  {
-    id: "logistic-map",
-    title: "Logistic Map / Bifurcation",
-    description:
-      "Bifurcation diagram with live cobweb plot — watch period-doubling route to chaos as r sweeps toward 4.",
-    longDescription:
-      "The logistic map — the classic route to chaos. A bifurcation diagram builds point-by-point as r sweeps from 2 to 4. Click any r for a cobweb plot overlay showing the orbit. The Feigenbaum constant δ ≈ 4.669 emerges from the period-doubling cascade. Adjust r and initial x₀ in real-time.",
-    tags: ["Canvas", "Chaos", "Bifurcation", "Mathematical"],
-    icon: <Activity className="w-5 h-5" />,
-    gradient: "from-amber-500 to-yellow-500",
-    thumbnail: "/images/experiments/logistic-map.svg",
-  },
-  {
-    id: "noise-topography",
-    title: "Noise Topography",
-    description:
-      "Layered Perlin-noise terrain with octave controls and STL mesh export for 3D printing.",
-    longDescription:
-      "Fractal noise terrain generator using layered Perlin noise. Explore how octaves, persistence, lacunarity, and seed shape the landscape. Adjust height multiplier, drag to pan, toggle auto-scroll for a flying-over effect, export the terrain as an STL file for 3D printing.",
-    tags: ["Canvas", "Noise", "Terrain", "3D", "Procedural"],
-    icon: <Activity className="w-5 h-5" />,
-    gradient: "from-cyan-500 to-amber-500",
-    thumbnail: "/images/experiments/noise-topography.svg",
-  },
-  {
-    id: "fourier-epicycles",
-    title: "Fourier Epicycles",
-    description:
-      "Draw any shape, then watch a DFT rebuild it from rotating epicycles — reconstruction error computed live.",
-    longDescription:
-      "The Fourier series tells us any closed shape is just a sum of rotating circles. Draw any closed shape with your mouse, watch a DFT decompose it into rotating epicycles (circles), and see the reconstruction converge from a blurry blob to a perfect outline as N increases.",
-    tags: ["Canvas", "Fourier", "Epicycles", "DFT"],
-    icon: <Activity className="w-5 h-5" />,
-    gradient: "from-amber-500 to-purple-500",
-    thumbnail: "/images/experiments/fourier-epicycles.svg",
-  },
-  {
-    id: "svd-compression",
-    title: "SVD Image Compression",
-    description:
-      "Upload an image, decompose it with SVD, and slide rank k to trade fidelity for compression ratio.",
-    longDescription:
-      "The Singular Value Decomposition (SVD) is the mathematical foundation of lossy compression. Upload any image, watch SVD decompose it into U, Σ, V^T, then use the rank slider to reconstruct from k singular values. See compression ratio update in real-time, the Σ diagonal with kept values highlighted, and a side-by-side comparison of original versus SVD reconstruction.",
-    tags: ["Canvas", "SVD", "Compression", "Linear Algebra", "Image Processing"],
-    icon: <Layers className="w-5 h-5" />,
-    gradient: "from-purple-500 to-pink-500",
-    thumbnail: "/images/experiments/svd-compression.svg",
-  },
-  {
-    id: "tesseract-projection",
-    title: "Tesseract Hypercube Projection",
-    description:
-      "A 4D hypercube projected through six independent rotation planes down to your 2D screen.",
-    longDescription:
-      "A 4D hypercube (tesseract) with 16 vertices and 32 edges, projected first from 4D to 3D via perspective projection, then to 2D. Rotate in all six 4D rotation planes (XY, XZ, XW, YZ, YW, ZW), toggle auto-rotation, adjust camera distance, and drag to explore the fourth dimension.",
-    tags: ["Canvas", "4D", "Geometry", "Hypercube", "Visualization"],
-    icon: <Hexagon className="w-5 h-5" />,
-    gradient: "from-amber-500 to-purple-500",
-    thumbnail: "/images/experiments/tesseract-projection.svg",
-  },
-  {
-    id: "pca-tsne-viz",
-    title: "PCA / t-SNE Visualization",
-    description:
-      "The same high-dimensional clusters through PCA and t-SNE side-by-side, with explained-variance readout.",
-    longDescription:
-      "Compare two dimensionality reduction techniques side-by-side. First, PCA projects high-dimensional clusters (5D–10D) to 2D, showing the covariance matrix and explained variance ratio. Then t-SNE separates clusters with adjustable perplexity, revealing how neighbor preservation differs from variance maximization.",
-    tags: ["Canvas", "PCA", "t-SNE", "Dimensionality Reduction", "ML"],
-    icon: <Activity className="w-5 h-5" />,
-    gradient: "from-green-500 to-teal-500",
-    thumbnail: "/images/experiments/pca-tsne-viz.svg",
-  },
-  {
-    id: "spring-physics",
-    title: "Spring Physics Sandbox",
-    description:
-      "Verlet-integration mass-spring sandbox — build cloth, chains, and ragdolls with tension-colored constraints.",
-    longDescription:
-      "A full-featured spring physics sandbox using Verlet integration. Click to place nodes, drag between nodes to connect springs, double-click to pin. Watch cloth drape, chains swing, and jelly wobble under gravity with real-time tension visualization.",
-    tags: ["Canvas", "Physics", "Verlet", "Interactive", "Springs"],
-    icon: <GitFork className="w-5 h-5" />,
-    gradient: "from-purple-500 to-pink-500",
-    thumbnail: "/images/experiments/spring-physics.svg",
-  },
-  {
-    id: "ulam-spiral",
-    title: "Ulam Spiral",
-    description:
-      "200K primes sieved onto Ulam's spiral — twin-prime diagonals and Mersenne highlights under a zoomable lens.",
-    longDescription:
-      "The Ulam Spiral arranges natural numbers in a square spiral and highlights primes, revealing striking diagonal patterns that hint at deep number-theoretic structure.",
-    tags: ["Number Theory", "Primes", "Spiral", "Visualization"],
-    icon: <Atom className="w-5 h-5" />,
-    gradient: "from-violet-500 to-purple-600",
-    thumbnail: "/images/experiments/ulam-spiral.svg",
-  },
-  {
-    id: "hyperbolic-gol",
-    title: "Hyperbolic Game of Life",
-    description:
-      "Conway's Game of Life on a {7,3} Poincaré-disk tiling, where infinity fits inside a circle.",
-    longDescription:
-      "Conway's Game of Life rendered on the Poincaré disk model of the hyperbolic plane. The {7,3} heptagonal tiling packs infinite cells into a finite circle, creating mesmerizing patterns.",
-    tags: ["Cellular Automata", "Hyperbolic", "Poincaré", "Emergence"],
-    icon: <Globe className="w-5 h-5" />,
-    gradient: "from-cyan-500 to-blue-600",
-    thumbnail: "/images/experiments/hyperbolic-gol.svg",
-  },
-  {
-    id: "conformal-mapping",
-    title: "Conformal Mapping Gallery",
-    description:
-      "Complex functions bending a polar grid in real time, angle preservation verified at every intersection.",
-    longDescription:
-      "Explore conformal mappings — complex functions that preserve angles locally. Watch a regular grid transform under z², 1/z, e^z, sin(z), z³, and √z while the angle markers at intersections stay constant, proving conformality.",
-    tags: ["Complex Analysis", "Conformal", "Grid", "Interactive"],
-    icon: <Globe className="w-5 h-5" />,
-    gradient: "from-cyan-500 to-blue-500",
-    thumbnail: "/images/experiments/conformal-mapping.svg",
-  },
-  {
-    id: "bezier-playground",
-    title: "Bézier Curve Playground",
-    description:
-      "N-degree Bézier/B-spline/Catmull-Rom editor animating de Casteljau's algorithm level by level.",
-    longDescription:
-      "A full-featured curve editor. Click to add control points, drag to reshape, toggle between Bézier (de Casteljau), B-spline, and Catmull-Rom interpolation. Animate the construction process and visualize Bernstein basis functions in real-time.",
-    tags: ["Bézier", "Curves", "de Casteljau", "Interactive"],
-    icon: <Wand2 className="w-5 h-5" />,
-    gradient: "from-amber-500 to-orange-500",
-    thumbnail: "/images/experiments/bezier-playground.svg",
-  },
-  {
-    id: "nn-art",
-    title: "Neural Network as Art",
-    description:
-      "A 2-6-1 MLP learning XOR, circle, and spiral live — activation particles flow along weights each forward pass.",
-    longDescription:
-      "Watch a 2-6-1 neural network learn XOR, circle, and spiral classification in real-time. Activation particles flow along weighted connections during each forward pass, the loss curve drops as gradient descent optimizes it, and a decision boundary evolves in the scatter plot below.",
-    tags: ["Neural Network", "Machine Learning", "Backprop", "Visualization"],
-    icon: <CircuitBoard className="w-5 h-5" />,
-    gradient: "from-purple-500 to-cyan-500",
-    thumbnail: "/images/experiments/neural-network-art.svg",
-  },
-  {
-    id: "fractal-flame-sync",
-    title: "Fractal Flame × Audio Sync",
-    description:
-      "IFS flame fractal whose variation weights breathe with your microphone's FFT bands.",
-    longDescription:
-      "An Iterated Function System flame fractal driven by real-time audio FFT. Upload a song or use your microphone — low frequencies morph the fractal's variation weights, mid frequencies rotate the transforms, and high frequencies shift the color palette. The flame literally dances to your music.",
-    tags: ["Fractal", "Audio", "FFT", "IFS", "Generative"],
-    icon: <Music className="w-5 h-5" />,
-    gradient: "from-amber-500 to-violet-500",
-    thumbnail: "/images/experiments/fractal-flame-sync.svg",
-  },
-  {
-    id: "prisoners-dilemma",
-    title: "Prisoner's Dilemma",
-    description:
-      "Round-robin iterated Prisoner's Dilemma across seven classic strategies, scored generation by generation.",
-    longDescription:
-      "Simulate an iterated Prisoner's Dilemma tournament with 7 strategies — Tit-for-Tat, Grim Trigger, Always Defect, Always Cooperate, Random, Pavlov, and Generous Tit-for-Tat. Watch as fitness-proportional selection and mutation drive strategy evolution over generations. A stacked area chart tracks population dynamics.",
-    tags: ["Game Theory", "Evolution", "Canvas", "Simulation"],
-    icon: <GitBranch className="w-5 h-5" />,
-    gradient: "from-red-500 to-amber-500",
-    thumbnail: "/images/experiments/prisoners-dilemma.svg",
-  },
-  {
-    id: "gradient-descent",
-    title: "Gradient Descent Landscape",
-    description:
-      "SGD, Momentum, and Adam racing down an animated loss landscape with contour overlay and learning-rate control.",
-    longDescription:
-      "Visualize gradient descent optimization on a 3D loss landscape. Watch SGD, Momentum, and Adam navigate contour lines from random starting points toward local minima. Compare optimizer paths, adjust learning rate, and explore how different algorithms handle saddle points.",
-    tags: ["Game Theory", "Optimization", "Gradient Descent", "3D"],
-    icon: <Activity className="w-5 h-5" />,
-    gradient: "from-amber-500 to-red-500",
-    thumbnail: "/images/experiments/gradient-descent.svg",
-  },
-  {
-    id: "simulated-annealing-tsp",
-    title: "Simulated Annealing TSP",
-    description:
-      "TSP solved by simulated annealing — temperature-colored tours cool from chaos to near-optimal routes.",
-    longDescription:
-      "The Traveling Salesman Problem (TSP) solved with Simulated Annealing. Click to place cities on the canvas, then watch the SA algorithm find shorter paths. Temperature cooling visualized in color, with acceptance probability allowing exploration at high temperatures and fine-tuning at low.",
-    tags: ["Game Theory", "TSP", "Simulated Annealing", "Optimization"],
-    icon: <CircuitBoard className="w-5 h-5" />,
-    gradient: "from-cyan-500 to-blue-500",
-    thumbnail: "/images/experiments/simulated-annealing-tsp.svg",
-  },
-  {
-    id: "relativistic-orbits",
-    title: "Relativistic Orbits",
-    description:
-      "Newton vs General Relativity side by side — Mercury's 43-arcsecond-per-century precession up close, photon sphere included.",
-    longDescription:
-      "Watch Mercury's famous perihelion precession unfold: a Newtonian orbit traces a closed ellipse while General Relativity adds a 1/r³ correction to the effective potential, causing the ellipse to precess by 43 arcseconds per century. Crank up the central mass and watch the photon sphere and event horizon (R_s) grow until the orbit becomes unstable and the particle plunges in.",
-    tags: ["Physics", "GR", "Orbits", "Canvas"],
-    icon: <Atom className="w-5 h-5" />,
-    gradient: "from-amber-500 to-cyan-500",
-    thumbnail: "/images/experiments/relativistic-orbits.svg",
-  },
-  {
-    id: "three-body-problem",
-    title: "3-Body Problem",
-    description:
-      "RK4-integrated three-body gravity: figure-eight, Lagrange, and Broucke orbits with live energy conservation.",
-    longDescription:
-      "The three-body problem is famously chaotic. Start from figure-8, Lagrange L4/L5, or Broucke orbits, then drag any body to perturb the system and watch trajectories diverge wildly. RK4 integration keeps orbits accurate while the live energy (KE + PE) and momentum displays verify conservation.",
-    tags: ["Astrophysics", "N-Body", "Chaos", "Gravity"],
-    icon: <GitFork className="w-5 h-5" />,
-    gradient: "from-cyan-500 to-purple-500",
-    thumbnail: "/images/experiments/three-body-problem.svg",
-  },
-  {
-    id: "galaxy-formation",
-    title: "Galaxy Formation",
-    description:
-      "900-particle N-body collapse seeded into a rotating disk — tune angular momentum and dark-matter fraction.",
-    longDescription:
-      "Seed 900 particles in a uniform rotating disk and watch a spiral galaxy emerge. Newtonian gravity with Plummer softening and velocity-Verlet integration drives the collapse; the initial angular-momentum profile and dark-matter fraction determine whether you get tight spiral arms or a diffuse, structureless blob. Particles are colored by local density from blue → cyan → amber → red as the core heats up.",
-    tags: ["Astrophysics", "N-Body", "Cosmology", "Spiral"],
-    icon: <Sparkles className="w-5 h-5" />,
-    gradient: "from-blue-500 to-purple-500",
-    thumbnail: "/images/experiments/galaxy-formation.svg",
-    featured: true,
-  },
-  {
-    id: "sentiment-gauge",
-    title: "Sentiment Gauge",
-    description:
-      "Type a sentence and watch a live AFINN-style gauge swing from red to amber to green, word by word.",
-    longDescription:
-      "A hand-rolled AFINN-style sentiment lexicon runs entirely in your browser. Type any text and see the aggregate valence swing across a red→amber→green gauge, per-word scores as colored chips, and intensity (magnitude) all computed deterministically — no network, no model.",
-    tags: ["NLP", "Sentiment", "Lexicon", "Text", "Deterministic"],
-    icon: <Gauge className="w-5 h-5" />,
-    gradient: "from-amber-500 to-green-500",
-    thumbnail: "/images/experiments/sentiment-gauge.svg",
-  },
-  {
-    id: "markov-generator",
-    title: "Markov Text Generator",
-    description:
-      "A first-order word chain over your own write-ups — walk it to mint a fresh-sounding bio, project blurb, or fact.",
-    longDescription:
-      "A from-scratch Markov chain is built over your actual projects, experience, and testimonials. Pick Bio / Project / Fact, bump the seed, and walk the transition graph to mint a fresh-sounding one-liner. Deterministic from a seed — regenerating is reproducible, and labelled 'generated, not AI'.",
-    tags: ["Markov", "NLP", "Generative", "Text", "Deterministic"],
-    icon: <Dices className="w-5 h-5" />,
-    gradient: "from-amber-500 to-violet-500",
-    thumbnail: "/images/experiments/markov-generator.svg",
-  },
-];
+/** Icons are the only JSX this list needs. Identity comes from the pure registry
+ *  (`lab-registry.ts`, also what SiteFacts reads) and presentation from
+ *  `lab-gallery.ts`, which is joined with it there so the merged type stays
+ *  non-optional. */
+const experimentIcons: Record<string, React.ReactNode> = {
+  "watch-demo": <Monitor className="w-5 h-5" />,
+  "liquid-distortion": <Droplets className="w-5 h-5" />,
+  "audio-visualizer": <Music className="w-5 h-5" />,
+  "fractal-explorer": <Hexagon className="w-5 h-5" />,
+  "interactive-canvas": <Paintbrush className="w-5 h-5" />,
+  "strange-attractor": <CircuitBoard className="w-5 h-5" />,
+  "logistic-map": <Activity className="w-5 h-5" />,
+  "noise-topography": <Activity className="w-5 h-5" />,
+  "fourier-epicycles": <Activity className="w-5 h-5" />,
+  "svd-compression": <Layers className="w-5 h-5" />,
+  "tesseract-projection": <Hexagon className="w-5 h-5" />,
+  "pca-tsne-viz": <Activity className="w-5 h-5" />,
+  "spring-physics": <GitFork className="w-5 h-5" />,
+  "ulam-spiral": <Atom className="w-5 h-5" />,
+  "hyperbolic-gol": <Globe className="w-5 h-5" />,
+  "conformal-mapping": <Globe className="w-5 h-5" />,
+  "bezier-playground": <Wand2 className="w-5 h-5" />,
+  "nn-art": <CircuitBoard className="w-5 h-5" />,
+  "fractal-flame-sync": <Music className="w-5 h-5" />,
+  "prisoners-dilemma": <GitBranch className="w-5 h-5" />,
+  "gradient-descent": <Activity className="w-5 h-5" />,
+  "simulated-annealing-tsp": <CircuitBoard className="w-5 h-5" />,
+  "relativistic-orbits": <Atom className="w-5 h-5" />,
+  "three-body-problem": <GitFork className="w-5 h-5" />,
+  "galaxy-formation": <Sparkles className="w-5 h-5" />,
+  "sentiment-gauge": <Gauge className="w-5 h-5" />,
+  "markov-generator": <Dices className="w-5 h-5" />,
+};
+
+const experiments: Experiment[] = LAB_GALLERY_EXPERIMENTS.map((meta) => ({
+  ...meta,
+  icon: experimentIcons[meta.id] ?? null,
+}));
 
 /** Shared registry for other islands (recommender strip) — id/title/tags only. */
 export const GALLERY_EXPERIMENTS: Array<{ id: string; title: string; tags: string[] }> =
-  experiments.map(({ id, title, tags }) => ({ id, title, tags }));
+  LAB_EXPERIMENTS.map(({ id, title, tags }) => ({ id, title, tags }));
 
 function LivePreview({ id }: { id: string }) {
   const Component = experimentComponents[id];
@@ -597,7 +308,7 @@ function ExperimentModal({
                 </div>
                 <div>
                   <h2 className="text-sm font-bold text-text-primary">{experiment.title}</h2>
-                  <p className="text-xs text-text-secondary">{experiment.longDescription}</p>
+                  <p className="text-xs text-text-secondary">{labLongDescription(experiment.id)}</p>
                 </div>
               </div>
               <button
@@ -625,7 +336,11 @@ function ExperimentModal({
 
 function ExperimentLoader() {
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full gap-3" aria-live="polite">
+    <div
+      className="flex flex-col items-center justify-center w-full h-full gap-3"
+      aria-live="polite"
+      data-experiment-loader=""
+    >
       <div className="w-10 h-10 rounded-full border-2 border-border border-t-amber-500 animate-spin" />
       <p className="text-xs text-text-secondary font-mono">memuat eksperimen…</p>
     </div>
@@ -643,92 +358,17 @@ function renderExperiment(id: string): React.ReactNode {
 }
 
 function experimentCursor(id: string): string {
-  const cursors: Record<string, string> = {
-    "watch-demo": "zoom-in",
-    "liquid-distortion": "crosshair",
-    "audio-visualizer": "crosshair",
-    "fractal-explorer": "zoom-in",
-    "interactive-canvas": "crosshair",
-    "strange-attractor": "crosshair",
-    "logistic-map": "zoom-in",
-    "noise-topography": "grab",
-    "fourier-epicycles": "crosshair",
-    "tesseract-projection": "crosshair",
-    "svd-compression": "crosshair",
-    "pca-tsne-viz": "crosshair",
-    "spring-physics": "crosshair",
-    "ulam-spiral": "zoom-in",
-    "hyperbolic-gol": "crosshair",
-    "conformal-mapping": "crosshair",
-    "bezier-playground": "crosshair",
-    "nn-art": "pointer",
-    "fractal-flame-sync": "crosshair",
-    "prisoners-dilemma": "crosshair",
-    "gradient-descent": "crosshair",
-    "simulated-annealing-tsp": "crosshair",
-    "relativistic-orbits": "crosshair",
-    "three-body-problem": "grab",
-    "galaxy-formation": "crosshair",
-    "sentiment-gauge": "text",
-    "markov-generator": "text",
-  };
-  return cursors[id] || "pointer";
+  return labCursor(id);
 }
 
-type ExperimentCategory =
-  | "Physics & Simulation"
-  | "Mathematics"
-  | "ML & Algorithms"
-  | "Generative & Audio"
-  | "Interaction & Tools";
-
-const EXPERIMENT_CATEGORIES: Record<string, ExperimentCategory> = {
-  "watch-demo": "Interaction & Tools",
-  "liquid-distortion": "Physics & Simulation",
-  "audio-visualizer": "Generative & Audio",
-  "fractal-explorer": "Mathematics",
-  "interactive-canvas": "Interaction & Tools",
-  "strange-attractor": "Physics & Simulation",
-  "logistic-map": "Mathematics",
-  "noise-topography": "Generative & Audio",
-  "fourier-epicycles": "Mathematics",
-  "svd-compression": "ML & Algorithms",
-  "pca-tsne-viz": "ML & Algorithms",
-  "tesseract-projection": "Mathematics",
-  "spring-physics": "Physics & Simulation",
-  "ulam-spiral": "Mathematics",
-  "hyperbolic-gol": "Mathematics",
-  "conformal-mapping": "Mathematics",
-  "bezier-playground": "Mathematics",
-  "nn-art": "ML & Algorithms",
-  "fractal-flame-sync": "Generative & Audio",
-  "prisoners-dilemma": "ML & Algorithms",
-  "gradient-descent": "ML & Algorithms",
-  "simulated-annealing-tsp": "ML & Algorithms",
-  "three-body-problem": "Physics & Simulation",
-  "relativistic-orbits": "Physics & Simulation",
-  "galaxy-formation": "Physics & Simulation",
-  "sentiment-gauge": "ML & Algorithms",
-  "markov-generator": "ML & Algorithms",
-};
-
-const CATEGORY_ORDER: ("All" | ExperimentCategory)[] = [
-  "All",
-  "Physics & Simulation",
-  "Mathematics",
-  "ML & Algorithms",
-  "Generative & Audio",
-  "Interaction & Tools",
-];
-
-function experimentCategory(id: string): ExperimentCategory {
-  return EXPERIMENT_CATEGORIES[id] ?? "Interaction & Tools";
+function experimentCategory(id: string): LabCategory {
+  return labCategory(id);
 }
 
 export default function GalleryGrid() {
   const [activeExperiment, setActiveExperiment] = useState<string | null>(null);
   const [focusedIndex, setFocusedIndex] = useState(-1);
-  const [activeCategory, setActiveCategory] = useState<"All" | ExperimentCategory>("All");
+  const [activeCategory, setActiveCategory] = useState<"All" | LabCategory>("All");
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const lastOpenedRef = useRef<string | null>(null);
   const vtActiveRef = useRef(false);
@@ -911,7 +551,7 @@ export default function GalleryGrid() {
         role="tablist"
         aria-label="Filter experiments by category"
       >
-        {CATEGORY_ORDER.map((cat) => {
+        {LAB_CATEGORY_ORDER.map((cat) => {
           const isActive = activeCategory === cat;
           const n =
             cat === "All"
@@ -966,12 +606,8 @@ export default function GalleryGrid() {
       )}
 
       {visibleExperiments.length === 0 ? (
-        <output
-          className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-border/60 bg-bg-secondary/30 px-6 py-16 text-center"
-        >
-          <span className="text-sm text-text-secondary">
-            Tidak ada eksperimen di kategori ini.
-          </span>
+        <output className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-border/60 bg-bg-secondary/30 px-6 py-16 text-center">
+          <span className="text-sm text-text-secondary">Tidak ada eksperimen di kategori ini.</span>
           <button
             type="button"
             onClick={() => {

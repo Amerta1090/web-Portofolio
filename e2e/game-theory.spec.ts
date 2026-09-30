@@ -1,10 +1,11 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { waitForExperimentReady } from "./hydration";
 
 test.describe("Game Theory experiments", () => {
   test.describe("Gradient Descent Landscape", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto("/gallery#gradient-descent");
-      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+      await waitForExperimentReady(page);
     });
 
     test.afterEach(async ({ page }) => {
@@ -44,7 +45,7 @@ test.describe("Game Theory experiments", () => {
   test.describe("Prisoner's Dilemma Tournament", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto("/gallery#prisoners-dilemma");
-      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+      await waitForExperimentReady(page);
     });
 
     test.afterEach(async ({ page }) => {
@@ -59,7 +60,12 @@ test.describe("Game Theory experiments", () => {
 
     test("shows strategy visibility toggles", async ({ page }) => {
       const modal = page.locator("[data-modal-content]");
-      await expect(modal.locator("button").filter({ hasText: /Tit-fo|Grim|Always|Random|Pavlov/i }).first()).toBeVisible();
+      await expect(
+        modal
+          .locator("button")
+          .filter({ hasText: /Tit-fo|Grim|Always|Random|Pavlov/i })
+          .first(),
+      ).toBeVisible();
     });
 
     test("has speed slider", async ({ page }) => {
@@ -83,7 +89,7 @@ test.describe("Game Theory experiments", () => {
   test.describe("Simulated Annealing TSP", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto("/gallery#simulated-annealing-tsp");
-      await page.waitForSelector("[data-modal-content]", { timeout: 5000 });
+      await waitForExperimentReady(page);
     });
 
     test.afterEach(async ({ page }) => {

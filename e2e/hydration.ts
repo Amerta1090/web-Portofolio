@@ -36,3 +36,30 @@ export function waitForIslandHydration(page: Page, selector: string, timeout = 2
     { timeout },
   );
 }
+
+/**
+ * Wait until a gallery modal has finished loading the experiment inside it.
+ *
+ * Each of the 27 experiments is a `React.lazy` chunk behind a `Suspense`
+ * fallback, so the modal shell appears long before the experiment's own controls
+ * exist. A measured probe caught the shell *and* its controls visible with the
+ * experiment's content still absent from the DOM — the shell appearing in
+ * 108–241 ms, while the lazy chunk was still resolving.
+ *
+ * That is why `waitForSelector("[data-modal-content]")` is the wrong condition:
+ * it proves the dialog mounted, not that there is anything in it to assert on.
+ * Thirteen `beforeEach` blocks used it, and on a 3 GB machine under a 13-minute
+ * `--workers=1` run one of them timed out at 5 s and failed a test whose code was
+ * fine — a false negative in the sprint gate. The fix is to wait for the actual
+ * condition: shell present *and* the `ExperimentLoader` fallback gone.
+ *
+ * The hook is a `data-` attribute rather than the loader's visible copy
+ * ("memuat eksperimen…") so a translation pass cannot silently turn this gate
+ * green by changing a string.
+ */
+export async function waitForExperimentReady(page: Page, timeout = 30_000) {
+  await page.waitForSelector("[data-modal-content]", { timeout: 10_000 });
+  await page
+    .locator("[data-modal-content] [data-experiment-loader]")
+    .waitFor({ state: "detached", timeout });
+}

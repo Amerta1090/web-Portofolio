@@ -1,9 +1,10 @@
 import { expect, test } from "@playwright/test";
+import { waitForExperimentReady } from "./hydration";
 
 test.describe("Markov Text Generator", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/gallery#markov-generator");
-    await page.waitForSelector("[data-modal-content]", { timeout: 8000 });
+    await waitForExperimentReady(page);
   });
 
   test.afterEach(async ({ page }) => {

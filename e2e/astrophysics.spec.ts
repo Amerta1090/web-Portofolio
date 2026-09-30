@@ -1,10 +1,11 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { waitForExperimentReady } from "./hydration";
 
 test.describe("Astrophysics experiments", () => {
   test.describe("3-Body Problem", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto("/gallery#three-body-problem");
-      await page.waitForSelector("[data-modal-content]", { timeout: 8000 });
+      await waitForExperimentReady(page);
     });
 
     test.afterEach(async ({ page }) => {
@@ -54,7 +55,7 @@ test.describe("Astrophysics experiments", () => {
   test.describe("Relativistic Orbits", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto("/gallery#relativistic-orbits");
-      await page.waitForSelector("[data-modal-content]", { timeout: 8000 });
+      await waitForExperimentReady(page);
     });
 
     test.afterEach(async ({ page }) => {
@@ -80,7 +81,9 @@ test.describe("Astrophysics experiments", () => {
     });
 
     test("increasing mass changes displayed values", async ({ page }) => {
-      const massSlider = page.locator("[data-modal-content] label:has-text('Mass') input[type='range']");
+      const massSlider = page.locator(
+        "[data-modal-content] label:has-text('Mass') input[type='range']",
+      );
       await massSlider.fill("100");
       const modal = page.locator("[data-modal-content]");
       await expect(modal.getByText("100")).toBeVisible();
@@ -97,7 +100,7 @@ test.describe("Astrophysics experiments", () => {
   test.describe("Galaxy Formation", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto("/gallery#galaxy-formation");
-      await page.waitForSelector("[data-modal-content]", { timeout: 8000 });
+      await waitForExperimentReady(page);
     });
 
     test.afterEach(async ({ page }) => {
@@ -111,8 +114,12 @@ test.describe("Astrophysics experiments", () => {
 
     test("has dark matter, angular momentum and speed sliders", async ({ page }) => {
       const modal = page.locator("[data-modal-content]");
-      await expect(modal.locator('label:has-text("Dark matter") input[type="range"]')).toBeVisible();
-      await expect(modal.locator('label:has-text("Angular momentum") input[type="range"]')).toBeVisible();
+      await expect(
+        modal.locator('label:has-text("Dark matter") input[type="range"]'),
+      ).toBeVisible();
+      await expect(
+        modal.locator('label:has-text("Angular momentum") input[type="range"]'),
+      ).toBeVisible();
       await expect(modal.locator('label:has-text("Speed") input[type="range"]')).toBeVisible();
     });
 
@@ -125,9 +132,13 @@ test.describe("Astrophysics experiments", () => {
     });
 
     test("changing dark matter fraction updates percentage", async ({ page }) => {
-      const slider = page.locator("[data-modal-content] label:has-text('Dark matter') input[type='range']");
+      const slider = page.locator(
+        "[data-modal-content] label:has-text('Dark matter') input[type='range']",
+      );
       await slider.fill("0.8");
-      await expect(page.locator("[data-modal-content] .text-amber-400").first()).toContainText("80%");
+      await expect(page.locator("[data-modal-content] .text-amber-400").first()).toContainText(
+        "80%",
+      );
     });
 
     test("card is present in gallery", async ({ page }) => {

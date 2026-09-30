@@ -1,9 +1,10 @@
 import { expect, test } from "@playwright/test";
+import { waitForExperimentReady } from "./hydration";
 
 test.describe("Sentiment Gauge", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/gallery#sentiment-gauge");
-    await page.waitForSelector("[data-modal-content]", { timeout: 8000 });
+    await waitForExperimentReady(page);
   });
 
   test.afterEach(async ({ page }) => {
