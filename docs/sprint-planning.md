@@ -135,8 +135,8 @@ Test-nya mengunci **properti yang rusak** (markup tak boleh bergantung pada apak
 
 ### Task 0.2 — Validasi build-time yang GAGAL KERAS
 
-- [ ] **M0.2.1** Cek `scripts/validate-data.mjs` (atau `bun run validate-data`) — Understand exit code & cara melapor.
-- [ ] **M0.2.2** Tambahkan assert: `profile.json` **tidak boleh** punya `metrics.projects_shipped` / `metrics.certifications` (field dihapus di T0.6). Kalau masih ada → **gagal**, jangan diam-diam.
+- [x] **M0.2.1** Cek `scripts/validate-data.mjs` (atau `bun run validate-data`) — Understand exit code & cara melapor. **Bukti 2026-09-30**: validasi mengumpulkan error, melaporkan tiap temuan dengan `console.error`, lalu `process.exit(1)`; sukses melapor via `console.log` dan exit 0. `bun run validate-data` pada data saat ini menghasilkan `OK: All data files validated` (exit 0).
+- [!] **M0.2.2 BLOCKER — urutan task berkontradiksi.** Assert yang diwajibkan langsung membuat `bun run validate-data` gagal pada data saat ini: `data/profile.json` masih berisi `metrics.projects_shipped: 18` dan `metrics.certifications: 54`. Plan baru menghapus dua field tersebut di M0.6.1, yang berada setelah seluruh Task 0.2; validator wajib hijau dan task harus selesai sebelum lanjut, sehingga urutan sekarang tidak punya jalur hijau. Bukti: baca `data/profile.json`, M0.6.1 di bawah, dan PRD §12. **Perlu memindahkan penghapusan/audit konsumen M0.6.1–M0.6.3 sebelum M0.2.2**, atau menyetujui urutan lain yang membuat validator hijau sebelum Task 0.2 berakhir.
 - [ ] **M0.2.3** Tambahkan assert: `data/testimonials.json` **harus tidak ada atau array kosong**. Kalau terisi → gagal.
 - [ ] **M0.2.4** Tambahkan assert: `src/lib/ml-metrics.ts` **tidak boleh** mengandung `Math.random` (grep gate,Pattern sama seperti gate hex/framer-motion yang sudah ada).
 - [ ] **M0.2.5** Tambahkan assert: hitungan nyata `projects.json`/`certifications.json` harus cocok dengan yang dipakai `buildSiteFacts()`.
@@ -639,7 +639,7 @@ Test-nya mengunci **properti yang rusak** (markup tak boleh bergantung pada apak
 | Sprint | Status | Unit | Section | e2e | Catatan |
 |---|---|---|---|---|---|
 | Baseline 2026-09-29 | ✅ tercatat | 875/875 | 14 | 245 | `astro check` 103 · `lint` 681 |
-| 0 — Truth & Integrity | 🔄 1/8 task | 936/936 | 14 | LIHAT §7 catatan | **Task 0.1 `SiteFacts` ✅** (M0.1.1–M0.1.7). `astro check` 103 (= baseline, 0 baru) · `lint` 676 (↓5) · payload `/` 202.6/563.7 KB (↓0.5) · listener 15 (↓1). Prasyarat: ekstraksi lab registry (2 modul) menghapus **3 salinan** daftar eksperimen. **2 defect produk dari gerbang**: harness gallery (13 blok) + jam build bocor ke markup (`useTimeOfDay` → subtree hero dibongkar saat hidrasi). Berikutnya: **Task 0.2 / M0.2.1** |
+| 0 — Truth & Integrity | 🔄 1/8 task | 936/936 | 14 | LIHAT §7 catatan | **Task 0.1 `SiteFacts` ✅** (M0.1.1–M0.1.7). Task 0.2: **M0.2.1 ✅** — validator sukses exit 0 dan lapor OK; jalur gagal exit 1 + tiap temuan di stderr (ditetapkan dari kode). `astro check` 103 (= baseline, 0 baru) · `lint` 676 (↓5) · payload `/` 202.6/563.7 KB (↓0.5) · listener 15 (↓1). Berikutnya: **M0.2.2** |
 | 1 — Career Spine | ⬜ | — | 13→12 | — | |
 | 2 — Evidence Surface | ⬜ | — | 12 | — | |
 | 3 — Capability Map | ⬜ | — | 12 | — | |
