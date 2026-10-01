@@ -8,7 +8,6 @@ export {
   getSkills,
   getVolunteering,
   getHonors,
-  getTestimonials,
   getFaq,
   buildFaqLd,
   getTimeline,

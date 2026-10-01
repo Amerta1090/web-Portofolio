@@ -11,7 +11,7 @@
   <text x="56" y="92" font-family="monospace" font-size="12" fill="#f59e0b">I built an AI recommendation</text>
   <text x="56" y="110" font-family="monospace" font-size="12" fill="#e0e0e0">engine solving retrieval and</text>
   <text x="56" y="128" font-family="monospace" font-size="12" fill="#e0e0e0">systems challenges at scale</text>
-  <text x="56" y="160" font-family="monospace" font-size="10" fill="#6b7268">23,800 word states from projects · experience · testimonials</text>
+  <text x="56" y="160" font-family="monospace" font-size="10" fill="#6b7268">word states from projects · experience</text>
   <g stroke="url(#g)" stroke-width="2" opacity="0.5" fill="none">
     <circle cx="120" cy="225" r="7"/>
     <circle cx="180" cy="215" r="7"/>

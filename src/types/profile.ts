@@ -18,9 +18,15 @@ export interface Contact {
   website: string | null;
 }
 
+/**
+ * `years_experience` is deprecated here for the same reason as the two fields
+ * that were removed: `SiteFacts.profile.yearsExperience` derives it from
+ * `experience.json` instead of reading a hand-written figure that could drift.
+ * It is still in `data/profile.json` because `validate-data` has no assert for
+ * it yet; no consumer reads it.
+ */
 export interface Metrics {
+  /** @deprecated Use `SiteFacts.profile.yearsExperience`. */
   years_experience: number;
-  projects_shipped: number;
-  certifications: number;
   languages: string[];
 }

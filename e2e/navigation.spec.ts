@@ -104,8 +104,10 @@ test.describe("Navigation hierarchy — one primary nav, one position readout", 
     // It reported "01 / 11" on a 14-section page: `systems-in-motion` and
     // `testimonials` were missing because the id list was hard-coded inside the
     // component instead of coming from the page that renders the sections.
+    //
+    // 13, not 14: the fabricated testimonials section was removed in Task 0.3.
     const sectionCount = await page.locator("section[id]").count();
-    expect(sectionCount).toBe(14);
+    expect(sectionCount).toBe(13);
     await expect(counter.locator("[data-section-dot]")).toHaveCount(sectionCount);
     await expect(counter).toHaveText(`01 / ${String(sectionCount).padStart(2, "0")}`);
 
@@ -122,7 +124,7 @@ test.describe("Navigation hierarchy — one primary nav, one position readout", 
     await page.goto("/");
     const counter = page.locator("[data-section-counter]");
     const start = await counter.textContent();
-    expect(start?.trim()).toBe("01 / 14");
+    expect(start?.trim()).toBe("01 / 13");
 
     await page.locator("nav[aria-label='Primary'] a[href='/#projects']").click();
     const top = await settleTop(page, "#projects");
@@ -131,12 +133,12 @@ test.describe("Navigation hierarchy — one primary nav, one position readout", 
     expect(Math.abs(top)).toBeLessThan(120);
 
     const after = counter.textContent();
-    expect((await after)?.trim()).not.toBe("01 / 14");
+    expect((await after)?.trim()).not.toBe("01 / 13");
     // projects is the 6th declared section (hero, about, systems-in-motion,
     // experience, journey, projects). The IntersectionObserver path can stall
     // >5s under memory pressure on this 3 GB machine (Q4.2), so give the
     // auto-retrying assertion a larger budget — the expected value is exact.
-    await expect(counter).toHaveText("06 / 14", { timeout: 15000 });
+    await expect(counter).toHaveText("06 / 13", { timeout: 15000 });
   });
 });
 

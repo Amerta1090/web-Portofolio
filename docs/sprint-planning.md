@@ -136,36 +136,58 @@ Test-nya mengunci **properti yang rusak** (markup tak boleh bergantung pada apak
 ### Task 0.2 — Validasi build-time yang GAGAL KERAS
 
 - [x] **M0.2.1** Cek `scripts/validate-data.mjs` (atau `bun run validate-data`) — Understand exit code & cara melapor. **Bukti 2026-09-30**: validasi mengumpulkan error, melaporkan tiap temuan dengan `console.error`, lalu `process.exit(1)`; sukses melapor via `console.log` dan exit 0. `bun run validate-data` pada data saat ini menghasilkan `OK: All data files validated` (exit 0).
-- [!] **M0.2.2 BLOCKER — urutan task berkontradiksi.** Assert yang diwajibkan langsung membuat `bun run validate-data` gagal pada data saat ini: `data/profile.json` masih berisi `metrics.projects_shipped: 18` dan `metrics.certifications: 54`. Plan baru menghapus dua field tersebut di M0.6.1, yang berada setelah seluruh Task 0.2; validator wajib hijau dan task harus selesai sebelum lanjut, sehingga urutan sekarang tidak punya jalur hijau. Bukti: baca `data/profile.json`, M0.6.1 di bawah, dan PRD §12. **Perlu memindahkan penghapusan/audit konsumen M0.6.1–M0.6.3 sebelum M0.2.2**, atau menyetujui urutan lain yang membuat validator hijau sebelum Task 0.2 berakhir.
-- [ ] **M0.2.3** Tambahkan assert: `data/testimonials.json` **harus tidak ada atau array kosong**. Kalau terisi → gagal.
-- [ ] **M0.2.4** Tambahkan assert: `src/lib/ml-metrics.ts` **tidak boleh** mengandung `Math.random` (grep gate,Pattern sama seperti gate hex/framer-motion yang sudah ada).
-- [ ] **M0.2.5** Tambahkan assert: hitungan nyata `projects.json`/`certifications.json` harus cocok dengan yang dipakai `buildSiteFacts()`.
-- [ ] **M0.2.6** Uji negatif: temporarily kembalikan `18` ke `profile.json` → validator **HARUS gagal** → pulihkan. (Bukti tes punya gigi — pelajaran F5.1 #3.)
-- [ ] **M0.2.7** Hook ke `package.json` script yang sudah ada + dokumentasikan di AGENTS.md.
+- [x] **M0.2.2** Assert: `data/profile.json` **tidak boleh** punya `metrics.projects_shipped` / `metrics.certifications`. **DEVIASI — M0.6.1–M0.6.3 dijalankan lebih awal, di dalam Task 0.2.** Alasannya persis blocker yang dicatat sesi lalu, tapi lebih luas dari dugaan awal: bukan 2 field, melainkan **3 task** yang dipastikan membuat validator merah (`0.3` testimonials, `0.4` ML metrics, `0.6` angka basi). Keputusan user 2026-09-30: kerjakan 0.3 + 0.4 sekarang. Konsekuensi nyata: urutan plan berubah dan itu dicatat, bukan diam-diam. Field dihapus **bukan diperbarui** (PRD §10) → `About.astro` sekarang baca `buildSiteFacts()`, `Profile["metrics"]` menyusut ke `years_experience` + `languages`, dan `normalize-linkedin.mjs` (yang menulis ulang `profile.json`) ikut diperbaiki — kalau tidak, satu skrip yang tak terpakai bisa menghidupkan kembali field yang baru saja dilarang. `years_experience` **tetap ada** di JSON: tidak ada assert untuk itu dan hanya satu konsumen yang sudah pindah.
+- [x] **M0.2.3** Assert: `data/testimonials.json` harus tidak ada atau array kosong → **file dihapus** (M0.3.2), gate tetap sebagai jaring pengaman.
+- [x] **M0.2.4** Assert: `src/lib/ml-metrics.ts` tidak boleh mengandung `Math.random`. File **dihapus** (M0.4.3) → gate jadi no-op, dan `ml-metrics.removed.test.ts` (4 test) mengunci penghapusan dari sisi yang akan gagal kalau ada yang menambahkannya kembali.
+- [x] **M0.2.5** Assert: hitungan nyata dataset cocok dengan angka yang tertulis di `data/*.json`.
+- [x] **M0.2.6** Uji negatif: 5 skenario, semua **terbukti gagal** lalu dipulihkan (`md5sum` cocok).
+- [x] **M0.2.7** Hook ke `package.json`: `validate-data` disisipkan sebagai **langkah pertama `build` dan `build:fast`**, bukan hanya script manual.
 
 **Verify**: validator hijau pada state final; **uji negatif lulus** (M0.2.6); tidak ada angka yang bisa basi tanpa build-time failure.
 
-### Task 0.3 — Hapus testimonial fiktif
+**Hasil Task 0.2 (2026-09-30, disatukan dgn 0.3 + 0.4):** validator hijau; `build`/`build:fast` **gagal keras** sebelum astro jalan; unit **932/932** (80 file, +4 test baru); `astro check` **103 = baseline, 0 baru** (diff by file+code satu arah: 6 entri hilang, 0 muncul); biome **0 error baru** di file tersentuh (5 file yang gagal lint sudah gagal di HEAD); `build:fast` **49 halaman**; payload `/` **199.9 / 560.8 KB** (↓2.7/↓2.9 dari 202.6/563.7); **e2e `--workers=1` 246/246** (8.1 mnt).
 
-- [ ] **M0.3.1** Audit **seluruh** konsumen: `rg -rn 'testimonial' src data e2e` — termasuk `TestimonialCarousel.tsx`, `data/faq.json`, `buildFaqLd()`, `buildIndex.ts` (command palette), `og/[...route].ts`, sitemap.
-- [ ] **M0.3.2** Hapus `data/testimonials.json`.
-- [ ] **M0.3.3** Hapus section `#testimonials` dari `src/pages/index.astro` **dan** `sectionIds` (→ 13 section).
-- [ ] **M0.3.4** Hapus `TestimonialCarousel.tsx` + unit test-nya; lepas dari semua mount.
-- [ ] **M0.3.5** Bersihkan `data/faq.json` (intent + jawaban yang menyebut testimonial/social proof) dan `buildIndex.ts` bila ia mengindeks testimonials.
-- [ ] **M0.3.6** Cek JSON-LD: `rg -n 'Trump|Prabowo|Jokowi' src data dist` = **0** (termasuk `buildFaqLd`).
-- [ ] **M0.3.7** `dist/` rebuild → `rg -c 'testimonial' dist` = 0.
+**Uji negatif (M0.2.6) — 5/5 terbukti punya gigi:**
 
-**Verify**: `bun run build` sukses; grep 0 match di `src`/`data`/`dist`; tidak ada consumer tersisa.
+| # | Mutasi | Hasil |
+|---|---|---|
+| 1 | `metrics.projects_shipped: 18` dikembalikan ke `profile.json` | ❌ gagal, 1 error → pulihkan |
+| 2 | `testimonials.json` dipulihkan (3 entri) | ❌ gagal, 1 error → hapus |
+| 3 | `ml-metrics.ts` dibuat ulang berisi `Math.random()` | ❌ gagal, 1 error → hapus |
+| 4 | `projects.json` dikurangi 1 proyek (22 → 21) | ❌ gagal, **2 file** protes: `capability-grammars.json` + `faq.json` |
+| 5 | `testimonials.json` = `[]` | ✅ lolos (positive control — gate tak menolak file kosong) |
 
-### Task 0.4 — Hapus metrik ML sintetis
+**Pelajaran M0.2.5 — gerbang harus bisa gagal ke ARAH KEDUA, bukan cuma satu.** Gate lama (hapus field dari `profile.json`) hanya menangkap *angka basi yang diketik tangan*. Yang tidak tertangkap: **claim di prosa yang benar sekarang lalu basi nanti** — `faq.json` menulis "Total 22 project" dan `capability-grammars.json` "22 public projects"; tidak ada yang menghitung ulang, jadi tidak ada yang tahu saat sebuah proyek dihapus. Gate count-claim menutup arah itu, dan **uji negatif #4 adalah yang membuktikannya**: bukan dengan mengetik angka salah, tapi dengan menghapus satu item dataset dan melihat dua file protes. Uji negatif yang hanya "balikin bug lama" membuktikan gate bisa menangkap **bug lama** — tidak membuktikan ia menangkap kelas bug yang*dikenai*-nya.
 
-- [ ] **M0.4.1** Baca `src/lib/ml-metrics.ts` penuh; petakan semua yang di-generate (`Math.random()`, bobot graph hardcoded, confusion matrix) vs yang berasal data.
-- [ ] **M0.4.2** Keputusan: **hapus** blok "ML Metrics" dari `src/pages/projects/[slug].astro` bila tak ada sumber nyata. **Jangan** menggantinya dengan angka baru yang juga sintetis.
-- [ ] **M0.4.3** Hapus `getMLMetrics` / dependensinya dari jalur render. (Catatan pelajaran B-3: 7 key `getMLMetrics` short-slug pernah tak resolve — pastikan penghapusan tidak meninggalkan import yatim di `NetworkGraph`/`LossCurve`/`ConfusionMatrix`.)
-- [ ] **M0.4.4** `rg -n 'getMLMetrics' src` → hanya tersisa di `__tests__` yang relevan, atau 0. Tentukan & catat.
-- [ ] **M0.4.5** Tambah regression test: `renderToStaticMarkup` halaman `/projects/<slug>` **tidak boleh** memuat string yang mengklaim akurasi/loss training.
+**Pelajaran M0.2.5b — gate yang hanya baca satu bahasa lebih buruk dari tidak ada gate.** Versi pertama regex-nya `\d+\s+(projects?|certifications?)` (English). Prosa `data/*.json` campur dua bahasa, jadi gate itu menandai `18 project` di `faq.json` sambil **melewati `54 sertifikasi` dua entri di atasnya** — angka basi yang sama, file yang sama. Pola yang sama seperti gate `Math.random` yang hanya meng-namespace satu file: cakupan parsial terlihat seperti cakupan. Empat pattern (en/id × project/cert) + satu lapis "laporkan sekali per pattern per file" supaya tiga salinan satu masalah tidak terbaca sebagai tiga masalah.
 
-**Verify**: `rg -n 'Math.random' src/lib/ml-metrics.ts` = 0 (file terhapus) atau tidak ada file itu; e2e `/projects/<slug>` hijau.
+### Task 0.3 — Hapus testimonial fiktif (✅ SELESAI, dikerjakan lebih awal — lihat DEVIASI M0.2.2)
+
+- [x] **M0.3.1** Audit seluruh konsumen. **11 file**, dan hasilnya **lebih luas dari dugaan plan**: `index.astro` (import + `getTestimonials()` + `sectionIds` + section), `TestimonialCarousel.tsx` + test, `types/testimonials.ts` + `types/index.ts`, `lib/data.ts` + `lib/index.ts`, `data/testimonials.json`, `experiments/MarkovGenerator.tsx`, `lib/lab-gallery.ts`, `public/images/experiments/markov-generator.svg`, 3 avatar JPEG. Yang **tidak** mengindeks testimonials (dicek, bukan diasumsikan): `buildIndex.ts`, `buildFaqLd()`, `og/[...route].ts`, sitemap, `faq.json`.
+- [x] **M0.3.2** `data/testimonials.json` dihapus (+ 3 avatar di `public/images/testimonials/`).
+- [x] **M0.3.3** Section `#testimonials` + `sectionIds` dihapus → **14 → 13 section**.
+- [x] **M0.3.4** `TestimonialCarousel.tsx` + `TestimonialCarousel.test.tsx` dihapus, lepas dari semua mount.
+- [x] **M0.3.5** `faq.json` ternyata **tidak** menyebut testimonial sama sekali (dicek dulu — jadi tak ada yang perlu dibersihkan). Yang perlu: deskripsi Markov di `lab-gallery.ts` + `aria-label` MarkovGenerator + **SVG thumbnail**, semuanya menyebut testimonials.
+- [x] **M0.3.6** `Trump|Prabowo|Jokowi` di `src`/`data` = **0** (cuma sisa nyarsa di komentar). `dist` ikut 0 setelah rebuild.
+- [x] **M0.3.7** `dist/` rebuild → `rg -c 'testimonial' dist` = **0**.
+
+**Verify**: `build:fast` sukses (49 halaman); grep 0 match di `src`/`data`/`dist`; tidak ada consumer tersisa. ✅
+
+**Temuan yang tak ada di plan — MarkovGenerator.** Plan menyebut `data/testimonials.json` sebagai file; padahal ada **konsumen kedua** yang tak akan terlihat kalau hanya `getTestimonials()` yang dihapus: `buildCorpus()` di `MarkovGenerator.tsx` memakai teks testimonial sebagai kalimat sumber untuk *Markov chain*. Kalau dibiarkan, eksperimen itu tetap berjalan sambil menghasilkan kalimat dari kutipan fiktif, lalu diberi label "generated, not AI" — klaim "dari data nyata" di atas data yang bukan nyata. Rule 6 (jangan tinggalkan kode mati) + Rule 7 (insight tak boleh mengarang) mendorong hal yang sama: corpus sekarang hanya projects + experience.
+
+**Temuan kedua — SVG thumbnail menyimpan angka yang tak pernah dihitung siapa pun.** `markov-generator.svg` menulis "23,800 word states from projects · experience · testimonials". Angka itu **tidak pernah benar**: corpus sebenarnya menghasilkan **1.362** state (dihitung ulang setelah testimonials dihapus). Tidak ada yang menulis ulang file ini saat corpus berubah, jadi ia kelas yang sama dengan angka basi di `profile.json` — hanya saja tak bisa gagal keras karena tak ada yang membacanya. Inilah kelas yang ditutup gate M0.2.5.
+
+### Task 0.4 — Hapus metrik ML sintetis (✅ SELESAI, dikerjakan lebih awal — lihat DEVIASI M0.2.2)
+
+- [x] **M0.4.1** `ml-metrics.ts` (146 baris) dipetakan: **loss curves** = `0.95*Math.exp(-i/8) + 0.08*Math.random() + 0.05` untuk 3 proyek (acak tiap build — determinisme dilanggar); **network graphs** = topologi hardcoded, bukan angka training; **confusion matrices** = diketik tangan (`[142,12,3]` dll) lalu diberi label "Classification performance — hover for precision/recall/F1", jadi presisi/recall/F1 yang dihitung dari matrix fiktif itu ditampilkan seolah hasil ukur.
+- [x] **M0.4.2** Keputusan: **hapus** blok "ML Metrics". Tak ada sumber nyata untuk training run mana pun di 22 proyek, dan PRD melarang menggantinya dengan angka sintetis baru.
+- [x] **M0.4.3** `getMLMetrics` + section dihapus dari `/projects/[slug]`. Import yatim: `NetworkGraph` **tidak** ikut terhapus — masih dipakai `RepositoryGalaxy.tsx` (dicek, bukan diasumsikan). `LossCurve` + `ConfusionMatrix` jadi 0 consumer → keduanya ikut dihapus (Rule 6: tak ada file dead).
+- [x] **M0.4.4** `rg -n 'getMLMetrics' src` = **0**. (Yang tersisa: `drawLossCurve` lokal di `NeuralNetworkArt.tsx` — fungsi canvas sendiri, tak terkait.)
+- [x] **M0.4.5** Regression test `src/lib/ml-metrics.removed.test.ts` (4 test) mengunci penghapusan. **DEVIASI dari plan**: plan bilang `renderToStaticMarkup`, tapi halaman ini `.astro` yang tak bisa diimpor ke jsdom, dan render pun tak bisa membuktikan apa yang terjadi *saat section ditambahkan kembali*. Test membaca **sumber** halamannya: tak ada import `getMLMetrics`/`ml-metrics`, tak ada `id="ml-metrics"`/heading "ML Metrics", tak ada import `atoms/LossCurve|ConfusionMatrix`, dan `ml-metrics.ts` tidak eksis. Poin terakhir penting justru karena **defect** aslinya bertahan lama tanpa build merah: import dikembalikan tapi section belum dirender akan lolos diam-diam.
+
+**Verify**: `rg -n 'Math.random' src/lib/ml-metrics.ts` = file tidak ada ✅ · e2e `/projects/<slug>` hijau (bagian dari 246/246) ✅ · `validate-data` hijau ✅.
+
+**Catatan jujur — ketidakjujuran yang tersisa.** Menghapus metrik sintetis berarti `/projects/[slug]` kini menampilkan **lebih sedikit**, dan tak ada yang menggantikannya. Itu isi M0.4.2 ("jangan ganti dengan angka sintetis baru"), tapi konsekuensinya nyata: 5 proyek tak punya grafik training di halaman detailnya, dan tak akan punya sampai ada run asli yang bisa dirujuk. Itu batas jujur dari "bukti > klaim" — bukan sesuatu yang perlu dinyalakan ulang dengan placeholder.
 
 ### Task 0.5 — Perbaiki kontrol mati
 
@@ -639,7 +661,7 @@ Test-nya mengunci **properti yang rusak** (markup tak boleh bergantung pada apak
 | Sprint | Status | Unit | Section | e2e | Catatan |
 |---|---|---|---|---|---|
 | Baseline 2026-09-29 | ✅ tercatat | 875/875 | 14 | 245 | `astro check` 103 · `lint` 681 |
-| 0 — Truth & Integrity | 🔄 1/8 task | 936/936 | 14 | LIHAT §7 catatan | **Task 0.1 `SiteFacts` ✅** (M0.1.1–M0.1.7). Task 0.2: **M0.2.1 ✅** — validator sukses exit 0 dan lapor OK; jalur gagal exit 1 + tiap temuan di stderr (ditetapkan dari kode). `astro check` 103 (= baseline, 0 baru) · `lint` 676 (↓5) · payload `/` 202.6/563.7 KB (↓0.5) · listener 15 (↓1). Berikutnya: **M0.2.2** |
+| 0 — Truth & Integrity | ✅ 0.1+0.2+0.3+0.4 | 932/932 | 13 | 246/246 (8.1m) | **Task 0.1 `SiteFacts` ✅** · **Task 0.2–0.4 ✅** (urut diubah dengan persetujuan). Validator + gate build-time aktif; `astro check` 103, `lint` 676; payload `/` 199.9/560.8 KB (↓2.7/↓2.9). Berikutnya: **Task 0.5** |
 | 1 — Career Spine | ⬜ | — | 13→12 | — | |
 | 2 — Evidence Surface | ⬜ | — | 12 | — | |
 | 3 — Capability Map | ⬜ | — | 12 | — | |

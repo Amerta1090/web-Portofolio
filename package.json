@@ -5,8 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "bun run fetch-data && astro build",
-    "build:fast": "astro build",
+    "build": "bun run validate-data && bun run fetch-data && astro build",
+    "build:fast": "bun run validate-data && astro build",
     "preview": "astro preview",
     "serve": "astro preview --port 4321",
     "lint": "biome check .",

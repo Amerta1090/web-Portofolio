@@ -1,10 +1,17 @@
 import { useMemo, useState } from "react";
-import { getExperience, getProjects, getTestimonials } from "../../lib/data";
+import { getExperience, getProjects } from "../../lib/data";
 import { type MarkovGraph, buildGraph, generate, hashSeed } from "../../lib/markov/markov";
 
 type Mode = "bio" | "project" | "fact";
 
-/** Build a corpus from real data-layer sentences (projects/experience/testimonials). */
+/**
+ * Build a corpus from real data-layer sentences (projects and experience).
+ *
+ * Testimonials used to be a third source and were removed with the fabricated
+ * ones (Task 0.3) — a chain trained on invented quotes would have produced
+ * invented sentences stamped as generated from real data, which is exactly the
+ * kind of claim this experiment must not make.
+ */
 export function buildCorpus(): string[] {
   const sentences: string[] = [];
   const projects = getProjects();
@@ -17,10 +24,6 @@ export function buildCorpus(): string[] {
   for (const e of experience) {
     if (e.role) sentences.push(`${e.role} at ${e.company}`);
     for (const h of e.highlights) if (h) sentences.push(h);
-  }
-  const testimonials = getTestimonials();
-  for (const t of testimonials) {
-    if (t.text) sentences.push(t.text);
   }
   return sentences;
 }
@@ -96,7 +99,7 @@ export default function MarkovGenerator({ compact }: { compact?: boolean }) {
       <div className="p-6 flex flex-col gap-6 max-w-3xl mx-auto w-full">
         <div>
           <p className="text-xs font-mono text-[#9ca39c] mb-2">
-            corpus: {count} word states from projects, experience &amp; testimonials
+            corpus: {count} word states from projects &amp; experience
           </p>
           <fieldset className="flex flex-wrap gap-2">
             <legend className="sr-only">Generation mode</legend>

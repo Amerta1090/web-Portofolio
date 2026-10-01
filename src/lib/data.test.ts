@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getFaq, buildFaqLd } from "./data";
+import { getFaq, buildFaqLd, getCertifications } from "./data";
 
 describe("getFaq", () => {
   it("returns all faq items", () => {
@@ -29,7 +29,13 @@ describe("getFaq", () => {
       .join(" ");
 
     expect(answers).toMatch(/Abdul Majid Ridwan Tyastonoatmaja/);
-    expect(answers).toMatch(/54/);
+    // Derived, not hardcoded. This assertion used to read `expect(answers).toMatch(/54/)`,
+    // which meant it passed while the FAQ itself claimed 54 certifications
+    // against a dataset of 62 — the test pinned the stale number instead of the
+    // truth. `validate-data` now rejects any count in `data/*.json` that
+    // disagrees with the dataset, and this asserts the same rule from the
+    // render side.
+    expect(answers).toContain(String(getCertifications().length));
     expect(answers).toMatch(/Tulungagung/);
     expect(answers).toMatch(/abdulmajidr708@gmail\.com/);
   });

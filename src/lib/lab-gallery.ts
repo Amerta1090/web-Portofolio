@@ -285,7 +285,7 @@ const PRESENTATION: Record<string, LabPresentation> = {
     description:
       "A first-order word chain over your own write-ups — walk it to mint a fresh-sounding bio, project blurb, or fact.",
     longDescription:
-      "A from-scratch Markov chain is built over your actual projects, experience, and testimonials. Pick Bio / Project / Fact, bump the seed, and walk the transition graph to mint a fresh-sounding one-liner. Deterministic from a seed — regenerating is reproducible, and labelled 'generated, not AI'.",
+      "A from-scratch Markov chain is built over your actual projects and experience. Pick Bio / Project / Fact, bump the seed, and walk the transition graph to mint a fresh-sounding one-liner. Deterministic from a seed — regenerating is reproducible, and labelled 'generated, not AI'.",
     gradient: "from-amber-500 to-violet-500",
     thumbnail: "/images/experiments/markov-generator.svg",
     cursor: "text",
