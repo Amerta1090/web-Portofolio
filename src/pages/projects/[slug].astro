@@ -1,5 +1,4 @@
 ---
-import { Image } from "lucide-react";
 import { Tag } from "../../components/atoms/Tag.tsx";
 import TechExplorer from "../../islands/TechExplorer";
 import BaseLayout from "../../layouts/BaseLayout.astro";
@@ -155,24 +154,6 @@ function extractReadmeSection(content: string, heading: string): string | null {
                     })}
                   </p>
                 </div>
-              </div>
-            </section>
-          )}
-
-          {project.media && project.media.length > 0 && (
-            <section class="mb-10">
-              <h2 class="text-xl font-semibold text-text-primary mb-4">Gallery</h2>
-              <div class="grid md:grid-cols-2 gap-4">
-                {project.media.map((m) => (
-                  <button type="button" data-lightbox class="bg-bg-secondary border border-border rounded-xl p-8 text-center hover:border-accent/30 transition-all duration-200 cursor-pointer group relative overflow-hidden"
-                    onClick="this.querySelector('.lightbox-overlay')?.classList.remove('hidden')"
-                  >
-                    <div class="w-12 h-12 mx-auto mb-3 rounded-lg bg-accent-muted/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-                      <Image class="w-6 h-6 text-accent" aria-hidden="true" />
-                    </div>
-                    <p class="text-text-secondary text-sm">{m}</p>
-                  </button>
-                ))}
               </div>
             </section>
           )}

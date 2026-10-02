@@ -53,6 +53,12 @@
 
 > **Aturan diff**: untuk `astro check` / `lint`, yang dibandingkan adalah **daftar** error (sorted + diff), bukan jumlahnya saja — nomor baris bergeser saat file tumbuh (pelajaran L3.1 #6). Jalankan `astro check 2>&1 | sed 's/\x1b\[[0-9;]*m//g' | sort` sebelum & sesudah.
 
+> **UPDATE 2026-10-02 (Task 0.5) — baseline `astro check` turun ke 101.** Task 0.5 menghapus blok `Gallery` mati di `/projects/[slug]`, dan diff sorted membuktikan **0 error baru, 2 hilang** — keduanya persis baris yang dihapus (`[slug].astro:168` `ts(2322)` tombol `data-lightbox`, `:171` `ts(2322)` `<Image>`). Jadi baseline baru = **101**, dan `astro check` tidak lagi gagal build. Gate "0 baru" tetap sama (**0 baru**, bukan 0 total).
+>
+> **Pelajaran yang lebih besar dari angkanya**: 2 error itu adalah **kontrol mati yang berteriak di type checker** — dan tak seorang pun melihatnya karena "103" dibaca sebagai satu gumpalan "pre-existing, abaikan". **Baseline berupa jumlah buta menyembunyikan error mana yang *layak* dibuka.** Kesalahan yang sama seperti "5 hijau pada kode yang belum pernah dijalankan". Angka **101** dipakai sebagai pembanding mulai Task 0.6; angka 103 tetap tertulis di atas sebagai baseline asal.
+>
+> Gate lain yang bergerak: `lint` **681 → 672** (↓9 selama Task 0.1–0.5), `unit` 875 → **937**, `/projects` **tidak** diukur `measure:routes` — metrik payload hanya mencakup `/`, `/work/…`, `/gallery`, jadi route yang saya ubah tidak punya gate payload sama sekali (dicatat, bukan ditutup).
+
 ### 0.4 Dependency Graph
 
 ```
@@ -189,14 +195,38 @@ Test-nya mengunci **properti yang rusak** (markup tak boleh bergantung pada apak
 
 **Catatan jujur — ketidakjujuran yang tersisa.** Menghapus metrik sintetis berarti `/projects/[slug]` kini menampilkan **lebih sedikit**, dan tak ada yang menggantikannya. Itu isi M0.4.2 ("jangan ganti dengan angka sintetis baru"), tapi konsekuensinya nyata: 5 proyek tak punya grafik training di halaman detailnya, dan tak akan punya sampai ada run asli yang bisa dirujuk. Itu batas jujur dari "bukti > klaim" — bukan sesuatu yang perlu dinyalakan ulang dengan placeholder.
 
-### Task 0.5 — Perbaiki kontrol mati
+### Task 0.5 — Perbaiki kontrol mati ✅ SELESAI (M0.5.1–M0.5.4, 2026-10-02)
 
-- [ ] **M0.5.1** `src/pages/projects/[slug].astro:198-206` — konfirmasi ulang: `onClick` memanggil `.lightbox-overlay` yang tak pernah di-render. (Sudah terverifikasi di audit; **re-verifikasi** di sprint ini per P2.)
-- [ ] **M0.5.2** **Pilih satu** dan catat alasannya di commit: (a) implementasikan lightbox sungguhan, atau (b) **hapus** blok tombol `data-lightbox` sampai ada lightbox. Default: **(b)**, karena PRD §9.5 postpone lightbox ke Sprint 2 dan "0 dead controls" lebih penting daripada tombol.
-- [ ] **M0.5.3** Hapus `onClick` inline (inline handler =emsp yang tidak di-escape Astro & bertentangan dengan aturan repo).
-- [ ] **M0.5.4** Unit/assert: markup SSR `/projects/<slug>` tidak punya `data-lightbox` tanpa implementasi.
+- [x] **M0.5.1** **Re-verifikasi (P2) — terkonfirmasi, dan defektnya lebih dalam dari dugaan plan.** `onClick="this.querySelector('.lightbox-overlay')?.classList.remove('hidden')"`. `rg 'lightbox-overlay' src` = **0** — target tak pernah di-render di mana pun, jadi `querySelector` → `null` → `?.` menelan. **Koreksi penting atas alasan di plan**: inline `on*` **tidak** inert di Astro — browser meng-compile-nya dan Astro menyalinnya apa adanya ke output, jadi handlernya **benar-benar jalan**, hanya tanpa target. Plan menyebutnya "tidak di-escape Astro"; itu tidak jadi alasan yang benar. Bukti: 3 inline handler lain di repo **hidup semua** — `Header.astro:48,60` (`opencode:palette`, didengar `CommandPalette.tsx:133`) dan `certifications.astro:48` (`filterCertifications` didefinisikan di file yang sama, baris 98). Tapi ada **dua lapis** kdeads-an: `this` = tombolnya sendiri, dan anak-anaknya cuma `<div>` ikon + `<p>` — jadi bahkan overlay di halaman lain tak akan ketemu.
+- [x] **M0.5.1b** **Kenapa tak ada e2e yang menangkapnya**: `rg "goto\('/projects/" e2e/` = **0 hit**. Spec yang ada hanya menyentuh `/projects` (listing) dan `/work/*`. Halaman detail proyek **tak pernah dibuka satu pun oleh browser test** — bukan karena tesnya lemah, tapi karena tak ada yang pernah mengarahkan mata ke sana. Unit tak bisa mengimpor halaman `.astro` ke jsdom, jadi kedua lapisan guard sama-sama buta. Pola ini = preseden **F5.1 #1** ("jalankan build penuh, bukan hanya tes fitur"), kebalikannya: di sini tak ada pun yang menjalankan halaman itu.
+- [x] **M0.5.2** **Keputusan: (b) hapus blok tombol** — alasannya lebih kuat dari default plan, dan bukan soal performa: **data-nya tak bisa menopang lightbox**. `media` berisi **label, bukan URL** — `["Prototype", "Prototype 1", "Prototype 2"]` untuk 2 proyek, dan nama file telanjang `"monitoring_accuracy.png"` (tanpa prefix direktori) untuk yang ketiga; `find public -name monitoring_accuracy.png` = **tidak ditemukan**. Jadi mengimplementasikan lightbox berarti **mengarang path** = memalsukan bukti (PRD P6). Field yang benar-benar berisi URL adalah `images[]` (22/22, tapi 17 placeholder `project.svg`) — itu pekerjaan Sprint 2/4 (M2.2.3), bukan Sprint 0. Yang dihapus: blok `Gallery` + `onClick` + import `Image` dari `lucide-react` (tinggal yatim → Rule 6).
+- [x] **M0.5.3** `onClick` inline hilang bersama section-nya (tak ada handler lain di file itu — diverifikasi, bukan diasumsikan). Field `media` **tidak dihapus dari data**: `facts.ts:288` (`withMedia`) dan `observatory/metrics.ts` masih menghitungnya, dan itu fakta data yang jujur, bukan kontrol mati. Peran `media` diputuskan di M2.2.3.
+- [x] **M0.5.4** Dua guard, karena celah keduanya berbeda:
+  - **Unit** `src/lib/projects-detail.dead-control.test.ts` (5 test) membaca **sumber** halaman — preseden `ml-metrics.removed.test.ts`: tak bisa render `.astro`, dan kegagalan yang dijaga adalah *section-nya dikembalikan*.
+  - **e2e** `e2e/projects-detail.spec.ts` (5 test, **spec pertama yang membuka `/projects/<slug]`**) menguji **markup SSR** — ini yang diminta M0.5.4 ("markup SSR") dan tak bisa dibuktikan grep sumber. 4 proyek yang punya `media` + 1 positive control.
 
-**Verify**: grep `data-lightbox` = 0 di `dist`; tidak ada `onClick=` inline di file itu.
+**DEVIASI — invarian ditulis sebagai "pasangan", lalu MUTASI membuktikan klaim awal saya berlebihan.** Draft pertama menulis "trigger + target = lightbox yang boleh kembali". Mutasi M2 (trigger **+** target ter-render) membuktikan **2 dari 5 test tetap merah** — test 1 (`hasTrigger === false`) dan test 3 (heading `Gallery`) adalah pernyataan **present tense** yang memblokir lightbox asli. Hanya test 2 (pasangan) yang bertahan. Test 2 memang invarian yang benar ("trigger tanpa target ter-render = kontrol mati"), tapi **dokumentasi dikoreksi** supaya tidak mengklaim lebih dari yang diukur: kuncian itu disengaja — mengembalikan fitur itu harus **menyentuh file test ini dengan sengaja** (kontrak sama seperti `ml-metrics.removed.test.ts`), bukan ditoleransi diam-diam oleh guard yang tak bisa membedakan lightbox baik dari buruk.
+
+**DEVIASI — "target" harus berarti *ter-render*, bukan *disebut*.** Putaran mutasi pertama salah baca soal ini: `hasTarget` disetel ke `/lightbox-overlay/.test(src)` — padahal **handler mati itu sendiri menyebut `lightbox-overlay` di dalam `querySelector`**, sehingga trigger-tanpa-target memenuhi guard-nya sendiri. Test 2 **tetap hijau** saat defect asli dikembalikan, jadi guard itu tidak punya gigi. Diperbaiki: `hasRenderedTarget` = class muncul di atribut `class=` atau `classList.add(...)`; `classList.remove`/`toggle` **dikecualikan** justru karena itu yang dipanggil handler mati. Sesudahnya mutasi M1 membuat **4 test merah**. Persis guruannya F5.1 #3 — asersi yang bisa "hijau" tanpa pernah diuji balik bukan bukti apa pun.
+
+**Uji mutasi — 4 mutasi, semuanya terverifikasi (file dipulihkan + `md5sum -c` OK):**
+
+| # | Mutasi | Hasil yang diharapkan | Hasil nyata |
+|---|---|---|---|
+| M1 | kembalikan defect asli persis (trigger + `onClick`, tanpa target) | merah | **4/5 merah** (test 1, 2, 3, 4) |
+| M2 | lightbox **sungguhan** (trigger + `<div class="lightbox-overlay">`) | hijau | **2/5 merah** → test 2 bertahan ✅ (ekspektasi dikoreksi, lihat DEVIASI) |
+| M3 | inline handler saja (`onclick="doThing()"`) | test 4 merah | **1/5 merah** ✅ |
+| M4 | import `lucide-react` yatim | test 5 merah | **1/5 merah** ✅ |
+
+Plus **mutasi e2e di produk** (bukan test): kembalikan blok tombol mati → `build:fast` → `rg -c data-lightbox dist/projects/automated-chicken-coop…/index.html` = 1 → e2e **4/4 gagal** (`toHaveCount`), positive control tetap hijau → pulihkan → rebuild → **5/5 hijau** lagi.
+
+**Gate**: unit **937/937** (81 file, ↑5 dari 932) · `astro check` **103 → 101, 0 baru** (diff sorted satu arah) · `lint` **672** (↓4 dari 676) · `validate-data` OK · `build:fast` **49 halaman** · `rg 'data-lightbox|lightbox-overlay' dist` = **0** · payload `/` **199.9 / 560.8** KB (datar — gate "tak naik" ✅) · e2e spec baru **5/5** · **e2e penuh `--workers=1` 251/251** (14.6 mnt, 0 gagal — 246 lama + 5 baru).
+
+**Temuan di luar plan — kontrol mati itu 2 dari 103 error baseline `astro check`.** `astro check` sorted diff: **0 error baru, 2 hilang** — persis di baris yang dihapus: `[slug].astro:168` (`ts(2322)`, `<button data-lightbox>` dengan children yang tak cocok) dan `:171` (`ts(2322)`, `<Image>` `LucideProps`). Jadi blok mati itu **berteriak di type checker** — dan tak seorang pun memperhatikannya karena "103" diperlakukan sebagai satu gumpalan yang "pre-existing, abaikan". **Baseline berupa jumlah buta menyembunyikan error mana yang "diharapkan".** Dua error itu tak bisa dibedakan dari "pre-existing yang tak akan pernah disentuh" tanpa membuka filenya. Baseline §0.3 di-update ke **101** (lihat catatan di §0.3).
+
+**Catatan jujur — apa yang hilang.** 4 dari 22 proyek tak lagi menampilkan "Gallery". Videos/screenshot MLOps (`monitoring_accuracy/latency/request_count.png`) **tidak pernah bisa dibuka** — file-nya memang tidak ada di `public/`, jadi yang hilang bukan bukti, hanya **tampilan bukti yang tak dapat diverifikasi**. Dan halaman ini tetap lebih tipis dari yang seharusnya: `ProjectCardGrid` menampilkan `association`/`media`/`skills` sebagai chip di sana, sedangkan `/projects/[slug]` (yang baru dibersihkan) masih sparse. Itu batas jujur "0 kontrol mati" — lebih sedikit, tapi tak ada yang menyesatkan.
+
+**Verify**: `rg 'data-lightbox|lightbox-overlay' dist` = 0 ✅ · tak ada `on*="` inline di file itu ✅ · unit+e2e hijau, mutasi terbukti punya gigi ✅.
 
 ### Task 0.6 — Hapus angka basi
 
@@ -229,13 +259,13 @@ Test-nya mengunci **properti yang rusak** (markup tak boleh bergantung pada apak
 - [ ] Semua microtask `- [x]`.
 - [ ] `bun run test` **≥ 875** (naik, tidak turun).
 - [ ] `bun run build` (penuh) 49 halaman OK.
-- [ ] `bunx astro check` = 103, 0 baru (diff daftar, bukan jumlah).
+- [ ] `bunx astro check` = 103, 0 baru (diff daftar, bukan jumlah). **_(0 baru terbukti setiap task; baseline bergerak 103 → 101 di M0.5 — 2 error hilang, keduanya baris yang dihapus. Lihat §0.3.)_**
 - [ ] `bun run lint` ≤ 681, 0 baru di file tersentuh.
 - [ ] `bun run validate-data` + validator SiteFacts hijau; **uji negatif lulus**.
 - [ ] `rg -n 'Trump|Prabowo|Jokowi' src data dist` = 0.
 - [ ] `rg -n 'Math.random' src/lib/ml-metrics.ts` = 0 (file terhapus).
 - [ ] `rg -n 'projects_shipped' src data` = 0.
-- [ ] `rg -n 'data-lightbox' dist` = 0.
+- [x] `rg -n 'data-lightbox' dist` = 0. **_(M0.5 ✅ 2026-10-02 — terbukti: `rg 'data-lightbox|lightbox-overlay' dist` = 0, plus guard unit 5 + e2e 5 yang membuat regresi ini mahal.)_**
 - [ ] `git diff --stat src/` = hanya file yangtho yang dimaksud.
 - [ ] **Checkpoint**: laporkan ke user, update §7 + `prompt.txt`.
 
@@ -661,7 +691,7 @@ Test-nya mengunci **properti yang rusak** (markup tak boleh bergantung pada apak
 | Sprint | Status | Unit | Section | e2e | Catatan |
 |---|---|---|---|---|---|
 | Baseline 2026-09-29 | ✅ tercatat | 875/875 | 14 | 245 | `astro check` 103 · `lint` 681 |
-| 0 — Truth & Integrity | ✅ 0.1+0.2+0.3+0.4 | 932/932 | 13 | 246/246 (8.1m) | **Task 0.1 `SiteFacts` ✅** · **Task 0.2–0.4 ✅** (urut diubah dengan persetujuan). Validator + gate build-time aktif; `astro check` 103, `lint` 676; payload `/` 199.9/560.8 KB (↓2.7/↓2.9). Berikutnya: **Task 0.5** |
+| 0 — Truth & Integrity | ✅ 0.1+0.2+0.3+0.4+**0.5** | 937/937 | 13 | **251/251** (14.6m) | **Task 0.1 `SiteFacts` ✅** · **Task 0.2–0.4 ✅** (urut diubah dengan persetujuan). Validator + gate build-time aktif; payload `/` 199.9/560.8 KB (datar). **Task 0.5 ✅ (2026-10-02)** — kontrol mati `data-lightbox` dihapus (pilihan **b**: `media` berisi label `"Prototype"`, bukan URL, dan `monitoring_*.png` tak ada di `public/`, jadi lightbox berarti mengarang path). Guard: unit 5 + **e2e 5 (spec pertama yang membuka `/projects/<slug]`)**. 4 mutasi terbukti punya gigi. `astro check` **103 → 101** (2 error hilang = 2 baris yang dihapus, 0 baru). Berikutnya: **Task 0.6** |
 | 1 — Career Spine | ⬜ | — | 13→12 | — | |
 | 2 — Evidence Surface | ⬜ | — | 12 | — | |
 | 3 — Capability Map | ⬜ | — | 12 | — | |
