@@ -69,14 +69,18 @@ for (const [file, schema] of Object.entries(schemas)) {
   }
 
   // Task 0.2.2: Assert profile.json must NOT have deprecated metrics fields
+  // Task 0.6.5 added `years_experience`, which sat here for a while with no
+  // assert: it had exactly the same justification for existing as the other two
+  // ("no assert, and its one consumer had already moved to SiteFacts") — so once
+  // that consumer moved, it was a hand-written number with zero readers. A gate
+  // that rejects two of three stale-count fields states the rule only half way.
   if (file === "profile.json" && data.metrics) {
-    if ("projects_shipped" in data.metrics) {
-      console.error(`ERROR: ${file} metrics.projects_shipped is deprecated (use SiteFacts)`);
-      errors++;
-    }
-    if ("certifications" in data.metrics) {
-      console.error(`ERROR: ${file} metrics.certifications is deprecated (use SiteFacts)`);
-      errors++;
+    const DEPRECATED_METRICS = ["projects_shipped", "certifications", "years_experience"];
+    for (const key of DEPRECATED_METRICS) {
+      if (key in data.metrics) {
+        console.error(`ERROR: ${file} metrics.${key} is deprecated (use SiteFacts)`);
+        errors++;
+      }
     }
   }
 

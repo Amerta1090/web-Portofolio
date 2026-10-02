@@ -23,11 +23,11 @@ function normalizeProfile(raw) {
       website: null,
     },
     summary: info.summary || "",
-    // No `projects_shipped` / `certifications` here: both are derived by
-    // `SiteFacts` from the datasets, and `validate-data` rejects them outright
-    // because a hand-written figure is what went stale (PRD §3.1 C3).
+    // No hand-written counts here: `projects_shipped`, `certifications` and
+    // `years_experience` are all derived by `SiteFacts` from the datasets, and
+    // `validate-data` rejects them outright because a hand-written figure is
+    // what went stale (PRD §3.1 C3).
     metrics: {
-      years_experience: 0,
       languages: (raw.skills?.languages || []).map((l) => l.language),
     },
     resume_url: "/resume.pdf",
