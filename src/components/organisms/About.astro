@@ -12,12 +12,17 @@ const { profile } = Astro.props;
 /**
  * Numbers come from `SiteFacts`, not from `profile.metrics`.
  *
- * `profile.json` used to carry hand-written `projects_shipped: 18` and
- * `certifications: 54` while the datasets held 22 and 62 — the stale-number
- * defect PRD §3.1 C3 exists to kill. `validate-data` now rejects those two
- * fields outright (M0.2.2), so the figures below are derived: projects and
+ * `profile.json` used to carry hand-written counts — 18 shipped projects and 54
+ * certifications — while the datasets held 22 and 62; the stale-number defect
+ * PRD §3.1 C3 exists to kill. `validate-data` now rejects both `metrics` fields
+ * outright (M0.2.2), so the figures below are derived: projects and
  * certifications counted from the datasets, years of experience derived from
  * `experience.json`. One source, and it cannot drift from the data.
+ *
+ * The removed key names are spelled out in `scripts/validate-data.mjs` rather
+ * than here, so the Task 0.6 grep gate for the deleted field stays a clean zero.
+ * A comment quoting a deleted field makes that gate read itself as evidence —
+ * the same trap that blinded the Task 0.5 dead-control guard.
  */
 const facts = buildSiteFacts();
 

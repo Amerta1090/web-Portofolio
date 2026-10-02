@@ -230,12 +230,24 @@ Plus **mutasi e2e di produk** (bukan test): kembalikan blok tombol mati → `bui
 
 ### Task 0.6 — Hapus angka basi
 
-- [ ] **M0.6.1** Hapus `metrics.projects_shipped` dan `metrics.certifications` dari `data/profile.json` (bukan diperbarui — sumber tunggal jadi `SiteFacts`).
-- [ ] **M0.6.2** Audit semua pembaca field itu: `rg -rn 'projects_shipped|metrics.certifications' src data`.
-- [ ] **M0.6.3** Ganti setiap pemakaian dengan `SiteFacts` (atau hapus komponen yang jadi tak bermakna).
-- [ ] **M0.6.4** `data/capability-grammars.json` sudah bilang 22 — konfirmasi konsisten setelah perubahan (harus jadi **satu** sumber).
+- [x] **M0.6.1** Hapus `metrics.projects_shipped` dan `metrics.certifications` dari `data/profile.json` (bukan diperbarui — sumber tunggal jadi `SiteFacts`). **✅ saat eksekusi — sudah dilakukan lebih awal di dalam Task 0.2** (DEVIASI M0.2.2), tapi tidak pernah dicentang di sini. Diverifikasi ulang di 2026-10-02, bukan diasumsikan: `data/profile.json` → `metrics` = `{ years_experience, languages }` saja; gate `validate-data.mjs:73-80` menolak kedua field itu.
+- [x] **M0.6.2** Audit semua pembaca field itu: `rg -rn 'projects_shipped|metrics.certifications' src data`. **Hasil: 0 pembaca hidup.** Hanya ada 1 sisa di `About.astro` — **di dalam komentar**, bukan kode. `metrics.certifications` = 0 di mana pun. (Sisa di `normalize-linkedin.mjs` sudah dinetralkan di M0.2.2.)
+- [x] **M0.6.3** Ganti setiap pemakaian dengan `SiteFacts` (atau hapus komponen yang jadi tak bermakna). **✅ sudah dilakukan di M0.2.2** — `About.astro:22` `const facts = buildSiteFacts()`, lalu 3 metrik (`Projects Shipped`, `Certifications`, `Years Experience`) membaca `facts.*`. Tidak ada komponen yang jadi tak bermakna, jadi tak ada yang dihapus.
+- [x] **M0.6.4** `data/capability-grammars.json` sudah bilang 22 — konfirmasi konsisten setelah perubahan (harus jadi **satu** sumber). **✅ konsisten**: klaim `"22 public projects"` = `projects.json` 22; `faq.json` 3 klaim lain (62/62/22) juga cocok dengan dataset. Yang membuatnya **satu sumber** bukan kecocokan hari ini melainkan **gate M0.2.5**, dan itu dibuktikan di bawah, bukan diterima begitu saja.
 
-**Verify**: `rg -rn 'projects_shipped' src data` = 0; semua angka di homepage traced ke `SiteFacts` (grep gate).
+**DEVIASI — satu commit ini butuh dua edit pada komentar, dan edit kedua saya buat karena saya sendiri masuk perangkapnya.** DoD Task 0 (`rg -n 'projects_shipped' src data` = 0) awalnya merah: **1 match**, di komentar `About.astro` yang menjelaskan kenapa field itu dihapus. Dua pilihan — hapus komentar (hilang konteks repo yang berguna) atau biarkan (DoD tidak pernah hijau). Saya pilih **menulis ulang komentar**: angka basi 18/54 dan angka dataset 22/62 justru bagian yang berharga, sementara *nama key* yang sudah dihapus tidak perlu diulang. Verifikasi: DoD jadi 0 match.
+
+Edit kedua: komentar versi pertama saya sendiri menuliskan literal `rg projects_shipped src data` untuk menjelaskan manuver itu — persis kelas kesalahan yang sedang saya perbaiki. Kalau tidak diukur ulang, commit ini akan "memperbaiki" gate lalu mengisinya sendiri. Pelajaran yang bisa dipakai ulang: **komentar yang menyebut nama field yang dihapus membuat gate berbasis grep membaca dirinya sebagai bukti** — kelas yang sama dengan guard `hasTarget` yang gagal di **M0.5 #4**.
+
+**Uji negatif M0.6.4 — konsistensi `capability-grammars.json` dibuktikan punya gigi, bukan sekadar cocok.** M0.2.6 sudah membuktikan arah "dataset berubah → gate protes" (hapus 1 proyek → 2 file protes). Yang belum pernah dibuktikan adalah arah yang **M0.6.4** klaim: bahwa file grammars ini benar-benar ikut diawasi, dan bukan kebetulan cocok. Diuji dengan menggeser klaim `22 public projects` → `21`, lalu memulihkannya:
+
+| Langkah | Hasil |
+|---|---|
+| `bun run validate-data` | ❌ `ERROR: capability-grammars.json claims 1 stale project count(s) 21 — the dataset holds 22`, exit 1 |
+| `bun run build:fast` | ❌ `error: script "validate-data" exited with code 1` → build gagal **sebelum astro jalan** (gate M0.2.7 hidup di jalur build) |
+| Pulihkan | ✅ `md5sum` = `b72f58ea…cbb` identik dengan sebelum mutasi · `git diff data/` kosong · `validate-data` → `OK` |
+
+**Verify**: `rg -rn 'projects_shipped' src data` = **0** ✅ · semua angka homepage traced ke `SiteFacts` (`About.astro` baca `facts.*`) ✅ · angka di `capability-grammars.json` = `projects.json` ✅.
 
 ### Task 0.7 — Perbaiki `useGSAP` global kill
 
@@ -264,7 +276,7 @@ Plus **mutasi e2e di produk** (bukan test): kembalikan blok tombol mati → `bui
 - [ ] `bun run validate-data` + validator SiteFacts hijau; **uji negatif lulus**.
 - [ ] `rg -n 'Trump|Prabowo|Jokowi' src data dist` = 0.
 - [ ] `rg -n 'Math.random' src/lib/ml-metrics.ts` = 0 (file terhapus).
-- [ ] `rg -n 'projects_shipped' src data` = 0.
+- [x] `rg -n 'projects_shipped' src data` = 0. **_(M0.6 ✅ 2026-10-02 — 0 match. Awalnya 1 match di komentar `About.astro`; komentar ditulis ulang agar gate tak membaca dirinya sendiri. Lihat §Task 0.6 DEVIASI.)_**
 - [x] `rg -n 'data-lightbox' dist` = 0. **_(M0.5 ✅ 2026-10-02 — terbukti: `rg 'data-lightbox|lightbox-overlay' dist` = 0, plus guard unit 5 + e2e 5 yang membuat regresi ini mahal.)_**
 - [ ] `git diff --stat src/` = hanya file yangtho yang dimaksud.
 - [ ] **Checkpoint**: laporkan ke user, update §7 + `prompt.txt`.
@@ -691,7 +703,7 @@ Plus **mutasi e2e di produk** (bukan test): kembalikan blok tombol mati → `bui
 | Sprint | Status | Unit | Section | e2e | Catatan |
 |---|---|---|---|---|---|
 | Baseline 2026-09-29 | ✅ tercatat | 875/875 | 14 | 245 | `astro check` 103 · `lint` 681 |
-| 0 — Truth & Integrity | ✅ 0.1+0.2+0.3+0.4+**0.5** | 937/937 | 13 | **251/251** (14.6m) | **Task 0.1 `SiteFacts` ✅** · **Task 0.2–0.4 ✅** (urut diubah dengan persetujuan). Validator + gate build-time aktif; payload `/` 199.9/560.8 KB (datar). **Task 0.5 ✅ (2026-10-02)** — kontrol mati `data-lightbox` dihapus (pilihan **b**: `media` berisi label `"Prototype"`, bukan URL, dan `monitoring_*.png` tak ada di `public/`, jadi lightbox berarti mengarang path). Guard: unit 5 + **e2e 5 (spec pertama yang membuka `/projects/<slug]`)**. 4 mutasi terbukti punya gigi. `astro check` **103 → 101** (2 error hilang = 2 baris yang dihapus, 0 baru). Berikutnya: **Task 0.6** |
+| 0 — Truth & Integrity | ✅ 0.1+0.2+0.3+0.4+**0.5**+**0.6** | 937/937 | 13 | **251/251** (11.0m) | **Task 0.1 `SiteFacts` ✅** · **Task 0.2–0.4 ✅** (urut diubah dengan persetujuan). Validator + gate build-time aktif; payload `/` 199.9/560.8 KB (datar). **Task 0.5 ✅ (2026-10-02)** — kontrol mati `data-lightbox` dihapus (pilihan **b**: `media` berisi label `"Prototype"`, bukan URL, dan `monitoring_*.png` tak ada di `public/`, jadi lightbox berarti mengarang path). Guard: unit 5 + **e2e 5 (spec pertama yang membuka `/projects/<slug]`)**. 4 mutasi terbukti punya gigi. `astro check` **103 → 101** (2 error hilang = 2 baris yang dihapus, 0 baru). **Task 0.6 ✅ (2026-10-02)** — 0 kode produk (M0.6.1–0.3 sudah dieksekusi di M0.2.2, DEVIASI); diverifikasi ulang + 1 kebocoran ditutup: DoD `rg 'projects_shipped' src data` tadinya **1 match di komentar** `About.astro` → ditulis ulang → **0**. M0.6.4 dibuktikan punya gigi (klaim 22→21 → `validate-data` ❌ + `build:fast` ❌ sebelum astro → pulihkan `md5sum` identik). Gate: unit 937/937 datar · `astro check` **101** · `lint` **672** · payload `/` **199.9/560.8** datar. Berikutnya: **Task 0.7** `useGSAP` global kill |
 | 1 — Career Spine | ⬜ | — | 13→12 | — | |
 | 2 — Evidence Surface | ⬜ | — | 12 | — | |
 | 3 — Capability Map | ⬜ | — | 12 | — | |
