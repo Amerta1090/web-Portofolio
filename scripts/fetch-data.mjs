@@ -2,6 +2,7 @@ import { execSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { inspectGitHubCache } from "./github-cache-expectations.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
@@ -115,13 +116,22 @@ try {
   const rawPath = resolve(cacheDir, "pinned-repos-raw.json");
   const rawData = JSON.parse(readFileSync(rawPath, "utf-8"));
   if (rawData?.errors?.length || !rawData?.data?.user) {
-    // An empty array here is indistinguishable from "no pinned repositories",
-    // and the site renders identically either way — so refuse to cache it.
+    // Guards a payload with no user node at all (partial GraphQL success).
+    // M0.8.1 re-verification: this does NOT reject an empty array, despite what
+    // the F5.1 commit message and the comment here used to claim. It cannot —
+    // this account genuinely pins nothing, so rejecting empty would fail every
+    // build forever. The broken-query-vs-no-pins ambiguity that guard was meant
+    // to resolve is already closed by the `data.errors` throw in fetchGraphQL.
     throw new Error(
       `pinned-repos-raw.json has no user payload: ${rawData?.errors?.[0]?.message ?? "missing data.user"}`,
     );
   }
-  const nodes = rawData.data?.user?.pinnedItems?.nodes ?? [];
+  if (rawData.data.user.pinnedItems == null) {
+    // The remaining real hole: `?? []` below used to fold a missing
+    // `pinnedItems` into a healthy-looking empty array reported as success.
+    throw new Error("pinned-repos-raw.json is missing pinnedItems");
+  }
+  const nodes = rawData.data.user.pinnedItems.nodes ?? [];
   const now = Date.now();
   const mapped = nodes.map((n) => {
     const created = new Date(n.createdAt).getTime();
@@ -192,8 +202,19 @@ await fetchJSON(
 try {
   const rawPath = resolve(cacheDir, "all-repos-raw.json");
   const rawData = JSON.parse(readFileSync(rawPath, "utf-8"));
+  // M0.8.2 — this used to be `Array.isArray(rawData) ? rawData : []`, so any
+  // payload that was not an array became a cached `[]` and the script printed
+  // `✓ all-repos (transformed)`. The site then rendered zero repositories,
+  // which is indistinguishable from an account with none. An empty result here
+  // is a failed fetch, never a fact about the account.
+  if (!Array.isArray(rawData)) {
+    throw new Error(`all-repos-raw.json is ${typeof rawData}, expected an array`);
+  }
+  if (rawData.length === 0) {
+    throw new Error("all-repos-raw.json is empty — GitHub returned no repositories");
+  }
   const now = Date.now();
-  const mapped = (Array.isArray(rawData) ? rawData : []).map((r) => {
+  const mapped = rawData.map((r) => {
     const created = new Date(r.created_at).getTime();
     return {
       name: r.name,
@@ -273,6 +294,26 @@ try {
   }
 } catch (err) {
   console.error(`  ✗ star-history: ${err.message}`);
+}
+
+/**
+ * M0.8.2 — second placement of the same non-degeneracy rule. `validate-data`
+ * runs *before* the fetches, so it cannot see a cache this run just emptied;
+ * this sweep runs after them. Missing caches are still tolerated (a fresh clone
+ * has no `languages.json` until `astro build` runs `fetchAllGitHubData()`), so
+ * only a file that exists and holds nothing is reported.
+ */
+console.log("\nChecking GitHub cache for degenerate data...");
+const githubCache = inspectGitHubCache(cacheDir);
+if (githubCache.status === "degenerate") {
+  for (const violation of githubCache.violations) {
+    console.error(`  ✗ ${violation}`);
+  }
+  results.failed.push("github-cache");
+} else {
+  console.log(
+    githubCache.status === "absent" ? "  (no cache to check)" : "  ✓ non-degenerate",
+  );
 }
 
 console.log("\nWriting build info...");

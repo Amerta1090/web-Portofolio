@@ -1,9 +1,11 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { inspectGitHubCache } from "./github-cache-expectations.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dataDir = resolve(__dirname, "../data");
+const githubCacheDir = resolve(__dirname, "../.cache/github");
 
 const schemas = {
   "profile.json": {
@@ -248,6 +250,31 @@ for (const file of readdirSync(dataDir).filter((f) => f.endsWith(".json"))) {
       errors++;
     }
   }
+}
+
+/**
+ * M0.8.2 — a GitHub cache that exists but holds nothing is a claim the build
+ * cannot back up, and it used to pass: `fetch-data.mjs` wrote `[]` for a
+ * non-array payload and printed `✓`, so a broken pipeline produced a site that
+ * rendered zero repositories and looked otherwise healthy.
+ *
+ * The gate is conditional on the cache existing. `.cache/` is gitignored, so
+ * `build:fast`, CI and a fresh clone have no cache — failing there would make
+ * `build:fast` unusable (M0.8.3). Missing is tolerated; present-but-empty is
+ * not. `SiteFacts` already refuses to turn degenerate GitHub data into a number,
+ * but `GitHubUniverse.astro` reads `getCachedGitHubData()` directly and is not
+ * covered by that.
+ */
+const githubCache = inspectGitHubCache(githubCacheDir);
+if (githubCache.status === "absent") {
+  console.log("GitHub cache: absent — skipping (build:fast / fresh clone)");
+} else if (githubCache.status === "degenerate") {
+  for (const violation of githubCache.violations) {
+    console.error(`ERROR: ${violation}`);
+    errors++;
+  }
+} else {
+  console.log("GitHub cache: non-degenerate");
 }
 
 if (errors > 0) {

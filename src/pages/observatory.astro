@@ -43,9 +43,14 @@ const overviewMetrics = {
   categories: cats.length,
   technologies: ds.distinctSkills.length,
   yearSpan,
-  totalRepos: ds.github?.total_repos ?? 0,
-  totalStars: ds.github?.total_stars ?? 0,
-  totalForks: ds.github?.total_forks ?? 0,
+  // M0.8.3 — these used to be `?? 0`, which turned "no GitHub cache" into
+  // "0 GitHub stars". `SiteFacts` already treats a missing or degenerate cache
+  // as `null` rather than 0; this page was the one consumer that threw that
+  // distinction away. `totalRepos` was dropped at the same time: it was passed
+  // into the island and never rendered (Rule 6, and the Observatory plan lists
+  // six cards that do not include it).
+  totalStars: ds.github?.total_stars ?? null,
+  totalForks: ds.github?.total_forks ?? null,
 };
 
 const catDesc = [...cats].sort((a, b) => b.count - a.count);

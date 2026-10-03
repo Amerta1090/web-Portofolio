@@ -57,7 +57,9 @@
 >
 > **Pelajaran yang lebih besar dari angkanya**: 2 error itu adalah **kontrol mati yang berteriak di type checker** — dan tak seorang pun melihatnya karena "103" dibaca sebagai satu gumpalan "pre-existing, abaikan". **Baseline berupa jumlah buta menyembunyikan error mana yang *layak* dibuka.** Kesalahan yang sama seperti "5 hijau pada kode yang belum pernah dijalankan". Angka **101** dipakai sebagai pembanding mulai Task 0.6; angka 103 tetap tertulis di atas sebagai baseline asal.
 >
-> Gate lain yang bergerak: `lint` **681 → 672** (↓9 selama Task 0.1–0.5), `unit` 875 → **937**, `/projects` **tidak** diukur `measure:routes` — metrik payload hanya mencakup `/`, `/work/…`, `/gallery`, jadi route yang saya ubah tidak punya gate payload sama sekali (dicatat, bukan ditutup).
+> Gate lain yang bergerak: `lint` **681 → 672** (↓9 selama Task 0.1–0.5), `unit` 875 → **963** (85 file), `/projects` **tidak** diukur `measure:routes` — metrik payload hanya mencakup `/`, `/work/…`, `/gallery`, jadi route yang saya ubah tidak punya gate payload sama sekali (dicatat, bukan ditutup). **Task 0.8 menambah satu lagi ke daftar itu: `/observatory`** — page yang/task ini ubah (kartu GitHub dihapus saat `null`) tetap **tanpa gate payload**. Gap yang sama seperti `/projects`, ditemukan karena kebetulan sedang mengerjakan halaman itu, bukan karena metriknya lengkap.
+>
+> **UPDATE 2026-10-03 (Task 0.8) — `astro check` tetap 101, `lint` tetap 672.** Keduanya membuktikan nol perubahan dari baseline Task 0.6. Yang berubah justru **cakupan gate `validate-data`**: sebelumnya skrip itu membaca **hanya** `data/*.json` dan **tidak pernah menyentuh** `.cache/github/` sama sekali — jadi "cache GitHub vorhanden tapi kosong" lolos tanpa pemeriksaan. Sekarang `.cache/github` ikut diperiksa, **conditional on existence** (`missing` ditoleransi, `empty` ditolak). Detail + DEVIATION di §Task 0.8.
 
 ### 0.4 Dependency Graph
 
@@ -341,28 +343,105 @@ Tiga perbaikan ini **semuanya harness** — `e2e/hydration.ts`, `e2e/recommend.s
 **Temuan sampingan: satu komentar dokumentasi ternyata lebih kuat dari kodenya.** `gallery.spec.ts` `openExperiment` punya komentar "avoids the hydration race" — padahal helper itu **tidak pernah** menunggu hidrasi. Yang dihindarinya adalah race shell-vs-content, yang berbeda. Komentar itu diperbaiki jadi menyatakan celahnya, lalu menunjuk `openExperiment` di `hydration.ts` sebagai versi converged. **Helper lokal gallery_spec sendiri sengaja TIDAK diganti** (71 test hijau; menyentuhnya di task soal `useGSAP` = membuka gerbang yang sudah bekerja, dan biaya re-prove-nya sendiri — preseden pelajaran M0.6.5). Dicatat sebagai **latent race**, bukan diperbaiki diam-diam. 71 test itu selamat karena tiap test melakukan `goto` + satu asersi heading/card lebih dulu, yang memberi jeda cukup untuk menutupinya; `recommend.spec.ts` langsung `goto` → `click`.
 **Gate M0.7**: unit **943/943** (82 file, **+6** test baru) · `astro check` **101 = baseline, 0 baru** · `lint` **672 = baseline** · `validate-data` OK · `build:fast` **49 halaman** · payload `/` **199.9 / 560.8** KB (datar) · import `ScrollTrigger` di `useGSAP.ts` dibuang (tak ada lagi pemakai) · **e2e `--workers=1` 251/251 (8.9m)**, `lint` **672 = baseline** · 3 defect harness ditemukan gerbang (nol perubahan produk).
 
-### Task 0.8 — GitHub data non-degenerate
+### Task 0.8 — GitHub data non-degenerate ✅ SELESAI (M0.8.1–M0.8.3, 2026-10-03)
 
-- [ ] **M0.8.1** Baca `scripts/fetch-data.mjs` bagian `fetchGraphQL` + transform `pinnedItems`. Konfirmasi 3 lapis fix F5.1 masih ada (separator koma, `throw` bila `data.errors`, transform menolak array kosong).
-- [ ] **M0.8.2** Tambah assert build-time: bila `total_repos == 0` atau `languages` kosong → **gagal keras**. (Pola: situs pernah tampak sehat sambil render 0 pinned repo karena fallback ke `top_repos` — pelajaran F5.1 #2.)
-- [ ] **M0.8.3** Pastikan `build:fast` (tanpa fetch) tetap bisa jalan → `SiteFacts.github` boleh `null`, tapi **UI harus gracefully degrade**, bukan render `NaN`/`0` yang menyesatkan. (Sudah jadi syarat M0.1.4 — verifikasi di UI.)
+- [x] **M0.8.1** Baca `scripts/fetch-data.mjs` bagian `fetchGraphQL` + transform `pinnedItems`. Konfirmasi 3 lapis fix F5.1 masih ada (separator koma, `throw` bila `data.errors`, transform menolak array kosong). — **2 dari 3 ada; lapis ke-3 tidak pernah ada** (DEVIASI di bawah).
+- [x] **M0.8.2** Tambah assert build-time: bila `total_repos == 0` atau `languages` kosong → **gagal keras**. — ✅ dua penempatan (keputusan user), **satu aturan**.
+- [x] **M0.8.3** Pastikan `build:fast` (tanpa fetch) tetap bisa jalan → `SiteFacts.github` boleh `null`, tapi **UI harus gracefully degrade**, bukan render `NaN`/`0` yang menyesatkan. — ✅ **defect produk nyata ditemukan di `/observatory`**, bukan sekadar verifikasi.
 
-**Verify**: `bun run build` penuh OK; `bun run build:fast` OK; UI saat GitHub kosong tidak menampilkan angka palsu.
+**Gate M0.8**: unit **963/963 (85 file, +20 dari 943/82)** · `astro check` **101 = baseline, 0 baru / 0 hilang** (sorted-diff vs worktree HEAD — identik setelah nomor baris dinormalkan) · `lint` **672 = baseline** · `validate-data` OK (mencetak `GitHub cache: non-degenerate`) · `bun run build` **penuh 49 halaman** OK · `build:fast` **49 halaman** · payload `/` **199.9 / 560.8** KB (datar) · 6 mutasi (M1–M6) semuanya merah pada asersi yang dimaksud, lalu dipulihkan dengan `md5sum` identik · matriks end-to-end gerbang 4/4 sesuai harapan · e2e `observatory` **5/5** + suite penuh `--workers=1` **251/251, 0 gagal (18.0m)**.
+
+#### M0.8.1 — Lapis ke-3 yang tercatat itu tidak pernah ada (DEVIASI, dibuktikan dari sumber)
+
+Plan menulis "konfirmasi **3 lapis**". Terbaca dari `git show 0191dc4` + kode HEAD:
+
+| Lapis | Status |
+|---|---|
+| separator koma (bukan titik koma) | ✅ ada |
+| `throw` bila `data.errors` | ✅ ada — dan ini yang **memang menutup** ambiguitas "query rusak vs memang tak ada pin" |
+| transform menolak array kosong | ❌ **tidak pernah ada** |
+
+Kode yang occupying tempat lapis ke-3 itu guarding `!rawData?.data?.user` — **payload tanpa node user sama sekali** (sukses GraphQL parsial), bukan array kosong. Dan **claims itu tak bisa diimplementasikan apa adanya**: akun ini **memang punya 0 pin** (`pinnedItems.nodes: []`, terverifikasi live). Menolak array kosong di sana = **gagal build permanen** dengan hasil nol, ditukar dengan proteksi yang sudah Entitle di lapis ke-2. Jadi lapis ke-3 **dihapus dari klaim** (komentar, pesan commit F5.1, AGENTS.md), bukan "diimplementasikan".
+
+**Lubang asli yang tersisa** justru tak tersentuh: `const nodes = rawData.data?.user?.pinnedItems?.nodes ?? []`. Kalau `pinnedItems` `null` (sukses parsial), `?? []` melipatkannya jadi array kosong yang **terlapor sukses**. Guard `pinnedItems == null` → throw ditambahkan di situ. Bukan lapis ke-3; ini lubang yang tak dikenal sebelumnya **karena yang dicari memang tak ada**.
+
+#### M0.8.2 — gate di dua penempatan, satu aturan (keputusan user)
+
+`scripts/github-cache-expectations.mjs` (baru) memegang `GITHUB_CACHE_RULES` + `inspectGitHubCache()`; kedua skrip meng-import-nya, jadi tidak ada duplikasi (preseden C3: salinan = drift).
+
+**Dua penempatan, karena keduanya punya celah berbeda yang saling menutup:**
+
+| Penempatan | Yang bisa ia tangkap | Yang tidak |
+|---|---|---|
+| `validate-data.mjs` (langkah pertama `build`/`build:fast`) | cache yang **sudah** rusak sebelum build — mendeteksi drift yang tertinggal di working tree | cache yang **run ini** baru kosongkan |
+| `fetch-data.mjs` (sweep setelah semua fetch) | cache yang fetch **baru saja** kosongkan | drift lama (sudah ditolak validate-data) |
+
+**`missing` ≠ `empty` — dan itu inti desainnya.** `.cache/` gitignored, jadi `build:fast`, CI, dan fresh clone **sah** tanpa cache sama sekali. Kalau "tak ada cache" ikut digagalkan, M0.8.3 mustahil dipenuhi. Jadi: file tak ada → ditoleransi; file ada tapi kosong → **gagal keras**. Status dikembalikan eksplisit (`absent | clean | degenerate`) supaya keputusan itu di dalam API, bukan ditebak tiap pemanggil.
+
+`pinned-repos.json` **dikecualikan dengan alasan tertulis** (akun memang 0 pin). Pengecualian yang tercatat sebagai alasan bisa diaudit; yang berupa lubang sunyi tidak. Kebenarannya dibuktikan mutasi M2 (gate ikut mengabaikannya → 2 test merah).
+
+**Akar masalahnya diperbaiki di tempat asalnya**, bukan hanya diberi jaring: `all-repos` pernah `Array.isArray(rawData) ? rawData : []` → payload non-array jadi `[]` tercache + **`✓ all-repos (transformed)` tetap tercetak** + exit 0. Itu persis F5.1 #2 (fallback yang terlalu longgar menyembunyikan kegagalan, bukan mencegah). Sekarang transform throw; gerbang menangkapnya kalau sebuah build pernahProduce-nya.
+
+**Matriks end-to-end (bukan hanya unit):**
+
+| Keadaan `.cache/github` | `validate-data` | `build:fast` | Status |
+|---|---|---|---|
+| `all-repos.json` = `[]` | ❌ | ❌ gagal sebelum astro | merah (yang diharapkan) |
+| `languages.json` = `[]` | ❌ | ❌ gagal sebelum astro | merah (yang diharapkan) |
+| `pinned-repos.json` = `[]` | ✅ | ✅ | **positive control** |
+| direktori cache dihapus | ✅ | ✅ | **positive control** |
+
+Semua md5 cache dipulihkan identik sesudah (`dab921af…`, `f5e5b637…`, `d7517139…`).
+
+#### M0.8.3 — bukan verifikasi, tapi defect produk nyata
+
+`SiteFacts` sudah menolak mengubah cache degenerat jadi angka (`toGithubFacts()` mengembalikan `null` untuk `total_repos <= 0` dan `languages: []`). Tapi **`/observatory` membuang balik pembedaan itu sendiri**:
+
+```astro
+totalRepos: ds.github?.total_repos ?? 0,   // ← "0" adalah klaim tentang orang,
+totalStars: ds.github?.total_stars ?? 0,   //   bukan tentang data yang hilang, maka
+totalForks: ds.github?.total_forks ?? 0,   //   build tanpa cache mempublikasikan
+                                            //   "0 GitHub stars" / "0 GitHub forks"
+```
+
+Kartu **dihapus** saat `null` (bukan dirender `0`), grid jadi adaptif (`lg:grid-cols-6` → `lg:grid-cols-4`), dan `totalRepos` dihapus karena diteruskan ke island tapi **tidak pernah dirender** (Rule 6; rencana Observatory mencantumkan 6 kartu yang memang tak memuatnya).
+
+**Dua lapis guard, karena celahnya berbeda** — pola yang sama seperti M0.5: `ObservatoryOverview.test.tsx` (6 test) membuktikan island **menerima** `null`; `observatory.github-null.test.ts` (3 test) membaca **sumber** `.astro` untuk membuktikan halaman benar-benar **mengirim** `null`. Tanpa lapis kedua, island hijau sementara halaman tetap menerbitkan nol. Lingkup ban-nya sengaja sempit (`?? 0` pada field GitHub saja) — halaman yang sama sah floors `barPct`/`edgeOpacity` ke 0.
+
+**Batas jujur verifikasi ini:** `astro build` *self-heal* cache lewat jaringan, jadi UI "tanpa data GitHub" hanya terjangkau di CI/offline/403. State UI dibuktikan lewat **penalaran kode + unit/source test**, bukan build kosong end-to-end — dan itu juga alasan gerbang harus **cache-conditional** (di atas).
+
+#### Pelajaran Task 0.8
+
+1. **Menyelesaikan klaim yang tak pernah ada adalah hasil yang sah; mengimplementasikannya bukan.** Plan menyebut "3 lapis", sumber bilang 2. Lapis ke-3 tak bisa dibangun karena kebenarannya memblokirnya (akun memang 0 pin). Jawaban benar: menghapus klaim itu **di kode, komentar, pesan commit, dan AGENTS.md** — bukan menulis implementasi yang mustahil, dan lebih buruk lagi bukan mengorbankan build harian demi guard yang tujuannya sudah terpenuhi. Preseden sama: Task 0.6 — "sudah dikerjakan" ≠ "sudah diverifikasi".
+2. **Mencari yang tertulis membuat lubangnya sendiri terlewat.** Audit fokus ke "apakah 3 lapis ada" → jawabannya "tidak" → tugas selesai. Lubang yang benar-benar ada (`pinnedItems == null` lewat `?? []`) ada dua baris di bawah yang dibaca, tapi tidak dibaca sebagai kandidat. Assertion harus menyorot **bentuk degenerate yang mungkin terjadi**, bukan nama guard yang tertulis di dokumentasi.
+3. **`missing` dan `empty` adalah dua klaim berbeda; menyamakan keduanya merusak build yang benar.** Gerbang yang terlalu ketat pada ketiadaan akan menggagalkan `build:fast`/CI/fresh clone — persis yang harus dijaga M0.8.3. Gerbang yang terlalu longgar (sebelum task ini: `.cache` ada tapi isinya tak pernah diperiksa) membiarkan kegagalan lewat. Bedakan secara eksplisit di API, jangan biarkan tiap pemanggil menebak.
+4. **Pengecualian yang tercatat sebagai alasan bisa diaudit; yang berupa lubang sunyi tidak.** `pinned-repos.json` dikecualikan karena akunnya memang 0 pin — itu fakta yang bisa salah di kemudian hari, jadi ditulis di `GITHUB_CACHE_EMPTY_IS_TRUTH` dan **dibuktikan punya gigi oleh mutasi M2**. Pelajaran yang sama seperti gate count-claim M0.2 (hapus 1 proyek → 2 file protes): yang membuktikan arah kedua bukan "balikin bug lama".
+5. **Satu aturan, dua pemanggil — bukan dua implementasi.** Modul `github-cache-expectations.mjs` dipakai kedua skrip, jadi perubahan aturan berikutnya tak bisa menggeser kedua tempat. Persis C3 yang menghapus 3 salinan daftar eksperimen; `fetch-data.mjs` + `validate-data.mjs` adalah pasangan yang paling mungkin menghasilkan salinan serupa.
+
+#### Di luar scope (dicatat, bukan ditutup)
+
+- **`bun run build` penuh dijalankan** (49 halaman OK, gate mencetak `GitHub cache: non-degenerate`) — jadi sweep pasca-fetch di `fetch-data.mjs` terverifikasi di jalur build nyata, bukan cuma lewat unit. Efek sampingnya: `.cache/github` **ter-refresh** dari jaringan, dan angka yang tadinya di-cache berubah → `/work` 151.8/394.2 → **150.2/392.6** dan `/gallery` 181.0/506.2 → **178.7/503.9**. Keduanya **turun** (gate "tak naik" ✅) dan **bukan** hasil diff task ini (halaman yang diubah adalah `/observatory`, yang tak diukur `measure:routes`). Dicotokkan sebagai bukti bahwa **staleness cache itu nyata dan berdampak ke angka** — lihat butir staleness di bawah.
+- **Duplikasi blok `if (errors > 0)` di akhir `validate-data.mjs`** membuat setiap run mencetak "OK" dua kali. Pre-existing (terbukti identik di HEAD), di luar scope task ini, `lint` tetap 672 = baseline.
+- **`/observatory` tidak punya gate payload** — `measure:routes` hanya mencakup `/`, `/work/…`, `/gallery`. Pre-existing; dicatat di §0.3.
+- **Staleness cache** (file `.cache/github/*.json` berumur berbulan-bulan di working tree) ditetapkan **di luar scope** oleh user: hanya gate non-degeneracy yang dikerjakan. Bukti bahwa staleness itu nyata: `languages.json` (1 Jul) berisi 10 bahasa termasuk Makefile; setelah refresh, 10 bahasa dengan GDScript menggantikan satu slot — angkanya memang berubah dalam ~3 bulan.
+
 
 ### DoD Sprint 0
 
-- [ ] Semua microtask `- [x]`.
-- [ ] `bun run test` **≥ 875** (naik, tidak turun).
-- [ ] `bun run build` (penuh) 49 halaman OK.
-- [ ] `bunx astro check` = 103, 0 baru (diff daftar, bukan jumlah). **_(0 baru terbukti setiap task; baseline bergerak 103 → 101 di M0.5 — 2 error hilang, keduanya baris yang dihapus. Lihat §0.3.)_**
-- [ ] `bun run lint` ≤ 681, 0 baru di file tersentuh.
-- [ ] `bun run validate-data` + validator SiteFacts hijau; **uji negatif lulus**.
-- [ ] `rg -n 'Trump|Prabowo|Jokowi' src data dist` = 0.
-- [ ] `rg -n 'Math.random' src/lib/ml-metrics.ts` = 0 (file terhapus).
+- [x] Semua microtask `- [x]`. **_(Task 0.1 → 0.8 tuntas 2026-10-03.)_**
+- [x] `bun run test` **≥ 875** (naik, tidak turun). **_(963/963 di 85 file — +88 dari baseline 875/75.)_**
+- [x] `bun run build` (penuh) 49 halaman OK. **_(2026-10-03 — sekaligus membuktikan sweep pasca-fetch `fetch-data.mjs` di jalur build nyata.)_**
+- [x] `bunx astro check` = 103, 0 baru (diff daftar, bukan jumlah). **_(0 baru terbukti setiap task; baseline bergerak 103 → 101 di M0.5 — 2 error hilang, keduanya baris yang dihapus. Lihat §0.3. Diverifikasi ulang 2026-10-03 lewat worktree HEAD: 101 vs 101, identik setelah nomor baris dinormalkan — 5 error `observatory.astro` bergeser +5 baris saja karena neto delta diff saya, kodenya sama.)_**
+- [x] `bun run lint` ≤ 681, 0 baru di file tersentuh. **_(672 = baseline sejak Task 0.5.)_**
+- [x] `bun run validate-data` + validator SiteFacts hijau; **uji negatif lulus**. **_(OK, mencetak `GitHub cache: non-degenerate`. Uji negatif: M0.2 gate count-claim 5/5 (termasuk arah kedua — hapus 1 proyek → 2 file protes) · M0.4 `projects_shipped`/`certifications`/`years_experience` 3/3 setelah refactor jadi array · M0.8 matriks cache 4/4.)_**
+- [x] `rg -n 'Trump|Prabowo|Jokowi' src data dist` = 0. **_(✅ 0 match.)_**
+- [x] `rg -n 'Math.random' src/lib/ml-metrics.ts` = 0 (file terhapus). **_(✅ file tidak ada. Ketat: 3 match tersisa di `src/lib` semuanya **komentar** yang mendokumentasikan ketiadaannya — `facts.ts`, `tracery.ts`, `markov.ts`.)_**
 - [x] `rg -n 'projects_shipped' src data` = 0. **_(M0.6 ✅ 2026-10-02 — 0 match. Awalnya 1 match di komentar `About.astro`; komentar ditulis ulang agar gate tak membaca dirinya sendiri. Lihat §Task 0.6 DEVIASI.)_**
 - [x] `rg -n 'data-lightbox' dist` = 0. **_(M0.5 ✅ 2026-10-02 — terbukti: `rg 'data-lightbox|lightbox-overlay' dist` = 0, plus guard unit 5 + e2e 5 yang membuat regresi ini mahal.)_**
-- [ ] `git diff --stat src/` = hanya file yangtho yang dimaksud.
-- [ ] **Checkpoint**: laporkan ke user, update §7 + `prompt.txt`.
+- [x] `git diff --stat src/` = hanya file yangtho yang dimaksud. **_(4 file produk: `pages/observatory.astro`, `islands/ObservatoryOverview.tsx`, `scripts/fetch-data.mjs`, `scripts/validate-data.mjs`; +4 file baru (2 test, 1 modul gate, 1 test gate).)_**
+- [x] **Checkpoint**: laporkan ke user, update §7 + `prompt.txt`.
+
+> **Catatan kejujuran untuk pembaca audit berikutnya (bukan gate, tidak diperbaiki):** `Math.random()` masih ada ~110 baris di `src/islands/experiments/*`, `RepositoryGalaxy`, `LanguageNebula`, `NetworkGraph`. Semuanya **runtime client-side** untuk simulasi yang acak **adalah** substansinya (chaos, TSP annealing, partikel, gas) atau untuk aurora visual. Tidak ada yang mengarang **klaim konten** di HTML statis — dan itulah yang jadi alasan `ml-metrics.ts` dihapus di M0.4 (kursor loss + confusion matrix **fiktif** dirender sebagai hasil ukur saat build). Aturan "no `Math.random`" di sprint ini berlaku untuk **konten deterministik**, bukan untuk interaksi. Dicatat supaya grep di kemudian hari tidak salah menyimpulkan.
 
 ---
 
@@ -786,7 +865,7 @@ Tiga perbaikan ini **semuanya harness** — `e2e/hydration.ts`, `e2e/recommend.s
 | Sprint | Status | Unit | Section | e2e | Catatan |
 |---|---|---|---|---|---|
 | Baseline 2026-09-29 | ✅ tercatat | 875/875 | 14 | 245 | `astro check` 103 · `lint` 681 |
-| 0 — Truth & Integrity | ✅ 0.1+0.2+0.3+0.4+**0.5**+**0.6**(+0.6.5)+**0.7** | 943/943 | 13 | **251/251** (8.7m) | **Task 0.1 `SiteFacts` ✅** · **Task 0.2–0.4 ✅** (urut diubah dengan persetujuan). Validator + gate build-time aktif; payload `/` 199.9/560.8 KB (datar). **Task 0.5 ✅ (2026-10-02)** — kontrol mati `data-lightbox` dihapus (pilihan **b**: `media` berisi label `"Prototype"`, bukan URL, dan `monitoring_*.png` tak ada di `public/`, jadi lightbox berarti mengarang path). Guard: unit 5 + **e2e 5 (spec pertama yang membuka `/projects/<slug]`)**. 4 mutasi terbukti punya gigi. `astro check` **103 → 101** (2 error hilang = 2 baris yang dihapus, 0 baru). **Task 0.6 ✅ (2026-10-02)** — 0 kode produk (M0.6.1–0.3 sudah dieksekusi di M0.2.2, DEVIASI); diverifikasi ulang + 1 kebocoran ditutup: DoD `rg 'projects_shipped' src data` tadinya **1 match di komentar** `About.astro` → ditulis ulang → **0**. M0.6.4 dibuktikan punya gigi (klaim 22→21 → `validate-data` ❌ + `build:fast` ❌ sebelum astro → pulihkan `md5sum` identik). Gate: unit 937/937 datar · `astro check` **101** · `lint` **672** · payload `/` **199.9/560.8** datar · e2e 251/251 (11.0m). **M0.6.5 ✅** (keputusan user) `metrics.years_experience` ikut dihapus (0 pembaca) + assert ketiga di gate (2 assert lama ikut diuji ulang setelah refactor jadi array). **Task 0.7 ✅ (2026-10-02)** — global kill `ScrollTrigger.getAll().forEach(kill)` di `useGSAP` dihapus; dari sumber GSAP 3.15, `ctx.revert()` **sudah** scoped kill utuh (ScrollTrigger daftar di context aktif + `Context.kill()` telusur `data`). Test infra ikut dibuka: jsdom tak punya `matchMedia` → `import src/lib/gsap.ts` di test mana pun throw → polyfill di `src/test/setup.ts`. **6 test baru** (satu memakai konsumen asli `JourneyTimeline`), mutasi **4/6 merah** pada asersi yang dimaksud. **A/B browser sungguhan**: deep-link `#journey` lalu scroll naik ke SignalLoom → build bermutasi **beku** (0.6775 → 0.6775), build tetap **hidup** (0.8261 → 0.9685); homepage luput hanya karena urutan section, bukan karena koreksinya benar. Gate: unit **943/943** (82 file, +6) · `astro check` **101** datar · `lint` **672** datar · payload `/` **199.9/560.8** datar · **e2e `--workers=1` 251/251 (8.9m)** — setelah 2 run merah yang uncover 3 defect harness (lihat blok di atas). Berikutnya: **Task 0.8** GitHub data non-degenerate |
+| 0 — Truth & Integrity | ✅ 0.1+0.2+0.3+0.4+**0.5**+**0.6**(+0.6.5)+**0.7**+**0.8** — *semua microtask Sprint 0 ✓* | **963/963** (85 file) | 13 | **251/251** (18.0m) | **Task 0.1 `SiteFacts` ✅** · **Task 0.2–0.4 ✅** (urut diubah dengan persetujuan). Validator + gate build-time aktif; payload `/` 199.9/560.8 KB (datar). **Task 0.5 ✅ (2026-10-02)** — kontrol mati `data-lightbox` dihapus (pilihan **b**: `media` berisi label `"Prototype"`, bukan URL, dan `monitoring_*.png` tak ada di `public/`, jadi lightbox berarti mengarang path). Guard: unit 5 + **e2e 5 (spec pertama yang membuka `/projects/<slug]`)**. 4 mutasi terbukti punya gigi. `astro check` **103 → 101** (2 error hilang = 2 baris yang dihapus, 0 baru). **Task 0.6 ✅ (2026-10-02)** — 0 kode produk (M0.6.1–0.3 sudah dieksekusi di M0.2.2, DEVIASI); diverifikasi ulang + 1 kebocoran ditutup: DoD `rg 'projects_shipped' src data` tadinya **1 match di komentar** `About.astro` → ditulis ulang → **0**. M0.6.4 dibuktikan punya gigi (klaim 22→21 → `validate-data` ❌ + `build:fast` ❌ sebelum astro → pulihkan `md5sum` identik). **M0.6.5 ✅** (keputusan user) `metrics.years_experience` ikut dihapus (0 pembaca) + assert ketiga di gate (2 assert lama ikut diuji ulang setelah refactor jadi array). **Task 0.7 ✅ (2026-10-02)** — global kill `ScrollTrigger.getAll().forEach(kill)` di `useGSAP` dihapus; dari sumber GSAP 3.15, `ctx.revert()` **sudah** scoped kill utuh. Test infra ikut dibuka: jsdom tak punya `matchMedia` → `import src/lib/gsap.ts` di test mana pun throw → polyfill di `src/test/setup.ts`. **6 test baru**, mutasi **4/6 merah**. **A/B browser sungguhan**: deep-link `#journey` lalu scroll naik ke SignalLoom → build bermutasi **beku** (0.6775 → 0.6775), build tetap **hidup** (0.8261 → 0.9685); homepage luput hanya karena urutan section, bukan karena koreksinya benar. Gate: unit **943/943** (82 file, +6) · `astro check` **101** · `lint` **672** · e2e 251/251 (8.9m) — 3 defect harness ter uncover. **Task 0.8 ✅ (2026-10-03)** — **DEVIASI M0.8.1: dari "3 lapis" fix F5.1, hanya 2 yang pernah ada**; lapis ke-3 (tolak array kosong) tak bisa diimplementasikan karena akun memang 0 pin → klaim dihapus dari kode/komentar/commit/AGENTS.md, bukan dipalsukan. Lubang asli yang ditemukan sebagai gantinya: `pinnedItems == null` terlipat ke `[]` lewat `?? []` → guard ditambahkan. **M0.8.2** gate non-degeneracy `.cache/github` di **dua penempatan, satu aturan** (`scripts/github-cache-expectations.mjs`): `validate-data.mjs` (drift lama) + sweep pasca-fetch di `fetch-data.mjs` (cache yang baru dikosongkan). **`missing` ≠ `empty`** — cache absen ditoleransi (`build:fast`/CI/fresh clone sah tanpa cache), file ada tapi kosong = gagal keras. `pinned-repos.json` dikecualikan **dengan alasan tertulis** (akun 0 pin) dan giginya dibuktikan mutasi M2. Akar masalah diperbaiki di tempat asal: transform `all-repos` yang `Array.isArray(x) ? x : []` → jadi `[]` tercache sambil tercetak `✓` + exit 0. **Matriks end-to-end 4/4 sesuai harapan** (2 merah, 2 positive control), md5 cache dipulihkan identik. **M0.8.3 bukan verifikasi tapi defect produk nyata**: `/observatory` `?? 0` pada `total_stars`/`total_forks` ⇒ build tanpa cache mempublikasikan "0 GitHub stars". Kartu dihapus saat `null`, grid adaptif, `totalRepos` dibuang (dead prop, Rule 6). Guard 2 lapis (island 6 test + source-scan 3 test) karena celahnya berbeda. Gate: unit **963/963** (85 file, **+20**) · `astro check` **101 = baseline, 0 baru/0 hilang** · `lint` **672 = baseline** · `validate-data` OK · `build:fast` **49 halaman** · payload `/` **199.9/560.8** datar · 6 mutasi semua merah lalu dipulihkan `md5sum` identik · e2e observatory 5/5 + suite penuh **251/251** (18.0m). **`bun run build` penuh ✅ 49 halaman** (gate mencetak `GitHub cache: non-degenerate`; sweep pasca-fetch terverifikasi di jalur nyata) · **staleness cache tetap di luar scope (user)**. Berikutnya: **Sprint 1 Task 1.1** — kontrak data spine |
 | 1 — Career Spine | ⬜ | — | 13→12 | — | |
 | 2 — Evidence Surface | ⬜ | — | 12 | — | |
 | 3 — Capability Map | ⬜ | — | 12 | — | |
