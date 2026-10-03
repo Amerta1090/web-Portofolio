@@ -63,3 +63,31 @@ export async function waitForExperimentReady(page: Page, timeout = 30_000) {
     .locator("[data-modal-content] [data-experiment-loader]")
     .waitFor({ state: "detached", timeout });
 }
+
+/**
+ * Open a gallery experiment by its card text, waiting for both races.
+ *
+ * `GalleryGrid` is `client:load`, so its cards — and their `onClick` — are in the
+ * server HTML before React has attached any handler. A click in that window is
+ * dropped silently: no modal, no error, and the test fails later on a timeout for
+ * whatever the click was supposed to cause. `recommend.spec.ts` hit exactly this
+ * (`e2e/recommend.spec.ts:34`, "never recommends the item currently being
+ * explored", failed once in a 7-minute `--workers=1` run with
+ * `element(s) not found` for `[data-modal-content]` — the shell never appeared at
+ * all, so it was not the shell-vs-contents condition `waitForExperimentReady`
+ * exists for, it was a dead click). It passed 24/24 in isolation, and the gallery
+ * path never touches `useGSAP`, so the race — not a regression — was the cause.
+ *
+ * Both waits are needed and they are not interchangeable: hydration decides
+ * whether the click does anything, `waitForExperimentReady` decides whether there
+ * is content to assert on.
+ *
+ * @param name Card text as it appears in the grid, e.g. `"Fractal Explorer"`.
+ */
+export async function openExperiment(page: Page, name: string) {
+  await waitForIslandHydration(page, "[aria-label='Experiments']");
+  const card = page.locator("[aria-label='Experiments']").getByText(name).first();
+  await card.scrollIntoViewIfNeeded();
+  await card.click();
+  await waitForExperimentReady(page);
+}

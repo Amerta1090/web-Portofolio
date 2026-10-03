@@ -6,6 +6,15 @@ test.describe("Craft details: selection/scrollbar/focus/tabular-nums", () => {
     const para = page.locator("main p").first();
     await expect(para).toBeVisible();
 
+    // The paragraph is SSR markup, so it is visible before the theme store has run.
+    // A browser probe caught the consequence: at the moment the first <p> became
+    // visible, <html> had no `dark` class and `::selection` still resolved to the
+    // light palette, flipping to the dark palette only once the client store
+    // hydrated. So the first assertion below read whatever the page happened to be
+    // mid-hydration. Gate on the state being asserted — the same condition
+    // `accessibility.spec.ts:485` already gates on before reading brand tokens.
+    await expect(page.locator("html")).toHaveClass(/dark/);
+
     const readSelection = () =>
       para.evaluate((el) => {
         const s = getComputedStyle(el, "::selection");

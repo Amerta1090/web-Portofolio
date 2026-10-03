@@ -263,12 +263,83 @@ Edit kedua: komentar versi pertama saya sendiri menuliskan literal `rg projects_
 
 ### Task 0.7 — Perbaiki `useGSAP` global kill
 
-- [ ] **M0.7.1** Baca `src/lib/useGSAP.ts` penuh. Konfirmasi `ScrollTrigger.getAll().forEach(st => st.kill())` di cleanup (sudah terverifikasi, re-verifikasi).
-- [ ] **M0.7.2** Ganti jadi **scoped kill**: kumpulkan instance milik komponen ini saja (`gsap.context()` sudah memberi scoping; atau catat trigger yang dibuat di `onEnter`/refs).
-- [ ] **M0.7.3** Unit test yang **harus punya gigi**: mount 2 island yang sama-sama pakai ScrollTrigger → unmount salah satu → **ScrollTrigger milik yang lain masih hidup** (assert `ScrollTrigger.getAll().length` tidak turun ke 0, dan progress trigger yang tersisa masih ter-update).
-- [ ] **M0.7.4** Uji mutasi: kembalikan ke `getAll().forEach(kill)` → test HARUS gagal → pulihkan. (pelajaran F5.1 #3)
+- [x] **M0.7.1** Baca `src/lib/useGSAP.ts` penuh. Konfirmasi `ScrollTrigger.getAll().forEach(st => st.kill())` di cleanup (sudah terverifikasi, re-verifikasi).
+- [x] **M0.7.2** Ganti jadi **scoped kill**: kumpulkan instance milik komponen ini saja (`gsap.context()` sudah memberi scoping; atau catat trigger yang dibuat di `onEnter`/refs).
+- [x] **M0.7.3** Unit test yang **harus punya gigi**: mount 2 island yang sama-sama pakai ScrollTrigger → unmount salah satu → **ScrollTrigger milik yang lain masih hidup** (assert `ScrollTrigger.getAll().length` tidak turun ke 0, dan progress trigger yang tersisa masih ter-update).
+- [x] **M0.7.4** Uji mutasi: kembalikan ke `getAll().forEach(kill)` → test HARUS gagal → pulihkan. (pelajaran F5.1 #3)
 
 **Verify**: unit hijau; mutasi test gagal seperti seharusnya.
+
+**Mekanismenya dibaca dari sumber GSAP 3.15, bukan dari ingatan.** `gsap.context()` ternyata **sudah** scopes:]: ScrollTrigger mendaftarkan dirinya ke context yang aktif (`ScrollTrigger.js:925` → `_context(this)`), dan `Context.revert()` → `kill()` menelusuri `data` itu, memanggil `revert()`/`kill()` pada tiap entri non-Tween/non-Timeline (`gsap-core.js:4002-4005`). Jadi **`ctx.revert()` saja sudah merupakan scoped kill** — baris `getAll().forEach(kill)` bukan sekadar berlebihan, ia merusak: membunuh trigger milik komponen lain, dan karena yang dibunuh bersifat global sedangkan pemiliknya tidak, pemilik itu **tidak pernah membuat ulang** (deps `useGSAP` masing-masing tidak berubah) → kerusakan permanen. Konsekuensi: perbaikannya adalah **penghapusan satu baris**, bukan penambahan mekanisme pelacakan. Import `ScrollTrigger` ikut dibersihkan.
+
+**Test infra yang belum ada — dan itu sebabnya bug ini tak pernah ketahuan.** jsdom **tidak punya `matchMedia` sama sekali**, sedangkan `gsap.registerPlugin(ScrollTrigger)` membacanya di module scope (`gsap-core.js:4073`), jadi **meng-import `src/lib/gsap.ts` di test mana pun langsung throw** `_win.matchMedia is not a function` sebelum body test jalan. Fakta ini baru diketahui lewat probe — tanpa itu, tak ada yang akan mengira `useGSAP` bisa diuji di unit test. Polyfill `matchMedia` ditambahkan ke `src/test/setup.ts` mengikuti pola `ResizeObserver`/`IntersectionObserver` yang sudah ada (default `matches: false`, sehingga test yang memang menguji cabang reduced-motion tetap men-stub sendiri).
+
+**Dua observabel yang dipakai test, keduanya dibaca dari sumber, bukan dikira-kira.** (a) `ScrollTrigger.getAll()` adalah registry hidup (`_triggers`). (b) `ScrollTrigger.kill()` **menyplice dirinya keluar dari `_triggers` DAN mengeset `animation.scrollTrigger = null`** sebelum membunuh animasinya (`ScrollTrigger.js` `self.kill`). Maka `tween.scrollTrigger === trigger` adalah sertifikat "trigger ini masih terpasang", dan `tween.scrollTrigger === null` adalah sertifikat kematiannya. Kedua sisi diuji dengan observabel yang sama: **unmount** satu island **tidak boleh** membunuh trigger tetangganya, dan **tetap harus** membunuh trigger sendiri sendiri — perbaikan yang sekadar mematikan pembersihan akan lolos sisi pertama dan gagal sisi kedua.
+
+**Mutasi M0.7.4 — 4 dari 6 test merah, bukan 6 dari 6.** Kembalikan `getAll().forEach(kill)` → 4 test gagal **tepat pada asersi yang dimaksud** (`expected [] to include ScrollTrigger{ …(36) }`, `expected [] to have a length of 2 but got +0`) → `md5sum f12a525f…` identik → 6/6 hijau lagi. Dua test yang tetap hijau saat mutasi adalah dua test sisi-kebalikan ("masih membunuh trigger sendiri", "masih merevert animasi sendiri") — secara konstruksi keduanya memang tak bisa gagal di bawah mutasi ini, karena mutasi itu justru membaca tangan soal trigger sendiri. Dilaporkan apa adanya, bukan diklaim 6/6.
+
+**A/B di browser sungguhan — dan probe pertama menghasilkan hasil NULL yang hampir menyesatkan.** Build tetap (tanpa mutasi) → transform garis Journey bereaksi seperti biasa; tapi build bermutasi (global kill aktif) → **nilai persis sama**. Hampir ditulis sebagai "bug-nya tidak nyata di produksi". Dua langkah menyelamatkan. (1) **Pastikan probe benar-benar menyajikan byte yang dikira:** `curl` chunk `useGSAP` yang benar-benar dirujuk oleh `index.html` → contains `getAll()` → jadi null result-nya bukan artefak serving (pelajaran F5.1 #1: "fallback yang terlalu longgar menyembunyikan kegagalan"). (2) **Ternyata urutan section yang menyelamatkan homepage:** `index.astro` menaruh SignalLoom (baris 82) **di atas** JourneyTimeline (baris 90), dan trigger `ImpactMetrics` di About (baris 75) ber-`once: true` sehingga sudah habis sebelum user menjangkau SignalLoom. Jadi pada scroll normal, churn SignalLoom selalu **selesai sebelum** trigger korban dibuat. Probe kedua memakai urutan yang benar-benar merusak — deep-link ke `#journey` (JourneyTimeline ter-hidrasi dan membuat trigger lebih dulu), **lalu scroll naik ke SignalLoom**:
+
+| Build | scrub sebelum SignalLoom | scrub sesudah SignalLoom | 3 dot ter-render |
+|---|---|---|---|
+| **bermutasi** (global kill) | ✅ 0.3345 → 0.749 | ❌ **0.6775 → 0.6775 (beku)** | ya |
+| **tetap** (scoped) | ✅ 0.334 → 0.749 | ✅ **0.8261 → 0.9685 (hidup)** | ya |
+
+Jadi bug-nya **nyata dan terukur**, cuma bisa muncul pada urutan tertentu. Dua pelajaran: (a) **hasil null dari probe adalah klaim yang belum diperiksa, bukan bukti** — "tidak terjadi" dan "tidak terukur" perlu dibedakan sebelum ditulis di laporan; (b) **kode berbahaya yang kebetulan tak terlihat tetap kode berbahaya** — homepage selamat karena urutan section, bukan karena koreksinya benar.
+
+**DEFECT HARNESS DARI GERBANG — tiga e2e penuh, tiga test berbeda, nol yang berulang, dan satu kelas akar.**
+
+Ringkasnya: **run 1 = 250/251, run 2 = 249/251, dan tidak ada satu pun test yang gagal dua kali.** Tiga kegagalan, tiga file berbeda, tiga spec berbeda. Itu bukan pola bug — itu pola nondeterminisme. Yang penting: ketiganya **kelas yang sama**, dan kelas itu sudah tiga kali didokumentasikan di sprint ini ("tunggu cangkang, bukan isi" / "klik pra-hidrasi") tanpa pernah benar-benar tertutup.
+
+| run | gagal | gejala | bukti mekanisme | status |
+|---|---|---|---|---|
+| 1 | `recommend.spec.ts:30` | `element(s) not found` untuk `[data-modal-content]` | cangkang tak pernah muncul = klik mati | **preventif** (tak tereproduksi) |
+| 2 | `assistant.spec.ts:29` | `locator.fill` timeout 30s menunggu input | FAB `GlobalChrome` `client:load`, klik jatuh pre-hidrasi | **terbukti** — probe **8/10 → 10/10** |
+| 2 | `craft.spec.ts:4` | dapat `rgb(93,107,84)` (light), harap `rgb(122,140,111)` (dark) | `::selection` dibaca sebelum theme store hidrasi | **terbukti** — probe **5/5** light di detik ke-0 |
+
+**Kelas akar yang sama untuk ketiganya: sebuah test mengukur state yang belum diterapkan island client, memakai gate yang sudah dipenuhi markup SSR.** Bentuknya selalu: `goto` → gate yang SSR sudah penuhi (`expect(para).toBeVisible()`, `scrollIntoViewIfNeeded`, `locator.fill` yang menunggu dialog) → baca/klikan state nyata.
+
+### Run 1 — `recommend.spec.ts` (preventif)
+
+e2e penuh pertama **250 passed / 1 failed**, gagal di `expect(page.locator("[data-modal-content]")).toBeVisible({ timeout: 10000 })` dengan `Error: element(s) not found`. Diagnosis penting: itu **bukan** kondisi shell-vs-content yang `waitForExperimentReady` alamat — di sana shell muncul lalu loader menggantung, dan errornya berbeda (timeout loader, bukan "not found"). Cangkang yang **tidak pernah muncul sama sekali** = klik-nya tidak pernah membuka modal.
+
+A/B dulu sebelum menyimpulkan apa pun: terisolasi **24/24 hijau** (`--repeat-each=6`), dan `/gallery` tak pernah menyentuh `useGSAP` (`JourneyTimeline`/`SignalLoom`/`ImpactMetrics` satu-satunya konsumen; `GalleryGrid` + `RecommendedRow` = 0 match), sementara diff `src/` cuma `useGSAP.ts` + `src/test/setup.ts` (vitest-only, tak masuk dist). Jadi bukan regresi Task 0.7.
+
+**Akar: `recommend.spec.ts` adalah satu-satunya spec galeri yang TIDAK pakai helper bersama.** `grep 'data-modal-content' e2e/` menunjukkan 5 spec lain semuanya lewat `waitForExperimentReady`, spec ini punya **3 blok inline** sendiri. Task 0.1 sudah mendiagnosis kelas yang sama dan menutupnya di **13 blok `beforeEach` pada 5 spec** — tapi remediasinya berupa *grep `waitForSelector("[data-modal-content]")`*, dan spec ini membuka modal **inline di dalam test**, jadi pola itu tak pernah menangkapnya. **Pelajaran M0.1 berulang, dan kelasnya lebih luas dari grep yang menutupnya: cari bentuk perilakunya (siapa saja yang membuka modal), bukan bentuk teks yang dipakai saat itu.**
+
+**Dua celah ditutup di akar** via helper bersama baru **`openExperiment(page, name)`** di `e2e/hydration.ts` (hydration wait → `scrollIntoViewIfNeeded` → click → `waitForExperimentReady`), dipakai 3 blok.
+
+**KAJIAN JUJUR — yang ini preventif, bukan terbukti memperbaiki.** Race pre-hidrasi **tidak bisa direproduksi di mesin sepi**: probe 12 trial per bentuk, `WITHOUT (old shape) 12/12` dan `WITH hydration wait 12/12` — keduanya buka modal. Jadi tak ada angka "tingkat kegagalan X%" yang boleh diklaim; yang bisa diklaim hanya sifat intermitennya (1 dari 251 penuh, 24/24 terisolasi), gejala cangkang tak pernah muncul, dan statusnya sebagai satu-satunya spec tanpa gerbang hidrasi. Race tak bisa dibuktikan dengan mutasi seperti asersi produk, jadi pembuktiannya adalah pengukuran — dan pengukurannya **negatif**. Dicatat apa adanya, dan **dibedakan tegas dari dua yang di bawah yang memang terbukti**.
+
+### Run 2 — `assistant.spec.ts` (terbukti)
+
+e2e penuh kedua **249 passed / 2 failed**. `recommend.spec.ts` **hijau** (perbaikannya bekerja), tapi dua test lain gagal — dan bukan yang sama.
+
+`assistant.spec.ts:29` gagal di `locator.fill` dengan `Test timeout of 30000ms exceeded`, menunggu `getByRole('dialog', {name:'detAIministic assistant'}).getByLabel('Pesan ke assistant')`. Gejalanya sistematis, bukan acak: **tidak ada drawer sama sekali**, jadi yang gagal adalah field di dalam drawer yang tak pernah dibuka. `GlobalChrome` = `client:load` dan **dipasang paling akhir** di BaseLayout, jadi FAB ada di HTML server sebelum React attach — persis kondisi yang sudah didokumentasikan `waitForIslandHydration`.
+
+**Yang membuat ini terbukti, bukan dugaan: probe menjalankan `goto` → click 10× pada `waitUntil: "commit"` → `WITHOUT 8/10 opened`, `WITH hydration wait 10/10 opened`.** Ini bukti gigi sungguhan, berbeda dari run 1. Perbaikan: helper lokal `openAssistant(page)` di `assistant.spec.ts` (pakai `waitForIslandHydration` bersama) dipakai **6 titik klik** — bukan cuma yang gagal, karena **kelasnya 6 test**. Catatan jujur soal angkanya: probe `commit` lebih agresif dari `goto` default Playwright (yang menunggu `load`), itulah sebabnya suite penuh melihat ~1 dari 251, bukan 2 dari 10.
+
+### Run 2 — `craft.spec.ts` (terbukti, dan polanya sudah ada di repo)
+
+Gagal: `Expected: "rgb(122, 140, 111)"`, `Received: "rgb(93, 107, 84)"` — dapat **light** di mana test mengharapkan **dark**.
+
+**Mekanisme, diukur 5/5 (probe browser):**
+
+| saat | class `<html>` | `::selection` |
+|---|---|---|
+| ketika `main p` pertama kali **visible** | `""` | `rgb(93,107,84)` — **light** |
+| +1,5 dtk (setelah theme store hidrasi) | `"dark"` | `rgb(122,140,111)` — **dark** |
+
+Akarnya: gate satu-satunya test adalah `expect(para).toBeVisible()`, yang **sudah dipenuhi markup SSR** — jadi asersi pertama membaca `::selection` saat halaman masih di tengah hidrasi. Dan kelas `dark` itu datang dari **theme store client**, bukan script inline (probe: `prefersDark=false`, `stored=null` saat dibaca — jadi script inline justru *tidak* menambahkan `dark`).
+
+**Temuan terpenting: pola yang benar SUDAH ADA di repo, satu file di sebelah.** `accessibility.spec.ts:485` sudah melakukan persis gerbang yang hilang ini — `await expect(page.locator("html")).toHaveClass(/dark/)` **sebelum** membaca `--color-brand-rgb`. `craft.spec.ts` hanya tidak pernah mengadopsi gerbang tetangganya. Perbaikannya persis pola itu, tanpa helper baru: **jawaban sudah tertulis, tugasnya memperhatikan itu.**
+
+### Yang berubah di produk: nihil
+
+Tiga perbaikan ini **semuanya harness** — `e2e/hydration.ts`, `e2e/recommend.spec.ts`, `e2e/assistant.spec.ts`, `e2e/craft.spec.ts`. Nol perubahan di `src/`. Tidak ada satu pun yang menyentuh logika produk; semuanya membuat test berhenti mengukur kondisi yang belum ada.
+
+**Temuan sampingan: satu komentar dokumentasi ternyata lebih kuat dari kodenya.** `gallery.spec.ts` `openExperiment` punya komentar "avoids the hydration race" — padahal helper itu **tidak pernah** menunggu hidrasi. Yang dihindarinya adalah race shell-vs-content, yang berbeda. Komentar itu diperbaiki jadi menyatakan celahnya, lalu menunjuk `openExperiment` di `hydration.ts` sebagai versi converged. **Helper lokal gallery_spec sendiri sengaja TIDAK diganti** (71 test hijau; menyentuhnya di task soal `useGSAP` = membuka gerbang yang sudah bekerja, dan biaya re-prove-nya sendiri — preseden pelajaran M0.6.5). Dicatat sebagai **latent race**, bukan diperbaiki diam-diam. 71 test itu selamat karena tiap test melakukan `goto` + satu asersi heading/card lebih dulu, yang memberi jeda cukup untuk menutupinya; `recommend.spec.ts` langsung `goto` → `click`.
+**Gate M0.7**: unit **943/943** (82 file, **+6** test baru) · `astro check` **101 = baseline, 0 baru** · `lint` **672 = baseline** · `validate-data` OK · `build:fast` **49 halaman** · payload `/` **199.9 / 560.8** KB (datar) · import `ScrollTrigger` di `useGSAP.ts` dibuang (tak ada lagi pemakai) · **e2e `--workers=1` 251/251 (8.9m)**, `lint` **672 = baseline** · 3 defect harness ditemukan gerbang (nol perubahan produk).
 
 ### Task 0.8 — GitHub data non-degenerate
 
@@ -715,7 +786,7 @@ Edit kedua: komentar versi pertama saya sendiri menuliskan literal `rg projects_
 | Sprint | Status | Unit | Section | e2e | Catatan |
 |---|---|---|---|---|---|
 | Baseline 2026-09-29 | ✅ tercatat | 875/875 | 14 | 245 | `astro check` 103 · `lint` 681 |
-| 0 — Truth & Integrity | ✅ 0.1+0.2+0.3+0.4+**0.5**+**0.6**(+0.6.5) | 937/937 | 13 | **251/251** (8.7m) | **Task 0.1 `SiteFacts` ✅** · **Task 0.2–0.4 ✅** (urut diubah dengan persetujuan). Validator + gate build-time aktif; payload `/` 199.9/560.8 KB (datar). **Task 0.5 ✅ (2026-10-02)** — kontrol mati `data-lightbox` dihapus (pilihan **b**: `media` berisi label `"Prototype"`, bukan URL, dan `monitoring_*.png` tak ada di `public/`, jadi lightbox berarti mengarang path). Guard: unit 5 + **e2e 5 (spec pertama yang membuka `/projects/<slug]`)**. 4 mutasi terbukti punya gigi. `astro check` **103 → 101** (2 error hilang = 2 baris yang dihapus, 0 baru). **Task 0.6 ✅ (2026-10-02)** — 0 kode produk (M0.6.1–0.3 sudah dieksekusi di M0.2.2, DEVIASI); diverifikasi ulang + 1 kebocoran ditutup: DoD `rg 'projects_shipped' src data` tadinya **1 match di komentar** `About.astro` → ditulis ulang → **0**. M0.6.4 dibuktikan punya gigi (klaim 22→21 → `validate-data` ❌ + `build:fast` ❌ sebelum astro → pulihkan `md5sum` identik). Gate: unit 937/937 datar · `astro check` **101** · `lint` **672** · payload `/` **199.9/560.8** datar · e2e 251/251 (11.0m). **M0.6.5 ✅** (keputusan user) `metrics.years_experience` ikut dihapus (0 pembaca) + assert ketiga di gate (2 assert lama ikut diuji ulang setelah refactor jadi array). Berikutnya: **Task 0.7** `useGSAP` global kill |
+| 0 — Truth & Integrity | ✅ 0.1+0.2+0.3+0.4+**0.5**+**0.6**(+0.6.5)+**0.7** | 943/943 | 13 | **251/251** (8.7m) | **Task 0.1 `SiteFacts` ✅** · **Task 0.2–0.4 ✅** (urut diubah dengan persetujuan). Validator + gate build-time aktif; payload `/` 199.9/560.8 KB (datar). **Task 0.5 ✅ (2026-10-02)** — kontrol mati `data-lightbox` dihapus (pilihan **b**: `media` berisi label `"Prototype"`, bukan URL, dan `monitoring_*.png` tak ada di `public/`, jadi lightbox berarti mengarang path). Guard: unit 5 + **e2e 5 (spec pertama yang membuka `/projects/<slug]`)**. 4 mutasi terbukti punya gigi. `astro check` **103 → 101** (2 error hilang = 2 baris yang dihapus, 0 baru). **Task 0.6 ✅ (2026-10-02)** — 0 kode produk (M0.6.1–0.3 sudah dieksekusi di M0.2.2, DEVIASI); diverifikasi ulang + 1 kebocoran ditutup: DoD `rg 'projects_shipped' src data` tadinya **1 match di komentar** `About.astro` → ditulis ulang → **0**. M0.6.4 dibuktikan punya gigi (klaim 22→21 → `validate-data` ❌ + `build:fast` ❌ sebelum astro → pulihkan `md5sum` identik). Gate: unit 937/937 datar · `astro check` **101** · `lint` **672** · payload `/` **199.9/560.8** datar · e2e 251/251 (11.0m). **M0.6.5 ✅** (keputusan user) `metrics.years_experience` ikut dihapus (0 pembaca) + assert ketiga di gate (2 assert lama ikut diuji ulang setelah refactor jadi array). **Task 0.7 ✅ (2026-10-02)** — global kill `ScrollTrigger.getAll().forEach(kill)` di `useGSAP` dihapus; dari sumber GSAP 3.15, `ctx.revert()` **sudah** scoped kill utuh (ScrollTrigger daftar di context aktif + `Context.kill()` telusur `data`). Test infra ikut dibuka: jsdom tak punya `matchMedia` → `import src/lib/gsap.ts` di test mana pun throw → polyfill di `src/test/setup.ts`. **6 test baru** (satu memakai konsumen asli `JourneyTimeline`), mutasi **4/6 merah** pada asersi yang dimaksud. **A/B browser sungguhan**: deep-link `#journey` lalu scroll naik ke SignalLoom → build bermutasi **beku** (0.6775 → 0.6775), build tetap **hidup** (0.8261 → 0.9685); homepage luput hanya karena urutan section, bukan karena koreksinya benar. Gate: unit **943/943** (82 file, +6) · `astro check` **101** datar · `lint` **672** datar · payload `/` **199.9/560.8** datar · **e2e `--workers=1` 251/251 (8.9m)** — setelah 2 run merah yang uncover 3 defect harness (lihat blok di atas). Berikutnya: **Task 0.8** GitHub data non-degenerate |
 | 1 — Career Spine | ⬜ | — | 13→12 | — | |
 | 2 — Evidence Surface | ⬜ | — | 12 | — | |
 | 3 — Capability Map | ⬜ | — | 12 | — | |

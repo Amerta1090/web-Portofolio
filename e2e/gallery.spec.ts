@@ -3,12 +3,25 @@ import { waitForExperimentReady } from "./hydration";
 
 /**
  * Robust card-open helper: scope to the experiments grid, scroll the card into
- * view, click it, then wait for the modal — avoids the hydration race where a
- * naive `getByText(...).click()` silently misses the card (see sprint detAIministic D4).
+ * view, click it, then wait for the modal (see sprint detAIministic D4).
  *
  * The "is it really open" condition lives in `./hydration` so that this helper and
  * the 13 deep-link `beforeEach` blocks cannot drift apart again; see
  * `waitForExperimentReady` for the measurement that forced the change.
+ *
+ * KNOWN GAP — this local helper does **not** wait for the island to hydrate, so a
+ * click landing before `GalleryGrid` (`client:load`) attaches its handlers is still
+ * dropped silently. The doc comment here used to claim it avoided "the hydration
+ * race"; it avoided the shell-vs-contents race, not this one. In practice every
+ * test in this file does a `goto` plus a heading/card assertion first, which adds
+ * enough settling time to hide it; `recommend.spec.ts` went straight from `goto` to
+ * `click` and failed once in a 7-minute run for exactly this reason.
+ *
+ * `openExperiment` in `./hydration` is the converged version (hydration wait +
+ * `waitForExperimentReady`) and is what `recommend.spec.ts` now uses. Swapping this
+ * file over is left undone on purpose: it would touch 71 currently-green tests in a
+ * task about `useGSAP`, and re-proving a working gate is its own cost (see the
+ * M0.6.5 lesson). Recorded as a latent race, not silently fixed.
  */
 async function openExperiment(page: Page, name: string) {
   const grid = page.locator("[aria-label='Experiments']");

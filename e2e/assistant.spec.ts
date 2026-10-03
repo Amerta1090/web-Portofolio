@@ -1,4 +1,28 @@
-import { expect, test } from "@playwright/test";
+import { type Page, expect, test } from "@playwright/test";
+import { waitForIslandHydration } from "./hydration";
+
+/**
+ * Open the assistant drawer, closing the pre-hydration race first.
+ *
+ * The FAB lives in `GlobalChrome` (`client:load`), which is the island mounted last
+ * on every page. Its markup — and therefore the button and its accessible name — is
+ * in the server HTML, so a click issued right after `goto` can land before React
+ * attaches any handler. The click is then dropped silently: no drawer, no error,
+ * and the test fails 30 s later on a `locator.fill` timeout for the input that the
+ * click was supposed to reveal. That is exactly how
+ * "typing a message and pressing Enter shows a reply" failed in a full
+ * `--workers=1` run, and it is invisible to a reader because the failure points at
+ * a field, not at the button.
+ *
+ * Measured with a browser probe driving the same `goto` → click shape 10 times at
+ * `waitUntil: "commit"`: **8/10 opened without this wait, 10/10 with it**. The probe
+ * commits harder than Playwright's default `goto` (which waits for `load`), which is
+ * why the full suite sees roughly 1 failure in 251 rather than 2 in 10.
+ */
+async function openAssistant(page: Page) {
+  await waitForIslandHydration(page, "[aria-label='Buka assistant detAIministic']");
+  await page.getByLabel("Buka assistant detAIministic").click();
+}
 
 test.describe("AssistantBot (detAIministic)", () => {
   test("FAB appears on the page (all pages)", async ({ page }) => {
@@ -9,7 +33,7 @@ test.describe("AssistantBot (detAIministic)", () => {
 
   test("opens the drawer with header + chips", async ({ page }) => {
     await page.goto("/");
-    await page.getByLabel("Buka assistant detAIministic").click();
+    await openAssistant(page);
     await expect(page.getByRole("dialog", { name: "detAIministic assistant" })).toBeVisible();
     await expect(page.getByText("detAIministic assistant")).toBeVisible();
     await expect(page.getByText("deterministic · no LLM · no backend")).toBeVisible();
@@ -17,7 +41,7 @@ test.describe("AssistantBot (detAIministic)", () => {
 
   test("clicking a quick-pick chip produces a reply", async ({ page }) => {
     await page.goto("/");
-    await page.getByLabel("Buka assistant detAIministic").click();
+    await openAssistant(page);
     const dialog = page.getByRole("dialog", { name: "detAIministic assistant" });
     const chip = dialog.getByRole("button", { name: /Skill/i }).first();
     await chip.click();
@@ -28,7 +52,7 @@ test.describe("AssistantBot (detAIministic)", () => {
 
   test("typing a message and pressing Enter shows a reply", async ({ page }) => {
     await page.goto("/");
-    await page.getByLabel("Buka assistant detAIministic").click();
+    await openAssistant(page);
     const dialog = page.getByRole("dialog", { name: "detAIministic assistant" });
     const input = dialog.getByLabel("Pesan ke assistant");
     await input.fill("apa saja skill kamu?");
@@ -41,7 +65,7 @@ test.describe("AssistantBot (detAIministic)", () => {
 
   test("opens the engine transparency modal", async ({ page }) => {
     await page.goto("/");
-    await page.getByLabel("Buka assistant detAIministic").click();
+    await openAssistant(page);
     const dialog = page.getByRole("dialog", { name: "detAIministic assistant" });
     await dialog.getByLabel("Buka engine").click();
     await expect(
@@ -53,7 +77,7 @@ test.describe("AssistantBot (detAIministic)", () => {
 
   test("closes the drawer", async ({ page }) => {
     await page.goto("/");
-    await page.getByLabel("Buka assistant detAIministic").click();
+    await openAssistant(page);
     await expect(page.getByRole("dialog", { name: "detAIministic assistant" })).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(page.getByRole("dialog", { name: "detAIministic assistant" })).toHaveCount(0);
@@ -63,7 +87,7 @@ test.describe("AssistantBot (detAIministic)", () => {
     page,
   }) => {
     await page.goto("/");
-    await page.getByLabel("Buka assistant detAIministic").click();
+    await openAssistant(page);
     const dialog = page.getByRole("dialog", { name: "detAIministic assistant" });
     const input = dialog.getByLabel("Pesan ke assistant");
     // Initial focus → input (via useFocusTrap).
