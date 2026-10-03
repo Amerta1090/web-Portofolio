@@ -44,8 +44,14 @@ import { type CategoryCount, categoryCounts } from "./observatory/metrics";
  * carry a date. Both numbers are therefore exposed — `byKind.certification` is
  * what the spine shows, `certifications.dated` is what the data holds — so the
  * cap can never be mistaken for a data limit.
+ *
+ * The constant itself moved to `src/lib/creative/career-spine.ts` in Sprint 1
+ * (M1.1.2): the spine is now what applies the cap, and it selects the newest by
+ * *date* instead of taking the first 15 in array order, which only looked like
+ * "newest" because `certifications.json` happens to be sorted. Re-exported here
+ * so there is still exactly one definition and existing importers keep working.
  */
-export const TIMELINE_CERTIFICATION_LIMIT = 15;
+export { TIMELINE_CERTIFICATION_LIMIT } from "./creative/career-spine";
 
 export interface IssuerGroup {
   issuer: string;

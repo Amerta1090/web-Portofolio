@@ -59,7 +59,9 @@
 >
 > Gate lain yang bergerak: `lint` **681 → 672** (↓9 selama Task 0.1–0.5), `unit` 875 → **963** (85 file), `/projects` **tidak** diukur `measure:routes` — metrik payload hanya mencakup `/`, `/work/…`, `/gallery`, jadi route yang saya ubah tidak punya gate payload sama sekali (dicatat, bukan ditutup). **Task 0.8 menambah satu lagi ke daftar itu: `/observatory`** — page yang/task ini ubah (kartu GitHub dihapus saat `null`) tetap **tanpa gate payload**. Gap yang sama seperti `/projects`, ditemukan karena kebetulan sedang mengerjakan halaman itu, bukan karena metriknya lengkap.
 >
-> **UPDATE 2026-10-03 (Task 0.8) — `astro check` tetap 101, `lint` tetap 672.** Keduanya membuktikan nol perubahan dari baseline Task 0.6. Yang berubah justru **cakupan gate `validate-data`**: sebelumnya skrip itu membaca **hanya** `data/*.json` dan **tidak pernah menyentuh** `.cache/github/` sama sekali — jadi "cache GitHub vorhanden tapi kosong" lolos tanpa pemeriksaan. Sekarang `.cache/github` ikut diperiksa, **conditional on existence** (`missing` ditoleransi, `empty` ditolak). Detail + DEVIATION di §Task 0.8.
+> **UPDATE 2026-10-03 (Task 0.8) — `astro check` tetap 101, `lint` tetap 672.** Keduanya membuktikan nol perubahan dari baseline Task 0.6. Yang berubah justru **cakupan gate `validate-data`**: sebelumnya skrip itu membaca **hanya** `data/*.json` dan **tidak pernah menyentuh** `.cache/github/` sama sekali — jadi "cache GitHub ada tapi kosong" lolos tanpa pemeriksaan. Sekarang `.cache/github` ikut diperiksa, **conditional on existence** (`missing` ditoleransi, `empty` ditolak). Detail + DEVIASI di §Task 0.8.
+>
+> **UPDATE 2026-10-03 (Task 1.1) — semua gate datar: unit 983/983 (86 file), `astro check` 101, `lint` 672, payload `/` 199.9/560.8, runtime scroll listener 15.** Yang **baru** dijamin adalah hal yang tak dijamin gate mana pun: `rg 'career-spine|CAREER_EVENT_KINDS' dist/_astro/` = **0**, yaitu kontrak data baru **tidak masuk client chunk mana pun**. Gate payload yang ada tak akan menangkap kebocoran seperti itu selama hanya satu route yang diukur — itu persis kelas bug Q4.1 (+18.5 KB gzip), jadi check grep ini **perlu ikut** setiap kali kontrak `src/lib/*` baru ditulis dan island-nya akan meng-import **nilai** (bukan tipe).
 
 ### 0.4 Dependency Graph
 
@@ -454,24 +456,90 @@ Kartu **dihapus** saat `null` (bukan dirender `0`), grid jadi adaptif (`lg:grid-
 **Expected files** (dihapus): `src/components/organisms/Experience.astro`, `src/islands/JourneyTimeline.tsx` + test
 **Expected files** (diubah): `src/pages/index.astro` (`#experience` + `#journey` → `#career`; 13 → 12 section), `src/lib/constants.ts` (kalau ada anchor nav), `e2e/*.spec.ts` yang mengacu ke section lama
 
-### Task 1.1 — Kontrak data spine
+### Task 1.1 — Kontrak data spine ✅ SELESAI (M1.1.1–M1.1.5, 2026-10-03)
 
-- [ ] **M1.1.1** Baca `getTimeline()` di `src/lib/data.ts` — petakan `TimelineItem` (7 pengalaman + 15 sertifikasi bertanggal) dan apakah `honors.json`/`volunteering.json` punya periode.
-- [ ] **M1.1.2** Tulis helper pure `src/lib/creative/career-spine.ts`:
-  - `parseCareerDate(raw): { year, month?, iso? } | null` — reusing **`parsePeriod` dari `src/lib/observatory/parsePeriod.ts`** kalau cocok (P3: jangan duplikasi parser yang sudah ada & teruji 22/22).
-  - `buildCareerEvents(): CareerEvent[]` — menggabungkan pengalaman + sertifikasi bertanggal + honors + volunteering, **diurutkan** (tie-break: `periodParsed` lalu `kind` lalu `title`).
-  - `careerEventKinds` = `['experience','certification','honor','volunteering']` (satu definisi, dipakai schema + UI + test).
-  - `groupEventsByYear` / `yearTicks` untuk spine.
-- [ ] **M1.1.3** Semua event wajib punya `kind`, `title`, `org?`, `periodParsed` — event tanpa tanggal **di-drop** (bukan_rendered tanpa posisi), dan jumlahnya dilaporkan di test.
-- [ ] **M1.1.4** Unit test: hitungan known (7 experience, 15 cert bertanggal, 3 honor, 1 volunteering = **26**, atau fewer kalau honors/volunteering tak bertanggal — **tulis angka nyata di test setelah verifikasi, jangan menebak**).
-- [ ] **M1.1.5** Unit test: urutan deterministik; 2× build identik.
+- [x] **M1.1.1** Baca `getTimeline()` di `src/lib/data.ts` — petakan `TimelineItem` (7 pengalaman + 15 sertifikasi bertanggal) dan apakah `honors.json`/`volunteering.json` punya periode. — **YA, keduanya punya**: honors `date: "2024"|"2025"|"2026"` (**tahun saja**), volunteering `start_date`/`end_date: "2025-05"`.
+- [x] **M1.1.2** Tulis helper pure `src/lib/creative/career-spine.ts` (`parseCareerDate` / `buildCareerEvents` / `CAREER_EVENT_KINDS` / `groupEventsByYear` / `yearTicks`) — **DEVIASI 1** (reuse `parsePeriod` → hasil negatif) + **DEVIASI 2** (2 file, bukan 1).
+- [x] **M1.1.3** Semua event wajib punya `kind`, `title`, `org?`, `date` — event tanpa tanggal **di-drop** dan **dilaporkan**, bukan dibuang senyap (`dropped[]`).
+- [x] **M1.1.4** Unit test: hitungan known — **angka ditulis setelah verifikasi**, bukan dari plan (lihat tabel di bawah).
+- [x] **M1.1.5** Unit test: urutan deterministik (total order); 2× build identik.
 
-**Verify**: unit hijau; angka yang tertulis di test = angka di `dist` (dicek di M1.2.4).
+**Gate M1.1**: unit **983/983 (86 file, +20)** · `astro check` **101 = baseline, 0 baru, 0 sebutan `career-spine`** · `lint` **672 = baseline** · `biome check` bersih di 4 file tersentuh · `validate-data` OK · `build:fast` **49 halaman** · payload `/` **199.9 / 560.8** KB (datar) · `measure:runtime` `/` scroll listener **15** (datar), `rectReads` 22 · `rg 'career-spine|CAREER_EVENT_KINDS' dist/_astro/` = **0** (kontrak tak masuk client chunk mana pun) · **6 mutasi M1–M6 semuanya merah pada asersi yang dimaksud**, dipulihkan dengan `md5sum` identik (`fa054c169f07`) · e2e suite penuh `--workers=1` **251/251, 0 gagal (12.3m)**.
+
+#### Angka nyata (M1.1.4 — semua diukur ulang dari data layer, bukan dari plan)
+
+| | Nilai terukur | Sumber / catatan |
+|---|---|---|
+| Event | **26 event** = 7 experience + 15 sertifikasi + 3 honor + 1 volunteering | plan menebak 26 → **cocok**, tapi **karena yang berbeda**: plan menulis "atau fewer kalau honors/volunteering tak bertanggal" — keduanya justru **bertanggal** (M1.1.1) |
+| Dataset | 7 pengalaman · **62** sertifikasi · 3 honors · 1 volunteering | `getExperience()` / `getCertifications()` / `getHonors()` / `getVolunteering()` |
+| Sertifikasi | **61** bertanggal · **1** tanpa tanggal (`EF SET English Certificate 72/100 (C2 Proficient)`, `date: null`) | `selectSpineCertifications()` |
+| Kejatuhan | **47** = `over-cap` **46** + `undated` **1** | 61 − 15 = 46 |
+| Tahun | ticks `[2026, 2025, 2024, 2023]` · per tahun `[2026,2] [2025,16] [2024,7] [2023,1]` | `groupEventsByYear()` |
+| Bentuk | 7 span · 19 titik · 26 id unik · **0** `org` null | ongoing = `exp-ferswit` ("May 2026 – Present"), first `exp-ferswit`, last `exp-idcamp` |
+| Tie nyata | 6 bulan punya >1 event (terbanyak 6 di `2024-01`) → tie-break bukan teori | sortKey `24301` ×6 |
+
+#### DEVIASI 1 — reuse `parsePeriod` (P3): **hasilnya negatif**, dan itu alasannya, bukan penolakan
+
+Plan menyebut "reuse `parsePeriod` dari `src/lib/observatory/parsePeriod.ts` kalau cocok". Parser itu dibaca dan **tak bisa dipakai**: ia menerima `"Mon YYYY – Mon YYYY"` (periode proyek, `"Sep 2024 – Jan 2025"`), sedangkan setiap record di sini `YYYY-MM` atau `YYYY`. Menyalin tabel bulan-nya = **parser ketiga untuk ide yang sama**.
+
+`parseCareerDate` ditulis strict (`/^(\d{4})(?:-(\d{2}))?$/`, bulan 01–12, tahun > 0, tanpa separator lain) dan mengembalikan `null` untuk `"20245"`, `"2024-5"`, `"2024-13"`, `"2024-00"`, `"Feb 2024"`, `"2024/05"`, `""`, `"0000"` — **9 kasus diuji**. `parseDate()` privat di `data.ts` memang bisa parse bentuk ini, tapi itu helper milik `getTimeline()` dan **keduanya hilang bareng** di M1.5, jadi digabung ke sini → setelah M1.5 ada **tepat satu** parser ISO di repo.
+
+#### DEVIASI 2 — 2 file, bukan 1: `career-spine-ids.ts` (nol import) + `career-spine.ts`
+
+`career-spine.ts` meng-import seluruh data layer. Island M1.3 yang butuh `CAREER_EVENT_KINDS` (nilai, bukan tipe) akan menarik JSON ke client chunk. Preseden **Q4.1 BUG FIX 1** persis: satu import nilai dari `src/content/schema.ts` = **+18.5 KB gzip** di `/work/[slug]`. Tipe di-erase compiler, nilai tidak. Jadi kosakata (kinds + labels) pindah ke modul **nol import**; island meng-import nilai dari sana dan **tipe saja** dari kontrak. **Diverifikasi setelah build**: `rg 'career-spine|CAREER_EVENT_KINDS' dist/_astro/` = **0**.
+
+`TIMELINE_CERTIFICATION_LIMIT` **pindah pemilik** ke `career-spine.ts` dan di-`re-export` dari `facts.ts` (satu definisi, importer lama tetap jalan — P8).
+
+#### DEVIASI 3 — cap 15 dipilih **berdasarkan tanggal**, bukan posisi array
+
+`getTimeline()` lama = `filter(c => c.date).slice(0, 15)`, yang **hanya sama dengan "15 terbaru"** karena `certifications.json` kebetulan terurut tanggal-turun — invarian yang tak didokumentasi dan tak diuji. Kalau file itu diurutkan ulang, halaman diam-diam menampilkan sertifikasi berbeda. Sekarang `selectSpineCertifications()` menyortir `dated` by `sortKey` lalu ambil 15, dan tesnya memakai **input yang dikocok** (`["oldest 2020", "newest 2026", "middle 2023"]` → `["newest","middle"]`).
+
+**Konsekuensi yang harus jujur disebut**: ini mengubah `facts.ts` dari "15" yang artinya *"15 pertama"* menjadi "15 terbaru". **Angkanya tidak berubah** (hari ini keduanya identik, sudah diverifikasi), tapi **maknanya diperketat** — dan itu justru yang dikehendaki M0.1.4 (cap presentasi vs fakta data).
+
+#### DEVIASI 4 — `<time datetime>` **tidak bisa** ada di 3 honor (konsekuensi ke baris DoD)
+
+Baris M1.2.2 menulis "WAJIB ada `datetime` yang valid". Praktisnya: `<time datetime>` menerima string bulan (`2025-10`) tapi **bukan tahun telanjang**, dan ketiga honor hanya punya tahun. Mel-padding-nya dengan Januari = **menaruh tanggal di halaman yang tak pernah ditulis siapa pun**. Jadi `careerDateTimeValue()` mengembalikan `null` di presisi tahun, renderer (M1.2) memakai teks polos untuk 3 record itu, dan **baris DoD "semua punya `<time datetime>` valid" harus dibaca sebagai "semua yang punya presisi bulan"** — 26 event, 3 di antaranya `<time>`-less **secara jujur**.
+
+#### Urutan = terbaru lebih dulu (cocok dengan `/timeline`)
+
+`getTimeline()` dan `src/pages/timeline.astro` sudah newest-first (`years.sort((a,b)=>b-a)`), jadi spine mengikutinya — kalau tidak, dua halaman "timeline" akan punya urutan berbeda. **Total order** dipakai supaya hasilnya tak bergantung pada stably-ness mesin: `sortKey` ↓ → urutan `CAREER_EVENT_KINDS` → `title` → `id`. Record tahun-saja dihitung **sebagai Januari**, jadi di daftar menurun ia **mengikuti** bulan-bulan lain di tahun itu — itu perilaku yang benar untuk "tahun 2025 tanpa bulan".
+
+#### 2 bug ditemukan **karena modulnya dijalankan**, bukan karena dibaca
+
+1. `formatCareerDate` pada presisi tahun menghasilkan `"2026 – "` (tanda pisah menggantung di span yang ujungnya cuma tahun). Commitment "**never a dangling dash**" sekarang jadi asersi per-label, bukan niat.
+2. Sertifikasi tanpa tanggal **hilang tanpa laporan** di percobaan pertama (tidak masuk `events` maupun `dropped`). Karena itu `dropped[]` dipecah jadi `undated` vs `over-cap`: **menggabungkan keduanya membuat cap terbaca sebagai batas data** — `#certifications` tetap menampilkan 62, spine 15, dan pembaca harus bisa membedakan "kami pilih 15" dari "hanya ada 15" (pelajaran M0.1.4).
+
+#### Bukti punya gigi — 6 mutasi, semua merah pada asersi yang dimaksud
+
+| Mutasi | Yang dirusak | Test yang merah |
+|---|---|---|
+| M1 | hapus `dated.sort` (kembali ke posisi array) | "takes the newest by date…" + "orders newest first and never reorders when the input order changes" |
+| M2 | hapus tie-break `kind` | "breaks same-month ties by kind, then title…" |
+| M3 | `careerDateTimeValue` selalu mengembalikan `iso` | "yields a valid `<time datetime>` only when the source had one" |
+| M4 | gabungkan `undated` ke `overCap` | "reports undated and over-cap separately" + "accounts for every record… nothing vanishes silently" |
+| M5 | urutan dibalik (terlama dulu) | 3 test, termasuk "sorts a year-only record as January, so it trails that year's later months" |
+| M6 | `formatCareerDate` pad tahun dengan Januari | "labels a year-only record with the bare year" + "…without a dangling dash" |
+
+Pulihkan setelah tiap mutasi, `md5sum` `fa054c169f07` identik sepanjang 6 putaran.
+
+#### Utang yang **dicatat, bukan ditutup**
+
+- **Tabel bulan kini ada 5×**: `career-spine.ts` (baru) + `Experience.astro:14`, `Certifications.astro:15`, `Volunteering.astro:14`, `certifications.astro:15` (pre-existing). Kontrak ini tidak mendeduplikasi — 3 dari 4 file itu **akan ditulis ulang atau dihapus** oleh M1.4/M1.5/Sprint 2, dan menyentuhnya sekarang = membuka gerbang yang tak sedang jadi tugas ini (preseden pelajaran M0.6.5). Pilihan yang disepakati: **catat, jangan sentuh**.
+- **`getTimeline()` masih hidup** dan masih dipakai `/timeline`. M1.5 yang pensionsi; setelah itu `parseDate()` di `data.ts` ikut hilang.
+- **Konten yang akan hilang bersama `Experience.astro`** sudah dipetakan ke `CareerEvent`: role→`title`, company→`org`, `type · location`→`meta`, `highlights`→`highlights`, technologies→`tags`, logo→`image`, badge "Active"→`ongoing` + `periodLabel` "… – Present".
+
+#### Pelajaran Task 1.1
+
+1. **"Reuse kalau cocok" adalah instruksi, bukan hasil — dan hasilnya bisa negatif tanpa biaya apa pun.** P3 melarang menduplikasi parser yang sudah teruji 22/22; dicek, parser itu untuk **bentuk tanggal lain** (periode proyek). Menyalin tabel bulan-nya justru **membuat** drift yang P3 economizar. Menolak reuse dengan bukti bentuk data lebih murah daripada menulis parser ketiga lalu menyebutnya "menghormati P3". Preseden: Task 0.8 #1 — klaim plan yang tak bisa dipenuhi lebih baik dikoreksi daripada dipaksakan.
+2. **Aturan "field milik consumer-nya" (M0.1.1) punya bagian kedua yang lebih mahal: modul yang consumer-nya client tak boleh memegang nilai.** `career-spine.ts` masuk 0 byte ke client bukan karena patch-nya efisien, tapi karena kosakatanya dipisah **sebelum ada consumer-nya**. Menunggu sampai M1.3 dan membiarkan island menarik data layer = **+puluhan KB gzip** yang tak akan terlihat di `measure:routes` selama hanya satu route yang diukur — bug kelas Q4.1 yang sudah dibayar sekali.
+3. **Preset yang bergantung pada urutan file adalah preset, bukan aturan** — dan ia bertahan justru karena hasilnya selalu benar. `slice(0, 15)` terlihat benar selama `certifications.json` kebetulan terurut; tidak ada yang menulis aturan itu, jadi tidak ada yang mengujinya. Melihat hari ini bahwa keduanya identik **tidak membuktikan** equivalence-nya. Tes dengan input dikocok adalah yang membuktikannya (mutasi M1).
+4. **Presisi data adalah bagian dari kontrak, bukan detail implementasi.** `CareerDate.precision` ada hanya untuk satu hal: mencegah 3 honor jadi tanggal Januari yang tak pernah ditulis siapa pun. Field yang "kebetulan tak terpakai" (`month` di presisi tahun) dan field yang "kebetulan sama saja" (`iso` untuk `"2024"`) justru yang menentukan apakah halaman mengarang tanggal. Preseden yang sama: `signal-loom-select.ts` — bentuk return yang bisa salah adalah yang perlu dipin test.
+5. **Menjalankan modul baru lebih cepat menemukan bug daripada membacanya.** Dua defect (tanda pisah menggantung, record tak bertanggal hilang senyap) ditemukan di menit pertama pemakaian — keduanya **kelas yang berulang di repo ini** (M0.2.6 "angka basi", M0.7 "kode berbahaya yang kebetulan tak terlihat"). Menulis test setelah menjalankan modul, bukan setelah menyalin definisi dari plan.
 
 ### Task 1.2 — Bentuk statis dulu (0 JS)
 
 - [ ] **M1.2.1** `CareerSpine.astro` — render **seluruh** event sebagai `<ol>` chronological, **tanpa JS**. Ini bentuk yang benar untuk mobile & no-JS; bukan fallback.
-- [ ] **M1.2.2** `<li>` per event: `data-career-kind`, ordinal mono, `<h3>` title, `<p>` org, `periodParsed` sebagai `<time datetime>` (WAJIB ada `datetime` yang valid — bukan teks bebas).
+- [ ] **M1.2.2** `<li>` per event: `data-career-kind`, ordinal mono, `<h3>` title, `<p>` org, `careerDateTimeValue()` sebagai `<time datetime>` (WAJIB ada `datetime` yang valid — bukan teks bebas). — **Dikoreksi oleh DEVIASI 4**: `careerDateTimeValue()` mengembalikan `null` untuk **3 honor presisi tahun**, jadi 3 dari 26 event memakai teks polos. **Jangan** padding ke Januari.
 - [ ] **M1.2.3** Grup per tahun dengan heading tahun (`<h4>` + `aria-labelledby`), supaya screen reader punya konteks.
 - [ ] **M1.2.4** `bun run build` → hitung `li[data-career-kind]` di `dist/home/index.html`; **tulis angka itu ke test unit** M1.1.4.
 - [ ] **M1.2.5** Cek overflow horizontal di 320/375/768.
@@ -525,7 +593,7 @@ Kartu **dihapus** saat `null` (bukan dirender `0`), grid jadi adaptif (`lg:grid-
 - [ ] `astro check` 0 baru; `lint` 0 baru di file tersentuh.
 - [ ] `measure:routes`: `/` initial & reachable **tidak naik**; island count **turun/tetap**.
 - [ ] `measure:runtime`: scroll listener `/` **tidak naik**; 0 React root baru.
-- [ ] `dist/home/index.html`: N event, semua punya `<time datetime>` valid.
+- [ ] `dist/home/index.html`: N event; `<time datetime>` valid untuk **setiap event berpresisi bulan** (23 dari 26 — 3 honor tahun-saja **harus tanpa** `<time>`, DEVIASI 4; DoD aslinya ditulis sebelum `careerDateTimeValue` ada).
 - [ ] Probe 320/375/768/1024/1440/1920/2560: **0 overflow horizontal**.
 - [ ] Reduced motion: spine **penuh**, tanpa scrub.
 - [ ] No-JS: seluruh 26 event tetap terbaca & berurutan.
@@ -866,7 +934,7 @@ Kartu **dihapus** saat `null` (bukan dirender `0`), grid jadi adaptif (`lg:grid-
 |---|---|---|---|---|---|
 | Baseline 2026-09-29 | ✅ tercatat | 875/875 | 14 | 245 | `astro check` 103 · `lint` 681 |
 | 0 — Truth & Integrity | ✅ 0.1+0.2+0.3+0.4+**0.5**+**0.6**(+0.6.5)+**0.7**+**0.8** — *semua microtask Sprint 0 ✓* | **963/963** (85 file) | 13 | **251/251** (18.0m) | **Task 0.1 `SiteFacts` ✅** · **Task 0.2–0.4 ✅** (urut diubah dengan persetujuan). Validator + gate build-time aktif; payload `/` 199.9/560.8 KB (datar). **Task 0.5 ✅ (2026-10-02)** — kontrol mati `data-lightbox` dihapus (pilihan **b**: `media` berisi label `"Prototype"`, bukan URL, dan `monitoring_*.png` tak ada di `public/`, jadi lightbox berarti mengarang path). Guard: unit 5 + **e2e 5 (spec pertama yang membuka `/projects/<slug]`)**. 4 mutasi terbukti punya gigi. `astro check` **103 → 101** (2 error hilang = 2 baris yang dihapus, 0 baru). **Task 0.6 ✅ (2026-10-02)** — 0 kode produk (M0.6.1–0.3 sudah dieksekusi di M0.2.2, DEVIASI); diverifikasi ulang + 1 kebocoran ditutup: DoD `rg 'projects_shipped' src data` tadinya **1 match di komentar** `About.astro` → ditulis ulang → **0**. M0.6.4 dibuktikan punya gigi (klaim 22→21 → `validate-data` ❌ + `build:fast` ❌ sebelum astro → pulihkan `md5sum` identik). **M0.6.5 ✅** (keputusan user) `metrics.years_experience` ikut dihapus (0 pembaca) + assert ketiga di gate (2 assert lama ikut diuji ulang setelah refactor jadi array). **Task 0.7 ✅ (2026-10-02)** — global kill `ScrollTrigger.getAll().forEach(kill)` di `useGSAP` dihapus; dari sumber GSAP 3.15, `ctx.revert()` **sudah** scoped kill utuh. Test infra ikut dibuka: jsdom tak punya `matchMedia` → `import src/lib/gsap.ts` di test mana pun throw → polyfill di `src/test/setup.ts`. **6 test baru**, mutasi **4/6 merah**. **A/B browser sungguhan**: deep-link `#journey` lalu scroll naik ke SignalLoom → build bermutasi **beku** (0.6775 → 0.6775), build tetap **hidup** (0.8261 → 0.9685); homepage luput hanya karena urutan section, bukan karena koreksinya benar. Gate: unit **943/943** (82 file, +6) · `astro check` **101** · `lint` **672** · e2e 251/251 (8.9m) — 3 defect harness ter uncover. **Task 0.8 ✅ (2026-10-03)** — **DEVIASI M0.8.1: dari "3 lapis" fix F5.1, hanya 2 yang pernah ada**; lapis ke-3 (tolak array kosong) tak bisa diimplementasikan karena akun memang 0 pin → klaim dihapus dari kode/komentar/commit/AGENTS.md, bukan dipalsukan. Lubang asli yang ditemukan sebagai gantinya: `pinnedItems == null` terlipat ke `[]` lewat `?? []` → guard ditambahkan. **M0.8.2** gate non-degeneracy `.cache/github` di **dua penempatan, satu aturan** (`scripts/github-cache-expectations.mjs`): `validate-data.mjs` (drift lama) + sweep pasca-fetch di `fetch-data.mjs` (cache yang baru dikosongkan). **`missing` ≠ `empty`** — cache absen ditoleransi (`build:fast`/CI/fresh clone sah tanpa cache), file ada tapi kosong = gagal keras. `pinned-repos.json` dikecualikan **dengan alasan tertulis** (akun 0 pin) dan giginya dibuktikan mutasi M2. Akar masalah diperbaiki di tempat asal: transform `all-repos` yang `Array.isArray(x) ? x : []` → jadi `[]` tercache sambil tercetak `✓` + exit 0. **Matriks end-to-end 4/4 sesuai harapan** (2 merah, 2 positive control), md5 cache dipulihkan identik. **M0.8.3 bukan verifikasi tapi defect produk nyata**: `/observatory` `?? 0` pada `total_stars`/`total_forks` ⇒ build tanpa cache mempublikasikan "0 GitHub stars". Kartu dihapus saat `null`, grid adaptif, `totalRepos` dibuang (dead prop, Rule 6). Guard 2 lapis (island 6 test + source-scan 3 test) karena celahnya berbeda. Gate: unit **963/963** (85 file, **+20**) · `astro check` **101 = baseline, 0 baru/0 hilang** · `lint` **672 = baseline** · `validate-data` OK · `build:fast` **49 halaman** · payload `/` **199.9/560.8** datar · 6 mutasi semua merah lalu dipulihkan `md5sum` identik · e2e observatory 5/5 + suite penuh **251/251** (18.0m). **`bun run build` penuh ✅ 49 halaman** (gate mencetak `GitHub cache: non-degenerate`; sweep pasca-fetch terverifikasi di jalur nyata) · **staleness cache tetap di luar scope (user)**. Berikutnya: **Sprint 1 Task 1.1** — kontrak data spine |
-| 1 — Career Spine | ⬜ | — | 13→12 | — | |
+| 1 — Career Spine | 🔄 **Task 1.1 ✅** (M1.1.1–M1.1.5) — sisanya ⬜ | **983/983** (86 file, +20) | 13 (→12 nanti) | **251/251** (12.3m) | **Kontrak data spine** (`career-spine.ts` + `career-spine-ids.ts`, 20 test). **Angka nyata**: 26 event (7/15/3/1), 61 dari 62 sertifikasi bertanggal, 47 kejatuhan = 46 `over-cap` + 1 `undated` (`EF SET`), ticks `[2026,2025,2024,2023]`. **4 DEVIASI**: (1) reuse `parsePeriod` (P3) **hasilnya negatif** — parser itu menerima `"Mon YYYY – Mon YYYY"`, semua record di sini `YYYY-MM`/`YYYY`; (2) 2 file, bukan 1 — kosakata dipisah ke modul nol-import supaya island tak menarik data layer (preseden Q4.1 BUG FIX 1; `rg dist/_astro` = 0); (3) cap 15 kini dipilih **berdasarkan tanggal**, bukan `slice(0,15)` yang hanya kebetulan benar karena `certifications.json` terurut; (4) **3 honor tak bisa punya `<time datetime>`** (hanya tahun) → DoD M1.2.2 & baris DoD dikoreksi, jangan padding ke Januari. **2 bug ditemukan karena modul dijalankan**: tanda pisah menggantung (`"2026 – "`) + sertifikasi tak bertanggal hilang senyap. **6 mutasi M1–M6 semua merah** pada asersi yang dimaksud, `md5sum` identik. Gate: `astro check` **101** · `lint` **672** · `validate-data` OK · `build:fast` **49 halaman** · payload `/` **199.9/560.8** datar · runtime scroll listener **15** datar. **Utang dicatat**: tabel bulan kini 5× (4 pre-existing, 3 di antaranya akan dihapus M1.4/M1.5/Sprint 2). |
 | 2 — Evidence Surface | ⬜ | — | 12 | — | |
 | 3 — Capability Map | ⬜ | — | 12 | — | |
 | 4 — Craft & Hardening | ⬜ | — | 12 | — | |
@@ -890,6 +958,8 @@ Kartu **dihapus** saat `null` (bukan dirender `0`), grid jadi adaptif (`lg:grid-
 | **`Received: ""` di computed style = node detached** | Dipetakan, bukan ditebak: `display:none` & `visibility:hidden` tetap mengembalikan nilai, hanya node detached yang mengembalikan `""`. Tanda ini yang membedakan "flake" dari defect produk | §12 |
 | **`useTimeOfDay` diperbaiki di produk, bukan testnya** | Gerbang e2e wajib hijau, dan akarnya produk. Menunggu hidrasi di test hanya menyembunyikan defect di balik gerbang yang dibuat hijau — preseden F5.1 (fallback terlalu longgar menyembunyikan kegagalan) | §12 |
 | **`astro check` & mutasi selalu via diff sorted / verifikasi pola** | Baseline Comparing daftar, bukan nomor baris (baris bergeser saat file tumbuh); mutasi tanpa `assert pola ditemukan` bisa gagal mendarat diam-diam lalu dilaporkan "tidak tertangkap" | §0.3 |
+| **Data contract dipecah: kosakata (nilai) ≠ isi (data layer)** | `process-stage-ids.ts` (+18.5 KB gzip) lalu `career-spine-ids.ts` — preseden yang sama, jadi jadi aturan. Tipe di-erase compiler, nilai tidak; cek `rg dist/_astro` = 0 tiap kontrak baru | §6 P7/P8 |
+| **`parsePeriod` tidak dipakai untuk spine** | P3 dibaca sebagai instruksi "kalau cocok", dicek, dan **tidak cocok** — bentuk periodenya berbeda. Menolak reuse lebih murah daripada membuat parser ketiga | §9.5 |
 
 ---
 
