@@ -1,0 +1,196 @@
+---
+/**
+ * Career Spine (`#career`) — one chronological list of every dated record.
+ *
+ * THE SHAPE IS THE POINT: this renders server-side with zero JS, which is what
+ * the no-JS and reduced-motion paths need and what mobile needs (a scroll scrub
+ * belongs to a pointer, not to a thumb). M1.3 upgrades this markup in place the
+ * way SignalLoom does — the list stays, only controls appear after hydration —
+ * so nothing here is a throwaway fallback.
+ *
+ * Everything it prints comes from the `CareerEvent` contract; this file decides
+ * layout and accessibility only. It deliberately does not build the data
+ * (the page owns the data layer, same as `Experience`/`Honors`/`Volunteering`).
+ */
+import type { CareerEvent, DroppedCareerEvent } from "../../lib/creative/career-spine";
+import {
+  careerDateTimeValue,
+  formatCareerDate,
+  groupEventsByYear,
+} from "../../lib/creative/career-spine";
+import { CAREER_EVENT_KIND_LABELS } from "../../lib/creative/career-spine-ids";
+
+export interface Props {
+  events: CareerEvent[];
+  /** Records the contract refused to place, with the reason. Reported, not hidden. */
+  dropped?: DroppedCareerEvent[];
+}
+
+const { events, dropped = [] } = Astro.props;
+const groups = groupEventsByYear(events);
+
+/** 1-based position in the whole spine, not in its year group. */
+let ordinal = 0;
+
+/**
+ * Rows flattened with their ordinal, so the template only lays things out.
+ *
+ * The counter lives here rather than inside the template expression: a `+=`
+ * inside a `.astro` callback reads as an assignment to neither a human nor
+ * biome's `useConst`, which then reports the `let` as never reassigned.
+ */
+const rows = groups.map((group) => ({
+  year: group.year,
+  events: group.events.map((event) => ({ event, ordinal: ++ordinal })),
+}));
+
+/**
+ * The `<time>` value for each end of a period, or `null` when the source was
+ * never that precise.
+ *
+ * A `<time datetime>` must be a real machine value, so a year-only record gets
+ * no element at all rather than a fabricated January. `showEnd` re-derives the
+ * one rule `periodLabel` already applied: a span that starts and ends in the
+ * same month prints once, and one real record does exactly that (the AMIKOM
+ * volunteering entry). Printing the end unconditionally would put
+ * "May 2025 – May 2025" on the page.
+ */
+function period(event: CareerEvent) {
+  const end = event.end;
+  return {
+    startIso: careerDateTimeValue(event.date),
+    startText: formatCareerDate(event.date),
+    showEnd: end !== null && end.sortKey !== event.date.sortKey,
+    endIso: end === null ? null : careerDateTimeValue(end),
+    endText: end === null ? null : formatCareerDate(end),
+  };
+}
+
+/**
+ * Certification totals for the footnote, all derived from what was actually
+ * built — a hardcoded "15 of 62" here is the exact bug this sprint exists to
+ * remove, so it would have to be re-checked every time the data changes.
+ */
+const shownCerts = events.filter((event) => event.kind === "certification").length;
+const overCapCerts = dropped.filter((record) => record.reason === "over-cap").length;
+const undatedCerts = dropped.filter((record) => record.reason === "undated").length;
+const certTotal = shownCerts + overCapCerts + undatedCerts;
+const hasCertNote = overCapCerts + undatedCerts > 0;
+---
+
+<ol data-career-spine>
+  {
+    rows.map((row) => (
+      <li data-career-year={row.year}>
+        <h3 id={`career-year-${row.year}`} class="section-label text-text-secondary/70 border-b border-border pb-2 lg:sticky lg:top-20 lg:z-10 lg:bg-bg-primary/90 lg:backdrop-blur-sm lg:px-2">
+          {row.year}
+        </h3>
+        <ol
+          aria-labelledby={`career-year-${row.year}`}
+          class="mt-4 space-y-5 border-l border-border pl-5 lg:pl-7"
+        >
+          {row.events.map(({ event, ordinal: position }) => {
+            const { startIso, startText, showEnd, endIso, endText } = period(event);
+            return (
+              <li
+                id={`career-${event.id}`}
+                data-career-kind={event.kind}
+                data-career-id={event.id}
+                class="relative scroll-mt-24"
+              >
+                <span
+                  aria-hidden="true"
+                  class="absolute -left-[1.5rem] top-6 h-2.5 w-2.5 rounded-full border-2 border-brand bg-bg-primary lg:-left-[1.9rem]"
+                />
+                <div class="rounded-lg border border-border bg-bg-secondary/40 p-4 sm:p-5">
+                  <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+                    {event.image && (
+                      <img
+                        src={event.image}
+                        alt=""
+                        width="32"
+                        height="32"
+                        loading="lazy"
+                        decoding="async"
+                        class="h-8 w-8 shrink-0 rounded border border-border object-cover"
+                      />
+                    )}
+                    <span class="section-label text-text-secondary/50 tabular-nums">
+                      {String(position).padStart(2, "0")}
+                    </span>
+                    <span class="section-label text-brand">
+                      {CAREER_EVENT_KIND_LABELS[event.kind]}
+                    </span>
+                    <span class="ml-auto text-xs text-text-secondary tabular-nums">
+                      {startIso ? (
+                        <time datetime={startIso}>{startText}</time>
+                      ) : (
+                        startText
+                      )}
+                      {showEnd && (
+                        <>
+                          {" – "}
+                          {endIso ? (
+                            <time datetime={endIso}>{endText}</time>
+                          ) : (
+                            endText
+                          )}
+                        </>
+                      )}
+                      {event.ongoing && " – Present"}
+                    </span>
+                  </div>
+
+                  <h4 class="mt-2 text-h4 font-semibold text-text-primary">
+                    {event.title}
+                  </h4>
+                  {event.org && <p class="text-sm text-brand">{event.org}</p>}
+                  {event.meta && (
+                    <p class="text-xs text-text-secondary/80">{event.meta}</p>
+                  )}
+
+                  {event.highlights.length > 0 && (
+                    <ul class="mt-3 space-y-1.5">
+                      {event.highlights.map((line) => (
+                        <li class="flex gap-2 text-sm text-text-secondary">
+                          <span aria-hidden="true" class="mt-2 h-1 w-1 shrink-0 rounded-full bg-brand" />
+                          <span class="min-w-0">{line}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  {event.tags.length > 0 && (
+                    <ul class="mt-3 flex flex-wrap gap-1.5">
+                      {event.tags.map((tag) => (
+                        <li class="rounded border border-border px-1.5 py-0.5 text-[10px] text-text-secondary">
+                          {tag}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      </li>
+    ))
+  }
+</ol>
+
+{
+  hasCertNote && (
+    <p class="mt-8 text-xs text-text-secondary/70">
+      <span class="section-label text-text-secondary/50">Note</span>{" "}
+      {shownCerts} of {certTotal} certifications are listed here as a reference sample, newest first.
+      {" "}All {certTotal} are in the Certifications section.
+      {undatedCerts > 0 && (
+        <>
+          {" "}
+          {undatedCerts} carries no recorded date, so it has no place on this timeline.
+        </>
+      )}
+    </p>
+  )
+}

@@ -2,6 +2,7 @@
 import CapabilityGenerator from "../components/molecules/CapabilityGenerator";
 import Section from "../components/molecules/Section.astro";
 import About from "../components/organisms/About.astro";
+import CareerSpine from "../components/organisms/CareerSpine.astro";
 import Certifications from "../components/organisms/Certifications.astro";
 import Contact from "../components/organisms/Contact.astro";
 import Experience from "../components/organisms/Experience.astro";
@@ -16,6 +17,8 @@ import ProjectCardGrid from "../islands/ProjectCardGrid";
 import SkillsExplorer from "../islands/SkillsExplorer";
 import TimeAwareHero from "../islands/TimeAwareHero";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { buildCareerEvents } from "../lib/creative/career-spine";
+import { buildSignalLoomGraph } from "../lib/creative/signal-loom";
 import {
   getCertifications,
   getExperience,
@@ -26,7 +29,6 @@ import {
   getSkills,
   getVolunteering,
 } from "../lib/data";
-import { buildSignalLoomGraph } from "../lib/creative/signal-loom";
 import { fetchAllGitHubData } from "../lib/github";
 
 const profile = getProfile();
@@ -34,6 +36,7 @@ const featuredProjects = getFeaturedProjects();
 const experiences = getExperience();
 const skills = getSkills();
 const signalLoom = buildSignalLoomGraph(getProjects(), skills);
+const career = buildCareerEvents();
 const certifications = getCertifications();
 const honors = getHonors();
 const volunteerings = getVolunteering();
@@ -49,6 +52,7 @@ const sectionIds = [
   "about",
   "systems-in-motion",
   "experience",
+  "career",
   "journey",
   "projects",
   "creative-lab",
@@ -85,6 +89,10 @@ const sectionIds = [
 
   <Section data-reveal id="experience" title="Experience" variant="alt" ariaLabel="Work experience">
     <Experience experiences={experiences} />
+  </Section>
+
+  <Section data-reveal id="career" title="Career Spine" subtitle="Every dated record in one chronological line — work, certifications, honors, volunteering" variant="alt" ariaLabel="Career spine">
+    <CareerSpine events={career.events} dropped={career.dropped} />
   </Section>
 
   <Section data-reveal id="journey" title="The Journey" subtitle="A scroll through my professional path" variant="alt" ariaLabel="Career journey">

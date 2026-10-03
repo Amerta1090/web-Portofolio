@@ -62,6 +62,10 @@
 > **UPDATE 2026-10-03 (Task 0.8) — `astro check` tetap 101, `lint` tetap 672.** Keduanya membuktikan nol perubahan dari baseline Task 0.6. Yang berubah justru **cakupan gate `validate-data`**: sebelumnya skrip itu membaca **hanya** `data/*.json` dan **tidak pernah menyentuh** `.cache/github/` sama sekali — jadi "cache GitHub ada tapi kosong" lolos tanpa pemeriksaan. Sekarang `.cache/github` ikut diperiksa, **conditional on existence** (`missing` ditoleransi, `empty` ditolak). Detail + DEVIASI di §Task 0.8.
 >
 > **UPDATE 2026-10-03 (Task 1.1) — semua gate datar: unit 983/983 (86 file), `astro check` 101, `lint` 672, payload `/` 199.9/560.8, runtime scroll listener 15.** Yang **baru** dijamin adalah hal yang tak dijamin gate mana pun: `rg 'career-spine|CAREER_EVENT_KINDS' dist/_astro/` = **0**, yaitu kontrak data baru **tidak masuk client chunk mana pun**. Gate payload yang ada tak akan menangkap kebocoran seperti itu selama hanya satu route yang diukur — itu persis kelas bug Q4.1 (+18.5 KB gzip), jadi check grep ini **perlu ikut** setiap kali kontrak `src/lib/*` baru ditulis dan island-nya akan meng-import **nilai** (bukan tipe).
+>
+> **UPDATE 2026-10-03 (Task 1.2) — `lint` 672 → 671, dan itu bukan perbaikan yang saya sengaja.** Penyebabnya diverifikasi ke `git show HEAD:src/pages/index.astro`: `index.astro` sudah punya **satu pelanggaran `organizeImports` sebelum task ini**, dan menambahkan import saya kebetulan membuat baris itu ikut terurut. Pelajarannya: **penurunan `lint` bukan otomatis perbaikan**, dan kalau gate bergerak tanpa sebab yang disengaja, **sebabnya harus ditelusuri ke sumber sebelum dilaporkan** — persis Task 0.5 §0.3, di mana 2 error `astro check` yang hilang ternyata adalah **baris yang dihapus**, bukan perbaikan diam-diam.
+>
+> **Gap gate baru yang ditemukan Task 1.2 — HTML tak pernah diukur, dan "payload datar" tak berarti "halaman tak tumbuh".** Section spine menambah **+40,4 KB raw** ke `dist/index.html` (571.431 → 612.793 byte; hanya **3,6 KB gzip**, total homepage **66,9 KB gzip**) sementara `measure:routes` tetap **datar** di 199.9/560.8 karena task ini memang nol JS. Gate yang ada menghitung **hanya JS**. Jadi berubah: (1) `measure:routes` **tak bisa dipakai sebagai bukti "halaman tak tumbuh"** — hanya "JS tak tumbuh"; (2) struktur home `section[id]` **13 → 14** selama M1.2–M1.3, dan pin `sectionCount`/`NN / NN` di `e2e/navigation.spec.ts` **ikut harus dihitung ulang** — itu yang hijau-ikut jadi merah di gerbang penuh (kelas yang sama untuk ketiga kalinya, lihat §Task 1.2).
 
 ### 0.4 Dependency Graph
 
@@ -454,7 +458,7 @@ Kartu **dihapus** saat `null` (bukan dirender `0`), grid jadi adaptif (`lg:grid-
 **PRD ref**: §9.4, §10 (`SiteFacts.timeline`)
 **Expected files** (baru): `src/lib/creative/career-spine.ts` (pure) + test, `src/islands/CareerSpine.tsx` + test, `src/components/organisms/CareerSpine.astro` (static fallback)
 **Expected files** (dihapus): `src/components/organisms/Experience.astro`, `src/islands/JourneyTimeline.tsx` + test
-**Expected files** (diubah): `src/pages/index.astro` (`#experience` + `#journey` → `#career`; 13 → 12 section), `src/lib/constants.ts` (kalau ada anchor nav), `e2e/*.spec.ts` yang mengacu ke section lama
+**Expected files** (diubah): `src/pages/index.astro` (`#experience` + `#journey` → `#career`; section **13 → 14 → 12 → 10** — lihat koreksi di Task 1.2 DEVIASI 8), `src/lib/constants.ts` (kalau ada anchor nav), `e2e/*.spec.ts` yang mengacu ke section lama
 
 ### Task 1.1 — Kontrak data spine ✅ SELESAI (M1.1.1–M1.1.5, 2026-10-03)
 
@@ -536,15 +540,93 @@ Pulihkan setelah tiap mutasi, `md5sum` `fa054c169f07` identik sepanjang 6 putara
 4. **Presisi data adalah bagian dari kontrak, bukan detail implementasi.** `CareerDate.precision` ada hanya untuk satu hal: mencegah 3 honor jadi tanggal Januari yang tak pernah ditulis siapa pun. Field yang "kebetulan tak terpakai" (`month` di presisi tahun) dan field yang "kebetulan sama saja" (`iso` untuk `"2024"`) justru yang menentukan apakah halaman mengarang tanggal. Preseden yang sama: `signal-loom-select.ts` — bentuk return yang bisa salah adalah yang perlu dipin test.
 5. **Menjalankan modul baru lebih cepat menemukan bug daripada membacanya.** Dua defect (tanda pisah menggantung, record tak bertanggal hilang senyap) ditemukan di menit pertama pemakaian — keduanya **kelas yang berulang di repo ini** (M0.2.6 "angka basi", M0.7 "kode berbahaya yang kebetulan tak terlihat"). Menulis test setelah menjalankan modul, bukan setelah menyalin definisi dari plan.
 
-### Task 1.2 — Bentuk statis dulu (0 JS)
+### Task 1.2 — Bentuk statis dulu (0 JS) ✅ SELESAI (M1.2.1–M1.2.5, 2026-10-03)
 
-- [ ] **M1.2.1** `CareerSpine.astro` — render **seluruh** event sebagai `<ol>` chronological, **tanpa JS**. Ini bentuk yang benar untuk mobile & no-JS; bukan fallback.
-- [ ] **M1.2.2** `<li>` per event: `data-career-kind`, ordinal mono, `<h3>` title, `<p>` org, `careerDateTimeValue()` sebagai `<time datetime>` (WAJIB ada `datetime` yang valid — bukan teks bebas). — **Dikoreksi oleh DEVIASI 4**: `careerDateTimeValue()` mengembalikan `null` untuk **3 honor presisi tahun**, jadi 3 dari 26 event memakai teks polos. **Jangan** padding ke Januari.
-- [ ] **M1.2.3** Grup per tahun dengan heading tahun (`<h4>` + `aria-labelledby`), supaya screen reader punya konteks.
-- [ ] **M1.2.4** `bun run build` → hitung `li[data-career-kind]` di `dist/home/index.html`; **tulis angka itu ke test unit** M1.1.4.
-- [ ] **M1.2.5** Cek overflow horizontal di 320/375/768.
+- [x] **M1.2.1** `CareerSpine.astro` — render **seluruh** event sebagai `<ol>` chronological, **tanpa JS**. Ini bentuk yang benar untuk mobile & no-JS; bukan fallback.
+- [x] **M1.2.2** `<li>` per event: `data-career-kind`, ordinal mono, **`<h4>`** title, `<p>` org, `careerDateTimeValue()` sebagai `<time datetime>` (WAJIB ada `datetime` yang valid — bukan teks bebas). — **Dikoreksi oleh DEVIASI 4**: `careerDateTimeValue()` mengembalikan `null` untuk **3 honor presisi tahun**, jadi 3 dari 26 event memakai teks polos. **Jangan** padding ke Januari. — **Dikoreksi lagi (DEVIASI 5)**: plan ini meminta **`<h3>` title**, sedangkan M1.2.3 meminta **`<h4>` tahun** → h2 → h4 → h3, **loncat lalu turun lagi**. `Section.astro:27` sudah render `<h2>`, jadi urutan yang benar h3 (tahun) → h4 (title).
+- [x] **M1.2.3** Grup per tahun dengan heading tahun (**`<h3>`** + `aria-labelledby`), supaya screen reader punya konteks. — **Heading level dikoreksi oleh DEVIASI 5** (lihat M1.2.2).
+- [x] **M1.2.4** `bun run build` → hitung `li[data-career-kind]` di **`dist/index.html`** (**path plan `dist/home/index.html` tak pernah ada — sudah dikoreksi**) → **26 event**; angka itu di-pin di `e2e/career-spine.spec.ts`, bukan di test unit (**DEVIASI 6**).
+- [x] **M1.2.5** Cek overflow horizontal di 320/375/768.
 
 **Verify**: build OK; `dist` memuat N event; 0 JS untuk section ini.
+
+**Gate M1.2**: unit **983/983 (86 file, 0 baru)** · `astro check` **101 = baseline** (diff sorted `file|code`: **IDENTIK, 0 baru / 0 hilang**) · `lint` **671** (baseline 672 — satu `organizeImports` **pre-existing** di `index.astro` ikut hilang karena import saya; diverifikasi ke `git show HEAD:src/pages/index.astro`) · `validate-data` OK · `build:fast` **49 halaman** · payload `/` **199.9 / 560.8** KB (datar) · island count **17 (7 eager / 10 deferred)** tak berubah · `measure:runtime` `/` scroll listener **15**, `rectReads` 22 (datar) · **0 React root / 0 RAF / 0 listener / 0 chunk JS baru** — `netAfterLoad` & `netAfterScroll` di `measure-route-runtime.mjs` **tidak memuat satu pun file CareerSpine** · **5 mutasi**, 4 merah + 1 yang **tidak** merah dan justru membongkar blind spot test · e2e suite penuh `--workers=1` **258/258** (dari 256/258: **2 test `navigation.spec.ts` merah karena pin jumlah section**, diperbaiki — lihat §butir "Defect test").
+
+#### Angka nyata M1.2 (semua diukur dari `dist`, bukan dari plan)
+
+| | Nilai terukur | Cara diukur |
+|---|---|---|
+| Event ter-render | **26** `li[data-career-kind]` = 15 `certification` · 7 `experience` · 3 `honor` · 1 `volunteering` | grep `dist/index.html` + `e2e` per-kind |
+| `<time datetime>` | **29 elemen** = 23 start presisi bulan + **6** ujung span; **tepat 23 event punya `<time>`**, 3 tanpa = ketiga honor | regex, lalu cross-check per-event |
+| Heading | 1 `<h2>` (dari `Section.astro`) · **4 `<h3>`** (satu per tahun) · **26 `<h4>`** (satu per title) | e2e "keeps heading levels in order" |
+| Tahun | 4 grup, `[2026, 2025, 2024, 2023]`, terbaru dulu | konsisten dengan `groupEventsByYear` |
+| JS di section | `<script>` **0** · `<astro-island>` **0** · atribut `on*` **0** | 41.195 byte markup, nol JS |
+| Baris overflow | **0** di 320 / 375 / 768 (dokumen & tepi kanan tiap baris) | e2e |
+| Berat | section **41,2 KB raw / 3,6 KB gzip**; `dist/index.html` 571.431 → **612.793 byte** (+40,4 KB raw, **66,9 KB gzip** total) | Lihat catatan jujur di bawah |
+
+#### DEVIASI 5 — urutan heading plan (M1.2.2 + M1.2.3) salah arah, dan **kedua barisnya** dikoreksi
+
+Plan M1.2.2 meminta **`<h3>` title** dan M1.2.3 meminta **`<h4>` tahun**. `Section.astro:27` sudah render judul section sebagai `<h2>`, jadi hasil plan = **h2 → h4 → h3**: melewati h3 lalu kembali. Diimplementasikan **h3 (tahun) → h4 (title)**. Asersi e2e ditulis sebagai **"naik hanya boleh satu tingkat"** (`current - previous <= 1`), **bukan** daftar level tetap — supaya urutan yang diminta plan **gagal di situ**: 2 → 4 melewati h3, dan itu memang defect-nya, bukan penggantinya yang_details. Istilah "yang_details" diabaikan; yang dipakai: **assert bentuk, bukan nilai**.
+
+#### DEVIASI 6 — M1.2.4 minta test unit; yang tersedia adalah e2e, dan itu bukan downgrade
+
+`astro/container` dicoba untuk merender `.astro` di jsdom: **buntu di Astro 6.1**. Runtime-nya (`experimental_AstroContainer`) **ter-ekspor**, tapi plugin Vite yang dibutuhkan **tidak** — `vite-plugin-container` hanya di-`import` oleh `astro/dist/core/create-vite.js`, tak pernah di-re-export; satu-satunya jalan masuk = deep import `dist/`. File spike dihapus.
+
+Jadi angka 26 dipin di **`e2e/career-spine.spec.ts`** (7 test), yaitu terhadap markup sungguhan. Preseden: **Task 0.5** — unit tak bisa mengimpor halaman `.astro` ke jsdom, dan dua lapis guard yang buta itulah yang membiarkan kontrol mati hidup di `/projects/<slug>`. Kontrak **tetap** dipin di unit (`career-spine.test.ts:176`, `realEvents` = 26), jadi kedua angka harus diubah bersama — itu yang membuat pinnya berguna.
+
+#### DEVIASI 7 — footnote jujur tentang cap sertifikasi (scope tambahan di luar daftar microtask)
+
+Menambah cap 15 tanpa penjelasan = **"M0.1.4 diulang"**: pembaca tak bisa membedakan "kami pilih 15" dari "hanya ada 15". Ditambahkan paragraf yang **semua angkanya diturunkan** dari `events`/`dropped` saat build (`shownCerts of certTotal`, "1 carries no recorded date") — **tidak ada angka yang diketik tangan** di file itu, persis aturan yang sprint ini tegakkan. Risikonya (angka basi)mustahil karena tak ada angka untuk jadi basi.
+
+#### DEVIASI 8 — `#career` dipasang **antara** `#experience` dan `#journey`; jumlah section jadi **14** sementara
+
+Section home **13 → 14** selama M1.2–M1.3, karena honors/volunteering/experience/journey **masih hidup** (dilipat di M1.4/M1.5). Duplikasi itu disengaja dan berumur pendek; kalau dilipat lebih awal, M1.4/M1.5 tak punya apa yang bongkar.
+
+**Konsekuensi yang harus jujur disebut: baris DoD "section homepage 14 → 12" salah aritmetika** dan dikoreksi di bawah. Rantai sebenarnya: **13 → 14 (M1.2) → 12 (M1.4 buang honors+volunteering) → 10 (M1.5 buang experience+journey)**. Angka "12" di DoD menghitung `#career` sebagai penggantian 1-dengan-1, padahal ia **penambahan** di tahap ini.
+
+`sectionIds` di `index.astro` ikut di-update (pemilik daftar = halaman, pelajaran Q4.3 #2) → counter jujur.
+
+#### Keputusan presentasi (bukan DEVIASI — pilihan yang ditulis dengan alasannya)
+
+- **Ordinal global 01–26 + `aria-hidden`**: tanggal + heading tahun sudah membawa semantiknya; ordinal murni navigasi mata.
+- **Gambar 32px `alt=""` untuk semua kind, tanpa aturan per-kind**: logo bersifat dekoratif karena teks org ada di sebelahnya (menghindari pengumuman ganda — pelajaran Q4.2 #7).
+- **`url` sengaja tidak dirender**: `Experience.astro` juga tidak, jadi tak ada kehilangan konten. Dipantau untuk M1.5.
+- **Tanpa aturan tersembunyi**: 2 aturan presentasi (`showEnd`, label kind) tinggal di komponen **dengan alasan tertulis**, karena M1.3 akan *upgrade markup ini di tempat* (pola SignalLoom L2.3-rev-II) dan tak butuh aturan yang sama. Kalau M1.3 ternyata merender ulang label, **ekstrak saat itu** — bukan sekarang, untuk kontrak yang tak ada consumer-nya (Rule 6).
+
+#### Bukti punya gigi — 5 mutasi, **4 merah, 1 tidak** (dan yang tidak itu yang paling berharga)
+
+| Mutasi | Yang dirusak | Hasil |
+|---|---|---|
+| M1 | ikuti urutan heading plan (h4 tahun di atas h3 title) | **2 merah** — "keeps heading levels in order" + "labels each year group" |
+| M2 | pad tahun-saja ke Januari (`careerDateTimeValue` selalu `iso`) | **1 merah** — asersi **regex tetap lolos**, yang menangkapnya adalah asersi **jumlah** (26 − 3). Persis M1.1 mutasi M3, tapi di tempat berbeda |
+| M3 | `showEnd: end !== null` (hapus aturan span satu bulan) | **1 merah** — "does not repeat a month…" → teks jadi "May 2025 – May 2025" |
+| M4 | `group.events.slice(0, -1)` | **5 merah** |
+| M5 | tambah `onclick` inline pada satu kartu | **7 tetap hijau** ❌ |
+
+Pulihkan tiap mutasi, `md5sum src/components/organisms/CareerSpine.astro` = `c2ccc7575a3b1dc20e11aa8f64c82958` identik sepanjang 5 putaran.
+
+#### Blind spot yang ditemukan oleh mutasi M5 — kelas yang sama dengan Task 0.5
+
+"Asersi 'section ini nol JS' dengan menghitung `<script>` + `<astro-island>`" **hijau penuh** saat ada `onclick` di 26 kartu. Guardianya menghitung hal yang salah: `.astro` tak pernah meng-escape handler inline, dan **inline `on*` adalah cara paling murah membuat section "punya JS" tanpa satu byte pun JS**. Asersi itu diperbaiki **menjumlahkan atribut `on*`** — lalu M5 yang sama **merah**. Ini persis kelas yang Task 0.5 temukan pada `/projects/[slug]` (kontrol mati = handler inline dengan tak ada target), dan persis pelajaran Q4.2: **pengujian harus menyorot bentuk yang mungkin terjadi, bukan nama yang tertulis**.
+
+#### Catatan jujur — `measure:routes` **tak bisa melihat** perubahan task ini
+
+Payload `/` datar (199.9 / 560.8 KB) karena task ini memang **nol JS** — tapi `dist/index.html` tumbuh **+40,4 KB raw** (571.431 → 612.793 byte; section spine 41,2 KB, hanya **3,6 KB gzip**; total gzip homepage **66,9 KB**). Gate yang ada hanya menghitung JS, jadi **HTML yang 40 KB lebih besar lolos tanparemark**. Angka ini dicatat eksplisit; **gate HTML belum ada** — itu gap pengukuran yang nyata, bukan kelonggaran yang bisa dibenarkan.
+
+#### Defect test — 2 test `navigation.spec.ts` merah karena pin jumlah section
+
+Gerbang e2e penuh pertama: **256 passed / 2 failed**. Keduanya `navigation.spec.ts` (pin `13` dan `01 / 13`). **Akar: bukan regresi — produk memang berubah** (M1.2 menambah section ke-14), jadi tesnya yang benar. Perbaikan: hitung ulang, **bukan** diasumsikan noise — pelajaran Task 0.3 #5. Tiga angka dihitung ulang: `13 → 14`, `01 / 13 → 01 / 14`, dan `06 / 13 → 07 / 14` (**ordinal ikut geser** karena `#career` disisipkan sebelum `#journey` — cuma mengganti jumlah would've lewat). Spec 5/5 hijau.
+
+**Ini kali ketiga** kelas yang sama muncul (Task 0.3: 14→13; Task 1.2: 13→14), dan plan sudah dirancang mengubahnya **dua kali lagi** (M1.4 → 12, M1.5 → 10). Pelajarannya bukan "jangan pin" — pin itulah yang **menangkap** perubahan tak sengaja — tapi: **setiap perubahan jumlah section=June biaya edit test yang harus dihitung ulang, dan biaya itu harus dianggarkan di plan**, bukan ditemukan oleh gerbang.
+
+#### Pelajaran Task 1.2
+
+1. **Klaim "nol JS" yang tak menghitung `on*` inline adalah separuh klaim.** Mutasi M5 membuktikannya di spec yang sudah hijau penuh: 26 handler inline masuk section, 7 test tetap hijau. Guardianya menghitung hal yang **benar untuk React** dan **salah untuk Astro** — karena tak ada tool yang meng-escape inline handler di server, "nol JS" adalah properti yang harus **dihitung**, bukan disimpulkan dari bentuk file. Kelas identik dengan Task 0.5; ditemukan lagi karena tes baru ditulis, bukan karena sudah diprediksi.
+2. **Asersi "bentuk" mengalahkan asersi "nilai" saat yang diuji adalah aturan.** M2 (pad ke Januari) **lolos** dari regex `^\d{4}-\d{2}$` — tanggalnya valid! Yang menangkapnya adalah asersi **jumlah**. Jadi aturan "jangan mengarang tanggal" tak bisa dijaga oleh validasi bentuk tangannya sendiri; yang menjaganya adalah **berapa banyak** yang punya tanggal.
+3. **Plan bisa salah di dua arah sekaligus; kedua barisnya harus dikoreksi, bukan yang satu.** M1.2.2 dan M1.2.3 bersama-sama meminta h2→h4→h3. Menorhaki satu baris akan menghasilkan h2→h3→h4 (salah), jadi koreksi harus membaca **urutan dokumen**, bukan tiap baris sendiri. Dan memindahkan permintaan itu jadi asersi **"naik hanya satu tingkat"** membuat spec menolak urutan plan tanpa menyebut penggantinya.
+4. **Sekali pathway `.astro` → unit test tertutup, jangan dipaksa.** `astro/container` terlihat seperti alat yang tepat (Astro memang **men-ekspor** runtime-nya) dan biaya spike itu nyata; buktinya: yang hilang adalah **plugin Vite-nya**, dan itu tidak diekspor. Preseden Task 0.8 #1 — klaim plan yang tak bisa dipenuhi lebih baik dikoreksi daripada dipaksakan. Pijakan yang benar: e2e atas markup nyata (preseden Task 0.5), **bukan** e2e yang melemah (yang tidak menghitung `on*`).
+5. **Gate yang mengukur hanya satu jenis aset akan melaporkan "datar" untuk perubahan pada jenis aset lain.** `measure:routes` tak pernah melihat +40,4 KB HTML. Ini bukan kelonggaran yang bisa dibenarkan — task ini memang benar nol JS — tapi **pelaporan harus menyebutnya**, karena "payload datar" yang dibaca sebagai "halaman tak tumbuh" adalah kesimpulan yang salah.
+
 
 ### Task 1.3 — Island scrub (desktop)
 
@@ -562,7 +644,7 @@ Pulihkan setelah tiap mutasi, `md5sum` `fa054c169f07` identik sepanjang 6 putara
 
 ### Task 1.4 — Fold honors & volunteering
 
-- [ ] **M1.4.1** Pindahkan `#honors` + `#volunteering` ke spine sebagai `kind: 'honor' | 'volunteering'` (13 → 12 section).
+- [ ] **M1.4.1** Pindahkan `#honors` + `#volunteering` ke spine sebagai `kind: 'honor' | 'volunteering'` (**14 → 12** section — `#honors` & `#volunteering` sudah ikut ter-render di spine sebagai event sejak M1.2, jadi ini murni **menghapus section**, bukan menambah isinya).
 - [ ] **M1.4.2** Verifikasi `honors.json`/`volunteering.json` punya periode yang bisa diparse; kalau tidak → **jangan dipaksa**, tetap di luar spine (catat alasannya).
 - [ ] **M1.4.3** Update `sectionIds` di `index.astro` (pemilik daftar = halaman, pelajaran Q4.3 #2) → SectionCounter jujur.
 
@@ -573,10 +655,10 @@ Pulihkan setelah tiap mutasi, `md5sum` `fa054c169f07` identik sepanjang 6 putara
 - [ ] **M1.5.1** Hapus `Experience.astro` (102 baris) + `JourneyTimeline.tsx` (99 baris) + test-nya.
 - [ ] **M1.5.2** Hapus import/mount di `index.astro`; `Experience`/`Journey` tak boleh tersisa di `NAV_ITEMS`/anchor manapun.
 - [ ] **M1.5.3** `rg -n 'Experience\.astro|JourneyTimeline|#journey|#experience' src e2e` = 0.
-- [ ] **M1.5.4** Audit e2e yang mengacu section lama; **perbarui** (jangan dihapus kalau masih menguji hal yang nyata).
+- [ ] **M1.5.4** Audit e2e yang mengacu section lama; **perbarui** (jangan dihapus kalau masih menguji hal yang nyata). — **Spesifik untuk M1.5**: `e2e/navigation.spec.ts` mem-pin `sectionCount` + `01 / NN` + `NN / NN`, jadi **tiga angka** harus dihitung ulang (12 → 10, dan ordinal `projects` ikut geser). Pin itu sudah terbukti menangkap perubahan nyata **dua kali** (Task 0.3, Task 1.2) — jangan dihapus, tapi biayanya harus dianggarkan.
 - [ ] **M1.5.5** Hapus anchor `#journey` dari mana pun + tambah redirect/alias kalau ada link eksternal (cek `og/`, sitemap, RSS).
 
-**Verify**: grep 0; `dist` tak punya `id="journey"`/`id="experience"`.
+**Verify**: grep 0; `dist` tak punya `id="journey"`/`id="experience"`; **`sectionIds.length` = 10** dan counter di DOM = `NN / 10`.
 
 ### Task 1.6 — Hero & nav
 
@@ -589,11 +671,12 @@ Pulihkan setelah tiap mutasi, `md5sum` `fa054c169f07` identik sepanjang 6 putara
 
 - [ ] Semua microtask `- [x]`.
 - [ ] `bun run test` **≥ 875 + 12**.
-- [ ] `bun run build` 49 halaman; **section homepage 14 → 12** (13 setelah T0.3, lalu 12 setelah T1.4).
+- [ ] `bun run build` 49 halaman; **section homepage 13 → 10** — **_(baris aslinya menulis "14 → 12 (13 setelah T0.3, lalu 12 setelah T1.4)" dan itu salah aritmetika; dikoreksi di Task 1.2 DEVIASI 8. Rantai sebenarnya: **13 → 14** (M1.2 menambah `#career`, sementara honors/volunteering/experience/journey masih hidup) **→ 12** (M1.4 buang honors + volunteering) **→ 10** (M1.5 buang experience + journey). Angka "12" menghitung `#career` sebagai penggantian 1-dengan-1, padahal ia penambahan di tahap ini.)_**
 - [ ] `astro check` 0 baru; `lint` 0 baru di file tersentuh.
 - [ ] `measure:routes`: `/` initial & reachable **tidak naik**; island count **turun/tetap**.
 - [ ] `measure:runtime`: scroll listener `/` **tidak naik**; 0 React root baru.
-- [ ] `dist/home/index.html`: N event; `<time datetime>` valid untuk **setiap event berpresisi bulan** (23 dari 26 — 3 honor tahun-saja **harus tanpa** `<time>`, DEVIASI 4; DoD aslinya ditulis sebelum `careerDateTimeValue` ada).
+- [ ] **`dist/index.html`** (**bukan `dist/home/index.html`** — path itu tak pernah ada; dikoreksi di M1.2.4): N event; `<time datetime>` valid untuk **setiap event berpresisi bulan** (23 dari 26 — 3 honor tahun-saja **harus tanpa** `<time>`, DEVIASI 4; DoD aslinya ditulis sebelum `careerDateTimeValue` ada).
+- [ ] **HTML homepage tidak tumbuh tanpa jejak**: `measure:routes` hanya menghitung JS, jadi +40,4 KB HTML pada M1.2 **lolos tanpa remark**. Gate HTML belum ada — **dicatat sebagai gap, bukan ditutup**.
 - [ ] Probe 320/375/768/1024/1440/1920/2560: **0 overflow horizontal**.
 - [ ] Reduced motion: spine **penuh**, tanpa scrub.
 - [ ] No-JS: seluruh 26 event tetap terbaca & berurutan.
@@ -934,7 +1017,7 @@ Pulihkan setelah tiap mutasi, `md5sum` `fa054c169f07` identik sepanjang 6 putara
 |---|---|---|---|---|---|
 | Baseline 2026-09-29 | ✅ tercatat | 875/875 | 14 | 245 | `astro check` 103 · `lint` 681 |
 | 0 — Truth & Integrity | ✅ 0.1+0.2+0.3+0.4+**0.5**+**0.6**(+0.6.5)+**0.7**+**0.8** — *semua microtask Sprint 0 ✓* | **963/963** (85 file) | 13 | **251/251** (18.0m) | **Task 0.1 `SiteFacts` ✅** · **Task 0.2–0.4 ✅** (urut diubah dengan persetujuan). Validator + gate build-time aktif; payload `/` 199.9/560.8 KB (datar). **Task 0.5 ✅ (2026-10-02)** — kontrol mati `data-lightbox` dihapus (pilihan **b**: `media` berisi label `"Prototype"`, bukan URL, dan `monitoring_*.png` tak ada di `public/`, jadi lightbox berarti mengarang path). Guard: unit 5 + **e2e 5 (spec pertama yang membuka `/projects/<slug]`)**. 4 mutasi terbukti punya gigi. `astro check` **103 → 101** (2 error hilang = 2 baris yang dihapus, 0 baru). **Task 0.6 ✅ (2026-10-02)** — 0 kode produk (M0.6.1–0.3 sudah dieksekusi di M0.2.2, DEVIASI); diverifikasi ulang + 1 kebocoran ditutup: DoD `rg 'projects_shipped' src data` tadinya **1 match di komentar** `About.astro` → ditulis ulang → **0**. M0.6.4 dibuktikan punya gigi (klaim 22→21 → `validate-data` ❌ + `build:fast` ❌ sebelum astro → pulihkan `md5sum` identik). **M0.6.5 ✅** (keputusan user) `metrics.years_experience` ikut dihapus (0 pembaca) + assert ketiga di gate (2 assert lama ikut diuji ulang setelah refactor jadi array). **Task 0.7 ✅ (2026-10-02)** — global kill `ScrollTrigger.getAll().forEach(kill)` di `useGSAP` dihapus; dari sumber GSAP 3.15, `ctx.revert()` **sudah** scoped kill utuh. Test infra ikut dibuka: jsdom tak punya `matchMedia` → `import src/lib/gsap.ts` di test mana pun throw → polyfill di `src/test/setup.ts`. **6 test baru**, mutasi **4/6 merah**. **A/B browser sungguhan**: deep-link `#journey` lalu scroll naik ke SignalLoom → build bermutasi **beku** (0.6775 → 0.6775), build tetap **hidup** (0.8261 → 0.9685); homepage luput hanya karena urutan section, bukan karena koreksinya benar. Gate: unit **943/943** (82 file, +6) · `astro check` **101** · `lint` **672** · e2e 251/251 (8.9m) — 3 defect harness ter uncover. **Task 0.8 ✅ (2026-10-03)** — **DEVIASI M0.8.1: dari "3 lapis" fix F5.1, hanya 2 yang pernah ada**; lapis ke-3 (tolak array kosong) tak bisa diimplementasikan karena akun memang 0 pin → klaim dihapus dari kode/komentar/commit/AGENTS.md, bukan dipalsukan. Lubang asli yang ditemukan sebagai gantinya: `pinnedItems == null` terlipat ke `[]` lewat `?? []` → guard ditambahkan. **M0.8.2** gate non-degeneracy `.cache/github` di **dua penempatan, satu aturan** (`scripts/github-cache-expectations.mjs`): `validate-data.mjs` (drift lama) + sweep pasca-fetch di `fetch-data.mjs` (cache yang baru dikosongkan). **`missing` ≠ `empty`** — cache absen ditoleransi (`build:fast`/CI/fresh clone sah tanpa cache), file ada tapi kosong = gagal keras. `pinned-repos.json` dikecualikan **dengan alasan tertulis** (akun 0 pin) dan giginya dibuktikan mutasi M2. Akar masalah diperbaiki di tempat asal: transform `all-repos` yang `Array.isArray(x) ? x : []` → jadi `[]` tercache sambil tercetak `✓` + exit 0. **Matriks end-to-end 4/4 sesuai harapan** (2 merah, 2 positive control), md5 cache dipulihkan identik. **M0.8.3 bukan verifikasi tapi defect produk nyata**: `/observatory` `?? 0` pada `total_stars`/`total_forks` ⇒ build tanpa cache mempublikasikan "0 GitHub stars". Kartu dihapus saat `null`, grid adaptif, `totalRepos` dibuang (dead prop, Rule 6). Guard 2 lapis (island 6 test + source-scan 3 test) karena celahnya berbeda. Gate: unit **963/963** (85 file, **+20**) · `astro check` **101 = baseline, 0 baru/0 hilang** · `lint` **672 = baseline** · `validate-data` OK · `build:fast` **49 halaman** · payload `/` **199.9/560.8** datar · 6 mutasi semua merah lalu dipulihkan `md5sum` identik · e2e observatory 5/5 + suite penuh **251/251** (18.0m). **`bun run build` penuh ✅ 49 halaman** (gate mencetak `GitHub cache: non-degenerate`; sweep pasca-fetch terverifikasi di jalur nyata) · **staleness cache tetap di luar scope (user)**. Berikutnya: **Sprint 1 Task 1.1** — kontrak data spine |
-| 1 — Career Spine | 🔄 **Task 1.1 ✅** (M1.1.1–M1.1.5) — sisanya ⬜ | **983/983** (86 file, +20) | 13 (→12 nanti) | **251/251** (12.3m) | **Kontrak data spine** (`career-spine.ts` + `career-spine-ids.ts`, 20 test). **Angka nyata**: 26 event (7/15/3/1), 61 dari 62 sertifikasi bertanggal, 47 kejatuhan = 46 `over-cap` + 1 `undated` (`EF SET`), ticks `[2026,2025,2024,2023]`. **4 DEVIASI**: (1) reuse `parsePeriod` (P3) **hasilnya negatif** — parser itu menerima `"Mon YYYY – Mon YYYY"`, semua record di sini `YYYY-MM`/`YYYY`; (2) 2 file, bukan 1 — kosakata dipisah ke modul nol-import supaya island tak menarik data layer (preseden Q4.1 BUG FIX 1; `rg dist/_astro` = 0); (3) cap 15 kini dipilih **berdasarkan tanggal**, bukan `slice(0,15)` yang hanya kebetulan benar karena `certifications.json` terurut; (4) **3 honor tak bisa punya `<time datetime>`** (hanya tahun) → DoD M1.2.2 & baris DoD dikoreksi, jangan padding ke Januari. **2 bug ditemukan karena modul dijalankan**: tanda pisah menggantung (`"2026 – "`) + sertifikasi tak bertanggal hilang senyap. **6 mutasi M1–M6 semua merah** pada asersi yang dimaksud, `md5sum` identik. Gate: `astro check` **101** · `lint` **672** · `validate-data` OK · `build:fast` **49 halaman** · payload `/` **199.9/560.8** datar · runtime scroll listener **15** datar. **Utang dicatat**: tabel bulan kini 5× (4 pre-existing, 3 di antaranya akan dihapus M1.4/M1.5/Sprint 2). |
+| 1 — Career Spine | 🔄 **Task 1.1 ✅ + Task 1.2 ✅** (M1.1.1–M1.1.5 · M1.2.1–M1.2.5) — sisanya ⬜ | **983/983** (86 file, 0 baru) | **14** (sementara →12 →10) | **258/258** (9.0m) | **Task 1.1 — kontrak data spine** (`career-spine.ts` + `career-spine-ids.ts`, 20 test). 26 event (7/15/3/1), 61 dari 62 sertifikasi bertanggal, 47 kejatuhan = 46 `over-cap` + 1 `undated` (`EF SET`), ticks `[2026,2025,2024,2023]`. 4 DEVIASI (reuse `parsePeriod` negatif · 2 file bukan 1 · cap 15 by date · 3 honor tanpa `<time>`). 6 mutasi semua merah.<br>**Task 1.2 ✅ (2026-10-03) — bentuk statis 0 JS.** `CareerSpine.astro` (196 baris) merender 26 event dari kontrak sebagai `<ol>` per tahun; **0 `<script>` / 0 `<astro-island>` / 0 atribut `on*`** di section (41,2 KB raw). `<time datetime>` **29 elemen** = 23 start + 6 ujung span; **tepat 23 event punya `<time>`**, 3 tanpa = ketiga honor (DEVIASI 4 dihormati, tak ada Januari hasil karangan). 1 h2 + **4 h3** (tahun) + **26 h4** (title). Overflow **0** di 320/375/768. **5 mutasi, 4 merah** — dan **M5 (tambah `onclick` inline) bikin 7 test tetap hijau**, membongkar blind spot "nol JS" yang tak menghitung `on*`; asersi diperbaiki lalu M5 yang sama merah. **DEVIASI 5**: plan minta h2→h4→h3 (loncat lalu turun); diimplementasikan h3→h4, asersi ditulis sebagai "naik hanya 1 tingkat" supaya urutan plan ditolak tanpa menyebut penggantinya. **DEVIASI 6**: M1.2.4 minta test unit tapi `astro/container` **buntu di Astro 6.1** (runtime ter-ekspor, plugin Vite-nya tidak) → angka 26 dipin di `e2e/career-spine.spec.ts` (7 test) atas markup nyata, kontrak tetap dipin di unit `:176`. **DEVIASI 7**: footnote cap 15 dengan semua angka diturunkan dari `events`/`dropped` (tak ada angka diketik tangan). **DEVIASI 8**: `#career` di antara `#experience` dan `#journey` → section **13 → 14** sementara; **baris DoD "14 → 12" dikoreksi ke 13 → 10** (salah aritmetika). Gate: unit **983/983** · `astro check` **101** (diff sorted identik) · `lint` **671** (↓1, `organizeImports` pre-existing di `index.astro` — diverifikasi ke HEAD) · `validate-data` OK · `build:fast` **49 halaman** · payload `/` **199.9/560.8** datar · island **17** tak berubah · runtime scroll listener **15** datar · **tidak ada file CareerSpine di `netAfterLoad`/`netAfterScroll`**. **Defect test: 2 `navigation.spec.ts` merah** di gerbang penuh (pin jumlah section 13) → **3 angka dihitung ulang** (`14`, `01 / 14`, `07 / 14` — ordinal ikut geser) → 258/258. **Catatan jujur**: `measure:routes` tak bisa melihat **+40,4 KB HTML** (571.431 → 612.793 byte; 3,6 KB gzip) — gate HTML belum ada. |
 | 2 — Evidence Surface | ⬜ | — | 12 | — | |
 | 3 — Capability Map | ⬜ | — | 12 | — | |
 | 4 — Craft & Hardening | ⬜ | — | 12 | — | |
@@ -949,7 +1032,7 @@ Pulihkan setelah tiap mutasi, `md5sum` `fa054c169f07` identik sepanjang 6 putara
 | **Tidak tambah dependency** (animejs ditolak) | GSAP 3.15 di `node_modules` sudah punya semua plugin yang persis; `onScroll` anime.js lebih buruk untuk budget listener; fitur utamanya rusak di jsdom | §8.3 |
 | **`SiteFacts` = satu sumber angka** | Membuat C3 (angka basi) mustahil secara struktural, bukan diperbaiki sekali | §10 |
 | **Lab registry jadi 2 modul** | Aturan satu kalimat: field milik modul yang consumer-nya membacanya. Diukur A/B — inline = payload `/` 203.1→207.4 KB | §10 |
-| **14 → 12 section** | Menambah bobot pada konten yang sudah ada, bukan menambah halaman baru | §5 N4 |
+| **Section homepage 13 → 10** | Menambah bobot pada konten yang sudah ada, bukan menambah halaman baru. (Angka aslinya di sini menulis "14 → 12" dan **salah aritmetika** — `#career` adalah *penambahan* sementara section lama masih hidup, bukan penggantian 1-dengan-1. Dikoreksi di Task 1.2 DEVIASI 8.) | §5 N4 |
 | **Nginx route** | Semua kerja di halaman & data yang sudah ada | §5 N3 |
 | **Timeline dibuang** | 22 proyek + 62 sertifikasi + GitHub data sudah ada; 4 dari 27 eksperimen lab tak pernah ditampilkan | §9.5, §9.6 |
 | **Naik trunk, bukan bikin island baru** | P3 + P7; island baru = listener baru | §6 P3/P7 |
@@ -960,6 +1043,9 @@ Pulihkan setelah tiap mutasi, `md5sum` `fa054c169f07` identik sepanjang 6 putara
 | **`astro check` & mutasi selalu via diff sorted / verifikasi pola** | Baseline Comparing daftar, bukan nomor baris (baris bergeser saat file tumbuh); mutasi tanpa `assert pola ditemukan` bisa gagal mendarat diam-diam lalu dilaporkan "tidak tertangkap" | §0.3 |
 | **Data contract dipecah: kosakata (nilai) ≠ isi (data layer)** | `process-stage-ids.ts` (+18.5 KB gzip) lalu `career-spine-ids.ts` — preseden yang sama, jadi jadi aturan. Tipe di-erase compiler, nilai tidak; cek `rg dist/_astro` = 0 tiap kontrak baru | §6 P7/P8 |
 | **`parsePeriod` tidak dipakai untuk spine** | P3 dibaca sebagai instruksi "kalau cocok", dicek, dan **tidak cocok** — bentuk periodenya berbeda. Menolak reuse lebih murah daripada membuat parser ketiga | §9.5 |
+| **"Nol JS" = 0 `<script>` + 0 `<astro-island>` + **0 atribut `on*`** | Mutasi M5 proved it: 26 `onclick` inline masuk `#career` dan 7 test tetap hijau. Astro tak meng-escape handler inline, jadi "nol JS" harus **dihitung**, bukan disimpulkan dari bentuk file | §11 |
+| **`.astro` diuji lewat e2e, bukan unit** | `astro/container` buntu di Astro 6.1 (runtime ter-ekspor, plugin Vite-nya tidak). Preseden Task 0.5: unit tak bisa mengimpor `.astro`, dan guard yang buta membiarkan kontrol mati | §12 |
+| **Pin jumlah section = guard yang bekerja** | Tertangkap **2×** (T0.3 14→13, T1.2 13→14). Jangan dihapus — tapi biayanya (3 angka per perubahan, termasuk **ordinal**) harus dianggarkan di plan | §12 |
 
 ---
 
