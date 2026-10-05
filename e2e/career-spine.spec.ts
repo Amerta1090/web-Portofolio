@@ -102,26 +102,6 @@ async function waitForRail(page: Page) {
   await page.locator("#career [data-career-step]").first().waitFor({ state: "attached" });
 }
 
-/**
- * Poll until a locator's viewport top stops moving (two consecutive reads
- * within 1px), then return it. Same shape as `navigation.spec.ts`'s
- * `settleTop`: a fixed sleep reads mid-animation and concludes the layout
- * disagrees with itself, which is how the jump test first failed here.
- */
-async function settleTop(page: Page, selector: string, timeoutMs = 8000): Promise<number> {
-  const start = Date.now();
-  let prev = Number.POSITIVE_INFINITY;
-  let stableRuns = 0;
-  while (Date.now() - start < timeoutMs) {
-    const top = await page.locator(selector).evaluate((el) => el.getBoundingClientRect().top);
-    if (Math.abs(top - prev) < 1) stableRuns += 1;
-    else stableRuns = 0;
-    prev = top;
-    if (stableRuns >= 2) return top;
-  }
-  return prev;
-}
-
 /** Records the island's markup hides, so Barrier B can be asserted rather than assumed. */
 function collapsedRecords(page: Page) {
   return page.locator("#career [data-career-spine]").evaluate((spine) =>
@@ -523,12 +503,19 @@ test.describe("career spine — rail", () => {
         Number.parseFloat(getComputedStyle(root).scrollPaddingTop)
       );
     });
-    const headingTop = await settleTop(page, "#career #career-year-2025", 15_000);
-    expect(
-      Math.abs(headingTop - expectedTop),
-      `the 2025 heading settled at ${headingTop}px, expected ~${expectedTop}px`,
-    ).toBeLessThanOrEqual(24);
-    expect(headingTop).toBeGreaterThan(0);
+    // Arrival-polled, not settle-polled. `settleTop` (two reads within 1px)
+    // misfires under full-suite load: frame starvation pauses the smooth
+    // scroll for >100ms mid-flight, which reads as "stable" at 471px — the
+    // exact failure this assertion caught once. Polling the distance to the
+    // known target cannot pass early; it can only time out on a real miss.
+    const headingTop = () =>
+      page
+        .locator("#career #career-year-2025")
+        .evaluate((node) => Math.round(node.getBoundingClientRect().top));
+    await expect
+      .poll(async () => Math.abs((await headingTop()) - expectedTop), { timeout: 15000 })
+      .toBeLessThanOrEqual(24);
+    expect(await headingTop()).toBeGreaterThan(0);
   });
 
   test("moves the selection with arrow keys and keeps one tab stop", async ({ page }) => {

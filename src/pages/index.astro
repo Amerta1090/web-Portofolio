@@ -7,9 +7,7 @@ import Certifications from "../components/organisms/Certifications.astro";
 import Contact from "../components/organisms/Contact.astro";
 import Experience from "../components/organisms/Experience.astro";
 import GitHubUniverse from "../components/organisms/GitHubUniverse.astro";
-import Honors from "../components/organisms/Honors.astro";
 import SignalLoom from "../components/organisms/SignalLoom.astro";
-import Volunteering from "../components/organisms/Volunteering.astro";
 import CreativeLabTeaser from "../islands/CreativeLabTeaser";
 import JourneyTimeline from "../islands/JourneyTimeline";
 import PageTailOverlays from "../islands/PageTailOverlays";
@@ -23,11 +21,9 @@ import {
   getCertifications,
   getExperience,
   getFeaturedProjects,
-  getHonors,
   getProfile,
   getProjects,
   getSkills,
-  getVolunteering,
 } from "../lib/data";
 import { fetchAllGitHubData } from "../lib/github";
 
@@ -38,8 +34,6 @@ const skills = getSkills();
 const signalLoom = buildSignalLoomGraph(getProjects(), skills);
 const career = buildCareerEvents();
 const certifications = getCertifications();
-const honors = getHonors();
-const volunteerings = getVolunteering();
 const gitHubData = await fetchAllGitHubData();
 
 /**
@@ -58,8 +52,6 @@ const sectionIds = [
   "creative-lab",
   "skills",
   ...(certifications.length > 0 ? ["certifications"] : []),
-  ...(honors.length > 0 ? ["honors"] : []),
-  ...(volunteerings.length > 0 ? ["volunteering"] : []),
   "github",
   "contact",
 ];
@@ -124,22 +116,6 @@ const sectionIds = [
     certifications.length > 0 && (
       <Section data-reveal id="certifications" title="Certifications" ariaLabel="Certifications">
         <Certifications certifications={certifications} />
-      </Section>
-    )
-  }
-
-  {
-    honors.length > 0 && (
-      <Section data-reveal id="honors" title="Honors & Awards" variant="alt" ariaLabel="Honors and awards">
-        <Honors honors={honors} />
-      </Section>
-    )
-  }
-
-  {
-    volunteerings.length > 0 && (
-      <Section data-reveal id="volunteering" title="Volunteering" ariaLabel="Volunteering experience">
-        <Volunteering volunteerings={volunteerings} />
       </Section>
     )
   }
