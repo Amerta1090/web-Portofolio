@@ -23,9 +23,9 @@
  * Where on the viewport the reader is "at" in the spine.
  *
  * Shared by the ScrollTrigger's `start`/`end` strings and by the arithmetic below:
- * one constant, so the drawn rule can never disagree with the year it marks. The
- * same 70% line `JourneyTimeline` used, kept because it is the height at which a
- * line of body text is being read.
+ * one constant, so the drawn rule can never disagree with the year it marks.
+ * 70% because that is the height at which a line of body text is being read
+ * (the retired `JourneyTimeline` used the same value for the same reason).
  */
 export const CAREER_READING_LINE = 0.7;
 

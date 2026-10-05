@@ -672,7 +672,8 @@ describe("CareerSpine scrub", () => {
   });
 
   it("kills only its own trigger on unmount (M1.3.6)", async () => {
-    // A neighbour that owns a trigger, standing in for JourneyTimeline.
+    // A neighbour that owns a trigger (any trigger will do — what matters is
+    // that unmounting this island leaves someone else's trigger alone).
     const neighbour = ScrollTrigger.create({
       trigger: document.body,
       start: "top 70%",

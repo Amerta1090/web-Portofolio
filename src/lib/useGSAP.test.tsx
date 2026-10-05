@@ -1,7 +1,6 @@
 import { render } from "@testing-library/react";
 import { useRef } from "react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import JourneyTimeline from "../islands/JourneyTimeline";
 import { ScrollTrigger, gsap } from "./gsap";
 import { useGSAP } from "./useGSAP";
 
@@ -28,7 +27,7 @@ import { useGSAP } from "./useGSAP";
 
 type Tween = gsap.core.Tween & { scrollTrigger?: ScrollTrigger | null };
 
-/** Mirrors `JourneyTimeline`: a scrub ScrollTrigger created via `fromTo`. */
+/** A scrub ScrollTrigger created via `fromTo` — the shape the retired `JourneyTimeline` used. */
 function ScrollTriggerOwner({ label }: { label: string }) {
   const ref = useRef<HTMLDivElement>(null);
   useGSAP(() => {
@@ -168,31 +167,13 @@ describe("useGSAP cleanup scope", () => {
   });
 });
 
-describe("real consumer: JourneyTimeline", () => {
-  const experiences = [
-    { title: "One", company: "A", period: "2024", description: "d" },
-    { title: "Two", company: "B", period: "2025", description: "d" },
-  ];
-
-  it("keeps its triggers when another island's cleanup runs", () => {
-    const timeline = render(<JourneyTimeline experiences={experiences} />);
-    const created = ScrollTrigger.getAll();
-    expect(created.length).toBeGreaterThanOrEqual(2);
-
-    const timelineOnly = render(<TimelineOnlyIsland label="timeline-only" />);
-    timelineOnly.unmount();
-
-    // Same instances, same order — nothing was spliced out or replaced.
-    expect(ScrollTrigger.getAll()).toHaveLength(created.length);
-    for (const st of created) expect(ScrollTrigger.getAll()).toContain(st);
-
-    // And every scrub trigger still points at a live animation.
-    for (const st of created) {
-      const animation = st.animation as Tween | undefined;
-      expect(animation?.scrollTrigger).toBe(st);
-    }
-
-    timeline.unmount();
-    expect(ScrollTrigger.getAll()).toHaveLength(0);
-  });
-});
+/**
+ * NOTE (M1.5): the "real consumer" describe that stood here is deleted, not
+ * retargeted. It rendered `JourneyTimeline` because that island owned two
+ * scrub triggers; the only remaining real trigger owner, `ImpactMetrics`,
+ * cannot fill the role — its trigger is `once: true`, and under jsdom's zero
+ * geometry it fires on creation and removes itself, so there is nothing whose
+ * survival can be asserted (measured: `getAll()` stays 0 after render). The
+ * mirror-based describes above assert the identical properties
+ * (neighbour survival through `ScrollTriggerOwner`), so no coverage is lost.
+ */

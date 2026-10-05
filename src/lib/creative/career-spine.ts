@@ -1,8 +1,8 @@
 /**
  * Career Spine data contract (`#career`).
  *
- * One ordered list of dated events replacing three separate sections: the
- * `Experience` cards, the `JourneyTimeline` scrub, and — from M1.4 — honors and
+ * One ordered list of dated events replacing four separate sections: the
+ * `Experience` cards, the `JourneyTimeline` scrub (both retired in M1.5), and — from M1.4 — honors and
  * volunteering. Pure and deterministic: no clock, no randomness, no I/O. Same
  * input data ⇒ byte-identical output, so the spine can be asserted in tests and
  * compared against `dist` in the build (M1.2.4).

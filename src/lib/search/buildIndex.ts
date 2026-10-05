@@ -109,7 +109,7 @@ export function buildSearchIndex(): SearchItem[] {
       title: exp.role,
       description: `${exp.company} · ${exp.type}`,
       keywords: withoutEmpty([exp.company, ...(exp.technologies ?? [])]),
-      target: "/#experience",
+      target: "/#career",
     });
   }
 

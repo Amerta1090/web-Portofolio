@@ -62,7 +62,9 @@ describe("buildSearchIndex", () => {
       expect(c.target).toBe("/certifications");
     }
     for (const e of byType["experience"]) {
-      expect(e.target).toBe("/#experience");
+      // Experience records live on the Career Spine since M1.4 — the items
+      // keep their role titles, only the jump target moved with the section.
+      expect(e.target).toBe("/#career");
     }
   });
 

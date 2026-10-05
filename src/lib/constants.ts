@@ -10,7 +10,7 @@ export const SITE = {
 
 export const NAV_ITEMS = [
   { label: "Home", href: "/" },
-  { label: "Experience", href: "/#experience" },
+  { label: "Experience", href: "/#career" },
   { label: "Projects", href: "/#projects" },
   { label: "Skills", href: "/#skills" },
   { label: "Observatory", href: "/observatory" },
