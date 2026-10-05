@@ -91,7 +91,10 @@ const sectionIds = [
     <Experience experiences={experiences} />
   </Section>
 
-  <Section data-reveal id="career" title="Career Spine" subtitle="Every dated record in one chronological line — work, certifications, honors, volunteering" variant="alt" ariaLabel="Career spine">
+  {/* `clip={false}` — the spine's rail and year headings pin to the viewport, and
+      `overflow: hidden` on the section makes it a scrollport, so sticky resolves
+      against the section and scrolls away instead of pinning (see Section.astro). */}
+  <Section data-reveal id="career" clip={false} title="Career Spine" subtitle="Every dated record in one chronological line — work, certifications, honors, volunteering" variant="alt" ariaLabel="Career spine">
     <CareerSpine events={career.events} dropped={career.dropped} />
   </Section>
 

@@ -7,11 +7,35 @@ export interface Props {
   class?: string;
   ariaLabel?: string;
   "data-reveal"?: boolean;
+  /**
+   * Clip overflowing content to the section's box.
+   *
+   * `true` by default, which is what every section has always done. But
+   * `overflow: hidden` makes the section a **scroll container**, and `position:
+   * sticky` resolves against the nearest scrollport — so a sticky descendant of a
+   * clipping section never pins: it scrolls away with the page, silently, with its
+   * computed `position` still saying `sticky`. Measured on `#career`: the rail's
+   * wrapper tracked scroll 1:1 (371 → −29 → −429 → −829) instead of holding 96px,
+   * and the four year headings never reached their 80px pin.
+   *
+   * Pass `false` for a section whose content needs to pin to the viewport.
+   * Nothing inside a `Section` relies on the clip for legibility, so this is a
+   * layout decision for the caller rather than a safety net worth defaulting on.
+   */
+  clip?: boolean;
 }
 
-const { title, subtitle, id, variant = "default", class: className, ariaLabel } = Astro.props;
+const {
+  title,
+  subtitle,
+  id,
+  variant = "default",
+  class: className,
+  ariaLabel,
+  clip = true,
+} = Astro.props;
 
-const cls = `py-16 md:py-32 relative overflow-hidden container-query-section ${variant === "alt" ? "bg-bg-secondary border-y border-border" : ""} ${className ?? ""}`;
+const cls = `py-16 md:py-32 relative ${clip ? "overflow-hidden " : ""}container-query-section ${variant === "alt" ? "bg-bg-secondary border-y border-border" : ""} ${className ?? ""}`;
 const revealAttr = Astro.props["data-reveal"] ? { "data-reveal": "" } : {};
 ---
 

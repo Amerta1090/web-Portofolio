@@ -2,16 +2,22 @@
 /**
  * Career Spine (`#career`) — one chronological list of every dated record.
  *
- * THE SHAPE IS THE POINT: this renders server-side with zero JS, which is what
- * the no-JS and reduced-motion paths need and what mobile needs (a scroll scrub
- * belongs to a pointer, not to a thumb). M1.3 upgrades this markup in place the
- * way SignalLoom does — the list stays, only controls appear after hydration —
- * so nothing here is a throwaway fallback.
+ * THE SHAPE IS THE POINT: the list renders server-side and holds every record,
+ * which is what the no-JS and reduced-motion paths need and what keeps the
+ * canonical list complete. M1.3's island upgrades this markup in place the way
+ * SignalLoom does — the list stays, only a desktop rail appears, and only after
+ * hydration — so nothing here is a throwaway fallback.
  *
  * Everything it prints comes from the `CareerEvent` contract; this file decides
  * layout and accessibility only. It deliberately does not build the data
  * (the page owns the data layer, same as `Experience`/`Honors`/`Volunteering`).
+ *
+ * LAYOUT (M1.3): below `lg` this is one column and the rail cell is `hidden`, so
+ * the island — mounted `client:media="(min-width: 1024px)"` — never hydrates on a
+ * narrow viewport and a scrub belongs to a pointer, not a thumb. From `lg` the
+ * rail is a sticky column and the list keeps the reading measure.
  */
+import CareerSpineIsland from "../../islands/CareerSpine";
 import type { CareerEvent, DroppedCareerEvent } from "../../lib/creative/career-spine";
 import {
   careerDateTimeValue,
@@ -78,10 +84,22 @@ const certTotal = shownCerts + overCapCerts + undatedCerts;
 const hasCertNote = overCapCerts + undatedCerts > 0;
 ---
 
-<ol data-career-spine>
+<div data-career-root class="lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-8">
+  {/* Desktop rail cell. The grid row is sized by the list in the second column,
+      so an empty rail before hydration costs zero layout shift — and the island
+      is `client:media` so on a narrow viewport it never hydrates at all. The
+      sticky wrapper lives inside a `self-stretch` cell so the pin range is the
+      whole spine, not the rail's own height. */}
+  <div class="hidden lg:block lg:self-stretch">
+    <div class="lg:sticky lg:top-24">
+      <CareerSpineIsland client:media="(min-width: 1024px)" />
+    </div>
+  </div>
+
+  <ol data-career-spine class="lg:col-start-2">
   {
     rows.map((row) => (
-      <li data-career-year={row.year}>
+      <li data-career-year={row.year} class="scroll-mt-28">
         <h3 id={`career-year-${row.year}`} class="section-label text-text-secondary/70 border-b border-border pb-2 lg:sticky lg:top-20 lg:z-10 lg:bg-bg-primary/90 lg:backdrop-blur-sm lg:px-2">
           {row.year}
         </h3>
@@ -177,20 +195,48 @@ const hasCertNote = overCapCerts + undatedCerts > 0;
       </li>
     ))
   }
-</ol>
+  </ol>
 
-{
-  hasCertNote && (
-    <p class="mt-8 text-xs text-text-secondary/70">
-      <span class="section-label text-text-secondary/50">Note</span>{" "}
-      {shownCerts} of {certTotal} certifications are listed here as a reference sample, newest first.
-      {" "}All {certTotal} are in the Certifications section.
-      {undatedCerts > 0 && (
-        <>
-          {" "}
-          {undatedCerts} carries no recorded date, so it has no place on this timeline.
-        </>
-      )}
-    </p>
-  )
-}
+  {
+    hasCertNote && (
+      <p class="mt-8 text-xs text-text-secondary/70 lg:col-start-2">
+        <span class="section-label text-text-secondary/50">Note</span>{" "}
+        {shownCerts} of {certTotal} certifications are listed here as a reference sample, newest first.
+        {" "}All {certTotal} are in the Certifications section.
+        {undatedCerts > 0 && (
+          <>
+            {" "}
+            {undatedCerts} carries no recorded date, so it has no place on this timeline.
+          </>
+        )}
+      </p>
+    )
+  }
+</div>
+
+{/*
+  The active year, marked by the island on the server-rendered group. Emphasis
+  only — the group is never hidden, so the canonical list stays complete and the
+  browser's own `#career-<id>` anchors keep working. A scoped style block rather
+  than a Tailwind variant because the attribute is written by JS after render,
+  so no static class can be attached to the state.
+*/}
+<style>
+  li[data-career-year][data-career-active] > h3 {
+    color: rgb(var(--color-brand-rgb));
+  }
+
+  li[data-career-year][data-career-active] > ol {
+    border-left-color: rgb(var(--color-brand-rgb) / 0.5);
+  }
+
+  li[data-career-year] > ol {
+    transition: border-color 300ms ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    li[data-career-year] > ol {
+      transition: none;
+    }
+  }
+</style>
