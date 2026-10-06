@@ -37,8 +37,14 @@ const settleTop = async (page: Page, selector: string, timeoutMs = 5000): Promis
 
 /**
  * Interactive controls painted inside the header band that are NOT the header's
- * own. The removed morphing nav contributed one here on every viewport: a
- * hamburger at (1378,16) on desktop, over the theme toggle on mobile.
+ * own. Only overlay-positioned ones (`fixed`/`sticky`) qualify: in-flow links
+ * legitimately transit the band while scrolling — beneath the fixed header,
+ * which wins by z-index — and snapshotting them there proves only that a scroll
+ * (or an early-load layout before above-fold images arrive) was in flight.
+ * Since M1.6.1 that includes the About metric cards, which used to be blind
+ * `<div>`s to this helper. The removed morphing nav failed this because its
+ * hamburger was `position: fixed` at (1378,16) on desktop, over the theme
+ * toggle on mobile — a shape this filter still catches.
  */
 const foreignControlsInHeaderBand = (page: Page) =>
   page.evaluate(() => {
@@ -47,6 +53,7 @@ const foreignControlsInHeaderBand = (page: Page) =>
       if (el.closest("header")) continue;
       const s = window.getComputedStyle(el);
       if (s.display === "none" || s.visibility === "hidden") continue;
+      if (s.position !== "fixed" && s.position !== "sticky") continue;
       if (el.closest("[aria-hidden='true']")) continue;
       const r = el.getBoundingClientRect();
       if (r.width === 0 || r.height === 0) continue;
@@ -78,8 +85,15 @@ test.describe("Navigation hierarchy — one primary nav, one position readout", 
     page,
   }) => {
     await page.goto("/");
-    await page.evaluate(() => window.scrollTo(0, 1200));
-    await page.waitForTimeout(600);
+    // Instant, then confirmed settled: `scroll-behavior: smooth` makes a plain
+    // `scrollTo` animate, and a fixed `waitForTimeout(600)` snapshots mid-flight
+    // under load — in-flow content (now including the About metric links from
+    // M1.6.1, previously blind divs) passing y∈[0,70] reads as "painted over".
+    // Settled at 1200 the cards sit at y≈206, far from the band.
+    await page.evaluate(() => window.scrollTo({ top: 1200, behavior: "instant" }));
+    await page.waitForFunction(() => Math.abs(window.scrollY - 1200) < 2, undefined, {
+      timeout: 10_000,
+    });
 
     // Before: a second hamburger at (1378,16) on desktop.
     expect(await foreignControlsInHeaderBand(page)).toEqual([]);
