@@ -100,7 +100,7 @@ const hasCertNote = overCapCerts + undatedCerts > 0;
   {
     rows.map((row) => (
       <li data-career-year={row.year} class="scroll-mt-28 mt-12 first:mt-0">
-        <h3 id={`career-year-${row.year}`} class="section-label text-text-secondary/70 border-b border-border pb-2 lg:sticky lg:top-20 lg:z-10 lg:bg-bg-primary/90 lg:backdrop-blur-sm lg:px-2">
+        <h3 id={`career-year-${row.year}`} class="section-label text-text-secondary/70 border-b border-border lg:sticky lg:top-20 lg:z-10 lg:bg-bg-primary/90 lg:backdrop-blur-sm lg:px-2 lg:flex lg:items-center lg:h-10">
           {row.year}
         </h3>
         <ol
