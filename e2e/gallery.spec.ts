@@ -129,9 +129,12 @@ test.describe("Gallery page", () => {
     await expect(page.getByRole("button", { name: "Mandelbrot" })).not.toBeVisible();
   });
 
+  // Cold-load arrival budget is 15s, not 5s: a hash deep-link pays full page
+  // load + a React.lazy experiment chunk + experiment init, measured at
+  // 4.5–5.7s on this 4-core box — right at the old edge, so it flaked by load.
   test("deep link via URL hash opens experiment", async ({ page }) => {
     await page.goto("/gallery#fractal-explorer");
-    await expect(page.getByRole("button", { name: "Mandelbrot" })).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("button", { name: "Mandelbrot" })).toBeVisible({ timeout: 15000 });
   });
 
   test("Iter slider is adjustable", async ({ page }) => {
@@ -252,12 +255,12 @@ test.describe("Gallery page", () => {
 
   test("deep link for strange-attractor opens via URL hash", async ({ page }) => {
     await page.goto("/gallery#strange-attractor");
-    await expect(page.getByRole("button", { name: "Lorenz" })).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("button", { name: "Lorenz" })).toBeVisible({ timeout: 15000 });
   });
 
   test("deep link for logistic-map opens via URL hash", async ({ page }) => {
     await page.goto("/gallery#logistic-map");
-    await expect(page.getByRole("button", { name: "Cobweb" })).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("button", { name: "Cobweb" })).toBeVisible({ timeout: 15000 });
   });
 
   test("Noise Topography card is present", async ({ page }) => {
