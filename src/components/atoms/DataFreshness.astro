@@ -10,7 +10,9 @@ const { fetchedAt, label = "Data updated" } = Astro.props;
 
 function timeAgo(dateStr: string): string {
   const now = Date.now();
-  const then = new Date(dateStr).getTime();
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime())) return "";
+  const then = d.getTime();
   const diff = Math.max(0, now - then);
   const minutes = Math.floor(diff / 60000);
   const hours = Math.floor(diff / 3600000);

@@ -10,9 +10,10 @@ import MagneticButton from "./MagneticButton";
 interface Props {
   topRepos: GitHubData["top_repos"];
   repoActivity: GitHubData["repo_activity"];
+  builtAt?: string;
 }
 
-export default function TopReposLeaderboard({ topRepos, repoActivity }: Props) {
+export default function TopReposLeaderboard({ topRepos, repoActivity, builtAt }: Props) {
   const prefersReduced = useReducedMotion();
   const [feedIndex, setFeedIndex] = useState(0);
   const feedRef = useRef<HTMLDivElement>(null);
@@ -152,7 +153,7 @@ export default function TopReposLeaderboard({ topRepos, repoActivity }: Props) {
 
       {/* CTA */}
       <motion.div
-        className="text-center"
+        className="flex flex-col items-center gap-4 text-center"
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8, duration: duration.deliberate, ease: easing["ease-out-expo"] }}
@@ -169,6 +170,26 @@ export default function TopReposLeaderboard({ topRepos, repoActivity }: Props) {
             />
           </a>
         </MagneticButton>
+
+        <a
+          href="https://github.com/Amerta1090?tab=repositories"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-xs text-text-secondary/70 hover:text-brand transition-colors"
+        >
+          View all repositories on GitHub
+          <ArrowRight className="w-3 h-3" aria-hidden="true" />
+        </a>
+
+        {builtAt && (
+          <span className="text-[10px] text-text-secondary/40">
+            as of {new Date(builtAt).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            })}
+          </span>
+        )}
       </motion.div>
     </div>
   );

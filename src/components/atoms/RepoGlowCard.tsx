@@ -42,7 +42,9 @@ function getRelativeTime(dateStr: string): { text: string; color: string } {
   if (hours < 24) return { text: `${hours}h ago`, color: "text-green-400" };
   if (days < 7) return { text: `${days}d ago`, color: "text-amber-400" };
   if (days < 30) return { text: `${Math.floor(days / 7)}w ago`, color: "text-gray-400" };
-  return { text: `${Math.floor(days / 30)}mo ago`, color: "text-gray-500" };
+  const months = Math.floor(days / 30);
+  if (Number.isNaN(months) || months < 0) return null;
+  return { text: `${months}mo ago`, color: "text-gray-500" };
 }
 
 function getRankBadge(rank: number) {
@@ -111,7 +113,13 @@ export default function RepoGlowCard({ repo, rank, index }: RepoGlowCardProps) {
   const [revealed, setRevealed] = useState(false);
 
   const langColor = getLanguageColor(repo.language);
-  const lastActive = getRelativeTime(repo.pushed_at);
+  const lastActive = (() => {
+    const ts = repo.pushed_at ?? repo.updated_at;
+    if (!ts) return null;
+    const d = new Date(ts);
+    if (Number.isNaN(d.getTime())) return null;
+    return getRelativeTime(ts);
+  })();
   const badge = getRankBadge(rank);
 
   useEffect(() => {
@@ -232,9 +240,11 @@ export default function RepoGlowCard({ repo, rank, index }: RepoGlowCardProps) {
               {badge.emoji && <span>{badge.emoji}</span>}
               {badge.label}
             </span>
-            <span className={cn("text-[10px] font-mono", lastActive.color)}>
-              {lastActive.text}
-            </span>
+            {lastActive && (
+              <span className={cn("text-[10px] font-mono", lastActive.color)}>
+                {lastActive.text}
+              </span>
+            )}
           </div>
 
           <h3 className="font-semibold text-sm text-text-primary truncate group-hover:text-brand transition-colors mb-1">

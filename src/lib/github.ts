@@ -627,6 +627,16 @@ export async function fetchAllGitHubData(): Promise<GitHubData> {
   };
 }
 
+export function getBuildInfo(): { fetched_at?: string; built_at?: string } | null {
+  try {
+    const info = readCache<{ fetched_at?: string; built_at?: string }>("build-info.json");
+    if (info) return info;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export function getCachedGitHubData(): GitHubData | null {
   try {
     const pinned = readCache<GitHubRepo[]>("pinned-repos.json");

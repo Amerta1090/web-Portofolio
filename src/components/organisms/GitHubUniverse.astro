@@ -9,6 +9,7 @@ import type { GitHubData } from "../../types/github";
 import Container from "../atoms/Container.astro";
 import DataFreshness from "../atoms/DataFreshness.astro";
 import Section from "../molecules/Section.astro";
+import { getBuildInfo } from "../../lib/github";
 
 export interface Props {
   gitHubData: GitHubData;
@@ -19,7 +20,8 @@ export interface Props {
 const { gitHubData, profileName, fullPage = false } = Astro.props;
 const hasData = gitHubData.pinned_repos.length > 0 || gitHubData.top_repos.length > 0;
 const repos = gitHubData.pinned_repos.length ? gitHubData.pinned_repos : gitHubData.top_repos;
-const buildTime = new Date().toISOString();
+const buildInfo = getBuildInfo();
+const buildTime = buildInfo?.fetched_at || buildInfo?.built_at || new Date().toISOString();
 ---
 
 {
@@ -122,6 +124,7 @@ const buildTime = new Date().toISOString();
         gitHubData={gitHubData}
         topRepos={gitHubData.top_repos}
         repoActivity={gitHubData.repo_activity}
+        builtAt={buildTime}
       />
     </div>
   )

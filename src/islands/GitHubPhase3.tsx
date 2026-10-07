@@ -9,6 +9,7 @@ interface Props {
   gitHubData: GitHubData;
   topRepos: GitHubData["top_repos"];
   repoActivity: GitHubData["repo_activity"];
+  builtAt?: string;
 }
 
 interface SectionShellProps {
@@ -63,7 +64,7 @@ function SectionShell({
  * `PhaseIndicator` scrolls to `[data-phase=…]` via querySelector and the
  * islands' SSR HTML keeps those targets queryable pre-hydration.
  */
-export default function GitHubPhase3({ repos, gitHubData, topRepos, repoActivity }: Props) {
+export default function GitHubPhase3({ repos, gitHubData, topRepos, repoActivity, builtAt }: Props) {
   return (
     <>
       <div data-phase="galaxy">
@@ -96,7 +97,7 @@ export default function GitHubPhase3({ repos, gitHubData, topRepos, repoActivity
             subtitle="Premium leaderboard by stars"
             ariaLabel="Top repositories"
           >
-            <TopReposLeaderboard topRepos={topRepos} repoActivity={repoActivity} />
+            <TopReposLeaderboard topRepos={topRepos} repoActivity={repoActivity} builtAt={builtAt} />
           </SectionShell>
         )}
       </div>
