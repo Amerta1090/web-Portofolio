@@ -89,6 +89,30 @@ const sectionIds = [
 
   <Section data-reveal id="projects" title="Featured Projects" subtitle="Selected work that demonstrates my range" ariaLabel="Featured projects">
     <ProjectCardGrid client:load projects={featuredProjects} />
+    <div class="mt-10 flex justify-center">
+      <a
+        href="/projects"
+        class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand/10 border border-brand/20 text-brand text-sm font-medium hover:bg-brand/20 transition-all duration-300 group"
+      >
+        View all projects
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="w-4 h-4 group-hover:translate-x-1 transition-transform"
+          aria-hidden="true"
+        >
+          <path d="M5 12h14" />
+          <path d="m12 5 7 7-7 7" />
+        </svg>
+      </a>
+    </div>
   </Section>
 
   <Section data-reveal id="creative-lab" title="Creative Lab" subtitle="Experimental playground — interactive visualizations and creative coding experiments" ariaLabel="Creative Lab experiments">
