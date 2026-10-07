@@ -21,6 +21,40 @@
   border-left: 3px solid var(--color-brand);
 }
 
+/* ── Project card cursor-following border glow (BorderGlow) ──
+   Pure CSS: the two custom properties (`--glow-x`/`--glow-y`) are written by
+   `TiltCard` in one coalesced rAF, and the ring is masked out of a 1px padding
+   box with `mask-composite` — so this costs no JavaScript of its own. The ring
+   only paints while the guard is live (attribute set) and is hidden entirely
+   when the reader asked for reduced motion. */
+.project-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(
+    200px circle at var(--glow-x, 50%) var(--glow-y, 50%),
+    rgb(var(--color-brand-rgb) / 0.95),
+    transparent 70%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.tilt-card[data-tilt-spotlight] .project-card::before {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .project-card::before {
+    display: none;
+  }
+}
+
 /* Section heading: when followed by a subtitle, add bottom spacing */
 .section-header:has(+ .section-subtitle) {
   margin-bottom: 0.25rem;

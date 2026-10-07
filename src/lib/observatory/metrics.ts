@@ -1,6 +1,14 @@
 import type { GitHubData } from "../../types/github";
 import type { Project } from "../../types/projects";
+// One vocabulary, defined in a no-import module so the client island can use the
+// values without dragging the observatory (or the data layer) into its bundle.
+import {
+  PROJECT_CATEGORY_LABELS as CATEGORY_LABELS,
+  projectCategoryLabel as categoryLabel,
+} from "../project-categories";
 import { parsePeriod } from "./parsePeriod";
+
+export { CATEGORY_LABELS, categoryLabel };
 
 const RE_HANDLE = /github\.com\/([\w.-]+\/[\w.-]+)/i;
 
@@ -47,18 +55,6 @@ export interface ComplexityBreakdown {
   media: number;
   images: number;
   hasAssociation: number;
-}
-
-export const CATEGORY_LABELS: Record<string, string> = {
-  ml: "Machine Learning",
-  web: "Web",
-  iot: "IoT",
-  cli: "CLI & Tooling",
-  devops: "DevOps & MLOps",
-};
-
-export function categoryLabel(category: string): string {
-  return CATEGORY_LABELS[category] ?? category;
 }
 
 function slugify(title: string): string {

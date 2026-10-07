@@ -1,5 +1,6 @@
 import type { GitHubData } from "../../types/github";
 import type { Project } from "../../types/projects";
+import { projectCategoryLabel as categoryLabel } from "../project-categories";
 import {
   categoryCounts,
   complexityScore,
@@ -230,23 +231,6 @@ function categoryTopSkills(projects: Project[]): CatTopSkill[] {
     if (top && top[1] > 0) out.push({ category: cat, skill: top[0], topCount: top[1] });
   }
   return out.sort((a, b) => b.topCount - a.topCount);
-}
-
-function categoryLabel(category: string): string {
-  switch (category) {
-    case "ml":
-      return "Machine Learning";
-    case "web":
-      return "Web";
-    case "iot":
-      return "IoT";
-    case "cli":
-      return "CLI & Tooling";
-    case "devops":
-      return "DevOps & MLOps";
-    default:
-      return category;
-  }
 }
 
 const EXAMPLE_TERMS: Record<string, string> = {

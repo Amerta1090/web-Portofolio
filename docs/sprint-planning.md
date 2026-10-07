@@ -790,17 +790,57 @@ M1 membuktikan perbaikan ini **bertemu masalah nyata**, bukan sekadar membiarkan
 
 **Catatan jujur — 1 observasi di luar scope:** tombol tema header ber-`aria-label="Switch to dark mode"` tetapi yang diklik justru **berpindah ke light** (label terbalik). Pre-existing, bukan dari diff ini, dan tidak disentuh (preseden M0.6.5 — membuka gerbang yang tak sedang jadi tugas ini).
 
-### Task 2.2 — Kartu proyek berbasis bukti
+### Task 2.2 — Kartu proyek berbasis bukti ✅ COMPLETE (2026-10-07)
+> Commit `prove: kartu proyek berbasis bukti`. **Task penambahan UI**: 2 file ditulis ulang (`ProjectCardGrid.tsx` 78→149 baris, `TiltCard.tsx`) + 4 file baru (`src/lib/project-categories.ts`, `ProjectCardGrid.test.tsx`, `TiltCard.test.tsx`, `e2e/project-cards.spec.ts`) + 3 file disentuh (`layout-queries.css`, `observatory/metrics.ts`, `observatory/insights.ts`); **0 section baru, 0 island baru, 0 dependency, 0 React root baru**.
 
-- [ ] **M2.2.1** Baca `ProjectCardGrid.tsx` (78 baris) + `data/projects.json` (field `title, featured, category, period, description, links, skills, image, images, media, association`).
-- [ ] **M2.2.2** Tampilkan di kartu: `skills[]` (chip), `category`, `period`, `links[]` (repo/live/demo sebagai link nyata dengan `rel`), `association` (badge) bila ada, jumlah `media` bila ada.
-- [ ] **M2.2.3** **Tentukan** peran `media` (T0.5 menghapusnya): bila harus live → postpone ke Sprint 4 dengan lightbox yang benar; bila tidak → hapus field dariconsideration dan catat. **Jangan**_render tombol mati.
-- [ ] **M2.2.4** Hover/focus: **spotlight 1-RAF** via CSS custom property — **bukan** pointer→React state→re-render (21st.dev). Nol React root/RAF baru; satu rAF batch, di-guard `useRafGuard`, berhenti saat `pointerleave`/hidden/reduced-motion.
-- [ ] **M2.2.5** `BorderGlow` (React Bits) pada kartu — 0 JS biaya (CSS `mask-composite: subtract` + 2 custom property).
-- [ ] **M2.2.6** Unit: setiap field yang dirender berasal dari data; kartu tanpa `skills`/`links` **tak crash** dan menampilkan fallback jujur.
-- [ ] **M2.2.7** Unit: pra-hidrasi tak punya kontrol mati (P5).
+- [x] **M2.2.1** Baca `ProjectCardGrid.tsx` (78 baris) + `data/projects.json` (field `title, featured, category, period, description, links, skills, image, images, media, association`).
+- [x] **M2.2.2** Tampilkan di kartu: `skills[]` (chip), `category`, `period`, `links[]` (repo/live/demo sebagai link nyata dengan `rel`), `association` (badge) bila ada, jumlah `media` bila ada.
+- [x] **M2.2.3** **Tentukan** peran `media` (T0.5 menghapusnya): **tidak dirender di kartu** — field berisi label (`"Prototype"`), asetnya (`monitoring_*.png`) tak ada di `public/`; menampilkan count = mengklaim bukti yang tak bisa dibuka (PRD P6). Data tetap hidup di `projects.json` (dihitung `facts.ts` + observatory). **Tanpa lightbox, tanpa tombol mati.**
+- [x] **M2.2.4** Hover/focus: **spotlight 1-RAF** — satu `requestAnimationFrame` ter-koales per frame (`frame.current` guard), menulis **hanya CSS** (transform + `--glow-x`/`--glow-y`), bukan pointer→React state→re-render. Read (`getBoundingClientRect`) + write di frame callback yang sama → tanpa read-after-write thrash. Di-guard **satu** grid-level `useRafGuard(gridRef, true)` (bukan per-kartu → +1 listener `visibilitychange`), berhenti saat `pointerleave`/unmount/hidden/reduced-motion.
+- [x] **M2.2.5** `BorderGlow` = CSS murni di `src/lib/layout-queries.css` (`.project-card::before` + `mask-composite: subtract` + 2 custom property dari rAF) — **0 JS biaya sendiri**; ring hanya nge-render saat `[data-tilt-spotlight]`.
+- [x] **M2.2.6** Unit: setiap field yang dirender berasal dari data (`title/category/period/description/skills/links/association/featured`); kartu tanpa `skills`/`links` **tak crash** → `"No skills listed"` + filter `link.url` (fallback jujur).
+- [x] **M2.2.7** Unit: pra-hidrasi tak punya kontrol mati (P5) — SSR = `<article>` + stretched title `<a>` (link asli ke `/projects/<slug>`) + link eksternal `z-10`; **0 `<button>`, 0 handler inline** (mutasi M5).
 
-**Verify**: unit ≥ 10 baru; `measure:runtime` `/` RAF tak naik.
+**Verify**: unit ≥ 10 baru (13) · `measure:runtime` `/` RAF tak naik (**per-frame identik, bukti di bawah**).
+
+**Bentuk**: kartu = satu `<article>`; title = **stretched link** (`after:inset-0`) sehingga seluruh permukaan kartu = destinasi utama; link eksternal di atasnya di layer `z-10` (`rel="noopener noreferrer"`, `target="_blank"`, label + `↗` + `sr-only "(opens in a new tab)"`). Kategori via **satu sumber baru** `src/lib/project-categories.ts` (modul tanpa import: `PROJECT_CATEGORIES` + `projectCategoryLabel`) — dipakai card, `observatory/metrics.ts`, dan `observatory/insights.ts` (3 lokasi yang sebelumnya punya mapping sendiri → kelas drift dihapus). Skill chip: `slice(0, 4)` + chip `+N` (agregasi dari data, bukan hardcode); skill > 18 karakter di-truncate `…` (presentasi, data utuh). Badge `Featured` class `featured-badge` yang di-`:has()` CSS. `data-project-card`, `data-project-association`, `data-project-no-skills` hooks untuk test.
+
+**DEVIASI 1 — `media` tidak dirender sama sekali, termasuk count-nya.** M2.2.2 menulis "jumlah `media` bila ada"; revisi di M2.2.3 (devisi dari daftar microtask): label `media` berisi `"Prototype"`/`"Prototype 1"` dan file-nya tak ada → **count pun** adalah klaim bukti yang tak terbuka. Komentar alasan ditulis di file (`:29`) + unit test `"never renders media labels (they are not openable evidence)"` mem-pinnya (mutasi M4 merah).
+
+**DEVIASI 2 — kategori dikonsolidasi.** Plan tidak menyebut `project-categories.ts`; ia lahir dari pemeriksaan pra-kerja: card, `observatory/metrics.ts`, dan `observatory/insights.ts` masing-masing punya mapping kategori sendiri (drift potensial, kelas pelajaran M2.1 #2). Satu modul tanpa import (aman untuk consumer client, pola Q4.1 BUG FIX 1), observatory di-routing lewat label yang sama.
+
+**DEVIASI 3 — `glare` dihapus dari `TiltCard`.** Tak ada consumer (sudah sejak L2.3 rev II); aturan repo Rule 6 (preseden M0.4 `LossCurve`/`ConfusionMatrix`).
+
+**TEMUAN T2 (mutasi no-op → guard mati terbukti, dihapus).** `TiltCard.flush` punya cabang dalam `if (spotlight)` yang **tak terjangkau secara konstruksi**: satu-satunya pemanggilnya adalah scheduler `handleMouseMove` yang sudah men-gate `!spotlight` sebelum menjadwalkan, dan kedua closure datang dari render yang sama → `spotlight` tak bisa berubah di antara keduanya. Dihapus; `spotlight` keluar dari deps `flush` → **gate tunggal kini di schedule-time** (`handleMouseMove`), terdokumentasi di komentar (`:65`). Harness `mutate-task22.mjs` sempat mencatat "T2 merah" — itu salah baca harness (fallback parse `failed=1`); setelah diverifikasi branch memang no-op, entri T2 dibuang dari harness dan dilaporkan sebagai temuan struktur, bukan mutasi merah palsu.
+
+**Mutasi 9/9 merah pada asersi yang dimaksud**, tiap restore `md5sum` identik: **ProjectCardGrid** M1 slug-lowercase (hash beda) · M2 cap-4 skill dihapus · M3 `rel` dilemahkan · M4 media dirender · M5 `<button>` disisipkan (0 dead controls) · M6 fallback no-skills dihapus; **TiltCard** T1 koalesensi rusak (tulis tiap move) · T3 glow tak dibersihkan saat leave · T4 rAF tanpa guard (guard.paused diabaikan).
+
+**Test**: 13 unit baru (9 `ProjectCardGrid.test.tsx` + 4 `TiltCard.test.tsx`) — basis 1048 → **1061**; e2e `e2e/project-cards.spec.ts` **7 test** (pakai `waitForIslandHydration` + `scrollIntoViewIfNeeded`; menunggu hydration **sebelum** mengasersi spotlight karena `data-tilt-spotlight="on"` ada di SSR oleh konstruksi). Reduced-motion di-cover unit (T4: guard paused → spotlight off), bukan e2e.
+
+**Gate** (semua hijau):
+- Unit **1061/1061** (94 file, +13) — run penuh **solo** 230 s (jangan paralel unit+e2e di mesin 3 GB — flake yang pernah terjadi di Task 2.1 tercatat).
+- `astro check` **100 = baseline** — diff sorted `file|code` **identik** (0 baru / 0 hilang).
+- **Lint — A/B worktree-baseline (fresh, tanpa `.opencode`)**: baseline **609** → current **605** (metode: `biome check --reporter=json --max-diagnostics=none` + diff per-file) = **net −4, 0 baru** — dua file yang ditulis ulang membawa error pre-existing (`ProjectCardGrid`×3 + `TiltCard`×1) yang **terhapus oleh rewrite**. Raw `bun run lint` = **699** (termasuk **94** diag gitignored `.opencode/` — artefak env, bukan sumber; angka historis "668/672" ikut menghitung noise `.opencode` yang jumlahnya berubah antar sesi). Biome per-file 8 file tersentuh: **0 error** (spec baru diformat oleh `biome check --write`).
+- `validate-data` OK (`GitHub cache: non-degenerate`; "OK" ganda = artifact pre-existing).
+- `build:fast` **49 halaman** (EXIT 0; `REST 403` star-history = noise pre-existing).
+- Payload `measure:routes`: `/` initial **200.8** / reachable **563.2** / html **65.1** KB gzip · `/work/ai-quranic-tafsir` 150.2/392.6/17.2 · `/gallery` 178.7/503.9/18.8. vs Task 2.1 baseline (199.9/562.7/64.8): initial **+0.9** (kartu kini dirender dari data), tanpa chunk baru; island **17 (7e/10d)** tetap.
+- **Runtime A/B (`measure:runtime` :4321 current vs :4323 baseline)** — `/`:
+  - **RAF/frame `1.0126 → 1.0120` (identik) → RAF TIDAK NAIK** ✓ (delta absolut afterScroll 403→423 = +20 frame sample lebih panjang, bukan kenaikan rate).
+  - afterLoad: rafCalls **32→23**, rectReads **7→1** (perbaikan dari rewrite).
+  - afterScroll **scroll listener 16 = 16** (0 scroll baru); **+1 `visibilitychange`** = satu grid-level `useRafGuard` (M2.2.4, teratribusi via grep `ProjectCardGrid.tsx:37`, bukan angka kabur — guard grid, bukan per-kartu, jadi +1 bukan +4).
+  - hydratedIslands **11 = 11**; idleFps **62 → 72.5**.
+- e2e focused **7/7**; **full `--workers=1`: 285 passed / 1 failed** (`gallery.spec.ts:84` Julia toggle) → **re-run terisolasi hijau** → flake load paralel, kelas terdokumentasi (Q4.2 #6 / M0.7 — mesin 4-core/3 GB) → **efektif 286/286** (279 + 7).
+- Arkeologi `dist/index.html`: 4 `data-project-card` + 4 `data-tilt-spotlight="on"`; **0 `<button>`/`onclick`** di `#projects`; label media hanya muncul di **payload serialized** `<astro-island>` (nilai prop, bukan teks render → asersi teks e2e benar hijau); kemunculan slug ekstra = index CommandPalette (expected).
+
+**Pelajaran (1) — guard yang tak terjangkau adalah kelas sendiri; mutasi hapus-branch tidak akan pernah merah untuknya.** Yang membuktikan bukan mutasi tapi analisis alur pemanggilan (satu pemanggil yang sudah men-gate di schedule-time). Melaporkan no-op sebagai "mutasi merah" = klaim palsu; laporkan sebagai temuan struktur + hapus branch.
+
+**Pelajaran (2) — satu guard per GRID, bukan per kartu.** Menulis `useRafGuard` per instance melipatgandakan listener `visibilitychange` dokumen (+4 untuk 4 kartu); satu guard di grid = +1, dan kartu menerima `spotlight={!guard.paused}` sebagai prop. Angka runtime lalu punya atribusi yang bisa di-`grep`.
+
+**Pelajaran (3) — "0 dead controls" e2e harus meng-hitung handler inline juga, bukan cuma `<button>`.** Mutasi M5 (sisipkan `<button>`) merah karena asersi `#projects button` = 0; kelas yang sama seperti Task 0.5 (`onclick` di `.astro`). Di kartu React, bentuk yang setara adalah `onMouseMove`/`onClick` yang berfungsi — kontrol mati di sini justru **tidak adanya** handler yang valid sebelum hidrasi, jadi SSR harus sudah berisi link asli.
+
+**Pelajaran (4) — agregasi dari data diuji sebagai *bentuk*, bukan angka.** `slice(0, 4)` + `+N` dipin test sebagai keputusan presentasi yang bisa diuji (mutasi M2 merah bila cap dibuang), sementara `N` diturunkan dari `skills.length` saat render — tidak ada angka diketik tangan yang bisa basi.
+
+**Pelajaran (5) — kontrak `data-tilt-spotlight` sama seperti `data-experiment-loader` (F5.1):** atribut hadir di HTML server (guard `paused=false` pra-hidrasi), hilang saat grid off-screen pasca-hidrasi. e2e mengasersi jumlah hanya **setelah** `waitForIslandHydration`. Atribut pada `TiltCard` ditulis `spotlight ? "on" : undefined` — menghilang dari output, bukan bernilai `"undefined"`.
 
 ### Task 2.3 — Filter proyek (bukan tab)
 
