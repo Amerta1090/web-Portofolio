@@ -3,14 +3,27 @@ import { motion, useReducedMotion, useScroll, useTransform } from "motion/react"
 import { useEffect, useState } from "react";
 import HeroAvatar from "../components/atoms/HeroAvatar";
 import RevealText from "../components/atoms/RevealText";
+import type { HeroMetric } from "../lib/hero-metrics";
 import { duration, easing } from "../lib/motion";
 import { useTimeOfDay } from "../lib/useTimeOfDay";
+
+/** Shared by both branches of the evidence row, so the swap cannot change layout. */
+const ROW_CLASS = "flex flex-wrap gap-x-10 gap-y-4 pt-1";
 
 interface Props {
   name: string;
   headline: string;
   tagline: string;
   resumeUrl: string;
+  /**
+   * Evidence row under the calls to action — `buildHeroMetrics()` output.
+   *
+   * Empty whenever the GitHub cache has nothing honest to show (missing cache, no
+   * contributions in the calendar), and the row is then not rendered at all: an
+   * absent claim is better than a confident zero (P6). Defaults to empty so the
+   * component keeps rendering without a cache.
+   */
+  metrics?: HeroMetric[];
 }
 
 function useReturnVisitor(): boolean {
@@ -25,13 +38,14 @@ function useReturnVisitor(): boolean {
   return isReturning;
 }
 
-export default function TimeAwareHero({ name, headline, tagline, resumeUrl }: Props) {
+export default function TimeAwareHero({ name, headline, tagline, resumeUrl, metrics = [] }: Props) {
   const prefersReduced = useReducedMotion();
   const { scrollY } = useScroll();
   const bgParallax = useTransform(scrollY, (v) => v * 0.15);
   const overlayParallax = useTransform(scrollY, (v) => v * 0.05);
   const contentParallax = useTransform(scrollY, (v) => v * -0.02);
   const [loaded, setLoaded] = useState(prefersReduced);
+  const [lowData, setLowData] = useState(false);
   const time = useTimeOfDay();
   const isReturning = useReturnVisitor();
 
@@ -43,6 +57,47 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl }: Pr
     const t = setTimeout(() => setLoaded(true), duration.narrative * 1000);
     return () => clearTimeout(t);
   }, [prefersReduced]);
+
+  useEffect(() => {
+    const query = window.matchMedia?.("(prefers-reduced-data: reduce)");
+    if (!query) return;
+    setLowData(query.matches);
+    const onChange = (event: MediaQueryListEvent) => setLowData(event.matches);
+    query.addEventListener?.("change", onChange);
+    return () => query.removeEventListener?.("change", onChange);
+  }, []);
+
+  /**
+   * The metric row is the only thing `lowData` touches: it drops the motion
+   * wrapper entirely, so the figures are text the moment they are in the DOM.
+   * Read after mount because SSR has no `matchMedia`.
+   */
+  const metricsStatic = (prefersReduced ?? false) || lowData;
+
+  const metricItems = metrics.map((m) => (
+    <li key={m.id}>
+      <a
+        href={m.href}
+        aria-label={m.name}
+        data-hero-metric={m.id}
+        className="group inline-flex flex-col gap-1"
+      >
+        {/*
+          Colour follows the site's existing `.section-label` convention
+          (`text-text-secondary`, no opacity modifier) — measured, not assumed: a
+          `/70` modifier put these labels at 4.18:1 dark and **2.72:1** light,
+          where every label already on the homepage measures 7.45 / 4.75. 11px
+          text under AA needs 4.5:1, so the dimmed version failed in light mode
+          while looking "styled".
+        */}
+        <span className="font-display text-h4 text-text-primary tabular-nums transition-colors group-hover:text-brand">
+          {m.value}
+          {m.suffix && <span className="text-text-secondary">{` ${m.suffix}`}</span>}
+        </span>
+        <span className="section-label text-text-secondary">{m.label}</span>
+      </a>
+    </li>
+  ));
 
   const greeting = isReturning ? "Welcome back" : time.greeting;
 
@@ -140,6 +195,45 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl }: Pr
                 <span className="text-sm opacity-60">(.pdf)</span>
               </a>
             </motion.div>
+
+            {/*
+              The evidence row (M2.1). Every figure is a link to the section that
+              prints the same number, so the claim can be checked instead of
+              believed — the accessible name is built next to the value in
+              `lib/hero-metrics.ts`, so it cannot drift from what is on screen.
+              An empty array renders nothing at all: no honest number is not the
+              same as a zero (P6).
+
+              The static branch is a plain `<ul>`, not a motion element with a
+              zero-length transition. Both preferences are read after mount
+              (`prefers-reduced-data` can only be read from an effect at all), so
+              `initial={false}` would already be too late — motion applies
+              `initial` at mount, and flipping it afterwards leaves the row
+              starting at `opacity: 0` and then *animating*, which is the one thing
+              these preferences ask not to do (M2.1.4).
+
+              `data-hero-metric-row` records which of the two it is — `ready` means
+              the reader has the figures now, `pending` means the entrance is
+              still holding them. Motion's own animation loop does not run
+              reliably outside a browser, so the hook is what lets a unit test
+              prove the row arrives instead of inferring it from an inline style.
+            */}
+            {metrics.length > 0 &&
+              (metricsStatic ? (
+                <ul className={ROW_CLASS} data-hero-metric-row="ready">
+                  {metricItems}
+                </ul>
+              ) : (
+                <motion.ul
+                  className={ROW_CLASS}
+                  data-hero-metric-row={loaded ? "ready" : "pending"}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={loaded ? { opacity: 1, y: 0 } : {}}
+                  transition={{ ...easing["ease-spring-gentle"], delay: duration.deliberate }}
+                >
+                  {metricItems}
+                </motion.ul>
+              ))}
           </div>
         </div>
       </motion.div>

@@ -22,7 +22,9 @@ import {
   getProjects,
   getSkills,
 } from "../lib/data";
+import { buildSiteFacts } from "../lib/facts";
 import { fetchAllGitHubData } from "../lib/github";
+import { buildHeroMetrics } from "../lib/hero-metrics";
 
 const profile = getProfile();
 const featuredProjects = getFeaturedProjects();
@@ -31,6 +33,10 @@ const signalLoom = buildSignalLoomGraph(getProjects(), skills);
 const career = buildCareerEvents();
 const certifications = getCertifications();
 const gitHubData = await fetchAllGitHubData();
+// Hero evidence row (M2.1): computed here, on the server, from the same
+// `SiteFacts` every other claim on the page reads — so the hero cannot print a
+// figure the rest of the site would contradict.
+const heroMetrics = buildHeroMetrics(buildSiteFacts().github);
 
 /**
  * Section ids in document order, owned here because the page owns the markup.
@@ -59,6 +65,7 @@ const sectionIds = [
       headline={profile.headline}
       tagline={profile.tagline}
       resumeUrl={profile.resume_url}
+      metrics={heroMetrics}
     />
   </section>
 

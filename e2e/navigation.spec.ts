@@ -127,10 +127,30 @@ test.describe("Navigation hierarchy — one primary nav, one position readout", 
     //   13 → 14  Task 1.2  added #career (the Career Spine), M1.2.1
     //   14 → 12  Task 1.4  folded #honors + #volunteering into the spine, M1.4.1
     //   12 → 10  Task 1.5  retired #experience + #journey, M1.5.1
-    const sectionCount = await page.locator("section[id]").count();
+    //
+    // `main > section[id]`, not `section[id]`: M2.1.2 pointed the hero's evidence
+    // row at `#github-metrics`, and that anchor is a `Section` nested *inside*
+    // `#github` (measured section-nesting depth 2 vs 1 for the rest) — one of five
+    // sibling phase sections inside the GitHub Universe. So the bare selector
+    // started counting an in-phase link target as a navigation section and
+    // reported 11 while the readout correctly said "01 / 10". Scope the selector
+    // to the top-level sections the page-owned `sectionIds` list enumerates.
+    const sectionCount = await page.locator("main > section[id]").count();
     expect(sectionCount).toBe(10);
     await expect(counter.locator("[data-section-dot]")).toHaveCount(sectionCount);
     await expect(counter).toHaveText(`01 / ${String(sectionCount).padStart(2, "0")}`);
+
+    // Pins the decision above so it cannot be "fixed" the other way. A nested
+    // section with an id is a link target, not a navigation step: the other four
+    // phases of the Universe have no id, so counting this one alone would make
+    // the readout claim "10 / 11" for a section that actually has five parts.
+    // If a second nested anchor ever appears, it has to be added here and
+    // argued for, rather than silently inflating the count.
+    expect(
+      await page
+        .locator("section[id]:not(main > section[id])")
+        .evaluateAll((els) => els.map((e) => e.id)),
+    ).toEqual(["github-metrics"]);
 
     // Decorative: it duplicates section landmarks, and the old 11 `aria-label`s
     // on role=generic dots were prohibited by ARIA 1.2.

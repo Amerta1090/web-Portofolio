@@ -705,14 +705,90 @@ Gerbang e2e penuh pertama: **256 passed / 2 failed**. Keduanya `navigation.spec.
 **PRD ref**: §9.1, §9.5, §9.6, §9.8, §9.10
 **Expected files**: `src/islands/ProjectCardGrid.tsx` (upgrade), `src/components/organisms/CreativeLabShowcase.astro` (baru, statis), `src/components/organisms/Certifications.astro` (upgrade), `src/components/organisms/Hero.astro` (upgrade), `src/lib/creative/lab-showcase.ts` (pure, optional)
 
-### Task 2.1 — Hero metrik dari `derived_metrics`
+### Task 2.1 — Hero metrik dari `derived_metrics` ✅ COMPLETE (2026-10-06)
 
-- [ ] **M2.1.1** Hero: baris metrik dari `SiteFacts.github` — `contribution_count`, `longestStreak`, `mostActiveDay` + `busiestMonth`. Tanpa data → **hilangkan metrik itu**, jangan tampilkan `0`/`NaN` (P6).
-- [ ] **M2.1.2** Tiap angka = `<a>` ke section yang menjelaskannya; `aria-label` ringkas `Kind: value` (Q4.2 D3, dan **jangan** uji dengan ambang jumlah kata — lessons Q4.2 #8).
-- [ ] **M2.1.3** Render full dari SiteFacts; nol literal.
-- [ ] **M2.1.4** Reduced motion: metrik **statis** (tak ada counter). `prefers-reduced-data`: tampilkan teks, bukan animasi.
+- [x] **M2.1.1** Hero: baris metrik dari `SiteFacts.github` — `contribution_count`, `longestStreak`, `mostActiveDay` + `busiestMonth`. Tanpa data → **hilangkan metrik itu**, jangan tampilkan `0`/`NaN` (P6).
+- [x] **M2.1.2** Tiap angka = `<a>` ke section yang menjelaskannya; `aria-label` ringkas `Kind: value` (Q4.2 D3, dan **jangan** uji dengan ambang jumlah kata — lessons Q4.2 #8).
+- [x] **M2.1.3** Render full dari SiteFacts; nol literal.
+- [x] **M2.1.4** Reduced motion: metrik **statis** (tak ada counter). `prefers-reduced-data`: tampilkan teks, bukan animasi.
 
-**Verify**: grep literal angka di `Hero.astro` = 0; probe light/dark.
+**Verify**: ~~grep literal angka di `Hero.astro`~~ — **dikoreksi setelah eksekusi**: `Hero.astro` ternyata **mati** (0 importer, dihapus), dan nol literal diverifikasi di `src/lib/hero-metrics.ts` + baris render `TimeAwareHero.tsx`, bukan di file yang plan sebut. Probe light/dark: kontras **7.45:1 / 4.75:1** setelah Temuan 1.
+
+> Commit `prove: baris bukti hero dari SiteFacts.github`. **Task penambahan UI**: **4 file baru** — 1 produk (`src/lib/hero-metrics.ts`) + 3 test (`src/lib/hero-metrics.test.ts`, `src/islands/TimeAwareHero.test.tsx`, `e2e/hero-metrics.spec.ts`), 3 file produk disentuh, 1 file mati dihapus; **0 section baru**, **0 island baru**, **0 listener/RAF baru**, **0 dependency**.
+> Bentuk: baris 4 angka (`571` / `27 days` / `Tue` / `September`) tepat di bawah CTA hero, tiap angka = `<a>` ke bagian yang **mencetak angka yang sama**.
+
+- [x] **M2.1.1** Builder pure `src/lib/hero-metrics.ts` (`buildHeroMetrics(github)`), dipanggil di `index.astro` (`buildSiteFacts().github`) lalu dikirim sebagai prop `HeroMetric[]` ke island. Aturan P6 ada **dua lapis dan keduanya diuji**: (1) `github == null` → `[]` — `.cache/` gitignored jadi `build:fast`/CI **tanpa cache adalah kasus normal**, bukan error; (2) `contributions <= 0` atau non-finite → **`[]` untuk seluruh baris**, karena `deriveMetrics({weeks: []})` menjawab dengan `longest_streak: 0`, `most_active_day: "mon"` dan `busiest_month: "Unknown"` yang **semuanya string valid** — renders apa adanya = hero mengklaim "Most active day: Mon" untuk tahun tanpa kontribusi. Per-metrik: streak 0, bulan `"Unknown"`, key hari tak dikenal, dan non-finite **tiap-tiapnya** menjatuhkan metriknya sendiri tanpa mematikan baris.
+- [x] **M2.1.2** Tiap angka `<a href="#github-metrics">` + `aria-label` = `Kind: value` **dihasilkan builder** (`HeroMetric.name`), jadi island tak bisa menyimpang dari field yang ia render; label terlihat ikut di dalamnya (WCAG 2.5.3). Diuji **bentuknya** (`name === \`${label}: ${value}${suffix}\``), **bukan ambang kata** (Q4.2 #8).
+- [x] **M2.1.3** Nol literal dataset: `rg -n "[0-9]" src/lib/hero-metrics.ts` → semua match ada di komentar/javadoc atau logika (`> 0`, `charAt(0)`); baris render di `TimeAwareHero.tsx` tanpa angka. Angka hari kapitalisasi di builder (`"tue"` → `"Tue"`) supaya **nama aksesibel identik dengan nilai yang terlihat**.
+- [x] **M2.1.4** Reduced motion → cabang `<ul>` polos (`data-hero-metric-row="ready"`, tanpa inline style); `prefers-reduced-data` → cabang sama, dibaca via `matchMedia` setelah mount + listener dibersihkan saat unmount. **Bukan** `motion.ul` dengan `initial={false}`: kedua preferensi baru diketahui **setelah mount**, jadi `initial` sudah terlanjur diterapkan → baris mulai dari `opacity: 0` lalu beranimasi — justru hal yang M2.1.4 larang.
+
+**Verify**: unit **1048/1048** (92 file, **+18**; 3 run penuh 2026-10-07: run pertama digelar ~1 mnt setelah suite e2e 22,7 mnt selesai → **1047/1048 dalam 483 dtk** dengan 1 gagal yang tak teridentifikasi (log kepotong `tail -6`) → run ulang **1048/1048** 227 dtk + konfirmasi **1048/1048** 165 dtk; gagal tak pernah terulang, durasi 2× lipat = pola load Q4.2 #6 — dicatat, bukan dihapus) · `astro check` **100 = baseline, diff sorted identik** · `lint` **668 = baseline sumber**, dua hal tercampur di angka ini dan keduanya diukur: (a) 669 → 668 = diagnostik `Hero.astro` yang ikut terhapus (A/B: file dipulihkan → 669, tanpa file → 668); (b) hitungan **fluktuasi 668/669** tergantung ada-tidaknya `test-results/.last-run.json` — artefak Playwright yang **gitignored tapi tetap di-scan biome** — jadi tepat setelah run e2e ia baca 669, tanpa artefak 668 · `biome check` bersih di 8 file tersentuh · `validate-data` OK · `build:fast` **49 halaman** · payload `/` initial **199.9 datar** / reachable **562.4 → 562.7 (+0.3)** / html **64.5 → 64.8 (+0.3)** · `/work` + `/gallery` datar · island **17 (7e/10d) = tetap** · runtime scroll **16** (rentang baseline 15–16), tak ada listener/RAF baru · e2e baru **6/6** · e2e penuh `--workers=1` **279/279** (run diulang 2026-10-07 — reboot menghapus log run pertama beserta semua artefak md5; hasil identik, 22,7 mnt, 0 gagal, `EXIT=0`).
+
+**DEVIASI 1 — file yang disebut plan (`Hero.astro`) **mati**, jadi target sebenarnya `TimeAwareHero`.** Plan menulis `src/components/organisms/Hero.astro` (upgrade). Diverifikasi: **0 importer** repo-wide (`rg 'organisms/Hero'` 0; satu-satunya hero di `index.astro` = `<TimeAwareHero client:idle>`), 29 baris, isinya versi lama tanpa CTA pointer/avatar/waktu. Implementasi dilakukan di `TimeAwareHero.tsx`; `Hero.astro` **dihapus** (Rule 6) — buktinya bukan "tak ada yang mengimpor" saja (grep bisa menipu, pelajaran M0.6 #1), tapi **test tak runtuh tanpa perubahan test**: `1048/1048` hijau setelah file hilang. Kalau tak dihapus, PRD §no-new-code akan meninggalkan komponen yang tak bisa dirender. **Catatan jujur**: penghapusan itu ternyata **ikut ter-commit di commit orang lain** — `d22e8f7` "fix: center year headings vertically in career spine" (2026-10-06 13:13; isinya cuma 2 file, sudah dicek `--name-status`: perbaikan visual `CareerSpine.astro` + `Hero.astro` dihapus) memasukkan staged-deletion saya saat penulisnya commit. Tak ada karya Task 2.1 lain yang ikut, tapi commit `prove:` saya tidak lagi memuat penghapusan ini. Tak di-rebase — commit itu punya orang, dan tree akhirnya identik.
+
+**DEVIASI 2 — target link `#github` → `#github-metrics` (dibuat anchor baru).** Probe browser: `#github` mendarat di **puncak** GitHub Universe, sementara Command Center — satu-satunya bagian yang **mencetak keempat angka** — ada **~2.000px di bawahnya** (kontribusi 2.112px, streak/bulan 3.406px). Link yang menjanjikan bukti tapi mendarat tanpa bukti = kelas yang sama dengan kontrol mati (P5). Anchor baru `id="github-metrics"` dipasang di `Section` Command Center (`GitHubUniverse.astro`), **hanya** di sana karena itu fakta tentang section itu sendiri, bukan tentang link-nya; ada di home **dan** `/github`.
+
+**DEVIASI 3 — proyek & sertifikasi tetap di About, tak diduplikasi ke hero.** Baris hero = GitHub saja (4 angka, semuanya punya section pembuktian). Menyalin "Projects/Certifications" ke hero akan menggandakan `ImpactMetrics` yang Task 1.6 baru saja jadikan link ke `#career`/`#certifications` — dua tempat yang sama, satu di bawah hero dan satu di bawahnya.
+
+**DEVIASI 4 — builder terpisah dari island (2 file, bukan 1), island **import type saja**.** `hero-metrics.ts` meng-import `formatCount` → seluruh data layer. Kalau island meng-import nilai apa pun dari sana, **seluruh data layer ikut** ke bundle browser (preseden Q4.1 BUG FIX 1, +18,5 KB gzip untuk satu konstanta). Aturan "field milik consumer-nya" Sprint 1 (pelajaran M0.1.1) punya ½ bagian lagi: di sini **nilai milik server**, dan `import type { HeroMetric }` dihapus compiler. Bukti: `rg 'hero-metrics' dist/_astro/` **0**.
+
+**Temuan 1 (defect produk, nyata) — kontras label hero gagal AA di light mode, dan hanya audit kontras yang menangkapnya.** Versi pertama memakai `text-text-secondary/70` (gaya "diredam"). Probe kontras (WCAG, over-alpha dihitung) di kedua palet:
+
+| | dark | light |
+|---|---|---|
+| label baris hero (sebelum) | 4.18:1 | **2.72:1** ❌ |
+| label hero (sesudah) | **7.45:1** | **4.75:1** |
+| `.section-label` yang sudah ada di homepage | 7.45:1 | 4.75:1 |
+
+11px di bawah AA butuh 4.5:1, jadi versi diredam **gagal di light mode** sambil tetap terlihat "styled" — persis kelas yang dikejar T0.8 (angka/penampilan yang tak jujur). Fix: `text-text-secondary` polos, **identik dengan konvensi `.section-label` yang sudah dipakai 4 tempat di homepage** (terukur, bukan diasumsikan). Angka kontrasnya tercatat di komentar kode.
+
+**Temuan 2 (defect test, kelas baru) — helper yang mencari list dari anaknya buta terhadap list kosong.** Test island awal menemukan baris lewat `[data-hero-metric]` → `parentElement.parentElement`, jadi `<ul>` **yang dirender tapi kosong** (`metrics.length >= 0`) **tidak terlihat oleh test yang justru melarangnya** — mutasi M5 **tetap hijau di 18/18**. Akar yang lebih umum dari M0.5 `hasTarget` dan M0.6: **lookup yang diturunkan dari isi tak bisa melihat keadaan yang salah justru karena tak ada isinya.** Diperbaiki: `row()` membaca hook miliknya sendiri (`[data-hero-metric-row]`) + asersi eksplisit jumlah hook = 0; M5 yang sama lalu merah.
+
+**Temuan 3 (defect harness) — `scrollIntoViewIfNeeded` pada section yang lebih tinggi dari viewport melewati isi yang justru jadi objek asersi.** Test "section yang ditaut prints angka sama" gagal: `Contributions` dan `Busiest month` tak cocok. Penyebab **dua**, satu produk-salah-ukur dan satu bug test:
+1. **Navigasi test, bukan produk.** `scrollIntoViewIfNeeded` menyelaraskan **bawah** section yang lebih tinggi dari viewport → counter jatuh di **y = −152px** (di luar layar), `useInView` tak pernah menyala, dan keempat `MetricCounter` **bertahan di 0**. Kedua jalur yang benar diukur: **klik link hero** → section y=122px, counter y=505px, terbaca `47/9/0/571`; **deep link `/#github-metrics`** → y=80/464px, nilai sama. Test sekarang **mengikuti link** (jalur pembaca sungguhan) + `toHaveURL`, bukan scroller.
+2. **Bug test: normalisasi satu sisi.** `norm()` diturunkan ke metrik nama saja, lalu dibandingkan dengan `textContent` mentah → `"September"` (kapital di DOM) tidak mengandung `"september"`. Section menormalisasi kapitalisasi secara **tidak konsisten** (`most_active_day` disimpan kecil dan jadi "TUE" oleh CSS `capitalize`; `busiest_month` nama bulan dengan huruf "S" besar) — sekarang **kedua sisi** dinormalisasi.
+
+**Temuan 4 (pengamatan) — "Preferensi" dan probe tidak sama dengan tema.** `emulateMedia({colorScheme:"light"})` **tidak** mengganti apa pun: situs ini dark-first dan `html.className` tetap `"dark"` di kedua palet (pola yang sama seperti `craft.spec.ts`, pelajaran T0.7). Probe light harus lewat toggle sungguhan; setelah diklik: `bodyBg rgb(250,250,248)`, overflow **0** di semua viewport.
+
+**Temuan 5 (defect test — ditemukan oleh gerbang penuh, dan kelasnya BARU: bukan "belum terhidrasi") — `section[id]` mulai menghitung anchor yang ada DI DALAM section.** Run penuh pertama: **278 passed / 1 failed**, `navigation.spec.ts:131` → `Expected: 10, Received: 11`. Ini **bukan** flake dan **bukan** regresi — produk memang berubah di task ini, jadi test-nya yang benar (pola yang sama seperti 2× di T1.2/T1.4). Yang keliru adalah **ukurannya**.
+
+DEVIASI 2 memasang `id="github-metrics"` pada `Section` Command Center, jadi anchor itu **ikut ter-render sebagai `<section id>`**. Dihitung polos, `section[id]` naik 10 → 11 dan terlihat seperti "halaman mendapat section baru". Tapi `github-metrics` **nested DI DALAM `#github`** — diukur di browser sungguhan: section-depth **2**, sedangkan 10 section lainnya depth **1**. Dan `sectionIds` di `index.astro` tetap **10** serta itu **benar**: `github-metrics` adalah **salah satu dari lima** phase section di dalam GitHub Universe (boot, dna, metrics, +2), dan **empat lainnya tidak punya `id`** karena tak ada yang menaut ke sana. Jadi ia **link target di dalam satu phase**, bukan langkah navigasi — menghitungnya sendiri membuat readout mengklaim "10 / 11" untuk section yang sebenarnya punya lima bagian.
+
+Diperbaiki **di akarnya**: selector disempitkan jadi `main > section[id]` (memang 10, persis `sectionIds`), **plus** pin baru `section[id]:not(main > section[id])` → `toEqual(["github-metrics"])`. Pin kedua itu yang menutup perbaikan **salah arah**: tanpa itu, cara tercepat membuat test hijau adalah menambahkan `github-metrics` ke `sectionIds`, dan mutasi M2 membuktikan itu **merusak 2 test**, bukan memperbaikinya.
+
+**Mutasi — 7/7 merah pada asersi yang dimaksud, tiap dipulihkan `md5sum` identik.** Harness JSON-reporter (`mutate2.py`) dengan nama test gagal dicetak, bukan cuma hitungan — harness pertama sempat melaporkan "7/7 RED" dengan `failed=1 passed=0` yang ternyata **fallback parse**, bukan hasil; angka yang dicetak di tabel bawah dari reporter JSON.
+
+| mutasi | file | apa yang dirusak | gagal | lolos |
+|---|---|---|---|---|
+| M1 | `hero-metrics.ts` | kalender kosong tak lagi menjatuhkan baris | 2 | 16 |
+| M2 | `hero-metrics.ts` | bulan non-kosong apa pun diterima (termasuk `"Unknown"`) | 1 | 17 |
+| M3 | `hero-metrics.ts` | streak 0 dicetak sebagai fakta | 2 | 16 |
+| M4 | `TimeAwareHero.tsx` | `prefers-reduced-data` tak lagi ambil cabang statis | 1 | 17 |
+| M5 | `TimeAwareHero.tsx` | `<ul>` kosong dirender (buta sampai helper diperbaiki, Temuan 2) | 1 | 17 |
+| M6 | `TimeAwareHero.tsx` | nama aksesibel jatuh ke text content | 1 | 17 |
+| M7 | `TimeAwareHero.tsx` | cabang statis melaporkan diri masih beranimasi | 2 | 16 |
+
+Harness kedua (`navigation.spec.ts`, Temuan 5) — 3 mutasi, **3/3 merah**, tiap dipulihkan `md5sum` identik (`da48bb17…` / `9479b724…` / `4b4241e3…`):
+
+| mutasi | file | apa yang dirusak | hasil |
+|---|---|---|---|
+| M1 | `navigation.spec.ts` | selector `main > section[id]` dikembalikan jadi `section[id]` polos | ❌ `Expected 10, Received 11` — **mereproduksi kegagalan gerbang persis** |
+| M2 | `index.astro` | `github-metrics` ditambahkan ke `sectionIds` (perbaikan **salah arah** yang paling menggoda) | ❌ **2 test** merah: dots 11 ≠ 10, dan test scroll-tracking ikut |
+| M3 | `GitHubUniverse.astro` | `id` pada anchor nested dihapus | ❌ pin nested: `- "github-metrics"` / `+ Array []` |
+
+M1 membuktikan perbaikan ini **bertemu masalah nyata**, bukan sekadar membiarkan test yang sudah benar hilang. M2 membuktikan pin baru **menolak** perbaikan yang membuat angka cocok. M3 membuktikan pin baru itu **hidup**, bukan hiasan yang selalu hijau.
+
+**Pelajaran (1) — "cari section yang menjelaskannya" adalah keputusan desain, dan probe mengalahkan opini.** `#github` tersedia di sana, dan masuk akal — plan tidak menyebut nama section, hanya "section yang menjelaskannya". Hanya menghitung jarak piksel di browser yang mengubahnya jadi `#github-metrics`. Kalau diterima begitu saja, baris ini akan jadi 4 link yang beroperasi dan **tidak membuktikan apa pun** — lebih buruk dari 4 teks statis, karena ia terlihat meyakinkan.
+
+**Pelajaran (2) — menormalisasi data dari dua sisi berbeda adalah bug yang menunggu; menormalkan satu sisi adalah bug yang sudah ada.** Huruf besar, `capitalize` CSS, dan spasi adalah bentuk normal yang berbeda; begitu satu sisi dilewatkan, perbandingan gagal **dengan cara yang terlihat seperti produknya salah** — persis pelajaran F5.1 #4.
+
+**Pelajaran (3) — "helper scroll" punya makna yang lebih tersembunyi dari namanya.** `scrollIntoViewIfNeeded` berarti "bikin terlihat"; untuk elemen yang lebih tinggi dari viewport itu berarti **menyelaraskan bawahnya** — dan konten di **atas** justru menjadi tak terlihat. Kalau asersinya tentang konten di atas, hasilnya bukan "bug produk" tapi "test mengukur jalan yang salah". Aturan: **sebelum memakai helper scroll untuk membuktikan sesuatu, catat di mana hasilnya mendarat.**
+
+**Pelajaran (4) — audit kontras menemukan kelas defect yang tak ada gate-nya.** T0.3/M0.2/M0.6/M0.8/M1.1/M1.2 semuanya **angka**; ini pertama kali di sprint ini yang **penampilan**, dan dua-duanya lolos semua gate (unit hijau, astro check datar, payload datar, e2e hijau). 15 menit probe menutup satu kegagalan AA yang tak akan pernah dilaporkan oleh test mana pun. Gate kontras yang bisa dijalankan (**gate registered**, bukan ide): hitung kontras `getComputedStyle` untuk `.section-label` baru + pembanding yang sudah ada di halaman.
+
+**Pelajaran (5) — "berapa banyak section" adalah pertanyaan ambigu, dan test yang tidak membedakannya secara eksplisit akan menghukum produk yang benar.** Selector `section[id]` berarti "apa pun yang punya id" — begitu sebuah **anchor** berubah dari `div` menjadi `Section`, hitungan itu naik **tanpa ada section navigasi baru**. Yang menyelamatkan produk di sini bukan kebetulan, tapi karena **dua pertanyaan itu memang bisa dibedakan**: `sectionIds` (daftar milik halaman) vs `section[id]` (apa pun yang punya id di DOM). Setelah selector dipersempit ke `main > section[id]`, kedua angka **tetap berbeda dan sama-sama benar** (10 vs 11), dan selisih itu kini **dipin**, bukan disembunyikan. Aturan: kalau sebuah test menghitung sesuatu, tuliskan juga **apa yang sengaja tidak ikut dihitung**. Kalau tidak, penambahan yang sah di masa depan akan terbaca sebagai regresi, dan jalur terpendek (memindahkan atau menghapus `id`) akan dianggap "perbaikan".
+
+**Catatan jujur — 1 observasi di luar scope:** tombol tema header ber-`aria-label="Switch to dark mode"` tetapi yang diklik justru **berpindah ke light** (label terbalik). Pre-existing, bukan dari diff ini, dan tidak disentuh (preseden M0.6.5 — membuka gerbang yang tak sedang jadi tugas ini).
 
 ### Task 2.2 — Kartu proyek berbasis bukti
 

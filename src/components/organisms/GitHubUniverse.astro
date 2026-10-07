@@ -58,7 +58,15 @@ const buildTime = new Date().toISOString();
 
       <!-- Phase 2: Command Center -->
       <div data-phase="metrics">
-        <Section title="Command Center" subtitle="Live metrics from the developer universe" ariaLabel="GitHub metrics dashboard">
+        {/*
+          `id="github-metrics"` is where the hero's evidence row points (M2.1.2).
+          Probed: a `#github` link lands at the top of the Universe, and the
+          Command Center sits ~2,000px below it — a reader who followed "here is
+          the proof" would find nothing resembling the number. This anchor is the
+          section that actually prints all four figures. Lives here rather than in
+          the hero because it is a fact about *this* section, not about the link.
+        */}
+        <Section id="github-metrics" title="Command Center" subtitle="Live metrics from the developer universe" ariaLabel="GitHub metrics dashboard">
           <Container>
             <div class="flex items-center justify-between mb-6">
               <p class="text-text-secondary text-sm">Aggregated stats from all public repositories</p>
