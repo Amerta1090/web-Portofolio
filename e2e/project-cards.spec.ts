@@ -54,15 +54,34 @@ test("media labels are never rendered (they are not openable evidence)", async (
   await expect(page.locator("#projects")).not.toContainText("IDR Predictor");
 });
 
-test("the card area has no dead controls", async ({ page }) => {
+// Task 2.3: the card area gained six filter chips, but only *after* hydration.
+// A pre-hydration control is a dead control, so the "no controls" contract is
+// asserted against the server HTML with JavaScript off; the post-hydration
+// contract is the inverse — every button that exists is a live filter chip.
+test.describe("server HTML (JavaScript disabled)", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("the card area has no dead controls", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator(CARDS)).toHaveCount(4);
+    // No chip, no reset — the server ships zero buttons in this section.
+    await expect(page.locator("#projects button")).toHaveCount(0);
+    // Inline onevent* attributes would be inert-until-hydration controls.
+    const withInlineHandlers = await page
+      .locator("#projects [onclick], #projects [onmouseover], #projects [onmousemove]")
+      .count();
+    expect(withInlineHandlers).toBe(0);
+  });
+});
+
+test("after hydration every card-area button is a live filter chip", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(CARDS)).toHaveCount(4);
-  await expect(page.locator("#projects button")).toHaveCount(0);
-  // Inline onevent* attributes would be inert-until-hydration controls.
-  const withInlineHandlers = await page
-    .locator("#projects [onclick], #projects [onmouseover], #projects [onmousemove]")
-    .count();
-  expect(withInlineHandlers).toBe(0);
+  await waitForIslandHydration(page, "[data-project-card]");
+  await expect(page.locator("#projects [data-filter-chip]")).toHaveCount(6);
+  // Nothing clickable exists outside the fieldset (the reset button only
+  // appears inside the empty state, which needs an active non-"all" filter).
+  await expect(page.locator("#projects button:not([data-filter-chip])")).toHaveCount(0);
 });
 
 test("clicking a card's title navigates to the real project page", async ({ page }) => {
@@ -84,5 +103,8 @@ test("cursor spotlight is on when the grid is visible after hydration", async ({
   // visible and hydrated the attribute must be present on all four cards.
   await waitForIslandHydration(page, "[data-project-card]");
   await expect(page.locator('#projects [data-tilt-spotlight="on"]')).toHaveCount(4);
-  await expect(page.locator("#projects button")).toHaveCount(0);
+  // Post-hydration the six filter chips are real buttons; nothing else in the
+  // card area may be clickable (the dead-control contract lives in the
+  // JS-disabled test above).
+  await expect(page.locator("#projects button:not([data-filter-chip])")).toHaveCount(0);
 });
