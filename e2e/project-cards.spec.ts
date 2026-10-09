@@ -72,6 +72,18 @@ test.describe("server HTML (JavaScript disabled)", () => {
       .count();
     expect(withInlineHandlers).toBe(0);
   });
+
+  test("skill chips are already real anchors before hydration", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator(CARDS)).toHaveCount(4);
+    // Without JS the chip is still a working link into the Capability Map —
+    // the server resolved every href, so nothing here needs React (P5).
+    await expect(
+      page.locator('#projects a[href="#signal-capability-programming-languages"]').first(),
+    ).toBeVisible();
+    await expect(page.locator('#projects a[href="#systems-in-motion"]').first()).toBeVisible();
+    await expect(page.locator("#projects [data-project-card] a[href^='#']")).toHaveCount(7);
+  });
 });
 
 test("after hydration every card-area button is a live filter chip", async ({ page }) => {
@@ -107,4 +119,62 @@ test("cursor spotlight is on when the grid is visible after hydration", async ({
   // card area may be clickable (the dead-control contract lives in the
   // JS-disabled test above).
   await expect(page.locator("#projects button:not([data-filter-chip])")).toHaveCount(0);
+});
+
+// Task 2.4 (M6a): each skill chip is a cross-link into the Capability Map. The
+// server (`buildSkillHrefs`) resolves every skill, so the chip is always a real
+// anchor — a declared capability yields `#signal-<nodeId>`, one the map cannot
+// place yields the section anchor (M2.4.3). Skill → node resolution is asserted
+// against the live page; the unit suite pins the resolution table itself.
+test("skill chips are real cross-links into the Capability Map", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(CARDS)).toHaveCount(4);
+  // Resolved skills point at their capability node (server-resolved hrefs).
+  await expect(
+    page.locator('#projects a[href="#signal-capability-programming-languages"]'),
+  ).toHaveCount(2);
+  await expect(
+    page.locator('#projects a[href="#signal-capability-machine-learning-ai"]'),
+  ).toHaveCount(1);
+  // A skill no declared capability describes still links to the section itself
+  // (an honest fallback, never a fabricated node id).
+  await expect(page.locator('#projects a[href="#systems-in-motion"]')).toHaveCount(1);
+  // Every chip is a link (no inert `<span>` left behind): 7 chips, all anchors.
+  await expect(page.locator("#projects [data-project-card] a[href^='#']")).toHaveCount(7);
+});
+
+test("clicking a resolved skill chip scrolls to its Capability Map node", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(CARDS)).toHaveCount(4);
+  const chip = page.locator('#projects a[href="#signal-capability-web-development"]').first();
+  await chip.scrollIntoViewIfNeeded();
+  await chip.click();
+
+  const node = page.locator("#signal-capability-web-development");
+  await expect(node).toBeVisible();
+  await expect(page).toHaveURL(/#signal-capability-web-development$/);
+  // Wait for the smooth scroll to *arrive*, not merely to be stable (Task 1.4):
+  // the node settles just below the fixed header via scroll-padding-top: 5rem.
+  await expect
+    .poll(
+      async () => {
+        const top = await node.evaluate((el) => Math.round(el.getBoundingClientRect().top));
+        return Math.abs(top - 80) <= 2 ? "settled" : top;
+      },
+      { timeout: 8000 },
+    )
+    .toBe("settled");
+});
+
+test("clicking the fallback chip scrolls to the section without a node hash", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(CARDS)).toHaveCount(4);
+  const chip = page.locator('#projects a[href="#systems-in-motion"]').first();
+  await chip.scrollIntoViewIfNeeded();
+  await chip.click();
+
+  await expect(page.locator("#systems-in-motion")).toBeVisible();
+  // The hash is the section, not a `#signal-` node, so `parseSignalHash` cannot
+  // (and must not) select a specific node from it (M2.4.3).
+  await expect(page).toHaveURL(/#systems-in-motion$/);
 });

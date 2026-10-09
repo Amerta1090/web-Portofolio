@@ -10,17 +10,26 @@ import { useRafGuard } from "../lib/useRafGuard";
 import type { Project } from "../types/projects";
 import TiltCard from "./TiltCard";
 
+/** A project plus the detail URL the server already resolved for it. */
+interface ProjectCardItem extends Project {
+  href: string;
+}
+
 interface Props {
-  projects: Project[];
+  projects: ProjectCardItem[];
+  /**
+   * Skill → Capability Map link, built on the server by `buildSkillHrefs` so the
+   * data layer never enters this island's bundle. The server resolves every
+   * skill: a skill a declared capability describes points at that node
+   * (`#signal-<nodeId>`), and one the map cannot place points at the section
+   * anchor — so the chip is always a real link and never deep-links to a node
+   * that does not exist (M2.4.3).
+   */
+  skillHrefs?: Record<string, string>;
 }
 
 /** `?f=` token = the category slug (same slug `buildIndex.ts` indexes). */
 type ProjectFilter = "all" | ProjectCategory;
-
-/** Same slug rule as `/projects/[slug]` and the observatory index (one output). */
-function slugify(title: string): string {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-}
 
 /**
  * Evidence-first project card: every line rendered here comes from a field in
@@ -38,7 +47,7 @@ function slugify(title: string): string {
  * (M2.2.3): it holds labels, not URLs, and its referenced assets are absent, so
  * showing a count would assert evidence that cannot be opened.
  */
-export default function ProjectCardGrid({ projects }: Props) {
+export default function ProjectCardGrid({ projects, skillHrefs = {} }: Props) {
   const gridRef = useRef<HTMLDivElement>(null);
   // One guard for the grid: pauses the cursor spotlight when the grid is
   // off-screen, the tab is hidden, or reduced motion is requested.
@@ -185,7 +194,6 @@ export default function ProjectCardGrid({ projects }: Props) {
       )}
       <div className="cq-grid-item grid gap-5">
         {visible.map((project) => {
-          const href = `/projects/${slugify(project.title)}`;
           const links = (project.links ?? []).filter((link) => link.url);
 
           return (
@@ -219,7 +227,7 @@ export default function ProjectCardGrid({ projects }: Props) {
 
                   <h3 className="mb-2 text-lg font-semibold leading-tight text-text-primary">
                     <a
-                      href={href}
+                      href={project.href}
                       className="transition-colors after:absolute after:inset-0 group-hover:text-brand"
                     >
                       {project.title}
@@ -240,17 +248,18 @@ export default function ProjectCardGrid({ projects }: Props) {
                     <p className="mb-1 text-xs text-text-secondary/50">{project.period}</p>
                   )}
 
-                  <div className="mt-auto space-y-3 pt-3">
+                  <div className="relative z-10 mt-auto space-y-3 pt-3">
                     <div className="flex flex-wrap gap-1.5">
                       {project.skills.length > 0 ? (
                         <>
                           {project.skills.slice(0, 4).map((skill) => (
-                            <span
+                            <a
                               key={skill}
+                              href={skillHrefs[skill]}
                               className="text-[10px] px-1.5 py-0.5 border border-border text-text-secondary rounded"
                             >
                               {skill.length > 18 ? `${skill.slice(0, 18)}…` : skill}
-                            </span>
+                            </a>
                           ))}
                           {project.skills.length > 4 && (
                             <span className="text-[10px] px-1.5 py-0.5 border border-border text-text-secondary rounded">
@@ -266,7 +275,7 @@ export default function ProjectCardGrid({ projects }: Props) {
                     </div>
 
                     {links.length > 0 && (
-                      <div className="relative z-10 flex flex-wrap gap-3">
+                      <div className="flex flex-wrap gap-3">
                         {links.map((link) => (
                           <a
                             key={`${link.label}-${link.url}`}

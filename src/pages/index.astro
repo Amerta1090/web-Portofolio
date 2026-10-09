@@ -14,7 +14,7 @@ import SkillsExplorer from "../islands/SkillsExplorer";
 import TimeAwareHero from "../islands/TimeAwareHero";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { buildCareerEvents } from "../lib/creative/career-spine";
-import { buildSignalLoomGraph } from "../lib/creative/signal-loom";
+import { buildSignalLoomGraph, buildSkillHrefs, projectHref } from "../lib/creative/signal-loom";
 import {
   getCertifications,
   getFeaturedProjects,
@@ -30,6 +30,14 @@ const profile = getProfile();
 const featuredProjects = getFeaturedProjects();
 const skills = getSkills();
 const signalLoom = buildSignalLoomGraph(getProjects(), skills);
+// M2.4: project-card skill chips link to the Capability Map node that declares
+// the skill (or to the section itself when the map cannot place it). The map is
+// built here, on the server, so it never ships to the client (a value imported
+// into the island would drag the whole data layer with it).
+const skillHrefs = buildSkillHrefs(featuredProjects, skills.categories);
+// The project detail URL is resolved here too, so the card island never carries
+// the slug rule (same reason as `skillHrefs`).
+const cardProjects = featuredProjects.map((project) => ({ ...project, href: projectHref(project) }));
 const career = buildCareerEvents();
 const certifications = getCertifications();
 const gitHubData = await fetchAllGitHubData();
@@ -88,7 +96,7 @@ const sectionIds = [
   </Section>
 
   <Section data-reveal id="projects" title="Featured Projects" subtitle="Selected work that demonstrates my range" ariaLabel="Featured projects">
-    <ProjectCardGrid client:load projects={featuredProjects} />
+    <ProjectCardGrid client:load projects={cardProjects} skillHrefs={skillHrefs} />
     <div class="mt-10 flex justify-center">
       <a
         href="/projects"

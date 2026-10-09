@@ -39,7 +39,12 @@ function projectId(project: Project): string {
   return `project-${slugify(project.title)}`;
 }
 
-function projectHref(project: Project): string {
+/**
+ * The project detail URL. Exported so the homepage can hand the card island a
+ * ready-made href instead of shipping the slug rule into the client bundle
+ * (Task 2.4 payload trim), exactly like `buildSkillHrefs` does for skills.
+ */
+export function projectHref(project: Project): string {
   return `/projects/${slugify(project.title)}`;
 }
 
@@ -184,4 +189,57 @@ export function connectedNodeIds(graph: SignalLoomGraph, nodeId: string): Set<st
   }
 
   return connected;
+}
+
+/**
+ * Resolve a free-form project skill to the capability node that declares it.
+ *
+ * This is the bridge between the project-card chips (Task 2.4) and the Signal
+ * Loom graph (Task 3.1): both read the same `normalizeSkill`/`skillMatches`
+ * pair, so a chip can never point at a capability the graph does not draw
+ * (M3.1.3 — one normaliser, two consumers).
+ *
+ * Returns `null` when no declared capability describes the skill, so the caller
+ * can fall back to the section anchor without inventing a node id that would
+ * deep-link to nothing (M2.4.3). The first matching category in source order
+ * wins, keeping the result deterministic.
+ */
+export function capabilityNodeIdForSkill(
+  skill: string,
+  categories: SkillCategory[],
+): string | null {
+  const category = categories.find((item) =>
+    item.skills.some((categorySkill) => skillMatches(skill, categorySkill.name)),
+  );
+  return category ? categoryId(category) : null;
+}
+
+/** Section anchor used when a skill has no capability node on the map (M2.4.3). */
+const CAPABILITY_SECTION_ANCHOR = "#systems-in-motion";
+
+/**
+ * Map every project skill to its Capability Map link.
+ *
+ * A skill a declared capability describes links to that node (`#signal-<nodeId>`);
+ * a skill the map cannot place links to the section itself, so the chip is still a
+ * real, honest link that lands on the map without pretending to know a node that
+ * does not exist (M2.4.3). Every skill is resolved here, on the server, so the
+ * fallback never ships in the island bundle — a value imported into
+ * `ProjectCardGrid` would drag the whole data layer with it. Duplicate skills
+ * across projects resolve once (the first project's mapping wins), which is the
+ * same result every time because both loops are in data order.
+ */
+export function buildSkillHrefs(
+  projects: Project[],
+  categories: SkillCategory[],
+): Record<string, string> {
+  const hrefs: Record<string, string> = {};
+  for (const project of projects) {
+    for (const skill of project.skills) {
+      if (hrefs[skill]) continue;
+      const nodeId = capabilityNodeIdForSkill(skill, categories);
+      hrefs[skill] = nodeId ? `#signal-${nodeId}` : CAPABILITY_SECTION_ANCHOR;
+    }
+  }
+  return hrefs;
 }

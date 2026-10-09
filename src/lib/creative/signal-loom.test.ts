@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vitest";
 import type { Project } from "../../types/projects";
 import type { SkillsData } from "../../types/skills";
-import { buildSignalLoomGraph, connectedNodeIds, mostConnectedNodeId } from "./signal-loom";
+import {
+  buildSignalLoomGraph,
+  buildSkillHrefs,
+  capabilityNodeIdForSkill,
+  connectedNodeIds,
+  mostConnectedNodeId,
+  projectHref,
+} from "./signal-loom";
 
 const skills: SkillsData = {
   categories: [
@@ -172,5 +179,71 @@ describe("mostConnectedNodeId", () => {
     ];
 
     expect(mostConnectedNodeId(nodes, [])).toBeNull();
+  });
+});
+
+/**
+ * M2.4 — the skill chip → Capability Map bridge. This is the single normaliser
+ * (M3.1.3): the project-card chip and the Sprint 3 graph both resolve skills
+ * through `capabilityNodeIdForSkill`, so a chip can never point at a capability
+ * the graph does not draw.
+ */
+describe("Task 2.4 — skill → Capability Map bridge", () => {
+  const sample: Project = {
+    title: "Forecasting System",
+    category: "ml",
+    period: "2026",
+    description: "Forecasts demand.",
+    links: [],
+    skills: ["Machine Learning", "IndexedDB"],
+  };
+
+  it("derives the project detail href from the title with a stable slug", () => {
+    // M2.4.2: the id is derived from the content, not a list index, so the same
+    // title always yields the same route and the value is reproducible.
+    expect(projectHref(sample)).toBe("/projects/forecasting-system");
+    expect(projectHref(sample)).toBe(projectHref({ ...sample }));
+  });
+
+  it("resolves a skill to the capability node that declares it", () => {
+    expect(capabilityNodeIdForSkill("Machine Learning", skills.categories)).toBe(
+      "capability-machine-learning-ai",
+    );
+    expect(capabilityNodeIdForSkill("React.js", skills.categories)).toBe(
+      "capability-web-development",
+    );
+  });
+
+  it("returns null for a skill no capability declares (never invents a node id)", () => {
+    expect(capabilityNodeIdForSkill("IndexedDB", skills.categories)).toBeNull();
+  });
+
+  it("maps every project skill to a node link or the honest section fallback", () => {
+    const hrefs = buildSkillHrefs(projects, skills.categories);
+    expect(hrefs["Machine Learning"]).toBe("#signal-capability-machine-learning-ai");
+    expect(hrefs["React.js"]).toBe("#signal-capability-web-development");
+    // Every skill of every supplied project is covered, so a chip always has an
+    // href and the island never has to guess.
+    for (const project of projects) {
+      for (const skill of project.skills) expect(hrefs[skill]).toBeTruthy();
+    }
+  });
+
+  it("falls back to the section anchor for a skill the map cannot place (M2.4.3)", () => {
+    const hrefs = buildSkillHrefs([sample], skills.categories);
+    expect(hrefs["Machine Learning"]).toBe("#signal-capability-machine-learning-ai");
+    expect(hrefs.IndexedDB).toBe("#systems-in-motion");
+  });
+
+  it("keeps node ids stable when categories are reordered (M2.4.2)", () => {
+    // The id is derived from the capability's name, not its position, so
+    // reordering the source array cannot move a skill's anchor.
+    const reversed: SkillsData = { categories: [...skills.categories].reverse() };
+    expect(capabilityNodeIdForSkill("Machine Learning", reversed.categories)).toBe(
+      "capability-machine-learning-ai",
+    );
+    expect(capabilityNodeIdForSkill("React.js", reversed.categories)).toBe(
+      "capability-web-development",
+    );
   });
 });

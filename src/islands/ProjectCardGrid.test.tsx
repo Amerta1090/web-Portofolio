@@ -10,9 +10,15 @@ import ProjectCardGrid from "./ProjectCardGrid";
  * a field in `data/projects.json`, a field with no data must render an honest
  * fallback (never a broken/empty control), and the pre-hydration HTML must be
  * fully usable on its own (real anchors, no dead controls).
+ *
+ * Task 2.4: the detail URL is resolved on the server (`projectHref`) and handed
+ * to the island, so the fixtures carry the `href` the page would pass.
  */
-const FULL: Project = {
+type CardProject = Project & { href: string };
+
+const FULL: CardProject = {
   title: "IJO PLIS — IHSG & USD/IDR Forecasting Platform",
+  href: "/projects/ijo-plis-ihsg-usd-idr-forecasting-platform",
   period: "May 2026 – Jun 2026",
   description: "Forecasting platform built on Prophet.",
   links: [
@@ -27,8 +33,9 @@ const FULL: Project = {
   image: "/images/projects/ijo-plis.png",
 };
 
-const MINIMAL: Project = {
+const MINIMAL: CardProject = {
   title: "Bare Project",
+  href: "/projects/bare-project",
   period: "",
   description: "Has neither skills nor links.",
   links: [],
@@ -36,8 +43,9 @@ const MINIMAL: Project = {
 };
 
 /** The homepage grid is 2 ml + 2 web — these fixtures mirror that shape. */
-const ML_SECOND: Project = {
+const ML_SECOND: CardProject = {
   title: "Sentiment Model Retrainer",
+  href: "/projects/sentiment-model-retrainer",
   period: "2025",
   description: "Second ml card so the filter has more than one survivor.",
   links: [],
@@ -45,8 +53,9 @@ const ML_SECOND: Project = {
   category: "ml",
 };
 
-const WEB_FIRST: Project = {
+const WEB_FIRST: CardProject = {
   title: "Nyatet Notes",
+  href: "/projects/nyatet-notes",
   period: "2025",
   description: "First web card.",
   links: [],
@@ -54,8 +63,9 @@ const WEB_FIRST: Project = {
   category: "web",
 };
 
-const WEB_SECOND: Project = {
+const WEB_SECOND: CardProject = {
   title: "Retro Portfolio",
+  href: "/projects/retro-portfolio",
   period: "2024",
   description: "Second web card.",
   links: [],
@@ -63,15 +73,17 @@ const WEB_SECOND: Project = {
   category: "web",
 };
 
-const GRID: Project[] = [FULL, ML_SECOND, WEB_FIRST, WEB_SECOND];
+const GRID: CardProject[] = [FULL, ML_SECOND, WEB_FIRST, WEB_SECOND];
 
 afterEach(cleanup);
 
 describe("ProjectCardGrid", () => {
-  it("renders the title as a link to the project's slug", () => {
+  it("renders the title as a link to the server-resolved project href", () => {
     render(<ProjectCardGrid projects={[FULL]} />);
     const link = screen.getByRole("link", { name: FULL.title });
-    expect(link).toHaveAttribute("href", "/projects/ijo-plis-ihsg-usd-idr-forecasting-platform");
+    // The href is `projectHref(project)` resolved on the server (Task 2.4), so
+    // the island never carries the slug rule into the client bundle.
+    expect(link).toHaveAttribute("href", FULL.href);
   });
 
   it("renders category, period and description straight from the data", () => {
@@ -141,7 +153,7 @@ describe("ProjectCardGrid", () => {
   it("ships usable HTML before hydration (no dead controls)", () => {
     const markup = renderToStaticMarkup(<ProjectCardGrid projects={[FULL, MINIMAL]} />);
     // Real navigation is already present pre-hydration…
-    expect(markup).toContain('href="/projects/ijo-plis-ihsg-usd-idr-forecasting-platform"');
+    expect(markup).toContain(`href="${FULL.href}"`);
     expect(markup).toContain('href="https://example.com/demo"');
     expect(markup).toContain('rel="noopener noreferrer"');
     // …and there is no inert control or inline handler anywhere.
@@ -280,5 +292,63 @@ describe("ProjectCardGrid — category filter (M2.3)", () => {
 
     await user.click(screen.getByRole("button", { name: /^All/ }));
     expect(window.location.search).toBe("");
+  });
+});
+
+/**
+ * M2.4 — the skill chip is a cross-link into the Capability Map. The island is a
+ * dumb renderer: the server (`buildSkillHrefs`) resolves *every* skill, so the
+ * fallback string and the data layer never ship in this bundle.
+ */
+describe("ProjectCardGrid — skill → Capability Map cross-link (M2.4)", () => {
+  const SKILL_HREFS: Record<string, string> = {
+    Python: "#signal-capability-programming-languages",
+    // `Prophet` is placed by no declared capability → honest section fallback.
+    Prophet: "#systems-in-motion",
+    Django: "#signal-capability-web-development",
+    Docker: "#signal-capability-devops-mlops",
+  };
+
+  it("turns each skill chip into a link to its resolved node (M2.4.1)", () => {
+    render(<ProjectCardGrid projects={[FULL]} skillHrefs={SKILL_HREFS} />);
+    expect(screen.getByRole("link", { name: "Python" })).toHaveAttribute(
+      "href",
+      "#signal-capability-programming-languages",
+    );
+    expect(screen.getByRole("link", { name: "Django" })).toHaveAttribute(
+      "href",
+      "#signal-capability-web-development",
+    );
+  });
+
+  it("keeps the honest section fallback for a skill the map cannot place (M2.4.3)", () => {
+    render(<ProjectCardGrid projects={[FULL]} skillHrefs={SKILL_HREFS} />);
+    // Still a real link — it lands on the section, not on an invented node.
+    expect(screen.getByRole("link", { name: "Prophet" })).toHaveAttribute(
+      "href",
+      "#systems-in-motion",
+    );
+  });
+
+  it("ships the chip links in the pre-hydration HTML (no dead controls)", () => {
+    const markup = renderToStaticMarkup(
+      <ProjectCardGrid projects={[FULL]} skillHrefs={SKILL_HREFS} />,
+    );
+    expect(markup).toContain('href="#signal-capability-programming-languages"');
+    expect(markup).toContain('href="#systems-in-motion"');
+    expect(markup).not.toContain("<button");
+  });
+
+  it("never fabricates an href for a skill the map does not carry", () => {
+    // Defensive: the server always resolves every skill, so this cannot happen
+    // from the page — but the island must not invent a link on its own.
+    render(
+      <ProjectCardGrid
+        projects={[FULL]}
+        skillHrefs={{ Python: "#signal-capability-programming-languages" }}
+      />,
+    );
+    expect(screen.queryByRole("link", { name: "Prophet" })).toBeNull();
+    expect(screen.getByText("Prophet")).toBeInTheDocument();
   });
 });

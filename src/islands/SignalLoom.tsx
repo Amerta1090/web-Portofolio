@@ -300,10 +300,16 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
     // it describes — the fallback then navigates somewhere true instead of
     // swallowing a click. This mirrors the reactor stepper: the enhancement owns
     // the controls, the server render owns the content.
-    if (!hydrated) {
-      return (
-        <li key={node.id}>
-          {node.href ? (
+    //
+    // The list item is rendered once — its `id="signal-<nodeId>"` is the anchor
+    // a project-card skill chip points at (Task 2.4), and it must exist
+    // whichever branch below renders. The global
+    // `html { scroll-padding-top: 5rem }` clears the fixed header; the
+    // mount-time hash read then selects the node.
+    return (
+      <li key={node.id} id={`signal-${node.id}`}>
+        {!hydrated ? (
+          node.href ? (
             <a
               href={node.href}
               data-signal-node={node.id}
@@ -329,36 +335,32 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
             >
               {content}
             </div>
-          )}
-        </li>
-      );
-    }
-
-    return (
-      <li key={node.id}>
-        <button
-          ref={captureButton(node.id)}
-          type="button"
-          data-signal-node={node.id}
-          data-node-kind={node.kind}
-          data-connected={isConnected ? "true" : undefined}
-          // The name stays short: the project summaries run to 30+ words, and a
-          // roving arrow keypress already re-announces the node. The summary is
-          // still in the subtree for browsing, and the live region below announces
-          // it once per selection.
-          aria-label={`${kindLabel}: ${node.label}`}
-          aria-pressed={isSelected}
-          aria-current={isSelected ? "true" : undefined}
-          tabIndex={isSelected ? 0 : -1}
-          onClick={() => handleSelect(node.id)}
-          onPointerEnter={() => setHoverId(node.id)}
-          onPointerLeave={() => setHoverId(null)}
-          onFocus={() => setHoverId(node.id)}
-          onBlur={() => setHoverId(null)}
-          className={cardClass}
-        >
-          {content}
-        </button>
+          )
+        ) : (
+          <button
+            ref={captureButton(node.id)}
+            type="button"
+            data-signal-node={node.id}
+            data-node-kind={node.kind}
+            data-connected={isConnected ? "true" : undefined}
+            // The name stays short: the project summaries run to 30+ words, and a
+            // roving arrow keypress already re-announces the node. The summary is
+            // still in the subtree for browsing, and the live region below announces
+            // it once per selection.
+            aria-label={`${kindLabel}: ${node.label}`}
+            aria-pressed={isSelected}
+            aria-current={isSelected ? "true" : undefined}
+            tabIndex={isSelected ? 0 : -1}
+            onClick={() => handleSelect(node.id)}
+            onPointerEnter={() => setHoverId(node.id)}
+            onPointerLeave={() => setHoverId(null)}
+            onFocus={() => setHoverId(node.id)}
+            onBlur={() => setHoverId(null)}
+            className={cardClass}
+          >
+            {content}
+          </button>
+        )}
       </li>
     );
   };
