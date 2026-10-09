@@ -868,13 +868,37 @@ M1 membuktikan perbaikan ini **bertemu masalah nyata**, bukan sekadar membiarkan
   - Konteks ekonomi: chunk `ProjectCardGrid` final = 7.249 raw / **2.915 gz** (HEAD tanpa fitur 4.701/1.989 → fitur berbiaya +926 gz); sum reachable didominasi `useDocumentVisible` 241.514 gz (42%), gsap 45.221, react 41.024 — pemangkasan di file fitur tak bisa menggerakkan angka besar itu.
 - **Gerbang final Task 2.3 (2026-10-08)**: unit **1070/1070** (94 file, +9 vs gate 2.2 = test filter M2.3.5) · `astro check` **101 = baseline, 0 baru** · lint **A/B worktree per-file: nol tracked file berubah jumlah diagnostiknya** (head 608 vs current 703 = +95 murni 25 file env gitignored `.opencode/` + `test-results/`; 4 file tersentuh **0 diagnostik**, `biome check` per-file bersih) · `validate-data` OK (GitHub cache non-degenerate) · `build:fast` **49 halaman** (log `/tmp/opencode/build-*.log`) · payload di DEVIASI 4 · **runtime** (`measure:runtime /tmp/opencode/runtime-t23.json`): afterScroll `scroll` **16 = baseline 16**, `rectReads` **28 = 28**, `hydratedIslands` **11 = 11**, dynamic roots **0** — dan bukti struktural: `grep` file fitur = **0 `requestAnimationFrame` / 0 `addEventListener` / 0 observer / 0 timer** (FLIP jalan via WAAPI `el.animate`, bukan loop) · **mutasi di source final: 3/3 merah pada asersi yang dimaksud** (M1 buang gate `hydrated &&` → 2 test: "no dead controls" + "no filter chrome"; M2 `?f=` diabaikan → "reads ?f= from the URL"; M3 `aria-pressed` selalu `true` → "keeps aria-pressed in sync"), tiap dipulihkan `md5sum 5e209deb…` identik · probe overflow **320–2560 = 0** (7 viewport × `/` + `/projects`, termasuk chrome pasca-hidrasi) · e2e penuh `--workers=1`: lihat §7.
 
-### Task 2.4 — Cross-link (M6a): skill chip → Capability Map
+### Task 2.4 — Cross-link (M6a): skill chip → Capability Map ✅ COMPLETE (2026-10-09, commit `7353477`)
 
-- [ ] **M2.4.1** Skill chip di kartu proyek = `<a href="/#systems-in-motion#signal-<id>">` (pola deep link yang sudah ada di Signal Loom: `parseSignalHash` + fallback).
-- [ ] **M2.4.2** Pastikan ID node Capability Map **stabil** & diturunkan dari data (bukan indeks) — Sprint 3 bergantung pada ini.
-- [ ] **M2.4.3** Kalau node belum ada (skill tanpa proyek) → chip tetap link tapi ke `#systems-in-motion` tanpa seleksi, **dan** ada fallback yang jujur.
+**Spec**: PRD §10 #M6a — skill chip di kartu proyek jadi cross-link ke node Capability Map.
 
-**Verify**: e2e klik chip → Capability Map ter-scroll → node terpilih (akan diuji penuh di Sprint 3).
+**Pendekatan**:
+- **Server-side href resolution**: `buildSkillHrefs(projects, categories)` di `signal-loom.ts` resolve setiap skill → `#signal-<nodeId>` atau fallback `#systems-in-motion`; island hanya render `<a href={skillHrefs[skill]}>` tanpa logic.
+- **Anchor ID on node wrapper**: `<li id={`signal-${node.id}`}>` di `SignalLoom.tsx` (SSR + hydrated); browser native scroll.
+- **Node ID stability**: `categoryId(category)` dari nama capability (bukan indeks); reorder-safe, Sprint 3 depends.
+
+**Mikrotask**:
+- [x] **M2.4.1** — href = `#signal-<nodeId>` (DEVIASI: single hash bukan double; anchor ID on `<li>` node wrapper SSR stabil)
+- [x] **M2.4.2** — ID node diturunkan dari data via `categoryId(category)` (verified unit reorder test; Sprint 3 determinism)
+- [x] **M2.4.3** — skill tanpa proyek → chip link ke `#systems-in-motion` (fallback section-only; jujur tanpa kontrol mati)
+
+**Implementation**:
+- `src/lib/creative/signal-loom.ts`: exported `capabilityNodeIdForSkill(skill, categories)` + `buildSkillHrefs(projects, categories)` + `projectHref(project)` (server-side, 0 client import)
+- `src/pages/index.astro`: compute `skillHrefs = buildSkillHrefs(cardProjects, categories)` + pass to island
+- `src/islands/ProjectCardGrid.tsx`: skill chip = `<a href={skillHrefs[skill]}>` (dumb renderer; +4 unit test)
+- `src/islands/SignalLoom.tsx`: single `<li id={`signal-${node.id}`}>` wrapper (SSR + hydrated); +test anchor ID presence
+
+**Payload**: reachable `/` = **577,867 B = 564.3 KB ≤ 577,894.4 B** (margin **27 B**, vs Task 2.3 margin 1.4 B — trim `projectHref` server-side moved cost to initial).
+
+**Verify**: 
+- unit **1080/1080** (94 file, +10)
+- `astro check` **101** (0 new)
+- `lint` **668** (per-file biome clean)
+- `validate-data` OK
+- `build:fast` **49 pages**
+- e2e `project-cards.spec.ts` **12/12** (4 new M2.4 cross-link tests green)
+- e2e full `--workers=1` **293/293** (0 fail)
+- grep `skillHrefs|capabilityNodeIdForSkill|projectHref` dist = **0** (server-side + tree-shake)
 
 ### Task 2.5 — Creative Lab: 4 → 27, statis
 
