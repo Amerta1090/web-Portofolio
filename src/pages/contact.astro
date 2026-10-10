@@ -1,12 +1,13 @@
 ---
 import Container from "../components/atoms/Container.astro";
-import Section from "../components/molecules/Section.astro";
-import BaseLayout from "../layouts/BaseLayout.astro";
-import ContactForm from "../islands/ContactForm";
-import { getProfile } from "../lib/data";
-import IconMail from "../components/atoms/IconMail.astro";
-import IconLinkedIn from "../components/atoms/IconLinkedIn.astro";
 import IconGitHub from "../components/atoms/IconGitHub.astro";
+import IconLinkedIn from "../components/atoms/IconLinkedIn.astro";
+import IconMail from "../components/atoms/IconMail.astro";
+import IconPhone from "../components/atoms/IconPhone.astro";
+import Section from "../components/molecules/Section.astro";
+import ContactForm from "../islands/ContactForm";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getProfile } from "../lib/data";
 
 const profile = getProfile();
 const { contact } = profile;
@@ -29,6 +30,18 @@ const { contact } = profile;
               <div>
                 <p class="text-sm font-medium text-text-primary group-hover:text-brand transition-colors">Email</p>
                 <p class="text-sm text-text-secondary">{contact.email}</p>
+              </div>
+            </a>
+            <a
+              href={`tel:${contact.phone}`}
+              class="flex items-center gap-3 p-3 bg-bg-secondary border border-border rounded-xl hover:border-brand/30 transition-all duration-200 group"
+            >
+              <div class="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
+                <IconPhone size={20} class="text-brand" />
+              </div>
+              <div>
+                <p class="text-sm font-medium text-text-primary group-hover:text-brand transition-colors">Phone</p>
+                <p class="text-sm text-text-secondary">{contact.phone}</p>
               </div>
             </a>
             <a

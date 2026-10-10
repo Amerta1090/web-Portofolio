@@ -1,6 +1,17 @@
+import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import { waitForIslandHydration } from "./hydration";
+
+/**
+ * Phone is a data-layer value (`data/profile.json`), not a literal in the spec.
+ * Bun ESM rejects `import profile from "../data/profile.json"` (JSON without an
+ * import attribute), so read it directly — same pattern as
+ * `e2e/certifications.spec.ts`. A count/number pinned here must match the dataset.
+ */
+const profile = JSON.parse(
+  readFileSync(new URL("../data/profile.json", import.meta.url), "utf8"),
+) as { contact: { email: string; phone: string } };
 
 /**
  * The contact form is a `client:load` island. Waiting for hydration is what stops
@@ -80,5 +91,38 @@ test.describe("Contact form (21st Δ2 — form primitives retheme)", () => {
     await search.fill("Python");
     // Hasil filter — setidaknya 1 kartu kategori dengan skill Python muncul
     await expect(page.getByText("Python", { exact: true }).first()).toBeVisible();
+  });
+});
+
+test.describe("Contact channels (Task 2.7 — phone)", () => {
+  test("Phone tampil sebagai tautan tel: dengan nama aksesibel Kind: nilai", async ({ page }) => {
+    await page.goto("/contact");
+
+    const phone = page.getByRole("link", { name: `Phone ${profile.contact.phone}`, exact: true });
+    await expect(phone).toBeVisible();
+    await expect(phone).toHaveAttribute("href", `tel:${profile.contact.phone}`);
+  });
+
+  test("mailto tetap kanal utama (Email sebelum Phone) di /contact", async ({ page }) => {
+    await page.goto("/contact");
+
+    await expect(
+      page.getByRole("link", { name: `Email ${profile.contact.email}`, exact: true }),
+    ).toBeVisible();
+
+    // Urutan DOM = urutan baca: mailto harus mendahului tel:
+    const order = await page
+      .locator('a[href^="mailto:"], a[href^="tel:"]')
+      .evaluateAll((els) => els.map((el) => el.getAttribute("href")?.split(":")[0]));
+
+    expect(order).toEqual(["mailto", "tel"]);
+  });
+
+  test("homepage juga menampilkan Phone sebagai tautan tel:", async ({ page }) => {
+    await page.goto("/");
+
+    const phone = page.getByRole("link", { name: `Phone ${profile.contact.phone}`, exact: true });
+    await expect(phone).toBeVisible();
+    await expect(phone).toHaveAttribute("href", `tel:${profile.contact.phone}`);
   });
 });

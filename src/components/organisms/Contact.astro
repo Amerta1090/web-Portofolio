@@ -1,9 +1,10 @@
 ---
-import type { Profile } from "../../types/profile";
 import ContactForm from "../../islands/ContactForm";
+import type { Profile } from "../../types/profile";
 import IconGitHub from "../atoms/IconGitHub.astro";
 import IconLinkedIn from "../atoms/IconLinkedIn.astro";
 import IconMail from "../atoms/IconMail.astro";
+import IconPhone from "../atoms/IconPhone.astro";
 
 export interface Props {
   profile: Profile;
@@ -31,6 +32,18 @@ const { contact } = profile;
           <div>
             <p class="text-sm font-medium text-text-primary group-hover:text-brand transition-colors">Email</p>
             <p class="text-sm text-text-secondary">{contact.email}</p>
+          </div>
+        </a>
+        <a
+          href={`tel:${contact.phone}`}
+          class="flex items-center gap-3 p-3 bg-bg-secondary border border-border rounded-xl hover:border-brand/30 transition-all duration-200 group"
+        >
+          <div class="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
+            <IconPhone size={20} class="text-brand" />
+          </div>
+          <div>
+            <p class="text-sm font-medium text-text-primary group-hover:text-brand transition-colors">Phone</p>
+            <p class="text-sm text-text-secondary">{contact.phone}</p>
           </div>
         </a>
         <a
