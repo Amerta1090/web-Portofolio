@@ -37,7 +37,10 @@ const signalLoom = buildSignalLoomGraph(getProjects(), skills);
 const skillHrefs = buildSkillHrefs(featuredProjects, skills.categories);
 // The project detail URL is resolved here too, so the card island never carries
 // the slug rule (same reason as `skillHrefs`).
-const cardProjects = featuredProjects.map((project) => ({ ...project, href: projectHref(project) }));
+const cardProjects = featuredProjects.map((project) => ({
+  ...project,
+  href: projectHref(project),
+}));
 const career = buildCareerEvents();
 const certifications = getCertifications();
 const gitHubData = await fetchAllGitHubData();
@@ -135,7 +138,11 @@ const sectionIds = [
   {
     certifications.length > 0 && (
       <Section data-reveal id="certifications" title="Certifications" ariaLabel="Certifications">
-        <Certifications certifications={certifications} />
+        <Certifications
+          certifications={certifications}
+          issuers={facts.certifications.byIssuer}
+          total={facts.certifications.count}
+        />
       </Section>
     )
   }

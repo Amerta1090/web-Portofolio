@@ -1,95 +1,208 @@
 ---
-import { ArrowRight, ChevronDown } from "lucide-react";
+/**
+ * Certifications bento (Prove It, Task 2.6).
+ *
+ * The homepage used to print all 62 certifications as one flat wall (PRD I5):
+ * the grouped figure "62 across 7 providers" was lost in the noise. This groups
+ * them into a **bento** — one tile per issuer, sized by its own count, so the
+ * dominant providers (Dicoding 23, DeepLearning.AI 19) lead visually *because
+ * of the number*, not because a class was hand-picked for them.
+ *
+ * Every figure comes from `SiteFacts.certifications` (`count` + `byIssuer`),
+ * never a literal here (Rule 7 / P8): the header total, the provider count and
+ * the per-tile counts are the same numbers the rest of the site cites.
+ *
+ * M2.6.3 — no duplication with the Career Spine. The spine already shows the
+ * newest `TIMELINE_CERTIFICATION_LIMIT` dated certifications in full. Listing
+ * them again here would print the same records twice on one page, so each tile
+ * lists only the certifications the spine does **not** carry and links back to
+ * `#career` for the rest. `certifications.spec.ts` proves the two sets are
+ * disjoint and together account for every record.
+ *
+ * Zero JS: `<details>`/`<summary>` are native, there is no island, no `<script>`
+ * and no inline handler (Astro does not escape `on*`, so the spec counts those
+ * too — M1.2 mutation M5).
+ */
+import { ChevronDown } from "lucide-react";
+import { selectSpineCertifications } from "../../lib/creative/career-spine";
+import type { IssuerGroup } from "../../lib/facts";
 import type { Certification } from "../../types/certifications";
 
-export interface Props {
+interface Props {
   certifications: Certification[];
+  /** `facts.certifications.byIssuer` — biggest first, so tile order is data-ordered. */
+  issuers: IssuerGroup[];
+  /** `facts.certifications.count`. */
+  total: number;
 }
 
-const { certifications } = Astro.props;
+const { certifications, issuers, total } = Astro.props;
 
-function formatDate(date: string | null): string {
-  if (!date) return "";
-  const [year, month] = date.split("-");
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-  return month ? `${months[Number.parseInt(month) - 1]} ${year}` : year;
+/**
+ * Titles the spine already prints, so the bento can leave them out. Title is a
+ * safe key here: `certifications.json` carries no duplicate titles (asserted in
+ * `certifications.spec.ts`). Derived from the same selector the spine uses, so
+ * the cap has one definition (`TIMELINE_CERTIFICATION_LIMIT`).
+ */
+const spineTitles = new Set(
+  selectSpineCertifications(certifications).selected.map((cert) => cert.title),
+);
+
+const byIssuer = new Map<string, Certification[]>();
+for (const cert of certifications) {
+  const issuer = cert.issuer?.trim() ?? "";
+  if (!issuer) continue;
+  const list = byIssuer.get(issuer);
+  if (list) list.push(cert);
+  else byIssuer.set(issuer, [cert]);
 }
 
-const grouped = certifications.reduce((acc: Record<string, Certification[]>, cert) => {
-  const issuer = cert.issuer || "Other";
-  if (!acc[issuer]) acc[issuer] = [];
-  acc[issuer].push(cert);
-  return acc;
-}, {});
+/**
+ * Visual weight follows the count: a tile is dominant when it holds at least
+ * half of the largest provider's share. Measured, not hardcoded — swap the data
+ * and a different provider becomes the lead.
+ */
+const largest = issuers[0]?.count ?? 0;
+const groups = issuers.map((group) => {
+  const all = byIssuer.get(group.issuer) ?? [];
+  const rest = all.filter((cert) => !spineTitles.has(cert.title));
+  return {
+    issuer: group.issuer,
+    count: group.count,
+    rest,
+    inSpine: all.length - rest.length,
+    dominant: largest > 0 && group.count >= largest / 2,
+  };
+});
+
+function year(date: string | null): string {
+  return date ? date.slice(0, 4) : "";
+}
 ---
 
-<div class="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
-  <div class="mb-6">
-    <span class="text-xs text-text-secondary border border-border px-2 py-1 rounded">
-      {certifications.length} Certifications
-    </span>
-  </div>
-  <div class="space-y-3">
+<div class="space-y-6">
+  <p class="max-w-2xl text-sm text-text-secondary">
+    <span class="font-mono tabular-nums text-text-primary" data-cert-total>{total}</span>
+    {" "}certifications across{" "}
+    <span class="font-mono tabular-nums text-text-primary">{issuers.length}</span> providers.
+    The newest dated entries already live in the{" "}
+    <a href="#career" class="text-accent hover:underline">Career Spine</a>; each
+    group below lists the rest and links back to it.
+  </p>
+
+  <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
     {
-      Object.entries(grouped).map(([issuer, certs]) => (
-        <details class="group bg-bg-secondary/50 border border-border rounded-lg overflow-hidden">
-          <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-brand/5 transition-colors list-none rounded-lg">
-            <div class="flex items-center gap-3">
-              <h3 class="font-semibold text-text-primary text-sm">{issuer}</h3>
-              <span class="text-[10px] text-text-secondary/60 border border-border px-1.5 py-0.5 rounded">{certs.length}</span>
+      groups.map((group) => (
+        <details
+          data-cert-issuer
+          data-cert-count={group.count}
+          class:list={[
+            "group flex flex-col rounded-xl border border-border bg-bg-secondary/50 transition-colors open:border-accent/40",
+            group.dominant && "sm:col-span-2",
+          ]}
+        >
+          <summary class="flex cursor-pointer list-none flex-col gap-3 p-4 select-none [&::-webkit-details-marker]:hidden">
+            <div class="flex items-start justify-between gap-3">
+              <h3 class="text-sm leading-snug font-semibold text-text-primary">
+                {group.issuer}
+              </h3>
+              <ChevronDown
+                className="mt-0.5 h-4 w-4 shrink-0 text-text-secondary transition-transform group-open:rotate-180"
+                aria-hidden="true"
+              />
             </div>
-            <ChevronDown class="w-5 h-5 text-text-secondary group-open:rotate-180 transition-transform duration-200" aria-hidden="true" />
+            <p class="flex items-baseline gap-2">
+              <span
+                class:list={[
+                  "font-display leading-none tabular-nums",
+                  group.dominant ? "text-4xl text-brand" : "text-2xl text-text-primary",
+                ]}
+              >
+                {group.count}
+              </span>
+              <span class="text-[11px] tracking-wide text-text-secondary uppercase">
+                {group.count === 1 ? "certification" : "certifications"}
+              </span>
+            </p>
           </summary>
-          <div class="border-t border-border">
-            {certs.map((cert) => (
-              <div class="p-4 border-b border-border last:border-b-0 hover:bg-brand/5 transition-colors">
-                <div class="flex items-start justify-between gap-4">
-                  <div>
-                    <p class="text-text-primary text-sm">
-                      {cert.url
-                        ? <a href={cert.url} target="_blank" rel="noopener noreferrer" class="hover:text-brand transition-colors">{cert.title}<span class="sr-only"> (opens in new tab)</span></a>
-                        : cert.title
-                      }
-                    </p>
-                    {cert.date && (
-                      <p class="text-xs text-text-secondary/60 mt-0.5">{formatDate(cert.date)}</p>
-                    )}
-                  </div>
-                  {cert.credential_id && (
-                    <span class="text-[10px] text-text-secondary/30 flex-shrink-0">ID: {cert.credential_id}</span>
-                  )}
-                </div>
-                {cert.skills && cert.skills.length > 0 && (
-                  <div class="flex flex-wrap gap-1.5 mt-2">
-                    {cert.skills.map((skill) => (
-                      <span class="text-[9px] px-1.5 py-0.5 border border-border text-text-secondary rounded">{skill}</span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+          <div class="border-t border-border px-4 pb-4">
+            {group.rest.length > 0 ? (
+              <ul class="divide-y divide-border/60">
+                {group.rest.map((cert) => (
+                  <li class="py-2" data-cert-entry>
+                    <div class="flex items-start justify-between gap-3">
+                      {cert.url ? (
+                        <a
+                          href={cert.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          data-cert-title
+                          class="text-sm text-text-primary transition-colors hover:text-accent"
+                        >
+                          {cert.title}
+                          <span class="sr-only"> (opens in new tab)</span>
+                        </a>
+                      ) : (
+                        <span class="text-sm text-text-primary" data-cert-title>
+                          {cert.title}
+                        </span>
+                      )}
+                      {cert.date && (
+                        <time
+                          datetime={cert.date}
+                          class="shrink-0 pt-0.5 font-mono text-xs text-text-secondary"
+                        >
+                          {year(cert.date)}
+                        </time>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p class="pt-3 text-sm text-text-secondary">
+                All listed in the Career Spine.
+              </p>
+            )}
+            {group.inSpine > 0 && (
+              <p class={group.rest.length > 0 ? "pt-3" : "pt-2"}>
+                <a
+                  href="#career"
+                  data-cert-spine-ref
+                  class="text-xs text-accent hover:underline"
+                >
+                  {group.inSpine} in the Career Spine →
+                </a>
+              </p>
+            )}
           </div>
         </details>
       ))
     }
   </div>
-  <div class="mt-8 text-center">
-      <a href="/certifications" class="inline-flex items-center gap-2 text-sm text-brand hover:text-brand-muted transition-colors group">
-      View all {certifications.length} certifications
-      <ArrowRight class="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+
+  <div class="text-center">
+    <a
+      href="/certifications"
+      class="group/text inline-flex items-center gap-2 text-sm text-brand transition-colors hover:text-brand-muted"
+    >
+      View all {total} certifications
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="h-4 w-4 transition-transform group-hover/text:translate-x-1"
+        aria-hidden="true"
+      >
+        <path d="M5 12h14" />
+        <path d="m12 5 7 7-7 7" />
+      </svg>
     </a>
   </div>
 </div>

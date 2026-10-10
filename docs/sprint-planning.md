@@ -921,15 +921,17 @@ M1 membuktikan perbaikan ini **bertemu masalah nyata**, bukan sekadar membiarkan
 
 **Temuan verifikasi**: `gallery.astro:28` cross-check "27 interactive engines" (`GALLERY_EXPERIMENTS`) konsisten dengan 27 kartu home.
 
-### Task 2.6 — Sertifikasi: 7 penerbit (bento)
+### Task 2.6 — Sertifikasi: 7 penerbit (bento) ✅ COMPLETE (2026-10-10)
 
-- [ ] **M2.6.1** Dari `data/certifications.json` (62 item, 7 penerbit) → `SiteFacts.certifications.byIssuer`.
-- [ ] **M2.6.2** `<details>`/`<summary>` native per penerbit (**0 JS**), dengan count di `<summary>`.
-- [ ] **M2.6.3** 15 yang bertanggal **tak boleh diduplikasi** sebagai daftar penuh — rujuk ke spine (`#career`). Tampilkan sisanya sebagai daftar ringkas di dalam bento.
-- [ ] **M2.6.4** Kontras & hierarki bento: penerbit teratas (Dicoding 23, DeepLearning.AI 19) dominan secara visual **karena angkanya**, bukan karena hardcode.
-- [ ] **M2.6.5** Verified di 320/375/768.
+- [x] **M2.6.1** Dari `data/certifications.json` (62 item, 7 penerbit) → `SiteFacts.certifications.byIssuer`.
+- [x] **M2.6.2** `<details>`/`<summary>` native per penerbit (**0 JS**), dengan count di `<summary>`.
+- [x] **M2.6.3** 15 yang bertanggal **tak boleh diduplikasi** sebagai daftar penuh — rujuk ke spine (`#career`). Tampilkan sisanya sebagai daftar ringkas di dalam bento.
+- [x] **M2.6.4** Kontras & hierarki bento: penerbit teratas (Dicoding 23, DeepLearning.AI 19) dominan secara visual **karena angkanya**, bukan karena hardcode.
+- [x] **M2.6.5** Verified di 320/375/768.
 
 **Verify**: jumlah di `dist` = 62; 7 group; 0 JS.
+
+**Catatan eksekusi** (detail: `docs/archive/`? — tidak, detail ada di `AGENTS.md` §Task 2.6): bento = 0 JS (island/script/`on*` dihitung), angka semua dari `SiteFacts.certifications.{count,byIssuer}` (Rule 7), tile dominan = `count >= largest/2` terukur (bukan hardcode), spine tak diduplikasi (47 entry bento + 15 spine refs, disjoint & union = 62, dibuktikan spec). **DEVIASI — test e2e-only**: spes tak bisa import data layer (`src/lib/data.ts` static-import JSON tanpa import attribute → Bun ESM menolak); spec baca `data/certifications.json` via `readFileSync` + mirror `buildIssuerGroups`, komentar menunjuk `facts.ts:228`. Mutasi 3/3 merah (dominance / partition+refs / `onclick` inline). `.astro` target `src/components/organisms/Certifications.astro` punya **2 error ts(2322) pre-existing** (lucide `class`) — file ini ditulis ulang jadi keduanya ikut hilang → `astro check` 100 → 98 (−2, 0 baru).
 
 ### Task 2.7 — Contact: pakai `phone`
 
