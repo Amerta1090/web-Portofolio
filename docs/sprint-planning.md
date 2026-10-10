@@ -900,16 +900,26 @@ M1 membuktikan perbaikan ini **bertemu masalah nyata**, bukan sekadar membiarkan
 - e2e full `--workers=1` **293/293** (0 fail)
 - grep `skillHrefs|capabilityNodeIdForSkill|projectHref` dist = **0** (server-side + tree-shake)
 
-### Task 2.5 — Creative Lab: 4 → 27, statis
+### Task 2.5 — Creative Lab: 4 → 27, statis ✅ COMPLETE (2026-10-10, commit `prove: creative lab 4→27 statis`)
 
-- [ ] **M2.5.1** `GALLERY_EXPERIMENTS` (27, diekspor `GalleryGrid.tsx:413`) + `EXPERIMENT_CATEGORIES` (`:685`) — pakai **angka & kategori yang sama**, jangan hitung ulang.
-- [ ] **M2.5.2** Ganti `src/lib/experiments.ts` (4 entri) dengan **contact-sheet strip** dari 27 thumbnail → deep link `/gallery#<id>`.
-- [ ] **M2.5.3** Tampilkan angka **truthfully** (dari `GALLERY_EXPERIMENTS.length`, bukan hardcode — pelajaran home-trim #3: grep angka ke `data/*.json` setiap kali jumlah berubah).
-- [ ] **M2.5.4** 6 kategori dengan `role="filter"`/`<details>` — **0 JS** (Astro statis).
-- [ ] **M2.5.5** Lazy-load thumbnail (`loading="lazy"`, `decoding="async"`) — 27 gambar baru tak boleh menaikkan payload inisial.
-- [ ] **M2.5.6** Hapus `src/lib/experiments.ts` yang lama bila tak ada consumer lain (`rg` dulu).
+- [x] **M2.5.1** `GALLERY_EXPERIMENTS` (27, diekspor `GalleryGrid.tsx:413`) + `EXPERIMENT_CATEGORIES` (`:685`) — pakai **angka & kategori yang sama**, jangan hitung ulang.
+- [x] **M2.5.2** Ganti `src/lib/experiments.ts` (4 entri) dengan **contact-sheet strip** dari 27 thumbnail → deep link `/gallery#<id>`.
+- [x] **M2.5.3** Tampilkan angka **truthfully** (dari `GALLERY_EXPERIMENTS.length`, bukan hardcode — pelajaran home-trim #3: grep angka ke `data/*.json` setiap kali jumlah berubah).
+- [x] **M2.5.4** 6 kategori dengan `role="filter"`/`<details>` — **0 JS** (Astro statis).
+- [x] **M2.5.5** Lazy-load thumbnail (`loading="lazy"`, `decoding="async"`) — 27 gambar baru tak boleh menaikkan payload inisial.
+- [x] **M2.5.6** Hapus `src/lib/experiments.ts` yang lama bila tak ada consumer lain (`rg` dulu).
 
 **Verify**: `dist/home/index.html` punya 27 link; `measure:routes` `/` initial **tidak naik** (> 1 KB = gagal, thumbnail lazy).
+
+**DEVIASI (dokumentasi)**: (1) **Sumber angka bukan `GALLERY_EXPERIMENTS` GalleryGrid** — array itu berisi JSX icon, tak bisa diimpor ke modul server; sumber = `lab-registry.ts` (`LAB_EXPERIMENTS` 27 / `LAB_CATEGORIES` 5 / `LAB_CATEGORY_ORDER` 6) + join `lab-gallery.ts`, angka render dari `facts.lab.{count,byCategory}` (Rule 7/P8, tak ada literal di komponen). (2) **M2.5.4 `role="filter"` bukan ARIA valid** → `<details open>`/`<summary>` native 0-JS (biome `useSemanticElements`); "6 kategori" = **All** (total di header `data-lab-count`) + **5** `<details>`; zero-count kategori sudah di-omit facts builder (Rule 12). Semua grup `open` default → 27 thumbnail tampil penuh (contact sheet). (3) **Kartu = thumbnail + judul saja** (deskripsi sengaja di-skip agar HTML ringkas — `display` contact sheet, bukan duplikasi grid gallery); `alt=""` (img dekoratif, teks judul = nama link — H2/H30). (4) **Island `client:visible` → organisme Astro statis 0 JS** → island home 17→16, reachable `/` turun. (5) **Guard `existsSync`** 27 thumbnail di `lab-gallery.test.ts` (typo path = 27 gambar rusak tanpa runtime error). (6) **e2e count record "293" stale by 4** (`--list` HEAD = 297; Task 2.4 menambah 4 cross-link test tanpa re-count); current = 302.
+
+**A/B payload terukur**: baseline "199.9 KB initial" yang tercatat **tidak reproducible** — HEAD fresh-build di env ini = **201.7 KB** = current **201.7 KB** (A/B stash→build→measure: **delta initial = 0**). Reachable `/` **564.3 → 551.0 KB** (−13,3; island client:visible + static imports 4 eksperimen keluar) · html 65.5 → **66.2 KB** gzip (raw +~14 KB dari 27 × `<img>` — dicatat jujur; `measure:routes` hanya mengukur JS) · `/work` 150.2/392.6 dan `/gallery` 178.7/503.9 **datar**. all dist JS 665.1 KB gzip (99 file).
+
+**Gerbang**: unit **1081/1081** (94 file, +1 guard thumbnail) · `astro check` **100** (HEAD 101 −1 persis = error `Variants` ts(2322) island yang dihapus; A/B sorted: 0 baru/1 hilang) · lint **665** (HEAD 667 −2 persis = 2 diagnostik pre-existing di 2 file dihapus; A/B: 0 tracked file berubah; index.astro hanya 1 format pre-existing `cardProjects` **terbukti ada di HEAD**) · `validate-data` OK · `build:fast` **49 halaman** · dist home: **27** `href="/gallery#id"` unik + **27** `data-lab-card` + **5** `data-lab-group` (semua `open`) + `data-lab-count>27` + **0** astro-island/script/atribut `on*` dalam section + **27** img `loading="lazy"`+`decoding="async"`+`alt=""` · island **16 (7e/9d)** · e2e penuh `--workers=1` **302/302 (17.0m), 0 gagal**.
+
+**Temuan gerbang (defect test — kelas strict-mode baru)**: `command-palette.spec.ts` "opens via Ctrl+K" gagal konsisten 2× terisolasi — `getByText("Galaxy Formation")` kini resolve ke **2 elemen**: kartu homepage baru (kontak sheet, `role=link`) + hasil palette (`role=button`). Bukan flake, bukan regresi produk — **dua elemen sah yang sama-sama nyata** (preseden recommend D4). Fix = scope ke `getByRole("dialog", { name: "Command palette" })` + komentar. Produk 0 perubahan; spec 5/5 setelah fix; full suite 302/302.
+
+**Temuan verifikasi**: `gallery.astro:28` cross-check "27 interactive engines" (`GALLERY_EXPERIMENTS`) konsisten dengan 27 kartu home.
 
 ### Task 2.6 — Sertifikasi: 7 penerbit (bento)
 

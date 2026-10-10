@@ -1,0 +1,139 @@
+---
+/**
+ * The Creative Lab contact sheet (Prove It, Task 2.5).
+ *
+ * Replaces the `client:visible` island that rendered four hand-picked
+ * experiments: the homepage advertised 4 of the 27 experiments the lab
+ * actually holds (PRD I4), and inspecting the sheet required a hydrated
+ * React island. This is the whole catalog in server HTML — no island, no
+ * script, no inline handler (a dead control here is exactly what M1.2's
+ * mutation M5 taught this repo to count for: Astro does not escape `on*`
+ * attributes), with per-category collapse delegated to a native `<details>`.
+ *
+ * Every number printed comes from `SiteFacts` (`lab.count` and
+ * `lab.byCategory`), never a literal in this file: the header count and the
+ * per-category counts are the same figures the rest of the site cites
+ * (Rule 7 / P8). The cards come from `lab-gallery.ts`, the join over the
+ * same registry, so a category row and the cards underneath it cannot
+ * disagree without `lab-gallery.test.ts` going red first — and
+ * `creative-lab.spec.ts` checks the agreement on the built page.
+ */
+import type { LabCategoryCount } from "../../lib/facts";
+import { LAB_GALLERY_EXPERIMENTS } from "../../lib/lab-gallery";
+
+interface Props {
+  lab: {
+    count: number;
+    byCategory: LabCategoryCount[];
+  };
+}
+
+const { lab } = Astro.props;
+
+/**
+ * The plan's "6 categories" are `LAB_CATEGORY_ORDER`: "All" plus the five
+ * declared categories (DEVIASI — sprint-planning §Task 2.5). "All" is the
+ * section total in the header: a collapsible containing the whole sheet
+ * would duplicate all 27 cards. Zero-count categories never reach here —
+ * the facts builder omits them, because an empty group is a dead control
+ * (Rule 12) — so every group below has at least one card.
+ */
+const groups = lab.byCategory.map((category) => ({
+  ...category,
+  experiments: LAB_GALLERY_EXPERIMENTS.filter((exp) => exp.category === category.category),
+}));
+---
+
+<div class="space-y-8">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <p class="max-w-2xl text-sm text-text-secondary">
+      <span class="font-mono tabular-nums text-text-primary" data-lab-count>{lab.count}</span>
+      {" "}interactive experiments — fluid solvers, fractals, cellular automata,
+      n-body gravity and learning models, every one written from scratch and
+      running entirely in your browser. Every thumbnail below opens the live
+      experiment in the lab.
+    </p>
+    <a
+      href="/gallery"
+      class="group inline-flex shrink-0 items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-5 py-2.5 text-sm font-medium text-accent transition-colors hover:border-accent/50 hover:bg-accent/20"
+    >
+      Explore the Creative Lab
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+        aria-hidden="true"
+      >
+        <path d="M5 12h14" />
+        <path d="m12 5 7 7-7 7" />
+      </svg>
+    </a>
+  </div>
+
+  {
+    groups.map((group) => (
+      <details open class="group" data-lab-group>
+        <summary class="flex cursor-pointer list-none select-none items-center gap-2 py-1 [&::-webkit-details-marker]:hidden">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="h-3.5 w-3.5 shrink-0 text-text-secondary transition-transform group-open:rotate-180"
+            aria-hidden="true"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+          <span class="section-label text-text-secondary">{group.label}</span>
+          {" "}
+          <span
+            class="rounded-full border border-border/50 px-2 py-0.5 font-mono text-xs tabular-nums text-text-secondary"
+            data-lab-group-count
+          >
+            {group.count}
+          </span>
+        </summary>
+        <ul class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          {group.experiments.map((exp) => (
+            <li>
+              <a
+                href={`/gallery#${exp.id}`}
+                data-lab-card
+                class="group/card block overflow-hidden rounded-xl border border-border/50 bg-bg-tertiary/60 transition-colors hover:border-accent/50"
+              >
+                <div class="relative aspect-[16/9] overflow-hidden bg-bg-secondary">
+                  <img
+                    src={exp.thumbnail}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    width="400"
+                    height="300"
+                    class="h-full w-full object-cover opacity-80 transition-opacity duration-300 group-hover/card:opacity-100"
+                  />
+                </div>
+                <div class="px-3 py-2.5">
+                  <span class="block truncate text-sm font-medium text-text-primary transition-colors group-hover/card:text-accent">
+                    {exp.title}
+                  </span>
+                </div>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </details>
+    ))
+  }
+</div>

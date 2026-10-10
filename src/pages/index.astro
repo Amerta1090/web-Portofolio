@@ -5,9 +5,9 @@ import About from "../components/organisms/About.astro";
 import CareerSpine from "../components/organisms/CareerSpine.astro";
 import Certifications from "../components/organisms/Certifications.astro";
 import Contact from "../components/organisms/Contact.astro";
+import CreativeLabTeaser from "../components/organisms/CreativeLabTeaser.astro";
 import GitHubUniverse from "../components/organisms/GitHubUniverse.astro";
 import SignalLoom from "../components/organisms/SignalLoom.astro";
-import CreativeLabTeaser from "../islands/CreativeLabTeaser";
 import PageTailOverlays from "../islands/PageTailOverlays";
 import ProjectCardGrid from "../islands/ProjectCardGrid";
 import SkillsExplorer from "../islands/SkillsExplorer";
@@ -44,7 +44,8 @@ const gitHubData = await fetchAllGitHubData();
 // Hero evidence row (M2.1): computed here, on the server, from the same
 // `SiteFacts` every other claim on the page reads — so the hero cannot print a
 // figure the rest of the site would contradict.
-const heroMetrics = buildHeroMetrics(buildSiteFacts().github);
+const facts = buildSiteFacts();
+const heroMetrics = buildHeroMetrics(facts.github);
 
 /**
  * Section ids in document order, owned here because the page owns the markup.
@@ -124,7 +125,7 @@ const sectionIds = [
   </Section>
 
   <Section data-reveal id="creative-lab" title="Creative Lab" subtitle="Experimental playground — interactive visualizations and creative coding experiments" ariaLabel="Creative Lab experiments">
-    <CreativeLabTeaser client:visible />
+    <CreativeLabTeaser lab={facts.lab} />
   </Section>
 
   <Section data-reveal id="skills" title="Skills" variant="alt" ariaLabel="Skills and technologies">

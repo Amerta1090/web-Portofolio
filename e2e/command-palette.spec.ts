@@ -23,7 +23,12 @@ test.describe("CommandPalette (detAIministic)", () => {
     const input = page.getByRole("searchbox");
     await input.fill("galaxy");
     await expect(page.getByRole("list", { name: "Hasil pencarian" })).toBeVisible();
-    await expect(page.getByText("Galaxy Formation")).toBeVisible();
+    // Scoped to the palette: the same experiment now also appears as a homepage
+    // contact-sheet card (Task 2.5), so an unscoped text query is ambiguous —
+    // the result button and the card are both real elements.
+    await expect(
+      page.getByRole("dialog", { name: "Command palette" }).getByText("Galaxy Formation"),
+    ).toBeVisible();
   });
 
   test("navigates to a lab on Enter", async ({ page }) => {

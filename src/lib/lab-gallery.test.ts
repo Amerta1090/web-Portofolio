@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { LAB_GALLERY_EXPERIMENTS, labCursor, labLongDescription } from "./lab-gallery";
 import { LAB_EXPERIMENTS } from "./lab-registry";
@@ -59,6 +61,16 @@ describe("lab presentation", () => {
     for (const merged of LAB_GALLERY_EXPERIMENTS) {
       expect(merged.thumbnail).toMatch(/^\/images\/experiments\/[a-z0-9-]+\.svg$/);
       expect(merged.cursor).toMatch(/^[a-z-]+$/);
+    }
+  });
+
+  it("points every thumbnail at a file that ships with the site", () => {
+    // The shape above can still name a file nobody created, and the homepage
+    // contact sheet (Task 2.5) renders all 27 paths into server HTML — so a
+    // typo is 27 broken images with no runtime error that could reveal it.
+    for (const merged of LAB_GALLERY_EXPERIMENTS) {
+      const file = join(process.cwd(), "public", merged.thumbnail.slice(1));
+      expect(existsSync(file), `${merged.id}: ${merged.thumbnail} is not in public/`).toBe(true);
     }
   });
 
