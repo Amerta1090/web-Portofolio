@@ -1,8 +1,12 @@
 import { useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEvent, RefCallback } from "react";
-import type { SignalLoomGraph, SignalLoomNode } from "../lib/creative/signal-loom";
-import { connectedNodeIds } from "../lib/creative/signal-loom";
+import type {
+  SignalEdgeEmphasis,
+  SignalLoomGraph,
+  SignalLoomNode,
+} from "../lib/creative/signal-loom";
+import { edgeStrokeWidth } from "../lib/creative/signal-loom";
 import { choreographyMode, signalDotEdges } from "../lib/creative/signal-loom-choreo";
 import { SIGNAL_LOOPS, SIGNAL_TRAVEL_SECONDS } from "../lib/creative/signal-loom-choreo";
 import {
@@ -79,7 +83,6 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
     () => (hoverId ? activeEdgeIds(graph, hoverId) : new Set<string>()),
     [graph, hoverId],
   );
-  const connectedRoots = useMemo(() => connectedNodeIds(graph, selectedId), [graph, selectedId]);
   const selectedNode = graph.nodes.find((node) => node.id === selectedId) ?? null;
 
   const choreoMode = choreographyMode(prefersReduced, lowPower, activeEdges.size);
@@ -259,7 +262,6 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
 
   const renderNode = (node: SignalLoomNode) => {
     const isSelected = node.id === selectedId;
-    const isConnected = connectedRoots.has(node.id);
     const isCapability = node.kind === "capability";
     const kindLabel = isCapability ? "Capability" : "Evidence";
     const cardClass = `flex h-32 flex-col items-start justify-center gap-1 rounded-md border p-3.5 text-left transition motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-brand focus-visible:outline-offset-2 ${
@@ -267,9 +269,7 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
     } ${
       isSelected
         ? "border-brand bg-brand/10 ring-1 ring-brand/40"
-        : isConnected
-          ? "border-brand/40 bg-bg-secondary/80 hover:border-brand hover:bg-brand/10 focus-visible:border-brand focus-visible:bg-brand/10"
-          : "border-border/70 bg-bg-secondary/80 hover:border-brand hover:bg-brand/10 focus-visible:border-brand focus-visible:bg-brand/10"
+        : "border-border/70 bg-bg-secondary/80 hover:border-brand hover:bg-brand/10 focus-visible:border-brand focus-visible:bg-brand/10"
     }`;
 
     const content = (
@@ -314,7 +314,6 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
               href={node.href}
               data-signal-node={node.id}
               data-node-kind={node.kind}
-              data-connected={isConnected ? "true" : undefined}
               aria-current={isSelected ? "true" : undefined}
               // Same concise name as the hydrated control below, so activating
               // the fallback link and then the upgraded button announce the
@@ -329,7 +328,6 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
             <div
               data-signal-node={node.id}
               data-node-kind={node.kind}
-              data-connected={isConnected ? "true" : undefined}
               aria-current={isSelected ? "true" : undefined}
               className={cardClass}
             >
@@ -342,7 +340,6 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
             type="button"
             data-signal-node={node.id}
             data-node-kind={node.kind}
-            data-connected={isConnected ? "true" : undefined}
             // The name stays short: the project summaries run to 30+ words, and a
             // roving arrow keypress already re-announces the node. The summary is
             // still in the subtree for browsing, and the live region below announces
@@ -386,16 +383,22 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
             if (!coords) return null;
             const isActive = activeEdges.has(edge.id);
             const isHoverShadow = hoverEdges.has(edge.id) && hoverId !== null;
+            const emphasis: SignalEdgeEmphasis = isActive
+              ? "active"
+              : isHoverShadow
+                ? "hover"
+                : "rest";
             return (
               <line
                 key={edge.id}
                 data-edge={edge.id}
+                data-edge-weight={edge.weight}
                 x1={coords.x1}
                 y1={coords.y1}
                 x2={coords.x2}
                 y2={coords.y2}
                 stroke={isActive || isHoverShadow ? BRAND_STROKE : MUTED_STROKE}
-                strokeWidth={isActive ? 2 : isHoverShadow ? 1.6 : 1.1}
+                strokeWidth={edgeStrokeWidth(edge.weight, emphasis)}
                 strokeLinecap="round"
                 vectorEffect="non-scaling-stroke"
               />

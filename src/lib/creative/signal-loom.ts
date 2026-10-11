@@ -31,6 +31,40 @@ export interface SignalLoomGraph {
   defaultNodeId: string;
 }
 
+/**
+ * The interaction state an edge is drawn in. Kept as a closed vocabulary so the
+ * width scale below and the island's three-way branch can never disagree.
+ */
+export type SignalEdgeEmphasis = "rest" | "hover" | "active";
+
+const EDGE_WIDTH_BASE = 1.1;
+const EDGE_WIDTH_STEP = 0.7;
+const EDGE_EMPHASIS_LIFT: Record<SignalEdgeEmphasis, number> = {
+  rest: 0,
+  hover: 0.5,
+  active: 0.9,
+};
+
+/**
+ * Map an edge's declared overlap `weight` (M3.1.2) to its stroke width.
+ *
+ * The width is the data made visible: one shared skill is the base line, and
+ * every additional overlap thickens it, so a two-skill connection reads as
+ * stronger evidence than a one-skill one. `emphasis` lifts the whole scale for
+ * the current interaction state while preserving the ordering, so the selected
+ * node's edges are always the boldest and a hover shadow never outranks the
+ * selection. Widths: weight 1 → 1.1 / 1.6 / 2.0, weight 2 → 1.8 / 2.3 / 2.7.
+ *
+ * A non-finite or non-positive weight cannot come from the builder (it never
+ * emits an edge below weight 1), but the fallback keeps a bad fixture from
+ * rendering a NaN width.
+ */
+export function edgeStrokeWidth(weight: number, emphasis: SignalEdgeEmphasis): number {
+  const base = Number.isFinite(weight) && weight > 0 ? weight : 1;
+  const width = EDGE_WIDTH_BASE + (base - 1) * EDGE_WIDTH_STEP + EDGE_EMPHASIS_LIFT[emphasis];
+  return Math.round(width * 10) / 10;
+}
+
 function slugify(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 }
@@ -193,17 +227,6 @@ export function mostConnectedNodeId(
   }
 
   return bestDegree > 0 ? best : null;
-}
-
-export function connectedNodeIds(graph: SignalLoomGraph, nodeId: string): Set<string> {
-  const connected = new Set<string>([nodeId]);
-
-  for (const edge of graph.edges) {
-    if (edge.from === nodeId) connected.add(edge.to);
-    if (edge.to === nodeId) connected.add(edge.from);
-  }
-
-  return connected;
 }
 
 /**

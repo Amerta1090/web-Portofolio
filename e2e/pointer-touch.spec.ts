@@ -50,19 +50,59 @@ async function openReactor(page: Page) {
 }
 
 /**
- * Edge stroke widths, each with one meaning: 2 = the selected node's own edges,
- * 1.6 = the hover shadow, 1.1 = untouched. Below `md` the connector plane is
- * hidden, so these counts are only meaningful on a tablet-or-wider viewport.
+ * One drawn edge: its declared skill-overlap weight and the stroke width the
+ * island actually rendered from it.
  */
-const edgeWidths = (page: Page) =>
-  page.locator("[data-edge]").evaluateAll((els) => {
-    const counts: Record<string, number> = {};
-    for (const el of els) {
-      const w = el.getAttribute("stroke-width") ?? "?";
-      counts[w] = (counts[w] ?? 0) + 1;
-    }
-    return counts;
-  });
+interface EdgeSample {
+  id: string;
+  weight: number;
+  width: number;
+}
+
+type Emphasis = "rest" | "hover" | "active";
+
+// A deliberate copy of `edgeStrokeWidth` from src/lib/creative/signal-loom.ts:
+// an e2e spec cannot import a client module (Bun ESM refuses the repo's JSON
+// imports — see e2e/certifications.spec.ts). The constants are mirrored, not the
+// assertion: the spec still reads the real rendered `stroke-width`, so if the
+// production mapping changes and this mirror does not, every width assertion
+// below fails loudly. Keep the two in step.
+const EDGE_WIDTH_BASE = 1.1;
+const EDGE_WIDTH_STEP = 0.7;
+const EDGE_EMPHASIS_LIFT: Record<Emphasis, number> = { rest: 0, hover: 0.5, active: 0.9 };
+const expectedWidth = (weight: number, emphasis: Emphasis) => {
+  const base = Number.isFinite(weight) && weight > 0 ? weight : 1;
+  return (
+    Math.round(
+      (EDGE_WIDTH_BASE + (base - 1) * EDGE_WIDTH_STEP + EDGE_EMPHASIS_LIFT[emphasis]) * 10,
+    ) / 10
+  );
+};
+
+const edgeSamples = (page: Page): Promise<EdgeSample[]> =>
+  page.locator("[data-edge]").evaluateAll((els) =>
+    els.map((el) => ({
+      id: el.getAttribute("data-edge") ?? "",
+      weight: Number(el.getAttribute("data-edge-weight") ?? "0"),
+      width: Number(el.getAttribute("stroke-width") ?? "0"),
+    })),
+  );
+
+/**
+ * Edges belonging to one node. Edge ids are `capabilityId->projectId`, so a
+ * project card's own edges are the ones pointing at it. Scoped per node because
+ * a whole-graph width tally cannot distinguish "this card is emphasised" from
+ * "some other card is".
+ */
+const ownEdges = (samples: EdgeSample[], nodeId: string) =>
+  samples.filter((sample) => sample.id.endsWith(`->${nodeId}`));
+
+const countAt = (samples: EdgeSample[], emphasis: Emphasis) =>
+  samples.filter((sample) => sample.width === expectedWidth(sample.weight, emphasis)).length;
+
+const allAt = (samples: EdgeSample[], emphasis: Emphasis) =>
+  samples.length > 0 &&
+  samples.every((sample) => sample.width === expectedWidth(sample.weight, emphasis));
 
 const selectedNode = (page: Page) =>
   page.locator("[data-signal-node][aria-current='true']").getAttribute("data-signal-node");
@@ -70,45 +110,29 @@ const selectedNode = (page: Page) =>
 /**
  * A project card the current selection does not already reach.
  *
- * Not a nicety: `strokeWidth` is a three-way choice where the selected node's own
- * edges (2) win over the hover shadow (1.6). Hovering a card that the selection
- * already connects therefore changes nothing observable, so an assertion like
- * "hovering produces 1.6 edges" silently tests nothing on those cards. Deriving
- * the target from `data-connected` states the precondition instead of assuming it.
+ * Not a nicety: the active emphasis (`strokeWidth` at the "active" lift) wins
+ * over the hover shadow. Hovering a card the selection already connects
+ * therefore changes nothing observable, so an assertion like "hovering produces
+ * a hover-width edge" silently tests nothing on those cards. Deriving the target
+ * from the rendered widths and weights states the precondition instead of
+ * assuming it.
  */
-async function unconnectedProjectCard(page: Page, which: 0 | 1 = 0) {
+async function unreachedProjectCard(page: Page, which: 0 | 1 = 0) {
+  const samples = await edgeSamples(page);
+  const selected = await selectedNode(page);
   const zone = page.getByRole("region", { name: "Project evidence nodes" });
   const ids = await zone
     .locator("[data-signal-node]")
-    .evaluateAll((els) =>
-      els
-        .filter((el) => el.getAttribute("data-connected") !== "true")
-        .map((el) => el.getAttribute("data-signal-node") as string),
-    );
-  const id = ids[which];
+    .evaluateAll((els) => els.map((el) => el.getAttribute("data-signal-node") as string));
+  const free = ids.filter((id) => {
+    if (id === selected) return false;
+    const own = ownEdges(samples, id);
+    return own.length > 0 && own.every((s) => s.width !== expectedWidth(s.weight, "active"));
+  });
+  const id = free[which];
   expect(id, "the portfolio graph must have a project the selection does not reach").toBeTruthy();
   return { id, card: zone.locator(`[data-signal-node="${id}"]`) };
 }
-
-/** Edge count, so a width assertion can never pass by measuring nothing. */
-const edgeCount = (page: Page) => page.locator("[data-edge]").count();
-
-/**
- * Stroke widths of the edges belonging to one node. Edge ids are
- * `capabilityId->projectId`, so a project card's own edges are the ones pointing
- * at it. Scoped per node because a whole-graph width tally cannot distinguish
- * "this card is emphasised" from "some other card is".
- */
-const ownEdgeWidths = (page: Page, nodeId: string) =>
-  page
-    .locator("[data-edge]")
-    .evaluateAll(
-      (els, id) =>
-        els
-          .filter((e) => (e.getAttribute("data-edge") ?? "").endsWith(`->${id}`))
-          .map((e) => e.getAttribute("stroke-width")),
-      nodeId,
-    );
 
 /** Bounding boxes of the interactive cards, for the touch-target measurement. */
 const targetSizes = (page: Page, selector: string) =>
@@ -142,27 +166,30 @@ test.describe("F5.1 — pointer input", () => {
     await expect(page.locator("[data-signal-status-text]")).toContainText(summary.slice(0, 40));
     expect(await selectedNode(page)).not.toBe(before);
     // Its incident edges are the emphasised ones, not merely the hovered ones.
-    expect((await edgeWidths(page))["2"] ?? 0).toBeGreaterThan(0);
+    const own = ownEdges(await edgeSamples(page), target);
+    expect(own.length).toBeGreaterThan(0);
+    expect(allAt(own, "active")).toBe(true);
   });
 
   test("hovering a card traces its edges without selecting it", async ({ page }) => {
     await openSignalLoom(page);
     await expect(page.locator("#systems-in-motion svg")).toBeVisible();
     const before = await selectedNode(page);
-    const { card } = await unconnectedProjectCard(page);
-    expect(await edgeCount(page)).toBeGreaterThan(0);
-    expect((await edgeWidths(page))["1.6"] ?? 0).toBe(0);
+    const { id, card } = await unreachedProjectCard(page);
+    expect((await edgeSamples(page)).length).toBeGreaterThan(0);
+    expect(countAt(await edgeSamples(page), "hover")).toBe(0);
 
     await card.hover();
 
     // Hover is emphasis, never selection: the reader can inspect a path without
     // changing what the live region is announcing.
-    await expect.poll(async () => (await edgeWidths(page))["1.6"] ?? 0).toBeGreaterThan(0);
+    await expect.poll(async () => countAt(await edgeSamples(page), "hover")).toBeGreaterThan(0);
+    expect(allAt(ownEdges(await edgeSamples(page), id), "hover")).toBe(true);
     expect(await selectedNode(page)).toBe(before);
 
     // And it is reversible: leaving the card clears the shadow.
     await page.locator("#systems-in-motion h2").first().hover();
-    await expect.poll(async () => (await edgeWidths(page))["1.6"] ?? 0).toBe(0);
+    await expect.poll(async () => countAt(await edgeSamples(page), "hover")).toBe(0);
     expect(await selectedNode(page)).toBe(before);
   });
 
@@ -170,46 +197,40 @@ test.describe("F5.1 — pointer input", () => {
     page,
   }) => {
     // The counterpart of the test above, pinning the precedence rule it relies on.
-    // A card the selection already connects shows stroke-width 2 both before and
+    // A card the selection already connects shows the active width both before and
     // during hover: the active edge wins, so the hover shadow is not drawn on top.
     // Without this, a reader could read a missing hover shadow on those cards as a
     // broken interaction rather than a deliberate choice.
     await openSignalLoom(page);
     const selected = await selectedNode(page);
+    const samples = await edgeSamples(page);
     // A card the selection reaches through *every* one of its edges. Stating the
     // precondition matters: the honest all-project graph (Task 3.1) gives projects
     // up to two edges, and hovering a partially-connected card correctly draws the
-    // shadow on its untouched edge — so "no 1.6 anywhere" would be the wrong
+    // shadow on its untouched edge — so "no hover width anywhere" would be the wrong
     // expectation there. This test is about the fully-connected card.
-    const connectedId = await page.evaluate((sel) => {
-      const edges = Array.from(document.querySelectorAll("[data-edge]"));
-      const nodes = Array.from(
-        document.querySelectorAll('[data-signal-node][data-connected="true"]'),
-      );
-      for (const node of nodes) {
-        const id = node.getAttribute("data-signal-node");
-        if (!id || id === sel) continue;
-        const own = edges.filter((e) => (e.getAttribute("data-edge") ?? "").endsWith(`->${id}`));
-        if (own.length > 0 && own.every((e) => e.getAttribute("stroke-width") === "2")) {
-          return id;
-        }
-      }
-      return null;
-    }, selected);
+    const nodeIds = await page
+      .locator("[data-signal-node]")
+      .evaluateAll((els) => els.map((el) => el.getAttribute("data-signal-node") as string));
+    const connectedId = nodeIds.find((id) => {
+      if (id === selected) return false;
+      const own = ownEdges(samples, id);
+      return own.length > 0 && allAt(own, "active");
+    });
     expect(connectedId).toBeTruthy();
 
     const card = page.locator(`[data-signal-node="${connectedId}"]`);
     // Scoped to this card's own edges: a whole-graph tally could be satisfied by
     // the selection's edges and prove nothing about the card under test.
-    const ownBefore = await ownEdgeWidths(page, connectedId as string);
+    const ownBefore = ownEdges(samples, connectedId as string);
     expect(ownBefore.length).toBeGreaterThan(0);
-    expect(ownBefore.every((w) => w === "2")).toBe(true);
+    expect(allAt(ownBefore, "active")).toBe(true);
 
     await card.hover();
     await page.waitForTimeout(200);
 
-    expect((await ownEdgeWidths(page, connectedId as string)).every((w) => w === "2")).toBe(true);
-    expect((await edgeWidths(page))["1.6"] ?? 0).toBe(0);
+    expect(allAt(ownEdges(await edgeSamples(page), connectedId as string), "active")).toBe(true);
+    expect(countAt(await edgeSamples(page), "hover")).toBe(0);
     expect(await selectedNode(page)).toBe(selected);
   });
 });
@@ -262,42 +283,45 @@ test.describe("F5.1 — touch input", () => {
 
     // Two cards the selection does not already reach, so their edges are free to
     // take the shadow width. (On a card the selection already reaches, the active
-    // edge at 2 always wins — see the precedence test in the pointer block.)
-    const first = await unconnectedProjectCard(page, 0);
-    const second = await unconnectedProjectCard(page, 1);
-    expect(await edgeCount(page)).toBeGreaterThan(0);
-    expect((await edgeWidths(page))["1.6"] ?? 0).toBe(0);
+    // edge at the active lift always wins — see the precedence test in the pointer
+    // block.)
+    const first = await unreachedProjectCard(page, 0);
+    const second = await unreachedProjectCard(page, 1);
+    expect((await edgeSamples(page)).length).toBeGreaterThan(0);
+    expect(countAt(await edgeSamples(page), "hover")).toBe(0);
 
     // Edge ids are `capabilityId->projectId`, so a card's own edges are the ones
     // pointing at it.
-    expect((await ownEdgeWidths(page, first.id)).length).toBeGreaterThan(0);
+    expect(ownEdges(await edgeSamples(page), first.id).length).toBeGreaterThan(0);
 
     // Positive control, in this same touch context and at this same width: a real
     // hover on the first card does produce the shadow. Without it, the negative
     // assertion below would pass just as well if the shadow mechanism were broken.
     await first.card.hover();
-    await expect.poll(async () => (await edgeWidths(page))["1.6"] ?? 0).toBeGreaterThan(0);
+    await expect.poll(async () => countAt(await edgeSamples(page), "hover")).toBeGreaterThan(0);
     await page.mouse.move(5, 5);
-    await expect.poll(async () => (await edgeWidths(page))["1.6"] ?? 0).toBe(0);
+    await expect.poll(async () => countAt(await edgeSamples(page), "hover")).toBe(0);
 
     // The property under test: a tap fires pointerenter like a hover does, yet the
-    // reader is left with a clean diagram — the tapped card reads as selected (2),
-    // and nothing keeps a shadow once the selection moves on.
+    // reader is left with a clean diagram — the tapped card reads as selected, and
+    // nothing keeps a shadow once the selection moves on.
     await first.card.tap();
     await expect(page.locator("[data-signal-node][aria-current='true']")).toHaveAttribute(
       "data-signal-node",
       first.id,
     );
-    expect((await ownEdgeWidths(page, first.id)).every((w) => w === "2")).toBe(true);
-    expect((await edgeWidths(page))["1.6"] ?? 0).toBe(0);
+    expect(allAt(ownEdges(await edgeSamples(page), first.id), "active")).toBe(true);
+    expect(countAt(await edgeSamples(page), "hover")).toBe(0);
 
     await second.card.tap();
     await expect(page.locator("[data-signal-node][aria-current='true']")).toHaveAttribute(
       "data-signal-node",
       second.id,
     );
-    await expect.poll(async () => (await edgeWidths(page))["1.6"] ?? 0, { timeout: 5_000 }).toBe(0);
-    expect((await ownEdgeWidths(page, first.id)).every((w) => w === "1.1")).toBe(true);
+    await expect
+      .poll(async () => countAt(await edgeSamples(page), "hover"), { timeout: 5_000 })
+      .toBe(0);
+    expect(allAt(ownEdges(await edgeSamples(page), first.id), "rest")).toBe(true);
 
     // Note on what this does and does not prove. An earlier version of this test
     // claimed to catch a hover shadow "stuck" on a card the finger had left, and

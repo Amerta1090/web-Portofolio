@@ -67,7 +67,7 @@ const GRAPH: SignalLoomGraph = {
       from: "capability-web",
       to: "project-a",
       label: "web",
-      weight: 1,
+      weight: 2,
     },
   ],
   defaultNodeId: "project-a",
@@ -314,21 +314,21 @@ describe("SignalLoom selection states (L2.1)", () => {
     expect(projectZone?.querySelectorAll("[data-signal-node]")).toHaveLength(1);
   });
 
-  it("marks the selected card and its connected cards for the card-to-card trace", async () => {
+  it("replaces the fallback link with a hydrated control", async () => {
     const user = userEvent.setup();
     const { container } = render(<SignalLoom graph={GRAPH} />);
 
     const web = container.querySelector<HTMLButtonElement>('[data-signal-node="capability-web"]');
-    const project = container.querySelector('[data-signal-node="project-a"]');
-    const ml = container.querySelector('[data-signal-node="capability-ml"]');
-    if (!web || !project || !ml) throw new Error("nodes missing");
+    if (!web) throw new Error("node missing");
 
     await user.click(web);
 
-    // Selected card and its connected card both carry the trace marker.
-    expect(web).toHaveAttribute("data-connected", "true");
-    expect(project).toHaveAttribute("data-connected", "true");
-    expect(ml).not.toHaveAttribute("data-connected");
+    // The trace is carried by the brand-coloured measured edges and the
+    // travelling dots, not by a per-card marker: with zero isolated nodes a
+    // `data-connected` flag would imply unmarked-but-connected cards are
+    // stranded. Selected emphasis stays on the card itself.
+    expect(web).toHaveAttribute("aria-current", "true");
+    expect(container.querySelector("[data-connected]")).toBeNull();
   });
 });
 
@@ -357,6 +357,25 @@ describe("SignalLoom bounded SVG choreography (L2.2)", () => {
     expect(edge).toHaveAttribute("y1");
     expect(edge).toHaveAttribute("x2");
     expect(edge).toHaveAttribute("y2");
+  });
+
+  it("draws each edge at a width derived from its declared overlap weight", async () => {
+    const { container } = render(<SignalLoom graph={GRAPH} />);
+    // defaultNodeId is project-a, so both edges are in the active emphasis.
+    const ml = await waitFor(() => {
+      const el = container.querySelector('[data-edge="capability-ml->project-a"]');
+      expect(el).not.toBeNull();
+      return el;
+    });
+    const web = container.querySelector('[data-edge="capability-web->project-a"]');
+    if (!ml || !web) throw new Error("edges missing");
+
+    // The weight is the data made visible: a two-skill overlap reads as a
+    // thicker line than a one-skill overlap, in the same emphasis state.
+    expect(ml).toHaveAttribute("data-edge-weight", "1");
+    expect(web).toHaveAttribute("data-edge-weight", "2");
+    expect(ml).toHaveAttribute("stroke-width", "2");
+    expect(web).toHaveAttribute("stroke-width", "2.7");
   });
 
   it("caps simultaneous animated paths at SIGNAL_MAX_DOTS", async () => {
@@ -501,7 +520,7 @@ describe("SignalLoom fallback without hydration (Q4.2)", () => {
     expect(html).toContain('href="/projects/project-a"');
     // Capabilities have no destination, so they stay non-interactive content.
     expect(html).toContain('data-node-kind="capability"');
-    expect(html).not.toContain('data-node-kind="capability" data-connected="true"><a');
+    expect(html).not.toMatch(/<a[^>]*data-signal-node="capability-/);
   });
 
   it("names the fallback link exactly as it names the hydrated control", () => {
@@ -527,11 +546,13 @@ describe("SignalLoom fallback without hydration (Q4.2)", () => {
     expect(html).toContain("Web capability summary");
   });
 
-  it("keeps the selected and connected emphasis without a control to toggle", () => {
+  it("keeps the selected emphasis without a control to toggle, and drops the stale trace marker", () => {
     const html = serverHtml();
-    // defaultNodeId is project-a, so it is the current item and its neighbours connected.
+    // defaultNodeId is project-a, so it is the current item.
     expect(html).toMatch(/data-signal-node="project-a"[^>]*aria-current="true"/);
-    expect(html).toMatch(/data-signal-node="capability-ml"[^>]*data-connected="true"/);
+    // M3.2.4 retired the per-card marker: the trace is brand edges + dots now.
+    expect(html).not.toContain("data-connected");
+    expect(html).not.toContain("border-brand/40");
   });
 
   it("turns the cards into selectable controls once hydrated", () => {

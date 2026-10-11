@@ -7,10 +7,11 @@ import {
   buildSignalLoomGraph,
   buildSkillHrefs,
   capabilityNodeIdForSkill,
-  connectedNodeIds,
+  edgeStrokeWidth,
   mostConnectedNodeId,
   projectHref,
 } from "./signal-loom";
+import type { SignalEdgeEmphasis } from "./signal-loom";
 
 const skills: SkillsData = {
   categories: [
@@ -193,19 +194,29 @@ describe("buildSignalLoomGraph", () => {
     expect(graph.edges).toEqual([]);
   });
 
-  it("returns the selected node and its direct neighbors", () => {
-    const graph = buildSignalLoomGraph(projects, skills);
-    expect([...connectedNodeIds(graph, "capability-machine-learning-ai")]).toEqual([
-      "capability-machine-learning-ai",
-      "project-forecasting-system",
-      "project-unfeatured-project",
-    ]);
-  });
-
   it("handles empty inputs without inventing a default node", () => {
     const graph = buildSignalLoomGraph([], { categories: [] });
     expect(graph).toEqual({ nodes: [], edges: [], defaultNodeId: "" });
-    expect([...connectedNodeIds(graph, "missing")]).toEqual(["missing"]);
+  });
+});
+
+describe("edgeStrokeWidth", () => {
+  const emphasisStates: SignalEdgeEmphasis[] = ["rest", "hover", "active"];
+
+  it("thickens an edge by its declared overlap weight", () => {
+    expect(emphasisStates.map((e) => edgeStrokeWidth(1, e))).toEqual([1.1, 1.6, 2]);
+    expect(emphasisStates.map((e) => edgeStrokeWidth(2, e))).toEqual([1.8, 2.3, 2.7]);
+  });
+
+  it("keeps every weight/emphasis pair visually distinct", () => {
+    const widths = [1, 2].flatMap((w) => emphasisStates.map((e) => edgeStrokeWidth(w, e)));
+    expect(new Set(widths).size).toBe(widths.length);
+  });
+
+  it("falls back to the base width for a non-finite or non-positive weight", () => {
+    for (const bad of [0, -3, Number.NaN, Number.POSITIVE_INFINITY]) {
+      expect(edgeStrokeWidth(bad, "rest")).toBe(1.1);
+    }
   });
 });
 
