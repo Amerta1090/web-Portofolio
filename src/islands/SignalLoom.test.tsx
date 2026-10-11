@@ -92,8 +92,63 @@ const WIDE_GRAPH: SignalLoomGraph = {
   defaultNodeId: "project-z",
 };
 
+const DETAIL_GRAPH: SignalLoomGraph = {
+  nodes: [
+    {
+      id: "capability-ml",
+      label: "Machine Learning",
+      kind: "capability",
+      summary: "ML capability summary",
+    },
+    {
+      id: "project-detailed",
+      label: "Detailed Project",
+      kind: "project",
+      summary: "Detailed project summary",
+      href: "/projects/detailed-project",
+      detail: {
+        association: "Universitas AMIKOM Yogyakarta",
+        skills: ["Machine Learning", "Python"],
+        links: [
+          { label: "Live Demo", url: "https://example.com/demo" },
+          { label: "GitHub Repository", url: "https://github.com/example/repo" },
+        ],
+      },
+    },
+    {
+      id: "project-bare",
+      label: "Bare Project",
+      kind: "project",
+      summary: "Bare project summary",
+      href: "/projects/bare-project",
+      detail: { skills: ["Bash"], links: [] },
+    },
+    {
+      id: "project-skills-only",
+      label: "Skills Only Project",
+      kind: "project",
+      summary: "Skills only summary",
+      detail: { skills: ["SQL"], links: [] },
+    },
+  ],
+  edges: [
+    {
+      id: "capability-ml->project-detailed",
+      from: "capability-ml",
+      to: "project-detailed",
+      label: "ml",
+      weight: 2,
+    },
+  ],
+  defaultNodeId: "project-detailed",
+};
+
 function statusText(container: HTMLElement): string {
   return container.querySelector("[data-signal-status-text]")?.textContent ?? "";
+}
+
+function detailPanel(container: HTMLElement): HTMLElement | null {
+  return container.querySelector<HTMLElement>("[data-signal-detail]");
 }
 
 function dotIds(container: HTMLElement): string[] {
@@ -571,5 +626,119 @@ describe("SignalLoom fallback without hydration (Q4.2)", () => {
     expect(capability).toHaveAttribute("aria-label", "Capability: Web Systems");
     // The summary is still reachable for browsing, and still announced once.
     expect(project?.querySelector("[data-node-summary]")?.textContent).toBe("Project A summary");
+  });
+});
+
+describe("SignalLoom selected project detail (M3.3.1)", () => {
+  it("renders the selected project's evidence panel from the server payload", () => {
+    const { container } = render(<SignalLoom graph={DETAIL_GRAPH} />);
+    const panel = detailPanel(container);
+    expect(panel).not.toBeNull();
+    expect(panel?.textContent).toContain("Universitas AMIKOM Yogyakarta");
+    expect(panel?.textContent).toContain("Machine Learning");
+    expect(panel?.textContent).toContain("Python");
+    expect(panel?.querySelector('a[href="https://example.com/demo"]')).not.toBeNull();
+  });
+
+  it("opens evidence links in a new tab with an announced context change", () => {
+    const { container } = render(<SignalLoom graph={DETAIL_GRAPH} />);
+    const link = container.querySelector<HTMLAnchorElement>(
+      '[data-signal-detail] a[href="https://example.com/demo"]',
+    );
+    if (!link) throw new Error("detail link missing");
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    expect(link.textContent).toContain("Live Demo");
+    expect(link.textContent).toContain("(opens in a new tab)");
+  });
+
+  it("leaves the panel wrapper unnamed — aria-label is prohibited on generic containers", () => {
+    const { container } = render(<SignalLoom graph={DETAIL_GRAPH} />);
+    const panel = detailPanel(container);
+    expect(panel?.tagName).toBe("DIV");
+    expect(panel).not.toHaveAttribute("aria-label");
+  });
+
+  it("keeps the detail panel outside the live region and before it", () => {
+    const { container } = render(<SignalLoom graph={DETAIL_GRAPH} />);
+    const status = container.querySelector("[data-signal-status]");
+    const panel = detailPanel(container);
+    expect(status).not.toBeNull();
+    expect(panel).not.toBeNull();
+    // The live region announces the summary only; the panel must not be swept
+    // into it, or every selection would read out all skills and links.
+    expect(panel?.contains(status)).toBe(false);
+    const order = Array.from(
+      container.querySelectorAll("[data-signal-detail], [data-signal-status]"),
+    ).map((el) => (el.hasAttribute("data-signal-status") ? "status" : "detail"));
+    expect(order).toEqual(["detail", "status"]);
+  });
+
+  it("clears the panel when a capability hub is selected", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<SignalLoom graph={DETAIL_GRAPH} />);
+    expect(detailPanel(container)).not.toBeNull();
+
+    const ml = container.querySelector<HTMLButtonElement>('[data-signal-node="capability-ml"]');
+    if (!ml) throw new Error("ml node missing");
+    await user.click(ml);
+
+    await waitFor(() => expect(statusText(container)).toBe("ML capability summary"));
+    // Cleared because capability nodes carry no detail at all (the builder only
+    // attaches it to projects), not because of a `kind` check in the island.
+    expect(detailPanel(container)).toBeNull();
+  });
+
+  it("swaps the panel content when a different project is selected", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<SignalLoom graph={DETAIL_GRAPH} />);
+
+    const bare = container.querySelector<HTMLButtonElement>('[data-signal-node="project-bare"]');
+    if (!bare) throw new Error("bare node missing");
+    await user.click(bare);
+
+    await waitFor(() => expect(detailPanel(container)?.textContent).toContain("Bash"));
+    expect(detailPanel(container)?.textContent).not.toContain("Universitas AMIKOM Yogyakarta");
+    expect(detailPanel(container)?.querySelector('a[href="https://example.com/demo"]')).toBeNull();
+  });
+
+  it("omits the association group for a project that declares none", () => {
+    const { container } = render(
+      <SignalLoom graph={{ ...DETAIL_GRAPH, defaultNodeId: "project-bare" }} />,
+    );
+    const panel = detailPanel(container);
+    expect(panel?.textContent).not.toContain("Association");
+    // Skills stay — the group only disappears when there is nothing to show.
+    expect(panel?.textContent).toContain("Skills");
+  });
+
+  it("renders no evidence-links group when the project has no links", () => {
+    const { container } = render(
+      <SignalLoom graph={{ ...DETAIL_GRAPH, defaultNodeId: "project-skills-only" }} />,
+    );
+    const panel = detailPanel(container);
+    expect(panel?.textContent).toContain("SQL");
+    expect(panel?.textContent).not.toContain("Evidence links");
+    expect(panel?.querySelector("a")).toBeNull();
+  });
+
+  it("shows no panel for a project node that carries no detail", () => {
+    const noDetail: SignalLoomGraph = {
+      nodes: [{ id: "project-x", label: "Project X", kind: "project", summary: "summary" }],
+      edges: [],
+      defaultNodeId: "project-x",
+    };
+    const { container } = render(<SignalLoom graph={noDetail} />);
+    expect(detailPanel(container)).toBeNull();
+  });
+
+  it("renders the selected project's detail in the server HTML — usable before hydration", () => {
+    const html = renderToStaticMarkup(<SignalLoom graph={DETAIL_GRAPH} />);
+    expect(html).toContain("data-signal-detail");
+    expect(html).toContain("Universitas AMIKOM Yogyakarta");
+    // A real anchor to openable evidence, not a control that only wakes up once
+    // the island hydrates (a control that acts only after JS would be dead).
+    expect(html).toContain('href="https://example.com/demo"');
+    expect(html).toContain('target="_blank"');
   });
 });

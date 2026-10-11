@@ -84,6 +84,12 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
     [graph, hoverId],
   );
   const selectedNode = graph.nodes.find((node) => node.id === selectedId) ?? null;
+  // M3.3.1: only project nodes carry detail, because the builder attaches it to
+  // projects alone (see `SignalLoomNode.detail`). So the panel clears on its own
+  // when a capability hub is selected — a `kind === "project"` guard here would
+  // be dead by construction (a mutation that removed it changed no test), and
+  // dead guards are what Rule 6 exists to stop.
+  const selectedDetail = selectedNode?.detail ?? null;
 
   const choreoMode = choreographyMode(prefersReduced, lowPower, activeEdges.size);
   const animated = hydrated && choreoMode === "full";
@@ -446,6 +452,73 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
           </ul>
         </section>
       </div>
+
+      {/* M3.3.1: the selected project's evidence. Rendered from the current
+          selection with no `hydrated` gate — it is static content derived from
+          the server-provided node, so a no-JS reader sees the same detail as a
+          hydrated one, and the links are real anchors that work before the
+          island upgrades (a control that only acts after hydration would be a
+          dead control — P5). The live region below stays the place that
+          announces the summary; this panel is never inside it, so a selection
+          never reads out every link and skill.
+
+          No `aria-label` on the wrapper: it is a generic container, and ARIA
+          prohibits naming role=generic. Visible sub-labels carry the structure
+          instead (Q4.2 #7). */}
+      {selectedDetail && (
+        <div
+          data-signal-detail
+          className="mx-4 mb-2 mt-4 space-y-3 rounded-md border border-border/70 bg-bg-secondary/50 p-4"
+        >
+          {selectedDetail.association && (
+            <p>
+              <span className="section-label block text-text-secondary">Association</span>
+              <span className="text-sm text-text-primary">{selectedDetail.association}</span>
+            </p>
+          )}
+          {selectedDetail.skills.length > 0 && (
+            <div>
+              <span className="section-label block text-text-secondary">Skills</span>
+              <ul className="mt-1 flex list-none flex-wrap gap-2">
+                {selectedDetail.skills.map((skill) => (
+                  <li
+                    key={skill}
+                    data-signal-detail-skill
+                    className="rounded-full border border-border/70 px-2 py-0.5 text-xs text-text-secondary"
+                  >
+                    {skill}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {selectedDetail.links.length > 0 && (
+            <div>
+              <span className="section-label block text-text-secondary">Evidence links</span>
+              <ul className="mt-1 flex list-none flex-wrap gap-3">
+                {selectedDetail.links.map((link) => (
+                  // Same convention as the project cards (M2.2): a real external
+                  // link, opened in a new tab with a screen-reader suffix so the
+                  // context change is announced rather than sprung on the reader.
+                  <li key={`${link.label}-${link.url}`}>
+                    <a
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-signal-detail-link
+                      className="text-sm font-medium text-brand transition-colors hover:text-accent motion-reduce:transition-none"
+                    >
+                      {link.label}
+                      <span aria-hidden="true"> ↗</span>
+                      <span className="sr-only"> (opens in a new tab)</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
 
       <div
         data-signal-status

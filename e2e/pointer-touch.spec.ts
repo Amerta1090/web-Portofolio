@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
+import { projectNodeId, requireLinkedProject } from "./project-data";
 
 // F5.1 — the input modalities of two PRD Definition-of-Done lines that no test
 // actually exercised.
@@ -233,6 +234,44 @@ test.describe("F5.1 — pointer input", () => {
     expect(countAt(await edgeSamples(page), "hover")).toBe(0);
     expect(await selectedNode(page)).toBe(selected);
   });
+
+  test("selecting a project shows its evidence panel; a capability hub clears it (M3.3.1)", async ({
+    page,
+  }) => {
+    await openSignalLoom(page);
+    const panel = page.locator("#systems-in-motion [data-signal-detail]");
+    // The narrative default is a capability hub, which carries no detail.
+    await expect(panel).toHaveCount(0);
+
+    const project = requireLinkedProject();
+    const nodeId = projectNodeId(project.title);
+    const card = page
+      .getByRole("region", { name: "Project evidence nodes" })
+      .locator(`[data-signal-node="${nodeId}"]`);
+    await card.scrollIntoViewIfNeeded();
+    await card.click();
+
+    await expect(panel).toBeVisible();
+    const firstLink = project.links[0];
+    const link = panel.locator(`a[href="${firstLink.url}"]`);
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute("target", "_blank");
+    // The declared skill is evidence too, and it is shown as a chip, not prose.
+    // Queried by its hook: `list-none` can strip list semantics from the
+    // accessibility tree, so a role query would be brittle here.
+    await expect(
+      panel.locator("[data-signal-detail-skill]").filter({ hasText: project.skills[0] }),
+    ).toHaveCount(1);
+
+    // A hub has no evidence payload, so the panel must clear rather than leave
+    // the previous project's links on screen.
+    await page
+      .getByRole("region", { name: "Capability nodes" })
+      .locator("[data-signal-node]")
+      .first()
+      .click();
+    await expect(panel).toHaveCount(0);
+  });
 });
 
 test.describe("F5.1 — touch input", () => {
@@ -343,6 +382,26 @@ test.describe("F5.1 — touch input", () => {
       expect(size.w).toBeGreaterThanOrEqual(MIN_TARGET_PX);
       expect(size.h).toBeGreaterThanOrEqual(MIN_TARGET_PX);
     }
+  });
+
+  test("a tap reveals the tapped project's evidence panel (M3.3.1)", async ({ page }) => {
+    // Tablet width so the connector plane is live; the panel itself is laid out
+    // as static content below the grid at every width.
+    await page.setViewportSize({ width: 834, height: 1112 });
+    await openSignalLoom(page);
+    const panel = page.locator("#systems-in-motion [data-signal-detail]");
+    await expect(panel).toHaveCount(0);
+
+    const project = requireLinkedProject();
+    const nodeId = projectNodeId(project.title);
+    const card = page
+      .getByRole("region", { name: "Project evidence nodes" })
+      .locator(`[data-signal-node="${nodeId}"]`);
+    await card.scrollIntoViewIfNeeded();
+    await card.tap();
+
+    await expect(panel).toBeVisible();
+    await expect(panel.locator(`a[href="${project.links[0].url}"]`)).toBeVisible();
   });
 
   test("a tap advances the Case Study Reactor to that stage", async ({ page }) => {

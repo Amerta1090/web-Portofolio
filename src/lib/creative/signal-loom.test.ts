@@ -11,7 +11,7 @@ import {
   mostConnectedNodeId,
   projectHref,
 } from "./signal-loom";
-import type { SignalEdgeEmphasis } from "./signal-loom";
+import type { SignalEdgeEmphasis, SignalLoomProjectDetail } from "./signal-loom";
 
 const skills: SkillsData = {
   categories: [
@@ -358,5 +358,113 @@ describe("Task 3.1 — real portfolio data", () => {
 
   it("is deterministic — two builds are byte-identical", () => {
     expect(buildSignalLoomGraph(projects, skills)).toEqual(graph);
+  });
+});
+
+/**
+ * M3.3.1 — the evidence a selected project node renders.
+ *
+ * The panel is only as honest as this contract: a project with no links must
+ * carry an empty array (so the island can omit the group), `association` must be
+ * absent when the data declares none (no empty label), and `media` must never be
+ * carried at all — its values are display *labels*, not URLs, and the files do
+ * not exist under `public/` (T2.2, P6).
+ */
+describe("Task 3.3 — project detail contract", () => {
+  const detailed: Project = {
+    title: "Associated Project",
+    category: "ml",
+    period: "2026",
+    description: "Has an association, links, and media labels.",
+    links: [{ label: "Live Demo", url: "https://example.com/demo" }],
+    skills: ["Machine Learning", "Python"],
+    association: "Universitas AMIKOM Yogyakarta",
+    media: ["Prototype"],
+  };
+  const bare: Project = {
+    title: "Bare Project",
+    category: "cli",
+    period: "2025",
+    description: "No association, no links, no media.",
+    links: [],
+    skills: ["Bash"],
+  };
+
+  const detailOf = (g: ReturnType<typeof buildSignalLoomGraph>, id: string) =>
+    g.nodes.find((node) => node.id === id)?.detail;
+
+  it("carries declared skills and links on a project node", () => {
+    const graph = buildSignalLoomGraph([detailed], skills);
+    expect(detailOf(graph, "project-associated-project")).toEqual({
+      association: "Universitas AMIKOM Yogyakarta",
+      skills: ["Machine Learning", "Python"],
+      links: [{ label: "Live Demo", url: "https://example.com/demo" }],
+    });
+  });
+
+  it("leaves capability nodes without detail so switching to a hub can clear the panel", () => {
+    const graph = buildSignalLoomGraph([detailed], skills);
+    const capabilities = graph.nodes.filter((node) => node.kind === "capability");
+    expect(capabilities.length).toBeGreaterThan(0);
+    for (const node of capabilities) expect(node.detail).toBeUndefined();
+  });
+
+  it("omits association entirely when the project declares none", () => {
+    const graph = buildSignalLoomGraph([bare], skills);
+    expect(detailOf(graph, "project-bare-project")).toEqual({ skills: ["Bash"], links: [] });
+    expect(detailOf(graph, "project-bare-project")).not.toHaveProperty("association");
+  });
+
+  it("keeps an empty links array rather than inventing a link", () => {
+    const graph = buildSignalLoomGraph([bare], skills);
+    expect(detailOf(graph, "project-bare-project")?.links).toEqual([]);
+  });
+
+  it("never carries media — its values are labels, not openable evidence", () => {
+    const graph = buildSignalLoomGraph([detailed], skills);
+    // `media` survives in the data (facts and observatory still count it); the
+    // map simply does not repeat a claim it cannot open.
+    expect(detailed.media).toEqual(["Prototype"]);
+    expect(detailOf(graph, "project-associated-project")).not.toHaveProperty("media");
+  });
+});
+
+/**
+ * M3.3.1, measured: the same pins as Task 3.1, now for the detail payload built
+ * from the 22 projects as they exist right now.
+ */
+describe("Task 3.3 — real portfolio detail", () => {
+  const skills = skillsData as SkillsData;
+  const projects = projectsData.projects as Project[];
+  const graph = buildSignalLoomGraph(projects, skills);
+  const details = graph.nodes
+    .filter((node) => node.kind === "project")
+    .map((node) => node.detail as SignalLoomProjectDetail);
+
+  it("gives every one of the 22 projects a detail payload", () => {
+    expect(details).toHaveLength(22);
+    expect(details.every((detail) => detail !== undefined)).toBe(true);
+  });
+
+  it("carries 23 links across the 19 projects that declare any", () => {
+    const linkCount = details.reduce((sum, detail) => sum + detail.links.length, 0);
+    expect(linkCount).toBe(23);
+    expect(details.filter((detail) => detail.links.length > 0)).toHaveLength(19);
+    // The three projects with no links carry the empty array, not a placeholder.
+    expect(details.filter((detail) => detail.links.length === 0)).toHaveLength(3);
+  });
+
+  it("adds association only for the six projects that declare one", () => {
+    expect(details.filter((detail) => detail.association !== undefined)).toHaveLength(6);
+  });
+
+  it("carries 43 skill instances across the map", () => {
+    const skillCount = details.reduce((sum, detail) => sum + detail.skills.length, 0);
+    expect(skillCount).toBe(43);
+  });
+
+  it("carries no media label anywhere, though four projects still hold them", () => {
+    for (const detail of details) expect(detail).not.toHaveProperty("media");
+    expect(projects.filter((project) => (project.media ?? []).length > 0)).toHaveLength(4);
   });
 });

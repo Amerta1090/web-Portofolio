@@ -1,7 +1,27 @@
-import type { Project } from "../../types/projects";
+import type { Project, ProjectLink } from "../../types/projects";
 import type { SkillCategory, SkillsData } from "../../types/skills";
 
 export type SignalLoomNodeKind = "capability" | "project";
+
+/**
+ * The evidence a selected project node can show (M3.3.1).
+ *
+ * `association` and `links` are optional in the source data, so they are
+ * optional here too: a project with no links must not render an empty "Evidence
+ * links" label. `skills` is always present — every project declares at least one
+ * and, when a project somehow declares none, the island simply omits the group.
+ *
+ * `media` is deliberately **not** part of this contract. In `projects.json`
+ * `media` holds display *labels* ("Prototype", "monitoring_accuracy.png"), not
+ * URLs, and the referenced image files do not exist under `public/` — rendering
+ * them would mean inventing paths and shipping evidence that cannot be opened
+ * (T2.2, P6). The field stays in the data; the map does not repeat the claim.
+ */
+export interface SignalLoomProjectDetail {
+  association?: string;
+  skills: string[];
+  links: ProjectLink[];
+}
 
 export interface SignalLoomNode {
   id: string;
@@ -10,6 +30,8 @@ export interface SignalLoomNode {
   summary: string;
   href?: string;
   category?: string;
+  /** Present on project nodes only; capability nodes stay lean (M3.3.1). */
+  detail?: SignalLoomProjectDetail;
 }
 
 export interface SignalLoomEdge {
@@ -92,6 +114,22 @@ function projectSummary(project: Project): string {
 }
 
 /**
+ * The detail payload a selected project node renders (M3.3.1). Populated on the
+ * server so the island only reads it — the client bundle never imports the data
+ * layer. `association` is added only when the project declares one, keeping the
+ * shape honest (no empty labels for data that is not there); `media` is left out
+ * on purpose (see `SignalLoomProjectDetail`).
+ */
+function projectDetail(project: Project): SignalLoomProjectDetail {
+  const detail: SignalLoomProjectDetail = {
+    skills: project.skills,
+    links: project.links,
+  };
+  if (project.association) detail.association = project.association;
+  return detail;
+}
+
+/**
  * Normalise a skill label for relationship matching.
  *
  * Parenthetical qualifiers ("Python (Programming Language)") are stripped so the
@@ -170,6 +208,7 @@ export function buildSignalLoomGraph(projects: Project[], skills: SkillsData): S
     summary: projectSummary(project),
     href: projectHref(project),
     category: project.category,
+    detail: projectDetail(project),
   }));
 
   const edges: SignalLoomEdge[] = [];

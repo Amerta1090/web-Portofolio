@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
+import { projectNodeId, requireLinkedProject } from "./project-data";
 
 // Q4.2 — accessibility and browser behaviour for the two sprint features.
 //
@@ -309,6 +310,49 @@ test.describe("Q4.2 — names, descriptions, selected state, reading order", () 
     expect(order[0]).toBe("stepper");
     expect(order[1]).toBe("panel");
     expect(order[2]).toBe("list");
+  });
+});
+
+test.describe("Task 3.3 — selected project evidence keeps the reading order", () => {
+  test("the detail panel is a sibling before the status, never inside the live region", async ({
+    page,
+  }) => {
+    await openSignalLoom(page);
+    // The narrative default is a capability hub, which carries no detail — so the
+    // reading-order invariant pinned above applies to the default selection.
+    await expect(page.locator("#systems-in-motion [data-signal-detail]")).toHaveCount(0);
+
+    const nodeId = projectNodeId(requireLinkedProject().title);
+    const card = page
+      .getByRole("region", { name: "Project evidence nodes" })
+      .locator(`[data-signal-node="${nodeId}"]`);
+    await card.scrollIntoViewIfNeeded();
+    await card.click();
+
+    const panel = page.locator("#systems-in-motion [data-signal-detail]");
+    await expect(panel).toBeVisible();
+
+    // Document order once a project is selected: the detail panel sits before the
+    // live region, and the status stays last.
+    const order = await page.evaluate(() =>
+      [
+        ...document.querySelectorAll(
+          "#systems-in-motion [data-signal-detail], #systems-in-motion [data-signal-status]",
+        ),
+      ].map((el) => (el.hasAttribute("data-signal-detail") ? "detail" : "status")),
+    );
+    expect(order).toEqual(["detail", "status"]);
+
+    // The panel must not nest inside the live region, or every selection would
+    // read out all skills and links instead of the one-line summary.
+    expect(
+      await page.evaluate(
+        () =>
+          document
+            .querySelector("[data-signal-status]")
+            ?.contains(document.querySelector("[data-signal-detail]")) ?? null,
+      ),
+    ).toBe(false);
   });
 });
 
