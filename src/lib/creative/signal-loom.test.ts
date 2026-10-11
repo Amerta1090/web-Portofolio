@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import projectsData from "../../../data/projects.json";
+import skillsData from "../../../data/skills.json";
 import type { Project } from "../../types/projects";
 import type { SkillsData } from "../../types/skills";
 import {
@@ -48,34 +50,48 @@ const projects: Project[] = [
     title: "Unfeatured Project",
     category: "cli",
     period: "2025",
-    description: "Should not enter the first graph.",
+    description: "Included in the map even without a featured flag.",
     links: [],
     skills: ["Machine Learning"],
   },
 ];
 
 describe("buildSignalLoomGraph", () => {
-  it("builds deterministic capability to featured-project edges", () => {
+  it("builds deterministic capability-to-every-project edges with overlap weights", () => {
     const graph = buildSignalLoomGraph(projects, skills);
 
+    // Every supplied project is a node (Sprint 3 objective) — no `featured`
+    // filter — with the capability hubs first and source order preserved.
     expect(graph.nodes.map((node) => node.id)).toEqual([
       "capability-machine-learning-ai",
       "capability-web-development",
       "project-forecasting-system",
       "project-interface-system",
+      "project-unfeatured-project",
     ]);
+    // Edge order is project order then category order, and `weight` is the
+    // declared skill overlap count (M3.1.2), not a taste knob.
     expect(graph.edges).toEqual([
       {
         id: "capability-machine-learning-ai->project-forecasting-system",
         from: "capability-machine-learning-ai",
         to: "project-forecasting-system",
         label: "Machine Learning",
+        weight: 1,
       },
       {
         id: "capability-web-development->project-interface-system",
         from: "capability-web-development",
         to: "project-interface-system",
         label: "React.js",
+        weight: 1,
+      },
+      {
+        id: "capability-machine-learning-ai->project-unfeatured-project",
+        from: "capability-machine-learning-ai",
+        to: "project-unfeatured-project",
+        label: "Machine Learning",
+        weight: 1,
       },
     ]);
     // L2.3 narrative first frame: default to the most-connected hub (tie-break
@@ -111,17 +127,18 @@ describe("buildSignalLoomGraph", () => {
         from: "capability-programming-languages",
         to: "project-python-platform",
         label: "Python (Programming Language)",
+        weight: 1,
       },
     ]);
   });
 
-  it("links a broad project skill to a more specific category skill by shared token", () => {
+  it("links a broader project skill through containment, not shared tokens", () => {
     const categories: SkillsData = {
       categories: [
         {
           name: "Web Development",
           icon: "code",
-          skills: [{ name: "Full-Stack Development", proficiency: 4 }],
+          skills: [{ name: "Back-End Web Development", proficiency: 4 }],
         },
       ],
     };
@@ -137,8 +154,43 @@ describe("buildSignalLoomGraph", () => {
 
     const graph = buildSignalLoomGraph([webProject], categories);
 
+    // "web development" is contained in "back-end web development", so the arm
+    // of the match that survived Task 3.1 links them.
     expect(graph.edges.map((edge) => edge.from)).toContain("capability-web-development");
     expect(graph.edges[0]?.label).toBe("Web Development");
+    expect(graph.edges[0]?.weight).toBe(1);
+  });
+
+  it("does not fabricate edges from shared tokens (Task 3.1)", () => {
+    const categories: SkillsData = {
+      categories: [
+        {
+          name: "IoT & Embedded Systems",
+          icon: "cpu",
+          skills: [{ name: "Embedded Systems", proficiency: 4 }],
+        },
+        {
+          name: "Data Science & Analytics",
+          icon: "chart",
+          skills: [{ name: "Data Engineering", proficiency: 4 }],
+        },
+      ],
+    };
+    const project: Project = {
+      title: "Recommender Project",
+      featured: true,
+      category: "ml",
+      period: "2026",
+      description: "Recommends things.",
+      links: [],
+      // The removed token rule matched both of these on "systems"/"engineering"
+      // and drew edges that are simply false.
+      skills: ["Recommender Systems", "Prompt Engineering"],
+    };
+
+    const graph = buildSignalLoomGraph([project], categories);
+
+    expect(graph.edges).toEqual([]);
   });
 
   it("returns the selected node and its direct neighbors", () => {
@@ -146,6 +198,7 @@ describe("buildSignalLoomGraph", () => {
     expect([...connectedNodeIds(graph, "capability-machine-learning-ai")]).toEqual([
       "capability-machine-learning-ai",
       "project-forecasting-system",
+      "project-unfeatured-project",
     ]);
   });
 
@@ -164,9 +217,9 @@ describe("mostConnectedNodeId", () => {
       { id: "b", label: "B", kind: "project" as const, summary: "" },
     ];
     const edges = [
-      { id: "hub->a", from: "hub", to: "a", label: "" },
-      { id: "hub->b", from: "hub", to: "b", label: "" },
-      { id: "a->b", from: "a", to: "b", label: "" },
+      { id: "hub->a", from: "hub", to: "a", label: "", weight: 1 },
+      { id: "hub->b", from: "hub", to: "b", label: "", weight: 1 },
+      { id: "a->b", from: "a", to: "b", label: "", weight: 1 },
     ];
 
     expect(mostConnectedNodeId(nodes, edges)).toBe("hub");
@@ -245,5 +298,54 @@ describe("Task 2.4 — skill → Capability Map bridge", () => {
     expect(capabilityNodeIdForSkill("React.js", reversed.categories)).toBe(
       "capability-web-development",
     );
+  });
+});
+
+/**
+ * M3.1.5 — pin the real, measured numbers against the live data layer.
+ *
+ * These are not targets, they are readings: the graph built from the 22
+ * projects and 8 skill categories as they exist right now. If the data changes
+ * the graph must change with it, and this test is the alarm.
+ */
+describe("Task 3.1 — real portfolio data", () => {
+  const skills = skillsData as SkillsData;
+  const projects = projectsData.projects as Project[];
+  const graph = buildSignalLoomGraph(projects, skills);
+
+  it("maps every category and every project — 8 + 22 = 30 nodes", () => {
+    expect(graph.nodes).toHaveLength(8 + 22);
+    expect(graph.nodes.filter((node) => node.kind === "capability")).toHaveLength(8);
+    expect(graph.nodes.filter((node) => node.kind === "project")).toHaveLength(22);
+  });
+
+  it("draws 31 honest edges", () => {
+    expect(graph.edges).toHaveLength(31);
+  });
+
+  it("weights every edge by its declared overlap count", () => {
+    const distribution = graph.edges.reduce<Record<number, number>>((acc, edge) => {
+      acc[edge.weight] = (acc[edge.weight] ?? 0) + 1;
+      return acc;
+    }, {});
+    expect(distribution).toEqual({ 1: 24, 2: 7 });
+  });
+
+  it("leaves no node isolated and no category without an edge", () => {
+    const connected = new Set<string>();
+    for (const edge of graph.edges) {
+      connected.add(edge.from);
+      connected.add(edge.to);
+    }
+    const isolated = graph.nodes.filter((node) => !connected.has(node.id));
+    expect(isolated).toEqual([]);
+  });
+
+  it("opens on the Machine Learning & AI hub (9 edges)", () => {
+    expect(graph.defaultNodeId).toBe("capability-machine-learning-ai");
+  });
+
+  it("is deterministic — two builds are byte-identical", () => {
+    expect(buildSignalLoomGraph(projects, skills)).toEqual(graph);
   });
 });

@@ -12,9 +12,27 @@ const VALID_IDS = ["capability-ml", "capability-web", "project-a"] as const;
 const GRAPH: SignalLoomGraph = {
   nodes: [],
   edges: [
-    { id: "capability-ml->project-a", from: "capability-ml", to: "project-a", label: "ml" },
-    { id: "capability-web->project-a", from: "capability-web", to: "project-a", label: "web" },
-    { id: "capability-ml->project-b", from: "capability-ml", to: "project-b", label: "ml" },
+    {
+      id: "capability-ml->project-a",
+      from: "capability-ml",
+      to: "project-a",
+      label: "ml",
+      weight: 1,
+    },
+    {
+      id: "capability-web->project-a",
+      from: "capability-web",
+      to: "project-a",
+      label: "web",
+      weight: 1,
+    },
+    {
+      id: "capability-ml->project-b",
+      from: "capability-ml",
+      to: "project-b",
+      label: "ml",
+      weight: 1,
+    },
   ],
   defaultNodeId: "project-a",
 };

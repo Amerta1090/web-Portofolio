@@ -17,6 +17,12 @@ export interface SignalLoomEdge {
   from: string;
   to: string;
   label: string;
+  /**
+   * Number of declared skill overlaps between the capability and the project
+   * (M3.1.2). A real, reproducible count from the data, never an aesthetic
+   * knob — Task 3.2 maps it to edge thickness.
+   */
+  weight: number;
 }
 
 export interface SignalLoomGraph {
@@ -24,8 +30,6 @@ export interface SignalLoomGraph {
   edges: SignalLoomEdge[];
   defaultNodeId: string;
 }
-
-const FEATURED_PROJECT_LIMIT = 6;
 
 function slugify(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-");
@@ -69,44 +73,53 @@ function normalizeSkill(value: string): string {
 
 /**
  * Decide whether a project skill and a category skill describe the same
- * capability. Exact string wins, then one-side containment (so "web
- * development" resolves against "Full-Stack Development"), then a shared
- * significant token (so "Python (Programming Language)" → "Python"). This keeps
- * the graph truthful to the declared skill data while avoiding the previous
- * stale situation where a Python-first portfolio showed almost no edges.
+ * capability. Two honest tests only: an exact match after normalisation, or
+ * one-side containment, so "Web Development" still resolves against the
+ * category's "Back-End Web Development".
+ *
+ * A shared-token fallback ("systems", "engineering", "processing") used to run
+ * here. It was dropped in Task 3.1 because it fabricated edges that are simply
+ * false — it linked "Recommender Systems" to the IoT category's "Embedded
+ * Systems", and "Image Processing" to "Natural Language Processing". Sprint 3
+ * is about evidence, not density (R3: an edge must carry real weight).
+ * `normalizeSkill` is still the one normaliser shared with the Task 2.4 chip
+ * resolver (M3.1.3); only the over-broad policy was removed.
  */
 function skillMatches(projectSkill: string, categorySkill: string): boolean {
   const project = normalizeSkill(projectSkill);
   const category = normalizeSkill(categorySkill);
   if (!project || !category) return false;
-  if (project === category) return true;
-  if (project.includes(category) || category.includes(project)) return true;
-  const tokens = (value: string) =>
-    new Set(value.split(/[^a-z0-9+#.]+/).filter((token) => token.length > 2));
-  const projectTokens = tokens(project);
-  return [...tokens(category)].some((token) => projectTokens.has(token));
-}
-
-function matchingCategories(project: Project, categories: SkillCategory[]): SkillCategory[] {
-  return categories.filter((category) =>
-    category.skills.some((categorySkill) =>
-      project.skills.some((projectSkill) => skillMatches(projectSkill, categorySkill.name)),
-    ),
-  );
+  return project === category || project.includes(category) || category.includes(project);
 }
 
 /**
- * Build the first Signal Loom graph from the portfolio's real skill and project data.
+ * Count the declared skill overlaps between a project and a capability. This is
+ * the edge weight (M3.1.2) — computed from the data, deterministic, no
+ * `Math.random()`.
+ */
+function overlapCount(project: Project, category: SkillCategory): number {
+  let count = 0;
+  for (const projectSkill of project.skills) {
+    for (const categorySkill of category.skills) {
+      if (skillMatches(projectSkill, categorySkill.name)) count += 1;
+    }
+  }
+  return count;
+}
+
+/**
+ * Build the Signal Loom graph from the portfolio's real skill and project data.
  *
- * The graph stays intentionally small: capability categories are the hubs and featured
- * projects are the evidence. The source order is preserved so the result is deterministic
- * and stable for both SSR and tests.
+ * Every supplied project becomes a node — there is no `featured` filter — so the
+ * project-evidence column can no longer omit 17 of 22 projects (Sprint 3
+ * objective). Capability categories are the hubs; each project is connected to
+ * every category it shares a declared skill with, and the edge carries the
+ * overlap count as its `weight`. Both node lists and the edge list follow source
+ * order, so the result is deterministic for SSR and tests (M3.1.4) and never
+ * calls `Math.random()`.
  */
 export function buildSignalLoomGraph(projects: Project[], skills: SkillsData): SignalLoomGraph {
   const categories = skills.categories;
-  const featuredProjects = projects
-    .filter((project) => project.featured)
-    .slice(0, FEATURED_PROJECT_LIMIT);
 
   const capabilityNodes: SignalLoomNode[] = categories.map((category) => ({
     id: categoryId(category),
@@ -116,7 +129,7 @@ export function buildSignalLoomGraph(projects: Project[], skills: SkillsData): S
     category: category.name,
   }));
 
-  const projectNodes: SignalLoomNode[] = featuredProjects.map((project) => ({
+  const projectNodes: SignalLoomNode[] = projects.map((project) => ({
     id: projectId(project),
     label: project.title,
     kind: "project",
@@ -126,10 +139,11 @@ export function buildSignalLoomGraph(projects: Project[], skills: SkillsData): S
   }));
 
   const edges: SignalLoomEdge[] = [];
-  for (const project of featuredProjects) {
+  for (const project of projects) {
     const target = projectId(project);
-    const matched = matchingCategories(project, categories);
-    for (const category of matched) {
+    for (const category of categories) {
+      const weight = overlapCount(project, category);
+      if (weight === 0) continue;
       const source = categoryId(category);
       const matchedSkill = project.skills.find((projectSkill) =>
         category.skills.some((skill) => skillMatches(projectSkill, skill.name)),
@@ -139,6 +153,7 @@ export function buildSignalLoomGraph(projects: Project[], skills: SkillsData): S
         from: source,
         to: target,
         label: matchedSkill ?? category.name,
+        weight,
       });
     }
   }

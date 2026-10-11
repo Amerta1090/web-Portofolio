@@ -294,7 +294,7 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
     );
 
     // Before hydration there is nothing to select with, so a card must not be a
-    // control: a roving-tabindex button is unreachable for 12 of the 13 cards and
+    // control: a roving-tabindex button is unreachable for 29 of the 30 cards and
     // inert for all of them when scripts are off. Render the same content as
     // static list items, and turn project evidence into a real link to the page
     // it describes — the fallback then navigates somewhere true instead of

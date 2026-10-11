@@ -176,12 +176,26 @@ test.describe("F5.1 — pointer input", () => {
     // broken interaction rather than a deliberate choice.
     await openSignalLoom(page);
     const selected = await selectedNode(page);
-    const connectedId = await page
-      .locator(`[data-signal-node][data-connected="true"]`)
-      .evaluateAll((els, sel) => {
-        const el = els.find((e) => e.getAttribute("data-signal-node") !== sel);
-        return el?.getAttribute("data-signal-node") ?? null;
-      }, selected);
+    // A card the selection reaches through *every* one of its edges. Stating the
+    // precondition matters: the honest all-project graph (Task 3.1) gives projects
+    // up to two edges, and hovering a partially-connected card correctly draws the
+    // shadow on its untouched edge — so "no 1.6 anywhere" would be the wrong
+    // expectation there. This test is about the fully-connected card.
+    const connectedId = await page.evaluate((sel) => {
+      const edges = Array.from(document.querySelectorAll("[data-edge]"));
+      const nodes = Array.from(
+        document.querySelectorAll('[data-signal-node][data-connected="true"]'),
+      );
+      for (const node of nodes) {
+        const id = node.getAttribute("data-signal-node");
+        if (!id || id === sel) continue;
+        const own = edges.filter((e) => (e.getAttribute("data-edge") ?? "").endsWith(`->${id}`));
+        if (own.length > 0 && own.every((e) => e.getAttribute("stroke-width") === "2")) {
+          return id;
+        }
+      }
+      return null;
+    }, selected);
     expect(connectedId).toBeTruthy();
 
     const card = page.locator(`[data-signal-node="${connectedId}"]`);
@@ -300,7 +314,7 @@ test.describe("F5.1 — touch input", () => {
   test("Signal Loom controls are large enough to hit with a finger", async ({ page }) => {
     await openSignalLoom(page);
     const sizes = await targetSizes(page, "[data-signal-node]");
-    expect(sizes).toHaveLength(13);
+    expect(sizes).toHaveLength(30);
     for (const size of sizes) {
       expect(size.w).toBeGreaterThanOrEqual(MIN_TARGET_PX);
       expect(size.h).toBeGreaterThanOrEqual(MIN_TARGET_PX);

@@ -55,8 +55,20 @@ const GRAPH: SignalLoomGraph = {
     { id: "project-a", label: "Project A", kind: "project", summary: "Project A summary" },
   ],
   edges: [
-    { id: "capability-ml->project-a", from: "capability-ml", to: "project-a", label: "ml" },
-    { id: "capability-web->project-a", from: "capability-web", to: "project-a", label: "web" },
+    {
+      id: "capability-ml->project-a",
+      from: "capability-ml",
+      to: "project-a",
+      label: "ml",
+      weight: 1,
+    },
+    {
+      id: "capability-web->project-a",
+      from: "capability-web",
+      to: "project-a",
+      label: "web",
+      weight: 1,
+    },
   ],
   defaultNodeId: "project-a",
 };
@@ -71,11 +83,11 @@ const WIDE_GRAPH: SignalLoomGraph = {
     { id: "project-z", label: "Project Z", kind: "project", summary: "Project Z summary" },
   ],
   edges: [
-    { id: "e1", from: "capability-a", to: "project-z", label: "one" },
-    { id: "e2", from: "capability-b", to: "project-z", label: "two" },
-    { id: "e3", from: "capability-c", to: "project-z", label: "three" },
-    { id: "e4", from: "capability-d", to: "project-z", label: "four" },
-    { id: "e5", from: "capability-e", to: "project-z", label: "five" },
+    { id: "e1", from: "capability-a", to: "project-z", label: "one", weight: 1 },
+    { id: "e2", from: "capability-b", to: "project-z", label: "two", weight: 1 },
+    { id: "e3", from: "capability-c", to: "project-z", label: "three", weight: 1 },
+    { id: "e4", from: "capability-d", to: "project-z", label: "four", weight: 1 },
+    { id: "e5", from: "capability-e", to: "project-z", label: "five", weight: 1 },
   ],
   defaultNodeId: "project-z",
 };

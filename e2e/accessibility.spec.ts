@@ -38,9 +38,9 @@ test.describe("Q4.2 — keyboard-only navigation", () => {
     await openSignalLoom(page);
 
     // Roving tabindex: exactly one card is in the tab order, so the graph is a
-    // single stop rather than thirteen.
+    // single stop rather than thirty.
     await expect(page.locator('[data-signal-node][tabindex="0"]')).toHaveCount(1);
-    await expect(page.locator('[data-signal-node][tabindex="-1"]')).toHaveCount(12);
+    await expect(page.locator('[data-signal-node][tabindex="-1"]')).toHaveCount(29);
 
     await page.locator('[data-signal-node][tabindex="0"]').focus();
     const start = await page
@@ -85,9 +85,14 @@ test.describe("Q4.2 — keyboard-only navigation", () => {
     await openSignalLoom(page);
     // The two zones are separate lists, so a plain roving tabindex could never
     // leave the capability column. The island walks one combined order instead.
+    // Cover every node rather than a fixed eight steps: the default selection is
+    // data-derived and, with the honest all-project graph (Task 3.1), it can sit
+    // at either end. A fixed count measured a single column and would pass or fail
+    // for the wrong reason; walking the whole order guarantees the crossing.
     await page.locator('[data-signal-node][tabindex="0"]').focus();
+    const nodeCount = await page.locator("[data-signal-node]").count();
     const kinds: string[] = [];
-    for (let i = 0; i < 8; i += 1) {
+    for (let i = 0; i < nodeCount; i += 1) {
       kinds.push(
         (await page.evaluate(() =>
           document.activeElement?.getAttribute("data-node-kind"),
@@ -176,7 +181,7 @@ test.describe("Q4.2 — names, descriptions, selected state, reading order", () 
         words: (el.getAttribute("aria-label") ?? "").split(/\s+/).length,
       })),
     );
-    expect(names).toHaveLength(13);
+    expect(names).toHaveLength(30);
     for (const entry of names) {
       expect(entry.name, `${entry.id} needs a concise accessible name`).toBeTruthy();
       expect(entry.words).toBeLessThanOrEqual(12);
@@ -233,7 +238,7 @@ test.describe("Q4.2 — names, descriptions, selected state, reading order", () 
         el.hasAttribute("data-signal-node") ? el.getAttribute("data-node-kind") : "status",
       ),
     );
-    expect(order.filter((k) => k === "project")).toHaveLength(5);
+    expect(order.filter((k) => k === "project")).toHaveLength(22);
     expect(order.filter((k) => k === "capability")).toHaveLength(8);
     // Every capability precedes every project, and the status comes last.
     expect(order.indexOf("project")).toBeGreaterThan(order.lastIndexOf("capability"));
@@ -387,13 +392,13 @@ test.describe("Q4.2 — no JavaScript and no animation enhancement", () => {
       };
     });
 
-    expect(fallback.total).toBe(13);
-    // Regression: every card used to be a button, 12 of them unreachable and all
+    expect(fallback.total).toBe(30);
+    // Regression: every card used to be a button, 29 of them unreachable and all
     // of them inert with scripts off.
     expect(fallback.buttons).toBe(0);
     expect(fallback.unreachables).toBe(0);
-    // The five project cards navigate to real pages instead of swallowing a click.
-    expect(fallback.links).toBe(5);
+    // The twenty-two project cards navigate to real pages instead of swallowing a click.
+    expect(fallback.links).toBe(22);
     expect(fallback.linksWithoutHref).toBe(0);
     for (const link of fallback.links3) {
       // Names are not bounded by a word count — real titles run from three to ten
@@ -530,7 +535,7 @@ test.describe("Q4.2 — dark, light, and zoom", () => {
       await page.setViewportSize({ width, height });
       await openSignalLoom(page);
       expect(await horizontalOverflow(page)).toBe(0);
-      await expect(page.locator("[data-signal-node]")).toHaveCount(13);
+      await expect(page.locator("[data-signal-node]")).toHaveCount(30);
       await expect(page.getByRole("region", { name: "Capability nodes" })).toBeVisible();
       await expect(page.getByRole("region", { name: "Project evidence nodes" })).toBeVisible();
       await expect(page.locator("[data-signal-status-text]")).toBeVisible();

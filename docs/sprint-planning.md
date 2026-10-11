@@ -971,17 +971,20 @@ M1 membuktikan perbaikan ini **bertemu masalah nyata**, bukan sekadar membiarkan
 **Depends on**: Sprint 0 (SiteFacts) + Task 2.4 (ID stabil).
 **PRD ref**: §9.3, I1, R3
 **Verified baseline (2026-09-29, menjalankan `buildSignalLoomGraph` terhadap `data/*.json` nyata)**: 13 node (8 kapabilitas + 5 proyek) · 8 edge · **5 node terisolasi (38%)** · kategori berdegree 0 = `data-science-analytics`, `iot-embedded-systems`, `devops-mlops`, `cloud-infrastructure`, `productivity-automation` · `buildSignalLoomGraph` memfilter ke `featured` **di dalam builder** (mengoper 22 proyek memberi hasil identik).
+**State saat ini (Task 3.1 selesai, 2026-10-11)**: 30 node (8 + 22) · **31 edge** · **0 node terisolasi** · bobot `{1: 24, 2: 7}` · derajat cap: ML&AI 9 / ProgLang 6 / DataSci 4 / Cloud 4 / Web 3 / IoT 2 / DevOps 2 / Productivity 1 · `defaultNodeId` `capability-machine-learning-ai` · matcher exact+containment (keputusan user; loose token fallback dibuang, 8 edge palsu). **≥60 edge ditolak via R3** (hanya 31 overlap jujur di dataset — rincian di Task 3.1).
 **Expected files**: `src/lib/creative/signal-loom.ts` (rewrite) + test, `src/islands/SignalLoom.tsx` (rewrite) + test, `src/components/organisms/SignalLoom.astro` (shell/fallback)
 
 ### Task 3.1 — Kontrak graf baru
 
-- [ ] **M3.1.1** Sumber: kategori dari `data/skills.json` (`.categories`) + 22 proyek dari `data/projects.json`.
-- [ ] **M3.1.2** Fungsi bobot: normalisasi nama skill (pakai lagi normalizer yang sudah ada di `signal-loom.ts` L2.3 — **jangan buat ulang**), lalu **edge = `project.skills[] ∩ category.skills[]`**, bobot = jumlah overlap.
-- [ ] **M3.1.3** **Normalisasi skill** yang sama juga dipakai Task 2.4 (chip) — satu fungsi, dua pemakai (P8).
-- [ ] **M3.1.4** Determinisme total: urutan node/edge stabil, tanpa `Math.random()`.
-- [ ] **M3.1.5** Unit test dengan **angka nyata**: hitung dulu, tulis angkanya ke test. **Target: ≥ 60 edge dan 0 node terisolasi.** Kalau target tak tercapai, **laporkan & koreksi plan** (R3) — jangan kirim graf spars dengan narasi bagus.
+- [x] **M3.1.1** Sumber: kategori dari `data/skills.json` (`.categories`) + 22 proyek dari `data/projects.json`.
+- [x] **M3.1.2** Fungsi bobot: normalisasi nama skill (pakai lagi normalizer yang sudah ada di `signal-loom.ts` L2.3 — **jangan buat ulang**), lalu **edge = `project.skills[] ∩ category.skills[]`**, bobot = jumlah overlap.
+- [x] **M3.1.3** **Normalisasi skill** yang sama juga dipakai Task 2.4 (chip) — satu fungsi, dua pemakai (P8).
+- [x] **M3.1.4** Determinisme total: urutan node/edge stabil, tanpa `Math.random()`.
+- [x] **M3.1.5** Unit test dengan **angka nyata**: hitung dulu, tulis angkanya ke test. **Target: ≥ 60 edge dan 0 node terisolasi.** Kalau target tak tercapai, **laporkan & koreksi plan** (R3) — jangan kirim graf spars dengan narasi bagus.
 
-**Verify**: unit hijau; angka tertulis = angka di `dist`.
+**✅ COMPLETE (2026-10-11, commit `prove: signal-loom graf 22 proyek + bobot overlap`)** — **DEVIASI-R3: target ≥ 60 edge TIDAK tercapai dan TIDAK dipalsukan** → **30 node (8 capability + 22 proyek) / 31 edge / 0 node terisolasi** (baseline lama: 13 node / 8 edge / 38% terisolasi). Bobot terukur `{1: 24, 2: 7}` (max overlap 2 — tidak ada proyek yang berbagi ≥3 skill dengan satu kategori). Derajat kategori: ML&AI 9 · ProgLang 6 · DataSci 4 · Cloud 4 · Web 3 · IoT 2 · DevOps 2 · Productivity 1. `defaultNodeId` = `capability-machine-learning-ai` (derajat tertinggi). 0 node terisolasi: setiap kategori ≥1 edge, tiap proyek ≥1 edge. **R3 dihormati**: angka jujur + catatan tertulis, bukan graf tiruan. Menggembungkan ke ≥60 secara jujur **mustahil** pada dataset: hanya 31 pasang kategori∩proyek yang benar-benar overlap setelah normalisasi tunggal; menambah edge = memalsukan hubungan (P6) — inilah alasan PRD R3 menulis "laporkan & koreksi plan". **Keputusan user (2026-10-11)**: matcher = **exact + containment saja**; fallback loose shared-token **dibuang** (token rule mengarang 8 edge palsu: `Recommender Systems`↔`Embedded Systems`, `Image Processing`↔`NLP`, `Data Engineering`↔`Prompt Engineering`, `Information Retrieval`↔`RAG`). `normalizeSkill` **tetap satu fungsi, dua pemakai** (builder + `buildSkillHrefs` Task 2.4 chip). **Efek samping chip fallback**: di bawah containment, hanya `Google Workspace` + `Image Processing` yang resolve ke `#systems-in-motion` (fallback section), keduanya TIDAK ada di 4 kartu featured → hitungan e2e Task 2.4 tidak berubah. `SignalLoomEdge.weight` jadi field wajib; fixture test (choreo 6, select 3, island 2 GRAPH + 5 WIDE_GRAPH) ikut diberi `weight: 1` (ditemukan lewat `astro check` +16). **Gate**: unit **1088/1088** (94 file) · `astro check` **98 = baseline** · biome 0 diagn di 8 file tersentuh · `validate-data` OK · `build:fast` **49 halaman** · payload `/` **201.7 / 551.0 KB = datar** (html 71.2 KB, +~5 KB dari 30 kartu fallback SSR — efek kontrak yang diharapkan, JS tak berubah) · `rg 'signal-loom' dist/_astro/` = **0** · e2e terfokus (accessibility + pointer-touch + project-cards, `--workers=1`) **45/45** · e2e penuh `--workers=1` lihat catatan DoD.
+
+**Verify**: unit hijau; angka tertulis = angka di `dist` (dipin unit `signal-loom.test.ts` real-data: 30/31/`{1:24,2:7}`/0 terisolasi/`capability-machine-learning-ai` + test no-fabrication).
 
 ### Task 3.2 — Island rebuild
 
@@ -1025,7 +1028,7 @@ M1 membuktikan perbaikan ini **bertemu masalah nyata**, bukan sekadar membiarkan
 - [ ] `bun run test` **≥ 875 + 45** (kumulatif).
 - [ ] `bun run build` 49 halaman.
 - [ ] `astro check` 0 baru; `lint` 0 baru; `biome` bersih.
-- [ ] **Target densitas terpenuhi: ≥ 60 edge, 0 node terisolasi** — atau ada catatan tertulis+R3 yang menjelaskan penyimpangan.
+- [ ] **Target densitas terpenuhi: ≥ 60 edge, 0 node terisolasi** — **KOREKSI VIA R3 (2026-10-11, Task 3.1)**: ≥60 tak tercapai secara jujur pada dataset (hanya 31 pasang overlap nyata); plan dikoreksi → **31 edge / 0 node terisolasi**, dengan catatan tertulis di Task 3.1. Kondisi alternatif "catatan tertulis+R3 yang menjelaskan penyimpangan" **terpenuhi**.
 - [ ] Probe geometri: semua edge ter-anchor, 0 overlap, 0 dashed, 0 node-point.
 - [ ] A11y: nama aksesibel identik pra/post hidrasi; tak ada `aria-label` pada `role=generic`.
 - [ ] Reduced motion → 0 dots; reduced data → statis.

@@ -10,12 +10,12 @@ import {
 const GRAPH: SignalLoomGraph = {
   nodes: [],
   edges: [
-    { id: "e1", from: "a", to: "z", label: "one" },
-    { id: "e2", from: "b", to: "z", label: "two" },
-    { id: "e3", from: "c", to: "z", label: "three" },
-    { id: "e4", from: "d", to: "z", label: "four" },
-    { id: "e5", from: "e", to: "z", label: "five" },
-    { id: "e6", from: "f", to: "other", label: "six" },
+    { id: "e1", from: "a", to: "z", label: "one", weight: 1 },
+    { id: "e2", from: "b", to: "z", label: "two", weight: 1 },
+    { id: "e3", from: "c", to: "z", label: "three", weight: 1 },
+    { id: "e4", from: "d", to: "z", label: "four", weight: 1 },
+    { id: "e5", from: "e", to: "z", label: "five", weight: 1 },
+    { id: "e6", from: "f", to: "other", label: "six", weight: 1 },
   ],
   defaultNodeId: "z",
 };
