@@ -11,6 +11,7 @@ import { choreographyMode, signalDotEdges } from "../lib/creative/signal-loom-ch
 import { SIGNAL_LOOPS, SIGNAL_TRAVEL_SECONDS } from "../lib/creative/signal-loom-choreo";
 import {
   ROVING_KEYS,
+  SIGNAL_HASH_PREFIX,
   activeEdgeIds,
   parseSignalHash,
   rovingTargetIndex,
@@ -114,9 +115,45 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
     return () => mq.removeEventListener?.("change", onChange);
   }, []);
 
+  const selectedIdRef = useRef(selectedId);
   useEffect(() => {
-    const id = parseSignalHash(window.location.hash, nodeIds, graph.defaultNodeId);
-    if (id !== graph.defaultNodeId) setSelectedId(id);
+    selectedIdRef.current = selectedId;
+  }, [selectedId]);
+
+  // Deep links: read the hash on mount, follow `hashchange` for manual URL
+  // edits and back/forward, and resolve in-page anchors through one delegated
+  // click listener. The click path is required because the site uses Astro's
+  // ClientRouter, which turns same-page anchor clicks into `history.pushState`
+  // — that never fires `hashchange` (mirror CaseStudyReactor).
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof document === "undefined") return;
+    const syncFromHash = () => {
+      const id = parseSignalHash(window.location.hash, nodeIds, graph.defaultNodeId);
+      if (id !== selectedIdRef.current) {
+        setSelectedId(id);
+      }
+    };
+    const onDocumentClick = (event: MouseEvent) => {
+      if (!(event.target instanceof Element)) return;
+      const anchor = event.target.closest<HTMLAnchorElement>(`a[href^="${SIGNAL_HASH_PREFIX}"]`);
+      if (!anchor) return;
+      const id = parseSignalHash(anchor.getAttribute("href") ?? "", nodeIds, "");
+      if (id) {
+        // Selection only. The URL is ClientRouter's job for same-page anchors:
+        // it turns the click into `history.pushState`, and writing the history
+        // again here would create a second entry for one click. Mirror
+        // CaseStudyReactor, which keeps `replaceState` only in its own selector
+        // (`handleSelect`), where there is no navigation to own the URL.
+        setSelectedId(id);
+      }
+    };
+    syncFromHash();
+    window.addEventListener("hashchange", syncFromHash);
+    document.addEventListener("click", onDocumentClick);
+    return () => {
+      window.removeEventListener("hashchange", syncFromHash);
+      document.removeEventListener("click", onDocumentClick);
+    };
   }, [graph, nodeIds]);
 
   /**
@@ -243,7 +280,12 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
 
   const handleSelect = (id: string) => {
     setSelectedId(id);
-    history.replaceState(null, "", `#signal-${id}`);
+    // Preserve the existing history state so Astro's ClientRouter can still
+    // restore this entry on `back()`. Writing `null` here replaces the astro
+    // state (`{ index, scrollX, scrollY }`) that `onPopState` requires to swap
+    // the DOM back — a null entry makes `back()` return early, leaving the
+    // previous page's markup on screen (Task 3.4 M3.4.3).
+    history.replaceState(history.state, "", `#signal-${id}`);
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
@@ -470,6 +512,27 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
           data-signal-detail
           className="mx-4 mb-2 mt-4 space-y-3 rounded-md border border-border/70 bg-bg-secondary/50 p-4"
         >
+          {/* M3.4.3 — a project node keeps its real page href on the contract,
+              so the panel turns it back into a same-tab anchor. This is the
+              hydrated path from the map to /projects/<slug>: the pre-hydration
+              card is already that anchor, but once the island upgrades the card
+              to a selectable button the link must live somewhere real. A same
+              tab link (no target) keeps the round trip honest — back() returns
+              here with the hash, and `hashchange` re-selects the node. */}
+          {selectedNode?.href && (
+            <p>
+              <span className="section-label block text-text-secondary">Project page</span>
+              <a
+                href={selectedNode.href}
+                data-signal-detail-project
+                className="text-sm font-medium text-brand transition-colors hover:text-accent motion-reduce:transition-none"
+              >
+                {selectedNode.label}
+                <span aria-hidden="true"> →</span>
+                <span className="sr-only"> (project page)</span>
+              </a>
+            </p>
+          )}
           {selectedDetail.association && (
             <p>
               <span className="section-label block text-text-secondary">Association</span>

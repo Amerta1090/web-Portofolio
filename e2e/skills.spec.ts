@@ -30,7 +30,12 @@ test.describe("Skills page discoverability", () => {
   test("following the footer link lands on the skills page", async ({ page }) => {
     await page.goto("/");
     await page.locator('footer a[href="/skills"]').click();
-    await expect(page).toHaveURL(/\/skills$/);
+    // Cold-load arrival budget is 15s, not 5s: a cross-page footer navigation
+    // pays full page load on this box, and under single-worker load the
+    // default 5s budget is marginal (isolated pass measured ~9s; full-suite
+    // runs at 2.5× the normal wall-clock time exceed 5s). Mirror the deep-link
+    // budgets raised to 15s in gallery.spec.ts (T1.6 DoD finding).
+    await expect(page).toHaveURL(/\/skills$/, { timeout: 15000 });
     // The header is the h1 now: the page's own title, not a generic "Skills",
     // and the stage names below it are deliberately not headings.
     const h1 = page.getByRole("heading", { level: 1 });

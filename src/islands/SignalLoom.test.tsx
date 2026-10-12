@@ -387,6 +387,113 @@ describe("SignalLoom selection states (L2.1)", () => {
   });
 });
 
+describe("SignalLoom deep links (Task 3.4)", () => {
+  it("re-syncs selection on hashchange (back/forward, manual edits)", async () => {
+    const { container } = render(<SignalLoom graph={GRAPH} />);
+    const web = container.querySelector('[data-signal-node="capability-web"]');
+    expect(web).not.toHaveAttribute("aria-current");
+
+    window.location.hash = "#signal-capability-web";
+    window.dispatchEvent(new HashChangeEvent("hashchange"));
+
+    // Native-listener state updates are auto-batched by React 18, so the DOM
+    // settles asynchronously — wait for it (same pattern as the click test).
+    await waitFor(() => expect(web).toHaveAttribute("aria-current", "true"));
+    expect(statusText(container)).toBe("Web capability summary");
+  });
+
+  it("selects the node a delegated in-page anchor click points at", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<SignalLoom graph={GRAPH} />);
+    const web = container.querySelector('[data-signal-node="capability-web"]');
+    expect(web).not.toHaveAttribute("aria-current");
+
+    // A real skill chip (Task 2.4) lives elsewhere on the page; the island
+    // owns the document-level listener. preventDefault keeps jsdom's own hash
+    // navigation out of this test, so the selection can only come from the
+    // delegated click — and the URL must stay untouched (ClientRouter's job).
+    const anchor = document.createElement("a");
+    anchor.setAttribute("href", "#signal-capability-web");
+    const stopDefault = (event: Event) => event.preventDefault();
+    anchor.addEventListener("click", stopDefault, { capture: true });
+    document.body.appendChild(anchor);
+    try {
+      await user.click(anchor);
+      await waitFor(() => expect(web).toHaveAttribute("aria-current", "true"));
+      expect(window.location.hash).toBe("");
+    } finally {
+      anchor.removeEventListener("click", stopDefault, { capture: true });
+      document.body.removeChild(anchor);
+    }
+  });
+
+  it("ignores delegated anchor clicks for unknown node ids", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<SignalLoom graph={GRAPH} />);
+    const project = container.querySelector('[data-signal-node="project-a"]');
+    expect(project).toHaveAttribute("aria-current", "true");
+
+    const anchor = document.createElement("a");
+    anchor.setAttribute("href", "#signal-does-not-exist");
+    const stopDefault = (event: Event) => event.preventDefault();
+    anchor.addEventListener("click", stopDefault, { capture: true });
+    document.body.appendChild(anchor);
+    try {
+      await user.click(anchor);
+      expect(project).toHaveAttribute("aria-current", "true");
+      expect(container.querySelector('[data-signal-node="capability-web"]')).not.toHaveAttribute(
+        "aria-current",
+      );
+    } finally {
+      anchor.removeEventListener("click", stopDefault, { capture: true });
+      document.body.removeChild(anchor);
+    }
+  });
+});
+
+describe("SignalLoom deep-link project page (M3.4.3)", () => {
+  it("renders a same-tab project-page link in the detail panel for a selected project node", () => {
+    const { container } = render(<SignalLoom graph={DETAIL_GRAPH} />);
+    // DETAIL_GRAPH defaults to project-detailed, which carries href + detail.
+    expect(detailPanel(container)).not.toBeNull();
+    const link = container.querySelector<HTMLAnchorElement>("a[data-signal-detail-project]");
+    expect(link).not.toBeNull();
+    expect(link?.getAttribute("href")).toBe("/projects/detailed-project");
+    expect(link).toHaveTextContent("Detailed Project");
+    // Same tab (no target) so back() can restore the map state — the round
+    // trip of M3.4.3 depends on this, unlike the external evidence links.
+    expect(link?.hasAttribute("target")).toBe(false);
+  });
+
+  it("ships the project-page link in the server render (no-JS path works)", () => {
+    const html = renderToStaticMarkup(<SignalLoom graph={DETAIL_GRAPH} />);
+    expect(html).toContain("data-signal-detail-project");
+    expect(html).toContain('href="/projects/detailed-project"');
+  });
+
+  it("hides the project-page link for a capability selection and for an href-less project", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<SignalLoom graph={DETAIL_GRAPH} />);
+    const ml = container.querySelector<HTMLButtonElement>('[data-signal-node="capability-ml"]');
+    const skillsOnly = container.querySelector<HTMLButtonElement>(
+      '[data-signal-node="project-skills-only"]',
+    );
+    if (!ml || !skillsOnly) throw new Error("nodes missing");
+
+    // Capability nodes carry no detail and no page: no panel, no link.
+    await user.click(ml);
+    expect(detailPanel(container)).toBeNull();
+    expect(container.querySelector("a[data-signal-detail-project]")).toBeNull();
+
+    // A project with detail but no href (the contract allows it) still never
+    // renders the link — href is the guard, matching the builder which sets it
+    // for every project node.
+    await user.click(skillsOnly);
+    expect(detailPanel(container)).not.toBeNull();
+    expect(container.querySelector("a[data-signal-detail-project]")).toBeNull();
+  });
+});
+
 describe("SignalLoom bounded SVG choreography (L2.2)", () => {
   it("renders travelling dots for the capped active edges once hydrated", async () => {
     const { container } = render(<SignalLoom graph={GRAPH} />);

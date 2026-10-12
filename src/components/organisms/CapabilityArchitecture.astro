@@ -134,9 +134,14 @@ function path(stages: StageId[]): string {
                 return (
                   <section class="cap-area" id={`area-${area.id}`} aria-labelledby={`h-${area.id}`}>
                     <h4 class="cap-area-name" id={`h-${area.id}`}>
-                      <Icon size={15} aria-hidden="true" />
-                      <span>{area.name}</span>
-                      <span class="cap-area-count">{area.skills.length}</span>
+                      <a
+                        href={`/#signal-capability-${area.id}`}
+                        class="group inline-flex items-center gap-1.5 rounded-md focus-visible:outline-2 focus-visible:outline-brand focus-visible:outline-offset-2"
+                      >
+                        <Icon size={15} aria-hidden="true" />
+                        <span>{area.name}</span>
+                        <span class="cap-area-count">{area.skills.length}</span>
+                      </a>
                     </h4>
 
                     <p class="cap-area-summary">{area.summary}</p>
@@ -365,6 +370,22 @@ function path(stages: StageId[]): string {
     flex-shrink: 0;
     color: var(--color-brand);
   }
+
+  .cap-area-name a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .cap-area-name a:hover span:first-of-type,
+  .cap-area-name a:hover > span:nth-of-type(2),
+  .cap-area-name a:focus-visible span {
+    color: var(--color-accent);
+  }
+
+  /* No `:focus-visible { outline: none }` here on purpose: the anchor's class
+     list already carries the repo ring (`focus-visible:outline-2
+     focus-visible:outline-brand`), and an un-layered override would beat those
+     utilities by specificity, swallowing the keyboard ring (Rule 10). */
 
   .cap-area-count {
     font-family: var(--font-mono);
