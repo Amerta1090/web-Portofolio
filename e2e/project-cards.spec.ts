@@ -121,6 +121,81 @@ test("cursor spotlight is on when the grid is visible after hydration", async ({
   await expect(page.locator("#projects button:not([data-filter-chip])")).toHaveCount(0);
 });
 
+// Task 4.1 (M4.1.1): the BorderGlow ring is pure CSS — `TiltCard` writes only
+// two custom properties (`--glow-x`, `--glow-y`) in its coalesced rAF, and
+// `.border-glow::before` turns them into a mesh ring with no JavaScript of its
+// own. Two kinds of evidence are pinned below, because each computed style
+// hides one side of the contract: var() references resolve at computed time,
+// and Chromium normalizes the legacy `-webkit-` composite keywords to the
+// standard ones. So the live ring proves the *painted* result (opacity while
+// the spotlight guard is live, 8 mesh layers, `mask-composite` cycling across
+// the 3-layer mask), and the served stylesheet text proves the *shipped*
+// declarations (the -webkit- pair kept for older WebKit, the standard pair
+// that wins the cascade, and the cursor cone reading the two custom properties
+// with safe `50%` fallbacks).
+test("BorderGlow ring is a pure-CSS conic-masked ::before reading --glow-x/--glow-y", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page.locator(CARDS)).toHaveCount(4);
+  // Same setup as the spotlight test above: the grid pauses its spotlight
+  // while off-screen (useRafGuard), so the ring's reveal rule can only hold
+  // once the guard is live and hydrated.
+  await page.locator("#projects").scrollIntoViewIfNeeded();
+  await waitForIslandHydration(page, "[data-project-card]");
+  await expect(page.locator('#projects [data-tilt-spotlight="on"]')).toHaveCount(4);
+
+  const ring = await page
+    .locator(CARDS)
+    .first()
+    .evaluate((el) => {
+      const cs = getComputedStyle(el, "::before");
+      return {
+        opacity: cs.opacity,
+        display: cs.display,
+        maskComposite: cs.maskComposite,
+        backgroundImage: cs.backgroundImage,
+        maskImage: cs.maskImage,
+      };
+    });
+
+  // The ring is real and revealed only while the spotlight guard is live
+  // (the base rule is `opacity: 0`).
+  expect(ring.opacity).toBe("1");
+  expect(ring.display).not.toBe("none");
+  // Eight background layers: seven brand radial stops + one linear fill.
+  expect(ring.backgroundImage.match(/radial-gradient\(/g) ?? []).toHaveLength(7);
+  expect(ring.backgroundImage.match(/linear-gradient\(/g) ?? []).toHaveLength(1);
+  // mask-composite: intersect, subtract — computed cycles to the layer count
+  // of the 3-layer mask ([cone, full, content-box]): "intersect, subtract,
+  // intersect".
+  expect(ring.maskComposite).toBe("intersect, subtract, intersect");
+  expect(ring.maskImage.startsWith("conic-gradient(")).toBe(true);
+  expect(ring.maskImage.match(/linear-gradient\(/g) ?? []).toHaveLength(2);
+
+  // Shipped-stylesheet contract: the served CSS must still carry the -webkit-
+  // pair (older WebKit), the standard `intersect, subtract` that wins the
+  // cascade, and the conic centred on `--glow-x`/`--glow-y`. Whitespace is
+  // normalized because LightningCSS minifies the declarations. The -webkit-
+  // assertion is deliberately semicolon-terminated: LightningCSS *also* emits
+  // a padded `-webkit-mask-composite:source-in,source-out,xor` auto-prefix of
+  // the standard pair, whose third layer (`xor` = exclude) is the wrong legacy
+  // alias — the explicit two-value pair cycles to `source-in,source-out,
+  // source-in` and must win the cascade for older WebKit. Requiring the exact
+  // `source-in,source-out;` (semicolon) form is what keeps that pair from
+  // being silently removed.
+  const shipped = await page.evaluate(async () => {
+    const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map(
+      (l) => (l as HTMLLinkElement).href,
+    );
+    const texts = await Promise.all(links.map(async (href) => await (await fetch(href)).text()));
+    return texts.join("\n").replace(/\s+/g, "");
+  });
+  expect(shipped).toContain("-webkit-mask-composite:source-in,source-out;");
+  expect(shipped).toContain("mask-composite:intersect,subtract");
+  expect(shipped).toContain("var(--glow-x,50%)var(--glow-y,50%)");
+});
+
 // Task 2.4 (M6a): each skill chip is a cross-link into the Capability Map. The
 // server (`buildSkillHrefs`) resolves every skill, so the chip is always a real
 // anchor — a declared capability yields `#signal-<nodeId>`, one the map cannot

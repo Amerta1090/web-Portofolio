@@ -21,36 +21,71 @@
   border-left: 3px solid var(--color-brand);
 }
 
-/* ── Project card cursor-following border glow (BorderGlow) ──
-   Pure CSS: the two custom properties (`--glow-x`/`--glow-y`) are written by
-   `TiltCard` in one coalesced rAF, and the ring is masked out of a 1px padding
-   box with `mask-composite` — so this costs no JavaScript of its own. The ring
-   only paints while the guard is live (attribute set) and is hidden entirely
-   when the reader asked for reduced motion. */
-.project-card::before {
+/* ── BorderGlow — cursor-following mesh ring (React Bits pattern) ──
+   Pure CSS. `TiltCard` writes two custom properties (`--glow-x`/`--glow-y`) in
+   one coalesced rAF; this rule turns them into a ring with **no JavaScript of
+   its own**, using the three named techniques from PRD §8.4:
+     1. a seven-stop **mesh gradient** paints the color,
+     2. a `conic-gradient` **cursor mask** centred on the cursor reveals an arc,
+     3. `mask-composite: intersect, subtract` cuts only the 1px padding ring.
+   The layer model is verified empirically (Chromium): the mask list is
+   `[cone, full, content-box]` and the composite cycles to the layer count
+   (`intersect, subtract, intersect`). Standard properties win over the
+   `-webkit-` pair (they alias the same property), which is kept first for
+   older WebKit. It only paints while the guard is live
+   (`[data-tilt-spotlight]`) and is hidden entirely for reduced motion or
+   reduced data. */
+.border-glow::before {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: radial-gradient(
-    200px circle at var(--glow-x, 50%) var(--glow-y, 50%),
-    rgb(var(--color-brand-rgb) / 0.95),
-    transparent 70%
-  );
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask-composite: exclude;
+  background:
+    radial-gradient(at 80% 55%, rgb(var(--color-brand-rgb) / 0.9) 0px, transparent 50%),
+    radial-gradient(at 69% 34%, rgb(var(--color-brand-warm-rgb) / 0.9) 0px, transparent 50%),
+    radial-gradient(at 8% 6%, rgb(var(--color-brand-muted-rgb) / 0.9) 0px, transparent 50%),
+    radial-gradient(at 41% 38%, rgb(var(--color-brand-rgb) / 0.9) 0px, transparent 50%),
+    radial-gradient(at 86% 85%, rgb(var(--color-brand-warm-rgb) / 0.9) 0px, transparent 50%),
+    radial-gradient(at 82% 18%, rgb(var(--color-brand-muted-rgb) / 0.9) 0px, transparent 50%),
+    radial-gradient(at 51% 4%, rgb(var(--color-brand-rgb) / 0.9) 0px, transparent 50%),
+    linear-gradient(rgb(var(--color-brand-rgb)) 0 100%);
+  -webkit-mask:
+    conic-gradient(
+      from 0deg at var(--glow-x, 50%) var(--glow-y, 50%),
+      #000 0%,
+      #000 22%,
+      transparent 38%,
+      transparent 100%
+    ),
+    linear-gradient(#000 0 0),
+    linear-gradient(#000 0 0) content-box;
+  -webkit-mask-composite: source-in, source-out;
+  mask:
+    conic-gradient(
+      from 0deg at var(--glow-x, 50%) var(--glow-y, 50%),
+      #000 0%,
+      #000 22%,
+      transparent 38%,
+      transparent 100%
+    ),
+    linear-gradient(#000 0 0),
+    linear-gradient(#000 0 0) content-box;
+  mask-composite: intersect, subtract;
   opacity: 0;
   pointer-events: none;
   z-index: 1;
 }
-.tilt-card[data-tilt-spotlight] .project-card::before {
+.tilt-card[data-tilt-spotlight] .border-glow::before {
   opacity: 1;
 }
 @media (prefers-reduced-motion: reduce) {
-  .project-card::before {
+  .border-glow::before {
+    display: none;
+  }
+}
+@media (prefers-reduced-data: reduce) {
+  .border-glow::before {
     display: none;
   }
 }

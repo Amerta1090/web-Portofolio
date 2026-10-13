@@ -207,7 +207,7 @@ export default function ProjectCardGrid({ projects, skillHrefs = {} }: Props) {
             >
               <article
                 data-project-card=""
-                className="card project-card group relative flex h-full flex-col overflow-hidden bg-bg-secondary border border-border rounded-lg transition-all duration-300"
+                className="card border-glow group relative flex h-full flex-col overflow-hidden bg-bg-secondary border border-border rounded-lg transition-all duration-300"
               >
                 <ProjectThumbnail src={project.image} alt={project.title} />
 
