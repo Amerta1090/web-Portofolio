@@ -2,8 +2,14 @@ import { act, cleanup, render } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useRafGuard } from "./useRafGuard";
 
-function Probe({ respectReducedMotion = false }: { respectReducedMotion?: boolean }) {
-  const guard = useRafGuard(undefined, respectReducedMotion);
+function Probe({
+  respectReducedMotion = false,
+  respectReducedData = false,
+}: {
+  respectReducedMotion?: boolean;
+  respectReducedData?: boolean;
+}) {
+  const guard = useRafGuard(undefined, respectReducedMotion, respectReducedData);
   return (
     <div
       ref={guard.ref}
@@ -89,5 +95,42 @@ describe("useRafGuard", () => {
     const { getByTestId } = render(<Probe respectReducedMotion />);
     const el = getByTestId("probe");
     expect(el.dataset.paused).toBe("true");
+  });
+
+  it("respectReducedData=true → paused saat prefers-reduced-data (M4.1.3)", () => {
+    vi.stubGlobal("IntersectionObserver", undefined);
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn().mockImplementation((query: string) => ({
+        matches: query.includes("prefers-reduced-data"),
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      })),
+    );
+    const { getByTestId } = render(<Probe respectReducedData />);
+    const el = getByTestId("probe");
+    expect(el.dataset.paused).toBe("true");
+  });
+
+  it("reduced-data diabaikan bila flag-nya off (default tak berubah)", () => {
+    vi.stubGlobal("IntersectionObserver", undefined);
+    const seen: string[] = [];
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn().mockImplementation((query: string) => {
+        seen.push(query);
+        return {
+          matches: query.includes("prefers-reduced-data"),
+          addEventListener: () => {},
+          removeEventListener: () => {},
+        };
+      }),
+    );
+    const { getByTestId } = render(<Probe />);
+    const el = getByTestId("probe");
+    // Query reduced-data tak pernah didaftarkan, dan paused tetap false walau
+    // media-nya matches — perilaku lama untuk ~30 pemanggil existing terjaga.
+    expect(seen).not.toContain("(prefers-reduced-data: reduce)");
+    expect(el.dataset.paused).toBe("false");
   });
 });

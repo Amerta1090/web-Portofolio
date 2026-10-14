@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useRafGuard } from "../lib/useRafGuard";
 import { useGSAP } from "../lib/useGSAP";
 import { gsap, ScrollTrigger } from "../lib/gsap";
 import { useReducedMotion } from "motion/react";
@@ -39,9 +40,10 @@ export default function ImpactMetrics({ metrics }: Props) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const prefersReduced = useReducedMotion();
   const [revealed, setRevealed] = useState(false);
+  const rafGuard = useRafGuard(sectionRef, true, true);
 
   useGSAP(() => {
-    if (prefersReduced) {
+    if (prefersReduced || rafGuard.paused) {
       setRevealed(true);
       return;
     }
@@ -52,7 +54,7 @@ export default function ImpactMetrics({ metrics }: Props) {
       onEnter: () => setRevealed(true),
       once: true,
     });
-  });
+  }, [prefersReduced, rafGuard.paused]);
 
   // One shared card body: a linked card and a static card differ only in the
   // wrapper, so a change to the numbers cannot drift between the two shapes.
@@ -79,7 +81,7 @@ export default function ImpactMetrics({ metrics }: Props) {
   );
 
   return (
-    <div ref={sectionRef} className="py-12">
+    <div ref={sectionRef} className="py-12 border-glow" data-tilt-spotlight="on">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {metrics.map((m) => {
           const cardClass =

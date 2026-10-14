@@ -76,7 +76,8 @@
   pointer-events: none;
   z-index: 1;
 }
-.tilt-card[data-tilt-spotlight] .border-glow::before {
+.tilt-card[data-tilt-spotlight] .border-glow::before,
+.border-glow[data-tilt-spotlight="on"]::before {
   opacity: 1;
 }
 @media (prefers-reduced-motion: reduce) {

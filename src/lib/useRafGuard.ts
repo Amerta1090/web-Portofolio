@@ -10,6 +10,11 @@ import type { RefObject } from "react";
  * - IntersectionObserver threshold 5%: pause saat elemen keluar viewport.
  * - `visibilitychange`: pause saat tab hidden.
  * - `respectReducedMotion` (opsional): pause saat prefers-reduced-motion.
+ * - `respectReducedData` (opsional, M4.1.3): pause saat prefers-reduced-data.
+ *   Tanpa ini, guard yang sudah menghormati reduced-motion tetap menulis dua
+ *   custom property glow per pointer move untuk pengguna yang meminta data
+ *   minimal — CSS `display:none` menyembunyikan ringnya, tapi JS-nya tetap
+ *   jalan. Flag ini menutup sisi JS-nya.
  *
  * Penggunaan kanonik — komponen menyerahkan `containerRef` miliknya (konvensi repo:
  * `useRef<HTMLDivElement>(null)` + `ref={containerRef}`). Hook OBSERVASI saja, tidak
@@ -40,16 +45,29 @@ export interface RafGuard {
 }
 
 export function useRafGuard(
-  containerRef?: RefObject<HTMLDivElement>,
+  // Widened M4.1.3: `RefObject` is readonly (covariant), so every existing
+  // `RefObject<HTMLDivElement>` caller still passes — while a `<section>` ref
+  // (`HTMLElement`) is now accepted too. The returned fallback `ref` stays
+  // `RefObject<HTMLDivElement>` (its only two consumers attach it to a `<div>`).
+  containerRef?: RefObject<HTMLElement>,
   respectReducedMotion = false,
+  respectReducedData = false,
 ): RafGuard {
   const fallbackRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(true);
   const [hidden, setHidden] = useState(false);
   const [reduced, setReduced] = useState(false);
+  const [lowData, setLowData] = useState(false);
+
+  // When reduced-data is requested, we also treat it as a pause condition.
+  // This is separate from reduced-motion so that we can still write the glow
+  // for reduced-motion users while completely halting for reduced-data users
+  // (the CSS `display:none` already hides the ring, but the JS writer should
+  // also stop so it doesn\'t schedule frames or update custom properties).
+  const pauseByReducedData = respectReducedData && lowData;
 
   useEffect(() => {
-    if (typeof IntersectionObserver === "undefined") return; // jsdom/test: selalu visible
+    if (typeof IntersectionObserver === "undefined") return; // jsdom/test: always visible
     const el = containerRef?.current ?? fallbackRef.current;
     if (!el) return;
     const io = new IntersectionObserver(
@@ -77,5 +95,20 @@ export function useRafGuard(
     return () => mq.removeEventListener?.("change", onChange);
   }, [respectReducedMotion]);
 
-  return { ref: fallbackRef, visible, hidden, paused: !visible || hidden || reduced };
+  useEffect(() => {
+    if (!respectReducedData) return;
+    const mq = window.matchMedia?.("(prefers-reduced-data: reduce)");
+    if (!mq) return;
+    setLowData(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setLowData(e.matches);
+    mq.addEventListener?.("change", onChange);
+    return () => mq.removeEventListener?.("change", onChange);
+  }, [respectReducedData]);
+
+  return {
+    ref: fallbackRef,
+    visible: !hidden && !pauseByReducedData,
+    hidden,
+    paused: !visible || hidden || reduced || pauseByReducedData,
+  };
 }

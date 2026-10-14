@@ -124,6 +124,15 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl, metr
           decoding="async"
         />
       </motion.picture>
+      {/* Glow layer at z-[15], separate from picture (M4.1.4) */}
+      {!prefersReduced && (
+        <div
+          className="absolute inset-0 border-glow rounded-lg pointer-events-none"
+          data-tilt-spotlight="on"
+          aria-hidden="true"
+          style={{ zIndex: 15 }}
+        />
+      )}
       <motion.div
         className="absolute inset-0 z-[1] bg-gradient-to-r from-bg-primary/85 via-bg-primary/60 to-bg-primary/40"
         style={prefersReduced ? {} : { y: overlayParallax }}

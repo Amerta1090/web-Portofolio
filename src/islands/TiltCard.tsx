@@ -8,11 +8,13 @@ interface TiltCardProps {
   perspective?: number;
   /** Scale on hover */
   scale?: number;
+  /** Whether to enable 3D tilt and cursor-following border glow */
+  tilt?: boolean;
   /**
    * Cursor-following border glow (M2.2.4/M2.2.5). The caller flips this off when
-   * its viewport/visibility/reduced-motion guard is paused, so the card is
-   * static then. When off, the two custom properties are never written and the
-   * CSS ring (keyed on `[data-tilt-spotlight]`) never renders.
+   * its viewport/visibility/reduced-motion/reduced-data guard is paused, so the
+   * card is static then. When off, the two custom properties are never written
+   * and the CSS ring (keyed on `[data-tilt-spotlight]`) never renders.
    */
   spotlight?: boolean;
   /** Class name for the card wrapper */
@@ -34,6 +36,7 @@ export default function TiltCard({
   maxTilt = 10,
   perspective = 1000,
   scale = 1.02,
+  tilt = true,
   spotlight = true,
   className = "",
 }: TiltCardProps) {
@@ -45,7 +48,7 @@ export default function TiltCard({
     frame.current = null;
     const el = ref.current;
     const p = pointer.current;
-    if (!el || !p) return;
+    if (!el || !p || !tilt) return;
 
     const rect = el.getBoundingClientRect();
     const x = p.x - rect.left;
@@ -58,17 +61,17 @@ export default function TiltCard({
     el.style.transform = `perspective(${perspective}px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(${scale}, ${scale}, ${scale})`;
     el.style.setProperty("--glow-x", `${x}px`);
     el.style.setProperty("--glow-y", `${y}px`);
-  }, [maxTilt, perspective, scale]);
+  }, [maxTilt, perspective, scale, tilt]);
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       // The single gate for the spotlight lives here, at schedule time: when
       // the caller pauses it, no frame is scheduled and nothing is written.
-      if (!spotlight) return;
+      if (!spotlight || !tilt) return;
       pointer.current = { x: e.clientX, y: e.clientY };
       if (frame.current === null) frame.current = requestAnimationFrame(flush);
     },
-    [spotlight, flush],
+    [spotlight, tilt, flush],
   );
 
   const reset = useCallback(() => {
@@ -79,10 +82,14 @@ export default function TiltCard({
     pointer.current = null;
     const el = ref.current;
     if (!el) return;
-    el.style.transform = `perspective(${perspective}px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
-    el.style.removeProperty("--glow-x");
-    el.style.removeProperty("--glow-y");
-  }, [perspective]);
+    if (tilt) {
+      el.style.transform = `perspective(${perspective}px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+      el.style.removeProperty("--glow-x");
+      el.style.removeProperty("--glow-y");
+    } else {
+      el.style.transform = `perspective(${perspective}px) scale3d(1, 1, 1)`;
+    }
+  }, [perspective, tilt]);
 
   // Cancel any pending frame (and unwind the transform) when the card unmounts.
   useEffect(() => reset, [reset]);
@@ -95,7 +102,7 @@ export default function TiltCard({
       onMouseMove={handleMouseMove}
       onMouseLeave={reset}
       style={{
-        transformStyle: "preserve-3d",
+        transformStyle: tilt ? "preserve-3d" : "unset",
         transition: "transform var(--dur-base) var(--ease-out)",
         position: "relative",
       }}

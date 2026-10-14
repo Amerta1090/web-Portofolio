@@ -50,8 +50,10 @@ type ProjectFilter = "all" | ProjectCategory;
 export default function ProjectCardGrid({ projects, skillHrefs = {} }: Props) {
   const gridRef = useRef<HTMLDivElement>(null);
   // One guard for the grid: pauses the cursor spotlight when the grid is
-  // off-screen, the tab is hidden, or reduced motion is requested.
-  const guard = useRafGuard(gridRef, true);
+  // off-screen, the tab is hidden, or reduced motion / reduced data is
+  // requested (M4.1.3 — the CSS `display:none` hides the ring, this stops
+  // the JS that would keep writing its two custom properties).
+  const guard = useRafGuard(gridRef, true, true);
 
   // M2.3.1: the filter only exists after hydration — the server HTML ships all
   // cards and no control (P5: a control that needs hydration must not appear
