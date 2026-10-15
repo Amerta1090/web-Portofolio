@@ -51,3 +51,23 @@ describe("ImpactMetrics links", () => {
     ]);
   });
 });
+
+/**
+ * M4.1.4 — the section wrapper carries the BorderGlow ring. The four cards
+ * themselves stay plain `<a>`/`<div>` (no TiltCard per card, no writer): the
+ * ring is one static layer on the section, revealed by a constant
+ * `data-tilt-spotlight="on"`, so there is no per-card JS to guard.
+ */
+describe("ImpactMetrics section glow", () => {
+  it("wraps the grid in one static border-glow layer", () => {
+    const { container } = render(
+      <ImpactMetrics
+        metrics={[{ label: "Projects Shipped", value: 22, suffix: "+", href: "#career" }]}
+      />,
+    );
+
+    const layers = container.querySelectorAll(".border-glow[data-tilt-spotlight='on']");
+    expect(layers).toHaveLength(1);
+    expect(layers[0].querySelectorAll(":scope > div > *")).not.toHaveLength(0);
+  });
+});

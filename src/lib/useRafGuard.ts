@@ -107,7 +107,11 @@ export function useRafGuard(
 
   return {
     ref: fallbackRef,
-    visible: !hidden && !pauseByReducedData,
+    // `visible` tetap state IntersectionObserver mentah (apakah elemen di
+    // viewport). Alasan reduced-data/low-data diwakili `paused`, bukan di
+    // sini — menggabungkannya membuat `visible=true` + `paused=true`
+    // bersamaan dan mematahkan test viewport (M4.1.4 fix).
+    visible,
     hidden,
     paused: !visible || hidden || reduced || pauseByReducedData,
   };

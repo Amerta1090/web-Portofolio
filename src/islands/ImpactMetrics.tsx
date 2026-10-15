@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
-import { useRafGuard } from "../lib/useRafGuard";
-import { useGSAP } from "../lib/useGSAP";
-import { gsap, ScrollTrigger } from "../lib/gsap";
 import { useReducedMotion } from "motion/react";
+import { useRef, useState } from "react";
+import { ScrollTrigger, gsap } from "../lib/gsap";
+import { useGSAP } from "../lib/useGSAP";
+import { useRafGuard } from "../lib/useRafGuard";
 
 interface Metric {
   label: string;

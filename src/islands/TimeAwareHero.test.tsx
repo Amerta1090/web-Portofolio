@@ -218,3 +218,29 @@ describe("TimeAwareHero evidence row", () => {
     });
   });
 });
+
+/**
+ * M4.1.4 — the hero carries one static BorderGlow layer above the picture
+ * (`z-15`, below the `z-20` content) and under nothing interactive
+ * (`pointer-events-none`, `aria-hidden`). It is decoration, never a control,
+ * and it stays out entirely under reduced motion.
+ */
+describe("TimeAwareHero glow layer", () => {
+  const glow = () => document.querySelector(".border-glow[data-tilt-spotlight='on']");
+
+  it("renders one decorative glow layer above the picture", () => {
+    render(<TimeAwareHero {...BASE_PROPS} metrics={METRICS} />);
+
+    const layer = glow() as HTMLElement | null;
+    expect(layer).not.toBeNull();
+    expect(layer?.getAttribute("aria-hidden")).toBe("true");
+    expect(layer?.style.zIndex).toBe("15");
+  });
+
+  it("renders no glow layer under reduced motion", () => {
+    reducedMotion = true;
+    render(<TimeAwareHero {...BASE_PROPS} metrics={METRICS} />);
+
+    expect(glow()).toBeNull();
+  });
+});
