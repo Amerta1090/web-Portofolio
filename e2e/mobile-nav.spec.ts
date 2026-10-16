@@ -77,6 +77,29 @@ test.describe("Mobile Site Navigation (21st Δ1)", () => {
     );
   });
 
+  test("tombol tutup mengembalikan fokus ke trigger", async ({ page }) => {
+    await page.goto("/gallery");
+    const trigger = page.getByRole("button", { name: "Menu", exact: true });
+    await trigger.click();
+    const sheet = page.getByRole("dialog", { name: "Menu navigasi", exact: true });
+    await expect(sheet).toBeVisible();
+    await sheet.getByRole("button", { name: "Tutup menu", exact: true }).click();
+    await expect(sheet).toBeHidden();
+    await expect(trigger).toBeFocused();
+  });
+
+  test("klik backdrop mengembalikan fokus ke trigger", async ({ page }) => {
+    await page.goto("/gallery");
+    const trigger = page.getByRole("button", { name: "Menu", exact: true });
+    await trigger.click();
+    const sheet = page.getByRole("dialog", { name: "Menu navigasi", exact: true });
+    await expect(sheet).toBeVisible();
+    // Sheet kanan (w-72 ≈ 288px), backdrop menutupi sisa kiri layar
+    await page.mouse.click(20, 400);
+    await expect(sheet).toBeHidden();
+    await expect(trigger).toBeFocused();
+  });
+
   test("setiap halaman memuat trigger + panel (cek /observatory)", async ({ page }) => {
     await page.goto("/observatory");
     const trigger = page.getByRole("button", { name: "Menu", exact: true });
