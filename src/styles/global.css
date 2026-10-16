@@ -104,6 +104,9 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 5rem;
+  /* M4.2.2: reserve the scrollbar gutter so overlay open/close
+     (body overflow hidden ↔ restore) never shifts layout width. */
+  scrollbar-gutter: stable;
   scrollbar-width: thin;
   scrollbar-color: var(--color-border) transparent;
 }
