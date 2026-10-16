@@ -21,6 +21,7 @@ import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { duration, easing, stagger, distance } from "../../lib/motion";
+import { acquireScrollLock, releaseScrollLock } from "../../lib/scroll-lock";
 import certificationsData from "../../../data/certifications.json";
 import experienceData from "../../../data/experience.json";
 import profileData from "../../../data/profile.json";
@@ -712,12 +713,15 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
 
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
-    document.body.style.overflow = "hidden";
+    // Window-scoped (M4.2.3): paired acquire/release on the shared counter.
+    // Also restores the exact previous value — the old `"auto"` hardcoded here
+    // clobbered whatever overflow was present before the menu opened.
+    acquireScrollLock();
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
-      document.body.style.overflow = "auto";
+      releaseScrollLock();
       stopKeyRepeat();
     };
   }, [

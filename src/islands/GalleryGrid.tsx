@@ -39,6 +39,7 @@ import {
   labCategory,
 } from "../lib/lab-registry";
 import { recordInteraction, setCurrent } from "../lib/recommend/session";
+import { acquireScrollLock, releaseScrollLock } from "../lib/scroll-lock";
 import { useFocusTrap } from "../lib/useFocusTrap";
 
 /** Lazy per-experiment chunks: setiap eksperimen jadi split chunk sendiri,
@@ -248,13 +249,12 @@ function ExperimentModal({
   useFocusTrap({ containerRef: modalRef, enabled: experiment != null });
 
   useEffect(() => {
-    if (experiment) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    if (!experiment) return;
+    // Window-scoped (M4.2.3): paired acquire/release on the shared counter,
+    // so a second overlay closing first cannot unlock this modal early.
+    acquireScrollLock();
     return () => {
-      document.body.style.overflow = "";
+      releaseScrollLock();
     };
   }, [experiment]);
 
