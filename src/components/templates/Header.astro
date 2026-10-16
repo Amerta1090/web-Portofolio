@@ -195,12 +195,35 @@ const navLinks = [
       return root.hasAttribute("data-mobile-nav-open");
     };
 
+    // `inert` konten belakang (M4.3.3): main + footer tak bisa difokus,
+    // diklik, atau dibaca SR saat sheet terbuka; dilepas saat tertutup.
+    // Header SENGAJA tak ikut — trigger di dalamnya harus tetap bisa diklik
+    // (`inert` memblokir klik juga, bukan cuma fokus); keyboard sudah dikurung
+    // trap M4.3.2 dan `aria-modal="true"` menyatakan modalitas ke SR.
+    // Tak ada `inert` pre-existing di repo (audit M4.3.1), jadi removeAttribute
+    // polos aman — tak ada milik orang lain yang bisa terhapus.
+    var setBackgroundInert = function (on) {
+      var targets = [];
+      var main = document.getElementById("main-content");
+      if (main) targets.push(main);
+      var footer = document.querySelector("footer");
+      if (footer && targets.indexOf(footer) === -1) targets.push(footer);
+      targets.forEach(function (el) {
+        if (on) {
+          el.setAttribute("inert", "");
+        } else {
+          el.removeAttribute("inert");
+        }
+      });
+    };
+
     var open = function () {
       lastFocused = document.activeElement;
       prevOverflow = document.body.style.overflow;
       root.setAttribute("data-mobile-nav-open", "");
       trigger.setAttribute("aria-expanded", "true");
       panel.setAttribute("aria-hidden", "false");
+      setBackgroundInert(true);
       document.body.style.overflow = "hidden";
       var first = panel.querySelector("[data-mobile-nav-close]");
       if (first && typeof first.focus === "function") first.focus();
@@ -210,6 +233,7 @@ const navLinks = [
       root.removeAttribute("data-mobile-nav-open");
       trigger.setAttribute("aria-expanded", "false");
       panel.setAttribute("aria-hidden", "true");
+      setBackgroundInert(false);
       document.body.style.overflow = prevOverflow;
       if (lastFocused && typeof lastFocused.focus === "function") lastFocused.focus();
       lastFocused = null;
