@@ -1,5 +1,6 @@
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { useRef, useState } from "react";
+import ChartDataTable from "../components/atoms/ChartDataTable";
 import type { GitHubLangStats } from "../types/github";
 
 interface Props {
@@ -146,6 +147,13 @@ export default function LanguageRadial({ languages }: Props) {
           ))}
         </div>
       </div>
+      {/* M4.7: same table in the reduced/static branch — data parity. */}
+      <ChartDataTable
+        id="languages-radial"
+        caption="Programming languages by share"
+        headers={["Language", "Share (%)"]}
+        rows={languages.map((l) => [l.language, l.percentage])}
+      />
     </div>
     );
   }
@@ -263,6 +271,13 @@ export default function LanguageRadial({ languages }: Props) {
             </motion.div>
           ))}
         </div>
+      {/* M4.7: same languages array the donut + legend render. */}
+      <ChartDataTable
+        id="languages-radial"
+        caption="Programming languages by share"
+        headers={["Language", "Share (%)"]}
+        rows={languages.map((l) => [l.language, l.percentage])}
+      />
     </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
+import ChartDataTable from "./ChartDataTable";
 import {
   drag,
   forceCenter,
@@ -304,6 +305,28 @@ export default function NetworkGraph({
           borderColor: themeColors(isDark).tooltipBorder,
           color: themeColors(isDark).textSecondary,
         }}
+      />
+      {/* M4.7: same node/link arrays the force simulation draws. Link
+          endpoints are stringified defensively: d3 replaces them with node
+          references in place once the simulation runs. */}
+      <ChartDataTable
+        id="repo-network-nodes"
+        caption="Repositories in the network graph"
+        headers={["Repository", "Group", "Size"]}
+        rows={propNodes.map((n) => [n.label || n.id, n.group ?? "", n.size ?? ""])}
+      />
+      <ChartDataTable
+        id="repo-network-links"
+        caption="Links in the network graph"
+        headers={["From", "To"]}
+        rows={propLinks.map((l) => [
+          typeof l.source === "object"
+            ? String((l.source as unknown as GraphNode).id)
+            : String(l.source),
+          typeof l.target === "object"
+            ? String((l.target as unknown as GraphNode).id)
+            : String(l.target),
+        ])}
       />
     </div>
   );

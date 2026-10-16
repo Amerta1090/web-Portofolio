@@ -1,5 +1,6 @@
 import { motion, useInView, useReducedMotion, AnimatePresence } from "motion/react";
 import { useRef, useState, useMemo } from "react";
+import ChartDataTable from "../components/atoms/ChartDataTable";
 import type { GitHubLangStats, GitHubRepo } from "../types/github";
 
 interface Props {
@@ -90,6 +91,13 @@ export default function LanguageNebula({ languages, allRepos }: Props) {
             </div>
           ))}
         </div>
+        {/* M4.7: same languages array the bar segments render. */}
+        <ChartDataTable
+          id="languages-nebula"
+          caption="Programming languages by share"
+          headers={["Language", "Share (%)", "Repos"]}
+          rows={languages.map((l) => [l.language, l.percentage, langRepoCount.get(l.language) ?? 0])}
+        />
       </div>
     );
   }
@@ -346,6 +354,14 @@ export default function LanguageNebula({ languages, allRepos }: Props) {
           </motion.div>
         )}
       </AnimatePresence>
+      {/* M4.7: same languages array the ribbon renders (full list — labels
+          only show segments >3%). */}
+      <ChartDataTable
+        id="languages-nebula"
+        caption="Programming languages by share"
+        headers={["Language", "Share (%)", "Repos"]}
+        rows={languages.map((l) => [l.language, l.percentage, langRepoCount.get(l.language) ?? 0])}
+      />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { useRef, useState } from "react";
+import ChartDataTable from "../components/atoms/ChartDataTable";
 import type { WeeklyPattern } from "../types/github";
 
 interface Props {
@@ -94,6 +95,13 @@ export default function ActivityWave({ data }: Props) {
           })}
         </svg>
       </div>
+      {/* M4.7: same table in the reduced branch — data parity. */}
+      <ChartDataTable
+        id="weekly-activity"
+        caption="Commits per weekday"
+        headers={["Day", "Commits"]}
+        rows={DAYS.map((d) => [DAY_LABELS[d] ?? d, data[d]])}
+      />
       </div>
     );
   }
@@ -199,6 +207,13 @@ export default function ActivityWave({ data }: Props) {
           );
         })}
       </svg>
+      {/* M4.7: same WeeklyPattern the bars encode (day → commits). */}
+      <ChartDataTable
+        id="weekly-activity"
+        caption="Commits per weekday"
+        headers={["Day", "Commits"]}
+        rows={DAYS.map((d) => [DAY_LABELS[d] ?? d, data[d]])}
+      />
     </div>
     </div>
   );

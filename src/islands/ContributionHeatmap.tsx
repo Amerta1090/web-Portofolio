@@ -1,6 +1,7 @@
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { useRef, useState } from "react";
 import { Flame } from "lucide-react";
+import ChartDataTable from "../components/atoms/ChartDataTable";
 import type { ContributionCalendar } from "../types/github";
 
 interface Props {
@@ -176,6 +177,17 @@ export default function ContributionHeatmap({ data, longestStreak = 0 }: Props) 
           <span>More</span>
         </div>
       </div>
+      {/* M4.7: same weeks the grid draws — one row per week, daily counts as
+          columns (identical data, tabular shape). */}
+      <ChartDataTable
+        id="contribution-weeks"
+        caption="Contributions per week with daily counts"
+        headers={["Week starting", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]}
+        rows={data.weeks.map((week) => [
+          week.days[0]?.date ?? "week",
+          ...week.days.map((d) => d.count),
+        ])}
+      />
     </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import ErrorBoundary from "../components/atoms/ErrorBoundary";
+import ChartDataTable from "../components/atoms/ChartDataTable";
 import { gsap, ScrollTrigger } from "../lib/gsap";
 import type { GitHubData } from "../types/github";
 
@@ -388,6 +389,13 @@ export default function CodeDNAHelix({ gitHubData }: Props) {
         <p className="text-center mt-6 text-xs text-text-secondary/40 italic max-w-sm mx-auto leading-relaxed">
           {signature}
         </p>
+        {/* M4.7: same top languages the rungs encode (language → share). */}
+        <ChartDataTable
+          id="codedna-languages"
+          caption="Programming languages by share of codebase"
+          headers={["Language", "Share (%)"]}
+          rows={topLangs.map((l) => [l.language, l.percentage])}
+        />
       </div>
     </div>
     </ErrorBoundary>
