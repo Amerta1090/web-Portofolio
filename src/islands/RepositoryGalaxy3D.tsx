@@ -6,6 +6,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import type { LineBasicMaterial, LineSegments } from "three";
 import { BufferAttribute, BufferGeometry, Color, Vector3 } from "three";
 import RepoPlanet from "../components/atoms/RepoPlanet";
+import { clampDt } from "../lib/damping";
 import useDocumentVisible from "../lib/useDocumentVisible";
 import type { GitHubData, GitHubRepo } from "../types/github";
 
@@ -123,9 +124,11 @@ function CameraFlythrough({ onComplete }: { onComplete: () => void }) {
   useFrame((_, delta) => {
     if (doneRef.current) return;
 
+    // M4.5: clamp the useFrame delta — a tab-switch spike must not teleport
+    // the intro camera in one frame (the lerp itself was already dt-aware).
     const target = new Vector3(0, 0, 8);
     if (camera.position.distanceTo(target) > 0.1) {
-      camera.position.lerp(target, delta * 0.6);
+      camera.position.lerp(target, clampDt(delta) * 0.6);
       camera.lookAt(0, 0, 0);
     } else {
       doneRef.current = true;

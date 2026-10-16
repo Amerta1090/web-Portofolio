@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { clampDt, frameDampingFactor } from "../lib/damping";
 
 interface CustomCursorProps {
   enableOnTouch?: boolean;
@@ -53,6 +54,11 @@ export default function CustomCursor({ enableOnTouch = false }: CustomCursorProp
     let ringX = 0;
     let ringY = 0;
     let running = false;
+    // M4.5: timestamp-basis for frame-rate independent damping. -1 = "no
+    // previous frame yet" (first frame moves nothing instead of consuming a
+    // huge dt); reset on every (re)start so a hidden-tab gap never teleports
+    // the ring even before the visibility guard engages.
+    let lastT = -1;
 
     const onMove = (e: MouseEvent) => {
       mouseX = e.clientX;
@@ -96,10 +102,15 @@ export default function CustomCursor({ enableOnTouch = false }: CustomCursorProp
       el.addEventListener("mouseleave", onHoverableLeave);
     }
 
-    const animate = () => {
+    const animate = (t: number) => {
       if (!running) return;
-      ringX += (mouseX - ringX) * 0.12;
-      ringY += (mouseY - ringY) * 0.12;
+      // M4.5: exponential damping on clamped dt — same curve at any refresh
+      // rate (factor(1/60) ≈ 0.12, the old constant), spike-clamped.
+      const dt = lastT < 0 ? 0 : clampDt((t - lastT) / 1000);
+      lastT = t;
+      const k = frameDampingFactor(dt);
+      ringX += (mouseX - ringX) * k;
+      ringY += (mouseY - ringY) * k;
       // Compositor-only positioning (S/A tier): transform replaces left/top,
       // which would trigger layout per frame. The base `translate(-50%, -50%)`
       // from cssText keeps the elements centered on the pointer.
@@ -114,11 +125,13 @@ export default function CustomCursor({ enableOnTouch = false }: CustomCursorProp
         if (rafId) cancelAnimationFrame(rafId);
       } else if (!running) {
         running = true;
+        lastT = -1;
         rafId = requestAnimationFrame(animate);
       }
     };
 
     running = true;
+    lastT = -1;
     rafId = requestAnimationFrame(animate);
     document.addEventListener("visibilitychange", onVisibility);
 

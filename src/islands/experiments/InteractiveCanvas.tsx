@@ -35,7 +35,6 @@ let _idCounter = 0;
 function uid(prefix = "x") { return `${prefix}_${++_idCounter}_${Math.random().toString(36).slice(2, 6)}`; }
 
 function distance(a: Point, b: Point) { return Math.hypot(b.x - a.x, b.y - a.y); }
-function lerp(a: number, b: number, t: number) { return a + (b - a) * t; }
 function clamp(v: number, lo: number, hi: number) { return v < lo ? lo : v > hi ? hi : v; }
 
 function applyTransform(ctx: CanvasRenderingContext2D, ox: number, oy: number, sc: number) {
