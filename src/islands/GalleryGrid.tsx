@@ -183,8 +183,8 @@ const ExperimentCard = forwardRef<
       }}
       className={`group relative bg-bg-secondary/50 backdrop-blur-sm border rounded-2xl overflow-hidden transition-all duration-300 outline-none ${
         isFocused
-          ? "border-amber-400/60 ring-2 ring-amber-400/20 shadow-lg shadow-amber-500/10"
-          : "border-border/60 hover:border-amber-500/30"
+          ? "border-brand/60 ring-2 ring-brand/20 shadow-lg shadow-brand/10"
+          : "border-border/60 hover:border-brand/30"
       }`}
       onClick={() => onLaunch(exp.id)}
       data-exp-id={exp.id}
@@ -220,11 +220,11 @@ const ExperimentCard = forwardRef<
             </span>
           ))}
         </div>
-        <h3 className="text-lg font-bold text-text-primary mb-2 group-hover:text-amber-400 transition-colors">
+        <h3 className="text-lg font-bold text-text-primary mb-2 group-hover:text-brand transition-colors">
           {exp.title}
         </h3>
         <p className="text-sm text-text-secondary leading-relaxed">{exp.description}</p>
-        <div className="mt-4 flex items-center gap-1.5 text-xs text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="mt-4 flex items-center gap-1.5 text-xs text-brand opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <Maximize2 className="w-3 h-3" />
           Launch Experiment
         </div>
@@ -341,7 +341,7 @@ function ExperimentLoader() {
       aria-live="polite"
       data-experiment-loader=""
     >
-      <div className="w-10 h-10 rounded-full border-2 border-border border-t-amber-500 animate-spin" />
+      <div className="w-10 h-10 rounded-full border-2 border-border border-t-brand animate-spin" />
       <p className="text-xs text-text-secondary font-mono">memuat eksperimen…</p>
     </div>
   );
@@ -581,7 +581,7 @@ export default function GalleryGrid() {
       {activeCategory === "All" && (
         <div className="mb-10">
           <div className="flex items-center gap-2 mb-4">
-            <span className="w-1.5 h-1.5 bg-amber-400 rounded-full" />
+            <span className="w-1.5 h-1.5 bg-brand rounded-full" />
             <h2 className="text-sm font-semibold text-text-secondary uppercase tracking-widest">
               Featured
             </h2>
