@@ -264,14 +264,20 @@ export default function CareerSpine() {
     if (!hydrated || scrubDisabled) return;
     const root = rootRef.current;
     if (!root || years.length === 0) return;
-    const trigger = ScrollTrigger.create({
-      trigger: root,
-      start: `top ${CAREER_READING_LINE_PERCENT}%`,
-      end: `bottom ${CAREER_READING_LINE_PERCENT}%`,
-      onUpdate: applyReadingLine,
-    });
+    // M4.10.2: owned via gsap.context (scoped kill on revert) instead of a
+    // bare by-reference kill — same single trigger, consistent scoping.
+    const ctx = gsap.context(() => {
+      ScrollTrigger.create({
+        trigger: root,
+        start: `top ${CAREER_READING_LINE_PERCENT}%`,
+        end: `bottom ${CAREER_READING_LINE_PERCENT}%`,
+        onUpdate: applyReadingLine,
+      });
+    }, root);
     applyReadingLine();
-    return () => trigger.kill();
+    return () => {
+      ctx.revert();
+    };
   }, [hydrated, scrubDisabled, years, applyReadingLine]);
 
   /**

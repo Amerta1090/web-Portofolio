@@ -69,50 +69,54 @@ export default function BootSequence({ gitHubData, profileName, onComplete }: Pr
       return;
     }
 
-    const tl = gsap.timeline({
-      onComplete: () => {
-        try {
-          localStorage.setItem("boot-sequence-seen", "true");
-        } catch {}
-        setPhase("complete");
-        onCompleteRef.current?.();
-      },
-    });
-
-    tl.to(glitchRef.current, {
-      textShadow: "2px 0 #ff0000, -2px 0 #00ffff",
-      duration: 0.05,
-    })
-      .to(glitchRef.current, {
-        textShadow: "-2px 0 #ff0000, 2px 0 #00ffff",
-        duration: 0.05,
-      })
-      .to(glitchRef.current, {
-        textShadow: "3px 0 #ff0000, -3px 0 #00ffff",
-        scale: 1.02,
-        duration: 0.03,
-      })
-      .to(glitchRef.current, {
-        textShadow: "0 0 transparent",
-        scale: 1,
-        duration: 0.1,
-      })
-      .to(glitchRef.current, {
-        opacity: 0,
-        duration: 0.02,
-      })
-      .to(glitchRef.current, {
-        opacity: 1,
-        duration: 0.05,
-      })
-      .to(glitchRef.current, {
-        textShadow: "0 0 24px rgb(122 140 111 / 0.6)",
-        duration: 0.5,
-        ease: "power2.out",
+    // M4.10.2: owned via gsap.context (scoped kill on revert) instead of a
+    // bare by-reference kill — same single timeline, consistent scoping.
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        onComplete: () => {
+          try {
+            localStorage.setItem("boot-sequence-seen", "true");
+          } catch {}
+          setPhase("complete");
+          onCompleteRef.current?.();
+        },
       });
 
+      tl.to(glitchRef.current, {
+        textShadow: "2px 0 #ff0000, -2px 0 #00ffff",
+        duration: 0.05,
+      })
+        .to(glitchRef.current, {
+          textShadow: "-2px 0 #ff0000, 2px 0 #00ffff",
+          duration: 0.05,
+        })
+        .to(glitchRef.current, {
+          textShadow: "3px 0 #ff0000, -3px 0 #00ffff",
+          scale: 1.02,
+          duration: 0.03,
+        })
+        .to(glitchRef.current, {
+          textShadow: "0 0 transparent",
+          scale: 1,
+          duration: 0.1,
+        })
+        .to(glitchRef.current, {
+          opacity: 0,
+          duration: 0.02,
+        })
+        .to(glitchRef.current, {
+          opacity: 1,
+          duration: 0.05,
+        })
+        .to(glitchRef.current, {
+          textShadow: "0 0 24px rgb(122 140 111 / 0.6)",
+          duration: 0.5,
+          ease: "power2.out",
+        });
+    }, glitchRef);
+
     return () => {
-      tl.kill();
+      ctx.revert();
     };
   }, [phase, prefersReduced]);
 
