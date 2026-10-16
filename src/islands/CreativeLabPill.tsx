@@ -23,14 +23,14 @@ export default function CreativeLabPill() {
         <AnimatePresence>
           {hovered && (
             <motion.div
-              className="mb-3 w-48 p-3 rounded-xl border border-white/10 bg-[#0f0f11]/95 backdrop-blur-xl shadow-2xl origin-bottom-right"
+              className="mb-3 w-48 p-3 rounded-xl border border-white/10 bg-bg-primary/95 backdrop-blur-xl shadow-2xl origin-bottom-right"
               initial={{ opacity: 0, y: 8, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 8, scale: 0.95 }}
               transition={{ duration: 0.2 }}
             >
               <div className="flex items-center gap-2 mb-2">
-                <FlaskConical size={12} className="text-amber-400" />
+                <FlaskConical size={12} className="text-brand" />
                 <span className="text-[11px] font-medium text-text-primary">
                   Creative Lab
                 </span>
@@ -40,7 +40,7 @@ export default function CreativeLabPill() {
               </p>
               <a
                 href="/gallery"
-                className="flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[11px] font-medium hover:bg-amber-500/20 transition-all"
+                className="flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg bg-brand/10 border border-brand/20 text-brand text-[11px] font-medium hover:bg-brand/20 transition-all"
               >
                 <span>Enter Lab</span>
                 <ArrowRight size={10} />
@@ -75,7 +75,7 @@ export default function CreativeLabPill() {
         {/* Badge */}
         <motion.a
           href="/gallery"
-          className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg border border-amber-500/20 bg-[#0f0f11]/90 backdrop-blur-xl shadow-lg shadow-amber-500/5 hover:border-amber-500/30 transition-colors"
+          className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg border border-brand/20 bg-bg-primary/90 backdrop-blur-xl shadow-lg shadow-brand/5 hover:border-brand/30 transition-colors"
           animate={prefersReducedMotion ? undefined : { scale: [1, 1.02, 1] }}
           transition={
             prefersReducedMotion
@@ -90,9 +90,9 @@ export default function CreativeLabPill() {
           whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
           whileTap={prefersReducedMotion ? { scale: 0.97 } : undefined}
         >
-          <FlaskConical size={14} className="text-amber-400" />
-          <span className="text-xs font-medium text-amber-400">Lab</span>
-          <Sparkles size={9} className="text-amber-400/50" />
+          <FlaskConical size={14} className="text-brand" />
+          <span className="text-xs font-medium text-brand">Lab</span>
+          <Sparkles size={9} className="text-brand/50" />
         </motion.a>
       </div>
     </div>
