@@ -22,10 +22,10 @@ const TYPE_LABEL: Record<SearchItemType, string> = {
 };
 
 const TYPE_BADGE: Record<SearchItemType, string> = {
-  person: "bg-amber-500/15 text-amber-300",
+  person: "bg-brand/15 text-brand-text",
   skill: "bg-sky-500/15 text-sky-300",
   project: "bg-violet-500/15 text-violet-300",
-  experience: "bg-emerald-500/15 text-emerald-300",
+  experience: "bg-brand-warm/15 text-brand-warm",
   certification: "bg-orange-500/15 text-orange-300",
   page: "bg-zinc-500/15 text-zinc-300",
   lab: "bg-pink-500/15 text-pink-300",
@@ -53,7 +53,7 @@ function highlight(text: string, query: string): React.ReactNode {
   return (
     <>
       {text.slice(0, idx)}
-      <mark className="rounded-sm bg-amber-500/30 px-0.5 text-amber-200">
+      <mark className="rounded-sm bg-brand/30 px-0.5 text-brand-text">
         {text.slice(idx, idx + q.length)}
       </mark>
       {text.slice(idx + q.length)}
@@ -220,7 +220,7 @@ export default function CommandPalette() {
               className="flex items-center gap-1 text-xs text-text-secondary"
               aria-hidden="true"
             >
-              <Sparkles className="h-3.5 w-3.5 animate-pulse text-amber-400" />
+              <Sparkles className="h-3.5 w-3.5 animate-pulse text-brand" />
               thinking…
             </span>
           )}
