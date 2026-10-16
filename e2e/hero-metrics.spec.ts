@@ -213,3 +213,32 @@ test.describe("hero evidence row", () => {
     }
   });
 });
+
+test.describe("Hero headline split (M4.9)", () => {
+  test("splits into words with full motion (aria + text intact)", async ({ page }) => {
+    await page.goto("/");
+    const headline = page.locator(".border-l-4 > p");
+    await expect(headline).toBeAttached();
+    await expect
+      .poll(async () => headline.locator(":scope > div").count(), { timeout: 15_000 })
+      .toBeGreaterThan(0);
+    const text = ((await headline.textContent()) ?? "").replace(/\s+/g, " ").trim();
+    expect(await headline.getAttribute("aria-label")).toBe(text);
+    expect(text.length).toBeGreaterThan(0);
+  });
+
+  test("headline stays whole with reduced motion (M4.9.2, no SplitText wrappers)", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const reduced = await page.evaluate(
+      () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    );
+    expect(reduced).toBe(true);
+    const headline = page.locator(".border-l-4 > p");
+    await expect(headline).toBeAttached();
+    expect(await headline.locator(":scope > div").count()).toBe(0);
+    expect((await headline.textContent())?.trim().length).toBeGreaterThan(0);
+  });
+});

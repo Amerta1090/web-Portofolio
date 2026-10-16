@@ -244,3 +244,58 @@ describe("TimeAwareHero glow layer", () => {
     expect(glow()).toBeNull();
   });
 });
+
+describe("TimeAwareHero headline split (M4.9)", () => {
+  const HEADLINE = BASE_PROPS.headline;
+  const WORD_COUNT = HEADLINE.split(" ").length;
+  const box = () => document.querySelector(".border-l-4");
+  const paragraph = () => box()?.querySelector(":scope > p");
+
+  it("splits the headline into words after the entrance (full motion)", async () => {
+    render(<TimeAwareHero {...BASE_PROPS} />);
+
+    // Before the entrance the paragraph is whole (split runs on `loaded`).
+    expect(paragraph()?.childElementCount).toBe(0);
+
+    await act(async () => {
+      // `duration.narrative` entrance timer (precedent: evidence-row test).
+      await new Promise((resolve) => setTimeout(resolve, 1300));
+    });
+    await act(async () => {
+      // Flush the dynamic `gsap/SplitText` import + split.
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    });
+
+    const p = paragraph();
+    expect(p?.childElementCount).toBe(WORD_COUNT);
+    // Accessible name survives the split (SplitText `aria: "auto"`).
+    expect(p?.getAttribute("aria-label")).toBe(HEADLINE);
+    // Same words, no paraphrase (SplitText absorbs inter-word whitespace into
+    // its own separators, so compare the word set, not raw textContent).
+    const words = [...(p?.querySelectorAll(":scope > div") ?? [])].map((w) => w.textContent);
+    expect(words).toEqual(HEADLINE.split(" "));
+  });
+
+  it("leaves the headline whole under reduced motion (M4.9.2)", () => {
+    reducedMotion = true;
+    render(<TimeAwareHero {...BASE_PROPS} />);
+
+    const p = paragraph();
+    expect(p?.childElementCount).toBe(0);
+    expect(p?.textContent).toBe(HEADLINE);
+  });
+
+  it("restores the whole headline on unmount (scoped revert)", async () => {
+    const { unmount } = render(<TimeAwareHero {...BASE_PROPS} />);
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 1300));
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    });
+    expect(paragraph()?.childElementCount).toBe(WORD_COUNT);
+    unmount();
+    // Revert ran: no split residue anywhere in the document.
+    expect(document.querySelector(".border-l-4")).toBeNull();
+  });
+});

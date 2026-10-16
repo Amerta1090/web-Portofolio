@@ -1,8 +1,9 @@
 import { ArrowRight } from "lucide-react";
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import HeroAvatar from "../components/atoms/HeroAvatar";
 import RevealText from "../components/atoms/RevealText";
+import { gsap } from "../lib/gsap";
 import type { HeroMetric } from "../lib/hero-metrics";
 import { duration, easing } from "../lib/motion";
 import { useTimeOfDay } from "../lib/useTimeOfDay";
@@ -48,6 +49,54 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl, metr
   const [lowData, setLowData] = useState(false);
   const time = useTimeOfDay();
   const isReturning = useReturnVisitor();
+  const headlineRef = useRef<HTMLParagraphElement>(null);
+
+  /**
+   * M4.9: SplitText on the headline only (plan §M4.9.1). Dynamic import keeps
+   * the plugin out of the initial chunk (0 bytes until the entrance runs) and
+   * out of SSR (module scope of `gsap/SplitText` is never evaluated on the
+   * server — the jsdom `matchMedia` lesson of M0.7 applies to plugin modules
+   * too). `type: "words"` needs no layout measurement, so it is jsdom-safe;
+   * `aria: "auto"` (the plugin's default, spelled out) keeps the full headline
+   * as the accessible name — the plan's `accessible: true` under the real
+   * option name. Reduced motion skips the split entirely: whole text, as the
+   * existing static branches already do (M4.9.2). Scoped `gsap.context` owns
+   * the split (SplitText self-registers into the active context), so cleanup
+   * is a single `ctx.revert()` restoring the original paragraph (M4.10.2).
+   * If the import ever fails, the headline simply stays whole — no dead
+   * control, no missing text. `headline` is intentionally not a dependency:
+   * it is a static mount-time prop (Astro islands remount on prop change),
+   * and re-splitting mid-life would fight the entrance choreography.
+   */
+  useEffect(() => {
+    if (prefersReduced || !loaded) return;
+    const el = headlineRef.current;
+    if (!el) return;
+    let cancelled = false;
+    let ctx: gsap.Context | null = null;
+    void import("gsap/SplitText")
+      .then(({ SplitText }) => {
+        if (cancelled || !headlineRef.current) return;
+        ctx = gsap.context(() => {
+          const split = new SplitText(headlineRef.current, {
+            type: "words",
+            aria: "auto",
+          });
+          gsap.from(split.words, {
+            y: "0.5em",
+            opacity: 0,
+            duration: 0.6,
+            ease: "power2.out",
+            stagger: 0.06,
+          });
+        }, headlineRef);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+      ctx?.revert();
+    };
+  }, [prefersReduced, loaded]);
 
   useEffect(() => {
     if (prefersReduced) {
@@ -179,7 +228,9 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl, metr
               transition={{ ...easing["ease-spring-gentle"], delay: duration.slow }}
             >
               <div className="border-l-4 border-brand pl-5 text-left">
-                <p className="text-xl md:text-2xl font-medium text-text-primary">{headline}</p>
+                <p ref={headlineRef} className="text-xl md:text-2xl font-medium text-text-primary">
+                  {headline}
+                </p>
               </div>
             </motion.div>
 
