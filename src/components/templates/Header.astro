@@ -239,6 +239,41 @@ const navLinks = [
       if (e.key === "Escape" && isOpen()) {
         e.preventDefault();
         close();
+        return;
+      }
+      // Focus trap (M4.3.2): Tab/Shift+Tab cycle di dalam dialog saat terbuka.
+      // Ekuivalen vanilla dari `useFocusTrap` (React hook — tak bisa di-import
+      // script `is:inline`, jadi logikanya di-mirror di sini, bukan hook-nya
+      // dipakai ulang; lihat DEVIASI di plan). Tanpa ini Tab lolos ke konten
+      // belakang (terbukti probe M4.3.1: TAB_ESCAPED=true).
+      if (e.key === "Tab" && isOpen()) {
+        var dialog = panel.querySelector('[role="dialog"]');
+        var scope = dialog || panel;
+        var focusables = scope.querySelectorAll(
+          'button:not([disabled]):not([tabindex="-1"]),' +
+            '[href]:not([tabindex="-1"]),' +
+            "input:not([disabled])," +
+            "textarea:not([disabled])," +
+            "select:not([disabled])," +
+            '[tabindex]:not([tabindex="-1"])',
+        );
+        if (focusables.length === 0) {
+          e.preventDefault();
+          return;
+        }
+        var first = focusables[0];
+        var last = focusables[focusables.length - 1];
+        var active = document.activeElement;
+        var inside = active ? scope.contains(active) : false;
+        if (e.shiftKey) {
+          if (!inside || active === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else if (!inside || active === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     });
   })();
