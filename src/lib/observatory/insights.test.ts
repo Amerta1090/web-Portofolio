@@ -92,7 +92,6 @@ describe("generateInsights", () => {
         busiest_month: "",
         most_active_day: "",
       },
-      star_history: {},
     };
     const ins = generateInsights({ projects: BIG, github: gh });
     expect(ins.find((i) => i.id === "github-scale")?.body).toContain("1,234");

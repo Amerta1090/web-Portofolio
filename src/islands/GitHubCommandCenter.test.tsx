@@ -16,7 +16,6 @@ const makeGitHubData = (overrides: Partial<GitHubData> = {}): GitHubData => ({
   repo_activity: [],
   weekly_pattern: { mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6, sun: 0 },
   derived_metrics: { longest_streak: 9, busiest_month: "March", most_active_day: "Friday" },
-  star_history: {},
   ...overrides,
 });
 

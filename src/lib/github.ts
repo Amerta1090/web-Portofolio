@@ -9,7 +9,6 @@ import type {
   GitHubReadme,
   GitHubRepo,
   GitHubRepoActivity,
-  StarHistory,
   WeeklyPattern,
 } from "../types/github";
 
@@ -444,56 +443,6 @@ export async function fetchRepoActivity(): Promise<GitHubRepoActivity[]> {
   }
 }
 
-export async function fetchStarHistory(
-  owner: string,
-  repo: string,
-): Promise<StarHistory> {
-  const cacheKey = `star-history-${repo}.json`;
-  const cached = readCache<StarHistory>(cacheKey);
-  if (cached && cached.length > 0) return cached;
-
-  try {
-    const stars: StarHistory = [];
-    let page = 1;
-    const perPage = 100;
-
-    while (page <= 10) {
-      const data = await rest<
-        Array<{
-          starred_at: string;
-        }>
-      >(
-        `/repos/${owner}/${repo}/stargazers?per_page=${perPage}&page=${page}`,
-      );
-
-      if (!Array.isArray(data) || data.length === 0) break;
-
-      for (const s of data) {
-        const month = s.starred_at.slice(0, 7);
-        const existing = stars.find((e) => e.date === month);
-        if (existing) {
-          existing.count += 1;
-        } else {
-          stars.push({ date: month, count: 1 });
-        }
-      }
-
-      if (data.length < perPage) break;
-      page++;
-    }
-
-    stars.sort((a, b) => a.date.localeCompare(b.date));
-
-    writeCache(cacheKey, stars);
-    return stars;
-  } catch (err) {
-    console.warn(`[github] Star history fetch failed for ${repo}: ${err}`);
-    const fallback = readCache<StarHistory>(cacheKey);
-    if (fallback) return fallback;
-    return [];
-  }
-}
-
 export function deriveWeeklyPattern(
   commitActivity: GitHubCommitActivity[],
 ): WeeklyPattern {
@@ -594,22 +543,6 @@ export async function fetchAllGitHubData(): Promise<GitHubData> {
   const weekly_pattern = deriveWeeklyPattern(commit_activity);
   const derived_metrics = deriveMetrics(contributions);
 
-  const top5 = [...allRepos]
-    .sort((a, b) => b.stars - a.stars)
-    .slice(0, 5);
-
-  const starHistoryResults = await Promise.allSettled(
-    top5.map((r) => fetchStarHistory(USERNAME, r.name)),
-  );
-
-  const star_history: Record<string, StarHistory> = {};
-  for (let i = 0; i < top5.length; i++) {
-    const result = starHistoryResults[i];
-    if (result.status === "fulfilled" && result.value.length > 0) {
-      star_history[top5[i].name] = result.value;
-    }
-  }
-
   return {
     pinned_repos,
     total_stars,
@@ -623,7 +556,6 @@ export async function fetchAllGitHubData(): Promise<GitHubData> {
     repo_activity,
     weekly_pattern,
     derived_metrics,
-    star_history,
   };
 }
 
@@ -668,7 +600,6 @@ export function getCachedGitHubData(): GitHubData | null {
       repo_activity: repoActivity ?? [],
       weekly_pattern,
       derived_metrics,
-      star_history: {},
     };
   } catch {
     return null;

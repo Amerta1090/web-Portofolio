@@ -250,52 +250,6 @@ try {
   results.failed.push("data-validation");
 }
 
-console.log("\n  Star history (top 5 repos):");
-try {
-  const allReposPath = resolve(cacheDir, "all-repos.json");
-  const allRepos = JSON.parse(readFileSync(allReposPath, "utf-8"));
-  const top5 = (Array.isArray(allRepos) ? allRepos : [])
-    .sort((a, b) => (b.stars ?? 0) - (a.stars ?? 0))
-    .slice(0, 5);
-
-  for (const repo of top5) {
-    const name = `star-history-${repo.name}`;
-    try {
-      const stars = [];
-      let page = 1;
-      const perPage = 100;
-      while (page <= 10) {
-        const headers = { "User-Agent": "portfolio-builder", Accept: "application/vnd.github.v3.star+json" };
-        if (GITHUB_TOKEN) headers.Authorization = `Bearer ${GITHUB_TOKEN}`;
-        const res = await fetch(
-          `https://api.github.com/repos/${USERNAME}/${repo.name}/stargazers?per_page=${perPage}&page=${page}`,
-          { headers },
-        );
-        if (!res.ok) break;
-        const data = await res.json();
-        if (!Array.isArray(data) || data.length === 0) break;
-        for (const s of data) {
-          const month = s.starred_at.slice(0, 7);
-          const existing = stars.find((e) => e.date === month);
-          if (existing) existing.count += 1;
-          else stars.push({ date: month, count: 1 });
-        }
-        if (data.length < perPage) break;
-        page++;
-      }
-      stars.sort((a, b) => a.date.localeCompare(b.date));
-      writeFileSync(resolve(cacheDir, `${name}.json`), JSON.stringify(stars, null, 2));
-      results.success.push(name);
-      console.log(`  ✓ ${name}`);
-    } catch (err) {
-      results.failed.push(name);
-      console.error(`  ✗ ${name}: ${err.message}`);
-    }
-  }
-} catch (err) {
-  console.error(`  ✗ star-history: ${err.message}`);
-}
-
 /**
  * M0.8.2 — second placement of the same non-degeneracy rule. `validate-data`
  * runs *before* the fetches, so it cannot see a cache this run just emptied;

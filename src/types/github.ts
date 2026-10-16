@@ -55,8 +55,6 @@ export interface GitHubReadme {
   fetched_at: string;
 }
 
-export type StarHistory = Array<{ date: string; count: number }>;
-
 export interface WeeklyPattern {
   mon: number;
   tue: number;
@@ -86,5 +84,4 @@ export interface GitHubData {
   repo_activity: GitHubRepoActivity[];
   weekly_pattern: WeeklyPattern;
   derived_metrics: DerivedGitHubMetrics;
-  star_history: Record<string, StarHistory>;
 }

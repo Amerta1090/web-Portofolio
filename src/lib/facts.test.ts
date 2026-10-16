@@ -227,7 +227,6 @@ function healthyCache(overrides: Partial<GitHubData> = {}): GitHubData {
     repo_activity: [],
     weekly_pattern: { mon: 0, tue: 0, wed: 0, thu: 0, fri: 0, sat: 0, sun: 0 },
     derived_metrics: { longest_streak: 20, busiest_month: "September", most_active_day: "wed" },
-    star_history: {},
     ...overrides,
   };
 }

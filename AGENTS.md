@@ -82,22 +82,21 @@ Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.j
 - `ContributionCalendar`: totalContributions, weeks[]
 - `GitHubCommitActivity`: week, total, days[]
 - `GitHubRepoActivity`: repo_name, repo_url, commits[]
-- `StarHistory`: Array<{date, count}>
 - `WeeklyPattern`: mon..sun numbers
 - `DerivedGitHubMetrics`: longest_streak, busiest_month, most_active_day
-- `GitHubData`: pinned_repos, total_stars, total_forks, total_repos, languages, contribution_count, commit_activity, contributions, top_repos, repo_activity, weekly_pattern, derived_metrics, star_history
+- `GitHubData`: pinned_repos, total_stars, total_forks, total_repos, languages, contribution_count, commit_activity, contributions, top_repos, repo_activity, weekly_pattern, derived_metrics
 
 ### Lib (`src/lib/github.ts`)
-- `fetchPinnedRepos()`, `fetchAllRepos()`, `fetchLanguages()`, `fetchCommitActivity()`, `fetchContributions()`, `fetchTopRepos()`, `fetchRepoActivity()`, `fetchReadme()`, `fetchStarHistory()`
+- `fetchPinnedRepos()`, `fetchAllRepos()`, `fetchLanguages()`, `fetchCommitActivity()`, `fetchContributions()`, `fetchTopRepos()`, `fetchRepoActivity()`, `fetchReadme()`
 - `deriveWeeklyPattern()`, `deriveMetrics()`
-- `fetchAllGitHubData()` — composes all into GitHubData
+- `fetchAllGitHubData()` — composes all into GitHubData (star history dihapus M4.8: 12/12 cache kosong + runtime `{}` selalu)
 - `getCachedGitHubData()` — read-only from .cache
 
 ### Scripts (`scripts/fetch-data.mjs`)
 Build-time pipeline: fetches raw GitHub API → transforms → writes `.cache/github/*.json`.
 
 ### Cache (`.cache/github/`)
-pinned-repos.json, all-repos.json, languages.json, commit-activity.json, contributions.json, top-repos.json, repo-activity.json, star-history-{name}.json, build-info.json
+pinned-repos.json, all-repos.json, languages.json, commit-activity.json, contributions.json, top-repos.json, repo-activity.json, build-info.json
 
 ## Existing Components
 
