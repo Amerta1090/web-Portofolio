@@ -100,6 +100,47 @@ test.describe("Mobile Site Navigation (21st Δ1)", () => {
     await expect(trigger).toBeFocused();
   });
 
+  test("Tab tak pernah keluar sheet; Shift+Tab dari pertama wrap ke terakhir (M4.3.6)", async ({
+    page,
+  }) => {
+    await page.goto("/gallery");
+    await page.getByRole("button", { name: "Menu", exact: true }).click();
+    const sheet = page.getByRole("dialog", { name: "Menu navigasi", exact: true });
+    await expect(sheet).toBeVisible();
+    // Sheet punya 7 focusable (tutup + 6 link); 14 Tab = 2 putaran penuh.
+    for (let i = 0; i < 14; i++) {
+      await page.keyboard.press("Tab");
+      const inside = await sheet.evaluate((el) => el.contains(document.activeElement));
+      expect(inside).toBe(true);
+    }
+    await page.keyboard.press("Shift+Tab");
+    await expect(sheet.getByRole("link", { name: "Contact", exact: true })).toBeFocused();
+  });
+
+  test("inert main+footer saat terbuka, dilepas saat tertutup (M4.3.6)", async ({ page }) => {
+    await page.goto("/gallery");
+    await page.getByRole("button", { name: "Menu", exact: true }).click();
+    const sheet = page.getByRole("dialog", { name: "Menu navigasi", exact: true });
+    await expect(sheet).toBeVisible();
+    expect(
+      await page.evaluate(() => document.getElementById("main-content")?.hasAttribute("inert")),
+    ).toBe(true);
+    expect(await page.evaluate(() => document.querySelector("footer")?.hasAttribute("inert"))).toBe(
+      true,
+    );
+    expect(await page.evaluate(() => document.querySelector("header")?.hasAttribute("inert"))).toBe(
+      false,
+    );
+    await page.keyboard.press("Escape");
+    await expect(sheet).toBeHidden();
+    expect(
+      await page.evaluate(() => document.getElementById("main-content")?.hasAttribute("inert")),
+    ).toBe(false);
+    expect(await page.evaluate(() => document.querySelector("footer")?.hasAttribute("inert"))).toBe(
+      false,
+    );
+  });
+
   test("setiap halaman memuat trigger + panel (cek /observatory)", async ({ page }) => {
     await page.goto("/observatory");
     const trigger = page.getByRole("button", { name: "Menu", exact: true });
