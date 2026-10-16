@@ -188,8 +188,46 @@ const navLinks = [
     var trigger = document.querySelector("[data-mobile-nav-trigger]");
     var panel = document.querySelector("[data-mobile-nav-panel]");
     if (!trigger || !panel) return;
-    var prevOverflow = "";
     var lastFocused = null;
+
+    // Window-scoped scroll lock (M4.3.4): protokol dataset yang SAMA dengan
+    // `src/lib/scroll-lock.ts` (`data-scroll-lock-count` /
+    // `data-scroll-lock-prev`), di-mirror dengan tangan karena script
+    // `is:inline` tak bisa import modul — kelas DEVIASI yang sama dengan trap
+    // M4.3.2. Key harus tetap identik dengan `COUNT_ATTR`/`PREV_ATTR` di sana;
+    // kalau key melenceng, dua overlay saling melepas lock (bug laten M4.2.3).
+    var readLockCount = function () {
+      var raw = document.body.dataset.scrollLockCount;
+      if (raw == null || raw === "") return 0;
+      var n = parseInt(raw, 10);
+      return isFinite(n) && n > 0 ? n : 0;
+    };
+
+    var acquireScrollLock = function () {
+      var body = document.body;
+      var count = readLockCount();
+      if (count === 0) {
+        body.dataset.scrollLockPrev = body.style.overflow;
+        body.dataset.scrollLockCount = "1";
+        body.style.overflow = "hidden";
+      } else {
+        body.dataset.scrollLockCount = String(count + 1);
+      }
+    };
+
+    var releaseScrollLock = function () {
+      var body = document.body;
+      var count = readLockCount();
+      if (count > 1) {
+        body.dataset.scrollLockCount = String(count - 1);
+        return;
+      }
+      if (count === 1) {
+        body.style.overflow = body.dataset.scrollLockPrev || "";
+        delete body.dataset.scrollLockCount;
+        delete body.dataset.scrollLockPrev;
+      }
+    };
 
     var isOpen = function () {
       return root.hasAttribute("data-mobile-nav-open");
@@ -219,12 +257,11 @@ const navLinks = [
 
     var open = function () {
       lastFocused = document.activeElement;
-      prevOverflow = document.body.style.overflow;
+      acquireScrollLock();
       root.setAttribute("data-mobile-nav-open", "");
       trigger.setAttribute("aria-expanded", "true");
       panel.setAttribute("aria-hidden", "false");
       setBackgroundInert(true);
-      document.body.style.overflow = "hidden";
       var first = panel.querySelector("[data-mobile-nav-close]");
       if (first && typeof first.focus === "function") first.focus();
     };
@@ -234,7 +271,7 @@ const navLinks = [
       trigger.setAttribute("aria-expanded", "false");
       panel.setAttribute("aria-hidden", "true");
       setBackgroundInert(false);
-      document.body.style.overflow = prevOverflow;
+      releaseScrollLock();
       if (lastFocused && typeof lastFocused.focus === "function") lastFocused.focus();
       lastFocused = null;
     };

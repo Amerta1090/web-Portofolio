@@ -46,6 +46,63 @@ test.describe("Scroll lock wiring (M4.2.3)", () => {
 });
 
 /**
+ * M4.3.4 — Header mobile-nav ikut protokol dataset window-scoped yang sama
+ * (`data-scroll-lock-count` / `data-scroll-lock-prev`, di-mirror dengan tangan
+ * di inline script karena `is:inline` tak bisa import modul — DEVIASI kelas
+ * M4.3.2). Test 1 = lifecycle + exact restore; test 2 = interleave dua holder
+ * (perilaku lama `prevOverflow`-var mengunci body selamanya di skenario ini:
+ * holder A melepas → sheet menutup → restore nilai basi `"hidden"`).
+ */
+test.describe("Scroll lock wiring — mobile nav (M4.3.4)", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("sheet memakai counter dataset + restore eksak nilai pra-lock", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => {
+      document.body.style.overflow = "auto";
+    });
+    const trigger = page.getByRole("button", { name: "Menu", exact: true });
+    await trigger.click();
+    const sheet = page.getByRole("dialog", { name: "Menu navigasi", exact: true });
+    await expect(sheet).toBeVisible();
+    expect(await bodyOverflow(page)).toBe("hidden");
+    expect(await page.evaluate(() => document.body.dataset.scrollLockCount ?? null)).toBe("1");
+    expect(await page.evaluate(() => document.body.dataset.scrollLockPrev ?? null)).toBe("auto");
+    await page.keyboard.press("Escape");
+    await expect(sheet).toBeHidden();
+    expect(await bodyOverflow(page)).toBe("auto");
+    expect(await page.evaluate(() => document.body.dataset.scrollLockCount ?? null)).toBe(null);
+  });
+
+  test("interleave: holder lain melepas duluan → sheet menutup tanpa mengunci body", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    // Seed seolah overlay modul (GalleryGrid/GameMenu) sedang memegang lock.
+    await page.evaluate(() => {
+      document.body.dataset.scrollLockCount = "1";
+      document.body.dataset.scrollLockPrev = "";
+      document.body.style.overflow = "hidden";
+    });
+    const trigger = page.getByRole("button", { name: "Menu", exact: true });
+    await trigger.click();
+    const sheet = page.getByRole("dialog", { name: "Menu navigasi", exact: true });
+    await expect(sheet).toBeVisible();
+    expect(await page.evaluate(() => document.body.dataset.scrollLockCount ?? null)).toBe("2");
+    // Holder lain melepas saat sheet masih terbuka (attrs hilang, count implisit 0).
+    await page.evaluate(() => {
+      delete document.body.dataset.scrollLockCount;
+      delete document.body.dataset.scrollLockPrev;
+      document.body.style.overflow = "";
+    });
+    await page.keyboard.press("Escape");
+    await expect(sheet).toBeHidden();
+    // Release tanpa acquire yang cocok = no-op: body TIDAK boleh terkunci.
+    expect(await bodyOverflow(page)).toBe("");
+    expect(await page.evaluate(() => document.body.dataset.scrollLockCount ?? null)).toBe(null);
+  });
+});
+/**
  * M4.2.4 — A/B probe: `documentElement.clientWidth` before / while-open /
  * after-close for all 3 overlay writers. Target: 0px delta everywhere.
  *
