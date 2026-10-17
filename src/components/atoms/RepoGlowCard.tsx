@@ -52,7 +52,7 @@ function getRankBadge(rank: number) {
     case 1:
       return {
         emoji: "👑",
-        className: "bg-amber-400/20 text-amber-400 border-amber-400/30",
+        className: "bg-brand/20 text-brand border-brand/30",
         label: "#1",
       };
     case 2:
@@ -64,7 +64,7 @@ function getRankBadge(rank: number) {
     case 3:
       return {
         emoji: "🥉",
-        className: "bg-amber-600/20 text-amber-600 border-amber-600/30",
+        className: "bg-brand-warm/20 text-brand-warm border-brand-warm/30",
         label: "#3",
       };
     default:
