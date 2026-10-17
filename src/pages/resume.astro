@@ -30,7 +30,7 @@ const { contact } = profile;
       <div class="py-10 px-8 sm:px-12 print:px-8 print:py-8">
         <header class="mb-7">
           <h1 class="text-[26px] font-bold text-gray-900 tracking-tight">{profile.name}</h1>
-          <p class="text-sm text-amber-800 font-medium mt-0.5 tracking-wide">{profile.headline}</p>
+          <p class="text-sm text-brand-text font-medium mt-0.5 tracking-wide">{profile.headline}</p>
           <p class="text-xs text-gray-500 mt-2 leading-relaxed">
             {profile.location}
             <span class="text-gray-300 mx-2">|</span>
@@ -38,11 +38,11 @@ const { contact } = profile;
             <span class="text-gray-300 mx-2">|</span>
             {contact.phone}
             <span class="text-gray-300 mx-2">|</span>
-            <a href={contact.linkedin} class="text-amber-800 hover:underline">linkedin.com/in/abdulmajidr708</a>
+            <a href={contact.linkedin} class="text-brand-text hover:underline">linkedin.com/in/abdulmajidr708</a>
             <span class="text-gray-300 mx-2">|</span>
-            <a href={contact.github} class="text-amber-800 hover:underline">github.com/Amerta1090</a>
+            <a href={contact.github} class="text-brand-text hover:underline">github.com/Amerta1090</a>
             <span class="text-gray-300 mx-2">|</span>
-            <a href="https://portfolio.abdulmajidr708.workers.dev" class="text-amber-800 hover:underline">portfolio.abdulmajidr708.workers.dev</a>
+            <a href="https://portfolio.abdulmajidr708.workers.dev" class="text-brand-text hover:underline">portfolio.abdulmajidr708.workers.dev</a>
           </p>
         </header>
 
@@ -59,7 +59,7 @@ const { contact } = profile;
                 <div class="flex items-baseline justify-between gap-4">
                   <div>
                     <h3 class="text-[14px] font-bold text-gray-900">{exp.role}</h3>
-                    <p class="text-[13px] text-amber-800 font-medium">{exp.company}</p>
+                    <p class="text-[13px] text-brand-text font-medium">{exp.company}</p>
                   </div>
                   <div class="text-[11px] text-gray-500 text-right whitespace-nowrap">
                     {exp.start_date} — {exp.end_date || "Present"}
@@ -71,7 +71,7 @@ const { contact } = profile;
                   <ul class="mt-1 space-y-0.5">
                     {exp.highlights.map((h) => (
                       <li class="text-[13px] text-gray-700 leading-[1.55] flex items-start gap-2">
-                        <span class="text-amber-700 mt-[3px] flex-shrink-0 text-[10px]">▸</span>
+                        <span class="text-brand-text mt-[3px] flex-shrink-0 text-[10px]">▸</span>
                         <span>{h}</span>
                       </li>
                     ))}
