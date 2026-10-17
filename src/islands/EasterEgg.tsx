@@ -102,7 +102,7 @@ export default function EasterEgg({
           activate("konami-code");
           const toast = document.createElement("div");
           toast.className =
-            "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] px-8 py-4 bg-amber-500/20 backdrop-blur-xl border border-amber-400/40 rounded-2xl text-amber-300 text-lg font-bold shadow-2xl shadow-amber-500/20 animate-bounce";
+            "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] px-8 py-4 bg-brand/20 backdrop-blur-xl border border-brand/40 rounded-2xl text-brand text-lg font-bold shadow-2xl shadow-brand/20 animate-bounce";
           toast.textContent = "🎮 KONAMI CODE ACTIVATED!";
           document.body.appendChild(toast);
           setTimeout(() => toast.remove(), 3000);
