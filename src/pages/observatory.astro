@@ -74,13 +74,13 @@ function edgeOpacity(count: number): number {
     <Container size="xl">
       <!-- Header -->
       <header class="mb-14" data-reveal>
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium mb-6">
-          <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/10 border border-brand/20 text-brand text-xs font-medium mb-6">
+          <span class="w-2 h-2 rounded-full bg-brand animate-pulse" />
           Analytical layer · deterministic insights
         </div>
         <h1 class="font-display text-[clamp(2.25rem,6vw+0.5rem,5rem)] leading-[0.95] tracking-[-0.035em] text-text-primary mb-4">
           The portfolio,{" "}
-          <span class="bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent">
+          <span class="bg-gradient-to-r from-brand to-brand-warm bg-clip-text text-transparent">
             read as a dataset
           </span>
         </h1>
@@ -365,13 +365,13 @@ function edgeOpacity(count: number): number {
         <div class="grid md:grid-cols-2 gap-4 sm:gap-6">
           {insights.map((ins) => (
             <article
-              class="group relative rounded-xl border border-border bg-bg-secondary/40 p-5 sm:p-6 hover:border-amber-500/30 transition-colors duration-300"
+              class="group relative rounded-xl border border-border bg-bg-secondary/40 p-5 sm:p-6 hover:border-brand/30 transition-colors duration-300"
               data-reveal
             >
               <h3 class="text-text-primary font-semibold mb-2">{ins.title}</h3>
               <p class="text-sm text-text-secondary leading-relaxed mb-4">{ins.body}</p>
               <p data-observatory="rule" class="text-[11px] font-mono text-text-secondary/60 flex gap-1.5 items-start">
-                <span class="text-amber-400/80 shrink-0">rule&gt;</span>
+                <span class="text-brand/80 shrink-0">rule&gt;</span>
                 <span>{ins.rule}</span>
               </p>
             </article>
