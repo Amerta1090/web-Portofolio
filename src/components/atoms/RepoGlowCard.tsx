@@ -40,7 +40,7 @@ function getRelativeTime(dateStr: string): { text: string; color: string } {
 
   if (hours < 1) return { text: "Just now", color: "text-green-400" };
   if (hours < 24) return { text: `${hours}h ago`, color: "text-green-400" };
-  if (days < 7) return { text: `${days}d ago`, color: "text-amber-400" };
+  if (days < 7) return { text: `${days}d ago`, color: "text-brand" };
   if (days < 30) return { text: `${Math.floor(days / 7)}w ago`, color: "text-gray-400" };
   const months = Math.floor(days / 30);
   if (Number.isNaN(months) || months < 0) return null;

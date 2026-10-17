@@ -31,6 +31,14 @@ export interface LabPresentation {
    *
    * They must stay statically analysable by Tailwind's content glob — see Task
    * 4.6 (palette tokenisation). Never build this string by interpolation.
+   *
+   * DOCUMENTED PALETTE EXCEPTION (M4.6.2, keputusan user 2026-10-17): the 27
+   * gradients use 13 Tailwind hue families (amber, cyan, purple, violet, yellow,
+   * teal, red, pink, blue, green, emerald, orange, indigo) as per-experiment
+   * contact-sheet identity. Tokenising would mean adding ~13 SemanticTokens ×
+   * light/dark to theme.css for one decorative surface; they are therefore
+   * treated like the canvas/SVG palette constants (Rule 3 exception) and the
+   * palette gate (`palette-gate.test.ts`) whitelists exactly this file.
    */
   gradient: string;
   thumbnail: string;

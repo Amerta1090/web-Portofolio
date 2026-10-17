@@ -80,8 +80,10 @@ describe("CareerSpine island never kills triggers it does not own", () => {
     expect(code).not.toMatch(/ScrollTrigger\.getAll/);
   });
 
-  it("kills the trigger it created, by reference", () => {
-    expect(code).toMatch(/const trigger = ScrollTrigger\.create\(/);
-    expect(code).toMatch(/return \(\) => trigger\.kill\(\)/);
+  it("kills the trigger it created — scoped, by the context that owns it", () => {
+    // M4.10.2 migrated the bare by-reference kill into `gsap.context` (the
+    // M0.7 contract: scoped kill only). Pin the new shape, not the old name.
+    expect(code).toMatch(/const ctx = gsap\.context\(\(\) => \{\s*ScrollTrigger\.create\(/);
+    expect(code).toMatch(/return \(\) => \{\s*ctx\.revert\(\);\s*\};/);
   });
 });
