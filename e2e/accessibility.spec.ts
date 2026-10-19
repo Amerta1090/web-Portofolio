@@ -611,3 +611,91 @@ test.describe("Q4.2 — dark, light, and zoom", () => {
     });
   }
 });
+
+// Sprint 5 (M5.2.3) — the homepage carries three evidence surfaces — the Career
+// Spine, the featured project cards, and the certifications bento — and each one
+// was rebuilt in Sprint 1–2 as a no-JS-first component. With scripts off they
+// must still be complete, in reading order, and free of controls that could only
+// work after hydration. Numbers here were measured in a no-JS context first
+// (probe 2026-10-19), then pinned — the same discipline as every claim above.
+test.describe("Sprint 5 — evidence surfaces without JavaScript", () => {
+  test("career, project, and certification content stays complete and ordered with scripts off", async ({
+    browser,
+  }) => {
+    const context = await browser.newContext({
+      viewport: { width: 1440, height: 900 },
+      javaScriptEnabled: false,
+    });
+    const page = await context.newPage();
+    await page.goto(HOME);
+
+    // Career Spine: the full contract-driven list, with real <time> dates.
+    await expect(page.locator("#career li[data-career-kind]")).toHaveCount(26);
+    await expect(page.locator("#career time[datetime]")).toHaveCount(29);
+    await expect(page.locator("#career li[data-career-year]")).toHaveCount(4);
+    // Featured evidence: four cards, and skill chips are anchors the server
+    // resolved, not buttons that need React (Task 2.2 / 2.4).
+    await expect(page.locator("#projects [data-project-card]")).toHaveCount(4);
+    await expect(page.locator("#projects [data-project-card] a[href^='#']")).toHaveCount(7);
+    // Certifications bento: one native <details> per provider, data-derived total.
+    await expect(page.locator("#certifications details[data-cert-issuer]")).toHaveCount(7);
+    await expect(page.locator("#certifications [data-cert-total]")).toHaveText("62");
+
+    // Reading order is document order: career → projects → certifications.
+    const tops = await page.evaluate(() =>
+      ["#career", "#projects", "#certifications"].map((sel) =>
+        Math.round(
+          (document.querySelector(sel)?.getBoundingClientRect().top ?? 0) + window.scrollY,
+        ),
+      ),
+    );
+    expect(tops[0]).toBeLessThan(tops[1]);
+    expect(tops[1]).toBeLessThan(tops[2]);
+
+    // No dead controls in any surface: scripts are off, so a button/input here
+    // could never do anything (P5 / Q4.2 D2).
+    for (const sel of ["#career", "#projects", "#certifications"]) {
+      await expect(
+        page.locator(`${sel} button, ${sel} input, ${sel} select, ${sel} textarea`),
+      ).toHaveCount(0);
+    }
+
+    await context.close();
+  });
+
+  // Sprint 5 (M5.2.4) — accessible names are pinned by their *shape*, never a
+  // word count (Q4.2 #8): each hero metric link announces `Kind: value`, where
+  // both parts are the strings already visible in the card.
+  test("hero metric links announce their kind and value without JavaScript", async ({
+    browser,
+  }) => {
+    const context = await browser.newContext({
+      viewport: { width: 1440, height: 900 },
+      javaScriptEnabled: false,
+    });
+    const page = await context.newPage();
+    await page.goto(HOME);
+
+    const links = page.locator("[data-hero-metric]");
+    await expect(links).toHaveCount(4);
+    const names = await links.evaluateAll((nodes) =>
+      nodes.map((n) => {
+        const spans = [...n.querySelectorAll("span")];
+        return {
+          label: n.getAttribute("aria-label") ?? "",
+          kind: spans.find((s) => s.classList.contains("section-label"))?.textContent?.trim() ?? "",
+          value: (n.querySelector("span")?.textContent ?? "").replace(/\s+/g, " ").trim(),
+          href: n.getAttribute("href") ?? "",
+        };
+      }),
+    );
+    for (const { label, kind, value, href } of names) {
+      expect(kind.length).toBeGreaterThan(0);
+      expect(value.length).toBeGreaterThan(0);
+      expect(label).toBe(`${kind}: ${value}`);
+      expect(href).toBe("#github-metrics");
+    }
+
+    await context.close();
+  });
+});

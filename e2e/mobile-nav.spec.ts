@@ -154,16 +154,44 @@ test.describe("Mobile Site Navigation (21st Δ1)", () => {
 });
 
 test.describe("Mobile Site Navigation — reduced motion", () => {
-  test.use({ viewport: MOBILE, reducedMotion: "reduce" });
+  // `test.use({ reducedMotion })` is silently ignored in this Playwright version
+  // (`matchMedia` reads `false`), so the preference never reached the page and the
+  // test passed without exercising reduced motion. `page.emulateMedia()` is the
+  // call that actually lands (Q4.2 #1) — kept the viewport in `test.use`.
+  test.use({ viewport: MOBILE });
 
   test("panel tetap buka/tutup tanpa animasi", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/gallery");
+    // Positive control: the preference actually landed before we assert on it.
+    expect(await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches)).toBe(
+      true,
+    );
+    const dialog = page.getByRole("dialog", { name: "Menu navigasi", exact: true });
+    // The dialog is the one that slides (`transition: transform 0.3s`), so its
+    // computed `transition-property` is where the reduced-motion CSS either lands
+    // (`none`) or does not (`transform, visibility`). Asserting the property — not
+    // a duration threshold — keeps it readable and engine-independent.
+    const transitionProperty = () =>
+      page
+        .locator('[data-mobile-nav-panel] [role="dialog"]')
+        .evaluate((el) => getComputedStyle(el).transitionProperty);
+    await expect.poll(transitionProperty).toBe("none");
+
     const trigger = page.getByRole("button", { name: "Menu", exact: true });
     await trigger.click();
-    await expect(page.getByRole("dialog", { name: "Menu navigasi", exact: true })).toBeVisible();
+    await expect(dialog).toBeVisible();
     await expect(trigger).toHaveAttribute("aria-expanded", "true");
     await page.keyboard.press("Escape");
-    await expect(page.getByRole("dialog", { name: "Menu navigasi", exact: true })).toBeHidden();
+    await expect(dialog).toBeHidden();
     await expect(trigger).toHaveAttribute("aria-expanded", "false");
+
+    // Negative control: flipping the preference back must bring the slide back,
+    // which proves the assertion above targets the media query and not a dialog
+    // that is simply always transition-free.
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await expect.poll(transitionProperty).not.toBe("none");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await expect.poll(transitionProperty).toBe("none");
   });
 });

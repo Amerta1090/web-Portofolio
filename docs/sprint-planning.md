@@ -1253,10 +1253,12 @@ M1 membuktikan perbaikan ini **bertemu masalah nyata**, bukan sekadar membiarkan
 
 ### Task 5.2 — A11y
 
-- [ ] **M5.2.1** Perluas `e2e/accessibility.spec.ts` (24 test) dengan asersi yang dipin ke defect yang benar-benar diukur di sprint ini.
-- [ ] **M5.2.2** `prefers-reduced-motion` — **WAJIB** `page.emulateMedia()`, **JANGAN** `test.use({ reducedMotion })` (terbukti diabaikan di versi Playwright repo ini; pelajaran Q4.2 #1).
-- [ ] **M5.2.3** No-JS: `javaScriptEnabled: false` → **semua** konten karier/bukti/sertifikasi tetap terbaca & berurutan (AC microtask 4 Q4.2 yang semula gagal total).
-- [ ] **M5.2.4** Nama aksesibel diuji dengan **bentuknya** (`name === \`${kind}: ${title}\``), bukan ambang jumlah kata (Q4.2 #8).
+> **✅ COMPLETE (2026-10-19).** Test-only: 2 file e2e disentuh (`e2e/accessibility.spec.ts` +2 test, `e2e/mobile-nav.spec.ts` fix + penguatan), **0 perubahan produk**, 0 unit test baru (1148/1148 datar). Dua spec bersama `--workers=1`: **37/37**.
+
+- [x] **M5.2.1** Perluas `e2e/accessibility.spec.ts` (24 test) dengan asersi yang dipin ke defect yang benar-benar diukur di sprint ini — +2 test (`Sprint 5 — evidence surfaces without JavaScript`), **26 test di file itu**; angka 26/29/4 · 4/7 · 7/62 diprobe lebih dulu di konteks no-JS, lalu dipin.
+- [x] **M5.2.2** `prefers-reduced-motion` — **WAJIB** `page.emulateMedia()`, **JANGAN** `test.use({ reducedMotion })` (terbukti diabaikan di versi Playwright repo ini; pelajaran Q4.2 #1). **Defect nyata ditemukan**: `e2e/mobile-nav.spec.ts:157` **memakai** `test.use({ viewport: MOBILE, reducedMotion: "reduce" })` → preferensi tak pernah mendarat (test hijau tanpa menguji apa pun). Diganti `page.emulateMedia()` + **positive control** (`matchMedia(...).matches === true`) + **negative control** (balik ke `no-preference` → `transition-property` kembali `transform, visibility`, lalu `reduce` → `none`) — jadi test punya gigi tanpa perlu rebuild mutasi.
+- [x] **M5.2.3** No-JS: `javaScriptEnabled: false` → **semua** konten karier/bukti/sertifikasi tetap terbaca & berurutan (AC microtask 4 Q4.2 yang semula gagal total) — `#career` 26 baris + 29 `<time datetime>` + 4 grup tahun · `#projects` 4 kartu + 7 chip anchor `href^='#'` · `#certifications` 7 `<details data-cert-issuer>` + total `62`; urutan dokumen career < projects < certifications; **0 kontrol mati** (button/input/select/textarea) di ketiga permukaan.
+- [x] **M5.2.4** Nama aksesibel diuji dengan **bentuknya** (`name === \`${kind}: ${title}\``), bukan ambang jumlah kata (Q4.2 #8) — 4 link `[data-hero-metric]` no-JS: `aria-label` dibandingkan dengan `kind` (span `.section-label`) + `value` yang benar-benar tampil, plus `href="#github-metrics"`.
 
 ### Task 5.3 — Responsive
 
