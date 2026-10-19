@@ -3,7 +3,7 @@
 > **Status**: APPROVED for planning → implementation
 > **Tanggal**: 2026-09-29
 > **Otoritatif untuk**: tujuan, batasan, keputusan teknologi, dan acceptance criteria
-> **Pasangan**: `docs/sprint-planning.md` (rencana eksekusi) · `prompt.txt` (execution controller)
+> **Pasangan**: `docs/archive/SPRINT-PLAN-PROVE-IT.md` (rencana eksekusi) · `prompt.txt` (execution controller)
 > **Preseden**: `docs/archive/PRD-CREATIVE-UI-ANIMATION.md` (sprint sebelumnya, sudah selesai)
 
 ---
@@ -246,7 +246,7 @@ Format: **sekarang → usulan → pertanyaan rekruiter yang dijawab → biaya**.
 - **Usulan**: Bangun ulang graf dari **membership nyata**: node = **8 kategori** `data/skills.json` + **22 proyek**; edge = `project.skills[] ∩ category.skills[]` dengan **bobot = jumlah overlap**. Pertahankan geometri edge terukur dari tepi kartu (`getBoundingClientRect`, 1 pass baca) + GSAP dot travel bounded (L2.2/L2.3-revII). Upgrade: klik proyek → kartu proyek melebar menampilkan `links`, `association`, `media`, `skills`.
 - **Target (terverifikasi, bukan tebakan)**:
   - **Keras: 0 node terisolasi**, termasuk **0 dari 8 kategori berdegree 0**. Ini yang harus dibuktikan.
-  - **Angka edge**: **dihitung dulu saat implementasi, lalu dipin di test** (`docs/sprint-planning.md` M3.1.5). Latar belakang kenapa tidak diestimasi di sini: rata-rata hanya **2.0 skill per proyek**, dan normalizer longgar yang dipakai uji cepat memunculkan **176 edge** (setiap proyek → setiap kategori) — keduanya ujung yang tidak sah. Angka-Pacific yang benar harus berasal dari **normalizer milik repo**, bukan dari estimator baru.
+  - **Angka edge**: **dihitung dulu saat implementasi, lalu dipin di test** (`docs/archive/SPRINT-PLAN-PROVE-IT.md` M3.1.5). Latar belakang kenapa tidak diestimasi di sini: rata-rata hanya **2.0 skill per proyek**, dan normalizer longgar yang dipakai uji cepat memunculkan **176 edge** (setiap proyek → setiap kategori) — keduanya ujung yang tidak sah. Angka-Pacific yang benar harus berasal dari **normalizer milik repo**, bukan dari estimator baru.
 - **Dijawab**: "Apakah klaim kemampuannya punya bukti, dan seberapa tangguh buktinya?"
 - **Biaya**: 1 island (sudah ada), 0 scroll listener, 0 RAF baru (GSAP dots sudah di-guard).
 
@@ -350,7 +350,7 @@ Aturan:
 
 Sprint dianggap selesai bila **semua** ini terpenuhi:
 
-1. ✅ `bun run test` hijau. **Lantai keras: ≥ 875** (baseline — tidak boleh turun). **Target: ≥ 925** (baseline + 50 test baru, sesuai `docs/sprint-planning.md`).
+1. ✅ `bun run test` hijau. **Lantai keras: ≥ 875** (baseline — tidak boleh turun). **Target: ≥ 925** (baseline + 50 test baru, sesuai `docs/archive/SPRINT-PLAN-PROVE-IT.md`).
 2. ✅ `bun run build` (penuh, bukan `build:fast`) sukses — 49 halaman, dan **pipeline `fetch-data` terbukti tidak diam-diam gagal** (F5.1).
 3. ✅ `bunx astro check` = baseline (**103**), 0 error baru.
 4. ✅ `bun run lint` ≤ baseline (**681**), 0 error baru di file tersentuh; `biome check` bersih di file tersentuh.
@@ -399,7 +399,7 @@ Dicatat supaya tidak diulang di sesi berikutnya:
 
 | Dokumen | Isi |
 |---|---|
-| `docs/sprint-planning.md` | Sprint → Task → Microtask + DoD + metode verifikasi |
+| `docs/archive/SPRINT-PLAN-PROVE-IT.md` | Sprint → Task → Microtask + DoD + metode verifikasi |
 | `prompt.txt` | Execution controller (baris 1 = state saat ini) |
 | `docs/motion-score-baseline.md` | Audit MotionScore kanonik §9–§11 (tak diarsipkan, disengaja) |
 | `AGENTS.md` | Sprint log, key files, conventions |

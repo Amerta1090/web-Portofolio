@@ -293,9 +293,59 @@ ada. Terukur sesudahnya: query valid, `pinnedItems.nodes: []` — akun memang ti
 diawasi orang". Skrip yang menandai `✓` pada payload error menghapus satu-satunya
 sinyal; dan hasil yang benar-benar nol terlihat identik dengan hasil yang salah.
 
+## 13. Sprint 5 "Prove It" — audit final (2026-10-19, setelah commit `c178f5c`)
+
+> Plan menyebut "update §12"; §12 adalah audit final F5.1 dan **tetap utuh** sebagai
+> rekam jejak. Audit final sprint ini ditambahkan sebagai §13 (nomor baru) supaya
+> kedua audit akhir bisa dibandingkan, bukan saling menimpa. Dijalankan terhadap
+> `dist` **`bun run build` penuh** (49 halaman) pada kode final Task 5.3/5.4.
+
+### 13.1 Blocker environment (baru, wajib dicatat)
+
+`npx motionscore` **gagal default** di box ini: `Error: Could not find Chrome
+(ver. 131.0.6778.204)`. Chrome puppeteer tidak pernah di-download dan jaringan
+download tidak tersedia. Solusi yang dipakai: menunjuk MotionScore ke Chromium yang
+sudah ada milik Playwright:
+
+```
+PUPPETEER_EXECUTABLE_PATH=/home/amerta/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome \
+  npx motionscore http://localhost:4321/<route> --no-upload
+```
+
+Tanpa ini audit **mustahil dijalankan** di box ini (bukan sekadar lebih lambat).
+
+### 13.2 Skor
+
+| Route | Overall | Findings (HIGH/LOW) | Temuan D/F |
+|-------|---------|---------------------|------------|
+| `/` run 1 | **B 59** | 5 / 7 | 0 |
+| `/` run 2 | **C 56** | 5 / 7 | 0 |
+| `/` run 3 | **B 56** | 5 / 7 | 0 |
+| `/gallery` | **S 85** | 1 / 7 | 0 |
+| `/observatory` | **A 76** | 3 / 5 | 0 |
+| `/work/ai-quranic-tafsir` | **S 87** | 1 / 6 | 0 |
+
+Gate M5.4.2 (**nol temuan D/F**) terpenuhi: `grep -c '[DF]-tier'` = **0** di keempat
+log, dan tidak ada finding ber-severity D/F (hanya HIGH/LOW). Seluruh HIGH sudah
+terdokumentasi struktural (§11.5, §M-4.3): overlap-promoted layers, high GPU memory,
+dan excess scroll listeners (yang §M-4.3 buktikan sebagai **rasio** dengan penalty
+capped, bukan count absolut).
+
+### 13.3 Kesimpulan yang boleh diklaim
+
+- **`/` rentang 56–59** (3 run) — di dalam band terdokumentasi 52–63 (§11.3). Gate
+  yang dipakai tetap **scroll listener 17** (stabil di ketiga run), **bukan** skor.
+- **`/gallery` S 85** (≥ S 84 ✓, naik dari S 84 F5.1 — dalam noise) · **`/observatory`
+  A 76** (≥ A 76 ✓, tepat di ambang; F5.1 belum mengukur route ini karena `/observatory`
+  baru diukur ulang di Sprint Observatory) · **`/work` S 87** (identik Q4.1/F5.1).
+- **Tidak ada regresi** di seluruh Sprint 1–4 terhadap baseline motion.
+
 ## Cara ulang audit
 ```
 bun run serve              # preview lokal :4321
+# Box ini: Chrome puppeteer 131 tidak ada + jaringan download tak tersedia →
+# WAJIB override ke Chromium milik Playwright (lihat §13.1), kalau tidak audit gagal.
+export PUPPETEER_EXECUTABLE_PATH=/home/amerta/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome
 npx motionscore http://localhost:4321 --no-upload          # home
 npx motionscore http://localhost:4321/gallery --no-upload
 npx motionscore http://localhost:4321/observatory --no-upload
@@ -305,7 +355,9 @@ node scripts/measure-route-runtime.mjs http://localhost:4321 current   # probe b
 ```
 > CLI menerima SATU URL per pemanggilan (multi-URL tidak didukung). Chrome puppeteer
 > di-download sekali (butuh ~100–200MB; timeout di jaringan lambat — retry saja).
-> Error "Failed to launch browser" di CI → set `MOTIONSCORE_NO_SANDBOX=1`.
+> Error "Could not find Chrome" / "Failed to launch browser" → set
+> `PUPPETEER_EXECUTABLE_PATH` ke Chromium Playwright (di atas) atau
+> `MOTIONSCORE_NO_SANDBOX=1` di CI.
 > **Audit `/` selalu ≥2 run**: variance skor ±10 dan tier thrashing S↔C pada kode
 > yang sama (lihat §11.3). Angka stabil yang bisa dipakai: scroll listener count,
 > findings tier D/F, dan payload per-route.

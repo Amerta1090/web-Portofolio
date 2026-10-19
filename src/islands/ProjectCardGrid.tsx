@@ -43,7 +43,7 @@ type ProjectFilter = "all" | ProjectCategory;
  * before hydration: server HTML already contains real `<a href>` elements, no
  * `<button>` and no inline handler, so there is no dead control (P5).
  *
- * `media` is deliberately **not** rendered — see `docs/sprint-planning.md`
+ * `media` is deliberately **not** rendered — see `docs/archive/SPRINT-PLAN-PROVE-IT.md`
  * (M2.2.3): it holds labels, not URLs, and its referenced assets are absent, so
  * showing a count would assert evidence that cannot be opened.
  */
@@ -115,7 +115,7 @@ export default function ProjectCardGrid({ projects, skillHrefs = {} }: Props) {
   // M2.3.4 — manual FLIP (First → Last → Invert → Play) on the Web Animations
   // API. GSAP's `Flip` plugin was measured at 13,709 B gzip; importing it into
   // this `client:load` island would raise the homepage's initial payload (gate:
-  // "initial tidak naik" — see the DEVIASI in docs/sprint-planning.md). This
+  // "initial tidak naik" — see the DEVIASI in docs/archive/SPRINT-PLAN-PROVE-IT.md). This
   // runs only on a filter change: no RAF loop, no listener. The "First"
   // positions are read synchronously inside the click that causes the change
   // (read → render → animate happen in one task, before the browser paints),

@@ -1,7 +1,8 @@
 # docs/archive
 
 Dokumen sprint yang **sudah selesai** dan tidak lagi menjadi sumber state aktif.
-Dipindahkan ke sini pada 2026-09-29, setelah Sprint Creative UI & Animation selesai.
+Batch pertama dipindahkan ke sini pada 2026-09-29, setelah Sprint Creative UI &
+Animation selesai; "Prove It" menyusul pada 2026-10-19.
 
 Isi file **tidak diubah** saat dipindahkan — perubahan satu-satunya ada pada jalur
 referensi (`docs/<file>` → `docs/archive/<file>`), supaya `git log --follow` tetap
@@ -23,6 +24,7 @@ sekarang di folder ini, dan masih dirujuk di `AGENTS.md`.
 | Motion (motion.dev + MotionScore) | `motion-upgrade-plan.md` · `motion-TASKS.md` | 2026-09-24 |
 | Observatory (Portfolio as Dataset) | `observatory-plan.md` · `observatory-TASKS.md` | 2026-09-25 |
 | Creative UI & Animation (Signal Loom + Case Study Reactor) | `PRD-CREATIVE-UI-ANIMATION.md` · `SPRINT-PLAN-CREATIVE-UI-ANIMATION.md` · `creative-ui-animation-TASKS.md` | 2026-09-28 |
+| "Prove It" (Truth & Integrity, 5 sprint) | `PRD-PROVE-IT.md` · `SPRINT-PLAN-PROVE-IT.md` | 2026-10-19 |
 
 Ringkasan hasil + pelajaran tiap sprint tetap ada di `AGENTS.md` — di situ yang
 dibaca sesi berikutnya, bukan dokumen mentah di sini.
