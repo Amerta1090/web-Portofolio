@@ -173,26 +173,32 @@ function edgeOpacity(count: number): number {
             ))}
           </svg>
           {/* M4.7: sr-only data table — same nodes the SVG draws (title, raw
-              period, category), for screen readers and crawlers. Static SSR. */}
-          <table class="sr-only" data-chart-table="timeline">
-            <caption>Projects on the timeline: title, period, and category</caption>
-            <thead>
-              <tr>
-                <th scope="col">Project</th>
-                <th scope="col">Period</th>
-                <th scope="col">Category</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ds.datedProjects.map((p) => (
+              period, category), for screen readers and crawlers. Static SSR.
+              M5.3.5: hidden by a `div.sr-only` wrapper, not `sr-only` on the
+              `<table>` — a table box ignores `width:1px`/`overflow:hidden`, so
+              it stayed 903px wide at 320px and gave this page a real horizontal
+              scroll (measured 563px). */}
+          <div class="sr-only">
+            <table data-chart-table="timeline">
+              <caption>Projects on the timeline: title, period, and category</caption>
+              <thead>
                 <tr>
-                  <td>{p.title}</td>
-                  <td>{p.periodParsed?.raw ?? "Undated"}</td>
-                  <td>{p.category ?? "other"}</td>
+                  <th scope="col">Project</th>
+                  <th scope="col">Period</th>
+                  <th scope="col">Category</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {ds.datedProjects.map((p) => (
+                  <tr>
+                    <td>{p.title}</td>
+                    <td>{p.periodParsed?.raw ?? "Undated"}</td>
+                    <td>{p.category ?? "other"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           <div class="flex flex-wrap gap-x-5 gap-y-2 mt-4 pt-4 border-t border-border">
             {timeline.legend.map((l) => (
               <span class="inline-flex items-center gap-2 text-xs text-text-secondary">
@@ -214,7 +220,12 @@ function edgeOpacity(count: number): number {
           </p>
         </div>
 
-        <div class="grid lg:grid-cols-2 gap-6">
+        <!-- M5.3.5: `grid-cols-1` declares the base track as `minmax(0, 1fr)`. An
+             implicit `auto` column is sized to its content's min-content, so the
+             190px labels + fixed count forced a 356px track at 320px viewport
+             (52px real overflow). minmax(0, …) lets the track shrink; content
+             inside already truncates/shrinks. -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div class="rounded-xl border border-border bg-bg-secondary/40 p-5 sm:p-6">
             <h3 class="text-text-primary font-semibold mb-4">Top technologies by project count</h3>
             <div class="space-y-2.5">
@@ -297,27 +308,30 @@ function edgeOpacity(count: number): number {
           </svg>
           {/* M4.7: sr-only data table — same nodes the SVG draws. The top-8
               edges already have a visible ordered-list equivalent below; this
-              covers the node side (skill → project count). */}
-          <table class="sr-only" data-chart-table="patterns">
-            <caption>Skills in the co-occurrence graph and how many projects each appears in</caption>
-            <thead>
-              <tr>
-                <th scope="col">Skill</th>
-                <th scope="col">Projects</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pattern.nodes.map((n) => (
+              covers the node side (skill → project count). M5.3.5: wrapper hide
+              (see the timeline table above for why). */}
+          <div class="sr-only">
+            <table data-chart-table="patterns">
+              <caption>Skills in the co-occurrence graph and how many projects each appears in</caption>
+              <thead>
                 <tr>
-                  <td>{n.id}</td>
-                  <td>{n.count}</td>
+                  <th scope="col">Skill</th>
+                  <th scope="col">Projects</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {pattern.nodes.map((n) => (
+                  <tr>
+                    <td>{n.id}</td>
+                    <td>{n.count}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-6 mt-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
           <div class="rounded-xl border border-border bg-bg-secondary/40 p-5 sm:p-6">
             <h3 class="text-text-primary font-semibold mb-4">Most recurrent combinations</h3>
             {pairs.length === 0 ? (
@@ -362,7 +376,7 @@ function edgeOpacity(count: number): number {
           </p>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-4 sm:gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           {insights.map((ins) => (
             <article
               class="group relative rounded-xl border border-border bg-bg-secondary/40 p-5 sm:p-6 hover:border-brand/30 transition-colors duration-300"

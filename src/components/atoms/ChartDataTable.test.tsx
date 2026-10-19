@@ -27,6 +27,13 @@ describe("ChartDataTable (M4.7)", () => {
 
   it("is visually hidden but present in markup (SSR/no-JS readers)", () => {
     const { container } = render(<ChartDataTable {...props} />);
-    expect(container.querySelector("table.sr-only")).not.toBeNull();
+    const table = container.querySelector("table[data-chart-table='languages-radial']");
+    expect(table).not.toBeNull();
+    if (!table) throw new Error("the chart data table is missing");
+    // M5.3.5: the hide lives on a block wrapper — `sr-only` on the `<table>`
+    // box itself is ignored by `display:table` (sizes to content, does not
+    // clip) and gave `/observatory` a real 563px horizontal scroll at 320px.
+    expect(table.closest(".sr-only")).not.toBeNull();
+    expect(table.classList.contains("sr-only")).toBe(false);
   });
 });
