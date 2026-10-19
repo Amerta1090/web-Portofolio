@@ -60,17 +60,33 @@ test.describe("CommandPalette (detAIministic)", () => {
     const dialog = page.getByRole("dialog", { name: "Command palette" });
     await expect(dialog).toBeVisible();
 
-    const box = await dialog.boundingBox();
-    const viewport = page.viewportSize();
-    expect(box).not.toBeNull();
-    expect(viewport).not.toBeNull();
-    if (!box || !viewport) return;
-    const centerOffset = Math.abs(box.x + box.width / 2 - viewport.width / 2);
+    // The overlay is `position: fixed; inset: 0`, so it spans the usable content
+    // box (1270px here) — `scrollbar-gutter: stable` (M4.2.2) reserves the last
+    // 10px on the root, and `documentElement.clientWidth` reads 1280 vs the
+    // overlay's 1270. Compare the dialog against the overlay it is centered in,
+    // not the raw window/root width, so the assertion is gutter-independent.
+    const metrics = await page.evaluate(() => {
+      const dlg = document.querySelector('dialog[aria-label="Command palette"]');
+      return {
+        dialog: dlg?.getBoundingClientRect().toJSON() ?? null,
+        overlay: dlg?.parentElement?.getBoundingClientRect().toJSON() ?? null,
+      };
+    });
+    const dialogRect = metrics.dialog;
+    const overlayRect = metrics.overlay;
+    expect(dialogRect).not.toBeNull();
+    expect(overlayRect).not.toBeNull();
+    if (!dialogRect || !overlayRect) return;
+    const centerOffset = Math.abs(
+      dialogRect.x + dialogRect.width / 2 - (overlayRect.x + overlayRect.width / 2),
+    );
     expect(centerOffset).toBeLessThanOrEqual(2);
     // Centered, not full-bleed: the panel keeps its max-w-xl card width.
-    expect(box.width).toBeLessThan(viewport.width);
+    expect(dialogRect.width).toBeLessThan(overlayRect.width);
     // Still inside the overlay padding on both sides.
-    expect(box.x).toBeGreaterThanOrEqual(0);
-    expect(box.x + box.width).toBeLessThanOrEqual(viewport.width);
+    expect(dialogRect.x).toBeGreaterThanOrEqual(overlayRect.x);
+    expect(dialogRect.x + dialogRect.width).toBeLessThanOrEqual(
+      overlayRect.x + overlayRect.width + 1,
+    );
   });
 });

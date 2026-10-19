@@ -570,8 +570,10 @@ test.describe("Case Study Reactor responsive composition", () => {
     // Hydration-dependent controls are absent, not dead.
     await expect(page.locator("[data-reactor-stepper]")).toHaveCount(0);
     // The reading column still measures correctly with no CSS from the island.
-    const overflow = await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    // Clamped: `scrollbar-gutter: stable` (M4.2.2) makes clientWidth exclude the
+    // gutter, so the raw difference under-reads without implying real overflow.
+    const overflow = await page.evaluate(() =>
+      Math.max(0, document.documentElement.scrollWidth - document.documentElement.clientWidth),
     );
     expect(overflow).toBe(0);
 

@@ -195,9 +195,13 @@ test.describe("Gallery page", () => {
     await expect(page.getByTitle("Node (N)")).toBeVisible();
   });
 
+  // Deep-link budget: a cold `/gallery#<id>` load lazy-resolves the experiment
+  // chunk (React.lazy, Sprint B-4) and measured 4.5–5.7s under load — the old
+  // 5s sat exactly on the edge (Sprint 1 DoD raised 3 of these; this finishes
+  // the class-level fix). 15s is the floor for a cold browser, not a retry.
   test("Interactive Canvas deep link opens via URL hash", async ({ page }) => {
     await page.goto("/gallery#interactive-canvas");
-    await expect(page.getByTitle("Pen (P)")).toBeVisible({ timeout: 5000 });
+    await expect(page.getByTitle("Pen (P)")).toBeVisible({ timeout: 15000 });
   });
 
   test("Strange Attractor Zoo card is present", async ({ page }) => {
@@ -301,7 +305,7 @@ test.describe("Gallery page", () => {
 
   test("Noise Topography deep link opens via URL hash", async ({ page }) => {
     await page.goto("/gallery#noise-topography");
-    await expect(page.getByRole("button", { name: "Export STL" })).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("button", { name: "Export STL" })).toBeVisible({ timeout: 15000 });
   });
 
   test("Fourier Epicycles card is present", async ({ page }) => {
@@ -330,7 +334,7 @@ test.describe("Gallery page", () => {
 
   test("Fourier Epicycles deep link opens via URL hash", async ({ page }) => {
     await page.goto("/gallery#fourier-epicycles");
-    await expect(page.getByText("Epicycles →")).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText("Epicycles →")).toBeVisible({ timeout: 15000 });
   });
 
   // ═══════════════════════════════════════════
@@ -390,17 +394,17 @@ test.describe("Gallery page", () => {
 
   test("deep link for svd-compression opens via URL hash", async ({ page }) => {
     await page.goto("/gallery#svd-compression");
-    await expect(page.getByText("Upload Image")).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText("Upload Image")).toBeVisible({ timeout: 15000 });
   });
 
   test("deep link for tesseract-projection opens via URL hash", async ({ page }) => {
     await page.goto("/gallery#tesseract-projection");
-    await expect(page.getByText("Auto", { exact: true })).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText("Auto", { exact: true })).toBeVisible({ timeout: 15000 });
   });
 
   test("deep link for pca-tsne-viz opens via URL hash", async ({ page }) => {
     await page.goto("/gallery#pca-tsne-viz");
-    await expect(page.getByText("Generate New Data")).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText("Generate New Data")).toBeVisible({ timeout: 15000 });
   });
 
   // ═══════════════════════════════════════════
@@ -426,7 +430,7 @@ test.describe("Gallery page", () => {
 
   test("Spring Physics Sandbox deep link opens via URL hash", async ({ page }) => {
     await page.goto("/gallery#spring-physics");
-    await expect(page.getByRole("button", { name: "Cloth" })).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("button", { name: "Cloth" })).toBeVisible({ timeout: 15000 });
   });
 
   // ═══════════════════════════════════════════

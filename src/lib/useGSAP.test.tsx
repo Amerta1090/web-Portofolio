@@ -5,8 +5,8 @@ import { ScrollTrigger, gsap } from "./gsap";
 import { useGSAP } from "./useGSAP";
 
 /**
- * Why these tests exist: `useGSAP`'s cleanup used to run
- * `ScrollTrigger.getAll().forEach((st) => st.kill())` after `ctx.revert()`.
+ * Why these tests exist: `useGSAP`'s cleanup used to run a global
+ * `ScrollTrigger.getAll()` sweep calling `kill()` on each after `ctx.revert()`.
  * That killed every ScrollTrigger on the page, not just this component's.
  *
  * Observables used throughout (from GSAP 3.15 source, not guessed):

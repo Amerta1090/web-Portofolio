@@ -10,8 +10,8 @@
  *    so the island must not import it, `data.ts`, or even the ids module. It
  *    reads the rendered page instead, which is why it takes no props.
  *
- * 2. **No global ScrollTrigger kill.** Task 0.7: `useGSAP`'s cleanup ran
- *    `ScrollTrigger.getAll().forEach(kill)` after `ctx.revert()`, killing every
+ * 2. **No global ScrollTrigger kill.** Task 0.7: `useGSAP`'s cleanup ran a
+ *    global `ScrollTrigger.getAll()` sweep after `ctx.revert()`, killing every
  *    trigger on the page — including the neighbouring Journey Timeline's, whose
  *    owner never rebuilt it because its own dependencies had not changed. That is
  *    permanent damage, and this island creates its own trigger, so the pattern

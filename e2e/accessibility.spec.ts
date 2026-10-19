@@ -29,8 +29,15 @@ async function openReactor(page: Page) {
   await page.locator("[data-reactor-stepper]").waitFor({ timeout: 20_000 });
 }
 
+// `scrollbar-gutter: stable` on `html` (Sprint 4 / M4.2.2) reserves a gutter, so
+// Chromium's `clientWidth` excludes it while `scrollWidth` reflects the content
+// box — the raw difference reads -10 even when nothing overflows horizontally
+// (`career-spine.spec.ts`, `work.spec.ts` already clamp this way). Clamp to 0;
+// the assertion that matters is "nothing overflows", not "the two numbers tie".
 const horizontalOverflow = (page: Page) =>
-  page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  page.evaluate(() =>
+    Math.max(0, document.documentElement.scrollWidth - document.documentElement.clientWidth),
+  );
 
 test.describe("Q4.2 — keyboard-only navigation", () => {
   test("Signal Loom is one tab stop, and arrows, Home, and End move selection", async ({

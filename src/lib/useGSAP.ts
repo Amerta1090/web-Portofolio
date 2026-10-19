@@ -22,7 +22,8 @@ export function useGSAP(
       // `revert()`/`kill()` on each entry, so `ctx.revert()` alone already tears
       // down this component's own triggers.
       //
-      // Do NOT re-add a `ScrollTrigger.getAll().forEach(st => st.kill())` here.
+      // Do NOT re-add a global `ScrollTrigger.getAll()` sweep calling `kill()`
+      // on each trigger here.
       // That line used to sit in this cleanup and killed every ScrollTrigger on
       // the page, including ones owned by other islands — and because the kill is
       // global while the owners are not, those owners never re-created theirs
