@@ -1,9 +1,9 @@
 # Motion Programme — Documentation Map
 
 This directory is the durable control surface for the portfolio's motion,
-animation, and visual-storytelling work. It exists so a future session can
-resume from **`prompt.txt` alone** without re-reading the entire repository
-history.
+animation, visual-storytelling, and visual-asset work. It exists so a future
+session can resume from **`prompt.txt` alone** without re-reading the entire
+repository history.
 
 `prompt.txt` (repository root, gitignored) is the controller. It tells an agent
 to read this directory, inspect Git, pick the active sprint, execute exactly one
@@ -20,6 +20,7 @@ sprint, verify it, and update these documents.
 | `DECISIONS.md` | Why was a technique/library/choreography chosen or rejected? | When a decision changes |
 | `RESEARCH.md` | What did we measure or read, and what is still an assumption? | During discovery research |
 | `STORYBOARD.md` | What does each section say, and how should motion serve it? | When narrative changes |
+| `ASSETS.md` | Which visual assets earn a place, what is licensed, and what is rejected? | When an asset decision changes |
 | `QA_CHECKLIST.md` | What must be run before a sprint can be marked `DONE`? | When a gate changes |
 | `SESSION_LOG.md` | What happened, in order, with evidence? | Every session |
 
@@ -64,6 +65,10 @@ labelled.
    the data layer (`SiteFacts` and friends), never typed into a component.
 9. **One canonical source per fact.** If two documents would repeat a long
    table, one owns it and the other links to it.
+10. **Visual assets earn their place.** No stock photography, generic AI
+    illustration, icon/texture/3D pack, or animation runtime. An external asset
+    needs a narrative job, a verified license, a measured image budget, and a row
+    in `ASSETS.md`. Optimize owned evidence images before adding anything.
 
 ## How to resume
 
@@ -72,7 +77,10 @@ labelled.
 3. Run `git status`, `git log --oneline -5`, and inspect the working tree.
 4. If a sprint is `IN_PROGRESS`, continue its remaining tasks. Otherwise pick
    the highest-priority `READY` sprint whose dependencies are `DONE`.
-5. Implement, verify with the commands in `QA_CHECKLIST.md`, then update
+5. If the task is visual assets, read `ASSETS.md` and D-11 first. Asset research
+   is not a sprint; do not start one or add an external asset without a measured
+   image budget.
+6. Implement, verify with the commands in `QA_CHECKLIST.md`, then update
    `STATUS.md`, `SPRINT_PLAN.md`, `SESSION_LOG.md`, and `QA_CHECKLIST.md`.
-6. Mark `DONE` only when every acceptance criterion and Definition of Done has
+7. Mark `DONE` only when every acceptance criterion and Definition of Done has
    evidence. If something is blocked, record the blocker and the next action.

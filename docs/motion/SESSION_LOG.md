@@ -121,3 +121,74 @@ compositor-only progress bar.
   first draft of that assertion mis-parsed its own file's shape.
 
 **Next:** MOTION-02 — Hero handoff (status `READY`).
+
+---
+
+## 2026-10-21 — Visual-asset research (no sprint)
+
+**Goal:** Decide whether a genuinely free visual asset layer would make the
+portfolio more distinctive, without disrupting the MOTION programme. Research
+first; no preselected aesthetic; "no new assets" allowed.
+
+**Read:** root `prompt.txt`; `docs/motion/{STATUS,SPRINT_PLAN,DECISIONS,STORYBOARD,ROADMAP,RESEARCH,README,QA_CHECKLIST,SESSION_LOG}.md`;
+`src/pages/index.astro`, `Section.astro`, `scroll-animations.css`, `global.css`,
+`theme.css`, `TimeAwareHero.tsx`, `SignalLoom.tsx`, `BootSequence.tsx`,
+`ProjectThumbnail.tsx`; `public/images/**`; three external research reports.
+
+**Measured (cold load, full lazy scroll, resource timing)**
+- Homepage image transfer: **3,147.0 KB / 41 images** at 1440×900;
+  **2,643.0 KB / 44 images** at 375×812.
+- Three files = **95.4% desktop / 94.5% mobile**: `retro-game-portfolio.png`
+  **1,829.9 KB** (1920×1080 shown in a 299–341 px card), `hero-bg-1920.webp`
+  **619.7 KB**, `ijo-plis.png` **554.0 KB** (1856×2561, cropped by `object-cover`).
+- Project cards use raw `<img>` with `loading="lazy"`/`decoding="async"` but no
+  `srcset`, no explicit dimensions, no WebP pipeline.
+- Page height @1440: **25,542 px**; `#career` 6,015 + `#github` 6,133 = **47.6%**.
+- Signal Loom first view: capability column top **3,734 px** vs project **2,498 px**
+  (**1,236 px** empty left panel); heights 622 vs 3,094.
+- BootSequence entry: only `$` placeholders at 500/1,500 ms; first lines arrive
+  **~4 s** after entering `#github`.
+- `public/` inventory: 370 images; `projects` 4.94 MB / 7; `sequence` 12.19 MB /
+  302; `audio` 5.03 MB / 1; `experiments` 52.5 KB / 27; `hero` 1.81 MB / 4;
+  `logos` 49.4 KB / 16; `profile` 87.4 KB.
+
+**External research**
+- **Old Book Illustrations** is the only source that passed both terms and
+  narrative review: no use restriction, no warranty, text CC BY-NC-SA, structured
+  credit requested. The 1883 telephone-exchange plate (Wellcome/IA, 1600×961,
+  512,290 B; 1200 px 287,725 B) is a literal ancestor of "systems in motion"; the
+  1882 Trouvelot comet (1600 px 135,269 B) is a weaker `/observatory` fit.
+- Heritage Type free bundles: terms live inside ZIPs, some PNG-only — unverified.
+- BHL licensing page 404; LoC item rights 403; Unsplash license 401/404. **No
+  commercial claim allowed without a live source.**
+- Generative/technical: Haikei is the only credible generator but generic;
+  Kenney CC0 patterns unnecessary; SVGRepo needs per-icon checks; Poly Haven
+  (1.6 MB floor), ambientCG (7.8 MB pack), Sketchfab, 3dicons rejected.
+- Motion runtimes: smallest Lottie 46 KB (529 KB total), Rive 433–993 KB, Spline
+  183–220 KB + watermark, useAnimations MIT/CC-BY conflict. `/` has ~7.7 KB
+  reachable-JS headroom; nothing enters the runtime.
+
+**Decision (D-11).** Evidence first. Optimize owned evidence images, fix the two
+structural defects, then at most one OBI plate as a staged pilot in
+`#systems-in-motion` with a real caption. No stock photography, generic AI
+illustration, icon/texture/3D pack, or animation runtime. Visual identity stays
+"Editorial Instrument" with the live sage/clay palette (D-01 correction).
+
+**Files changed (docs only)**
+- `docs/motion/ASSETS.md` (new) — register, three-outcome comparison, pilot spec,
+  license register, integration/motion rules, open verifications.
+- `docs/motion/DECISIONS.md` — D-01 palette correction; D-11 added.
+- `docs/motion/RESEARCH.md` — §2.9, open questions, sources.
+- `docs/motion/STORYBOARD.md` — visual-asset direction + per-section asset intent.
+- `docs/motion/STATUS.md` — image baseline, structural defects, blockers.
+- `docs/motion/ROADMAP.md` — asset principles; out-of-scope classes.
+- `docs/motion/SPRINT_PLAN.md` — M5.0 Signal Loom alignment; M6.0 BootSequence entry.
+- `docs/motion/README.md` — `ASSETS.md` row, rule 10, asset resume step.
+- `docs/motion/QA_CHECKLIST.md` — image-budget environment row; §4.5 gate.
+- root `prompt.txt` — asset workflow.
+
+**Not changed:** product code, package manifest, routes, sections, island count,
+sprint statuses. MOTION-01 remains `DONE`; MOTION-02 remains `READY`.
+
+**Next:** start MOTION-02. The asset prerequisite (image hygiene) is a separate
+task, documented in `ASSETS.md` §10; do not fold it into a motion sprint.

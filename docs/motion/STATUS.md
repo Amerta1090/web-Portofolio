@@ -1,13 +1,13 @@
 # Motion Programme — Status
 
-**Last updated:** 2026-10-21 (Sprint MOTION-01 complete)
+**Last updated:** 2026-10-21 (Sprint MOTION-01 complete; visual-asset research recorded)
 **Branch:** `main` · **HEAD at session start:** `64cd5e0`
 **Active sprint:** none — MOTION-01 is `DONE`; next is MOTION-02 (`READY`)
 
 ## One-paragraph state
 
 The portfolio is a finished 10-section Astro site with a strong editorial
-identity (Fraunces display type, JetBrains Mono labels, warm amber accent) and a
+identity (Fraunces display type, JetBrains Mono labels, sage/clay accent) and a
 large experimental gallery. Motion infrastructure already exists — CSS
 scroll-driven reveals, GSAP 3.15, `motion` 13.4.1, R3F, Lenis — but it is
 uneven: the homepage reveals each entire section as one block, the reduced-motion
@@ -19,7 +19,10 @@ is a true `animation: none` off switch, and the progress bar runs on the
 compositor via `transform: scaleX()` as a decorative `aria-hidden` element.
 Verified: guard 9/9 (teeth proven by 2 CSS mutations), targeted e2e 25 passed +
 1 honestly skipped (Chromium cannot emulate `prefers-reduced-data`) + 18/18
-career-spine, payload flat, islands unchanged at 16 (7e/9d).
+career-spine, payload flat, islands unchanged at 16 (7e/9d). **Visual-asset
+research (2026-10-21) found a larger problem than decoration:** the homepage
+ships **3,147.0 KB desktop / 2,643.0 KB mobile** of images, **95% from three
+files**, and the strategy is evidence-first with no new external layer (D-11).
 
 ## Verified baseline (2026-10-21 unless noted)
 
@@ -42,11 +45,26 @@ career-spine, payload flat, islands unchanged at 16 (7e/9d).
 | Audit GPU floor ≈ 606 MB; A/B probe showed the page contributes ~0 to it | `motion-score-baseline.md` §M-4.2 | DOCUMENTED |
 | CSS scroll-driven animations: Chromium 115+, Safari 26+, Firefox not supported through 161 (caniuse, 2026-10-21) | `RESEARCH.md` | VERIFIED (external) |
 | `data-reveal-stagger` has exactly one consumer: `CapabilityArchitecture.astro` | `rg 'data-reveal-stagger' src` | VERIFIED |
+| Homepage image transfer: **3,147.0 KB desktop (41 images) / 2,643.0 KB mobile (44 images)**; three files = 95.4% / 94.5% | `performance.getEntriesByType("resource")` + `transferSize`, cold load, full lazy scroll (`.opencode/probe-images.mjs`) | VERIFIED |
+| Project thumbnails: `retro` 1920×1080 / 1,873,549 B, `ijo` 1856×2561 / 567,020 B, rendered 299–341 px wide; raw `<img>`, no `srcset`, no explicit dimensions | `ProjectThumbnail.tsx` + `data/projects.json` + measured card boxes | VERIFIED |
+| Page height @1440 = **25,542 px**; `#career` 6,015 + `#github` 6,133 = **47.6%** | `.opencode/probe-visual.mjs`, `.opencode/probe-2.mjs` | VERIFIED |
+| Signal Loom first-view defect: capability column top **3,734 px** vs project **2,498 px** (**1,236 px** offset); heights 622 vs 3,094 | desktop probe at 1440 | VERIFIED |
+| BootSequence entry: only `$` placeholders at 500/1,500 ms; first lines **~4 s** after entering `#github` | timed screenshots/probe | VERIFIED |
+| Owned image inventory: 370 files; projects 4.94 MB / 7; sequence 12.19 MB / 302; audio 5.03 MB / 1; lab 52.5 KB / 27; hero 1.81 MB / 4; logos 49.4 KB / 16 | `find`/`du -sb public/images` | VERIFIED |
+| OBI terms: no use restriction, no warranty; text CC BY-NC-SA; PD labels are curatorial, not legal advice | OBI Terms of Use, read 2026-10-21 | VERIFIED (external) |
+| OBI telephone plate: 1883, wood engraving, E. Alix, Wellcome/IA, 1600×961, 512,290 B; 1200 px 287,725 B | OBI item + `HEAD`/`identify` | VERIFIED (external) |
+| OBI comet plate: 1882, Trouvelot, NYPL, 1600 px JPEG 135,269 B; 1200 px 71,198 B | OBI item + `HEAD` | VERIFIED (external) |
+| Image budget gate absent: `measure:routes` counts JS only | script source | VERIFIED |
+| BHL/LoC/Unsplash/Heritage Type licenses | BHL 404, LoC 403, Unsplash 401/404, Heritage Type terms inside ZIPs | TODO — do not claim |
 
 ## Active work
 
 **None in progress.** MOTION-01 (Chapter Reveal System) is complete and
 verified — see `SPRINT_PLAN.md` completion notes and `QA_CHECKLIST.md` §8.
+
+**Visual-asset strategy (2026-10-21):** research complete, recorded in
+`ASSETS.md`; policy is D-11. No product or tracked file changed. The next asset
+action is image hygiene (owned evidence), not acquisition.
 
 **Next: MOTION-02 — Hero handoff** (`READY` per `SPRINT_PLAN.md`; GSAP/R3F/hero
 scope lives there, untouched by MOTION-01).
@@ -74,8 +92,23 @@ scope lives there, untouched by MOTION-01).
   disjoint route graphs. Use per-route `measure:routes` instead.
 - **Lenis ignores `prefers-reduced-motion` (D-10):** recorded gap; candidate
   follow-up in MOTION-02.
+- **Image debt is the largest asset cost (VERIFIED):** 3.15 MB desktop / 2.64 MB
+  mobile; optimizing owned evidence is a prerequisite to any new asset, and it is
+  not a motion sprint. See `ASSETS.md` §10.
+- **Signal Loom first-view emptiness (VERIFIED):** 1,236 px offset; owner M5.0.
+  Do not paper over it with a plate or background.
+- **BootSequence blank entry (VERIFIED):** ~3.5–4 s; owner M6.0. Do not decorate
+  the terminal before fixing the wait.
+- **No image-budget gate (VERIFIED):** `measure:routes` counts JS only; image
+  transfer must be measured with resource timing. Owner image-hygiene task.
+- **Asset rights unverified for BHL/LoC/Unsplash/Heritage Type (VERIFIED
+  limitation):** never claim commercial usability without a live source. OBI is
+  the only source with terms read this session; its 1883/1882 items are
+  public-domain by publication date, with local-law responsibility.
 
 ## Next action
 
 Start MOTION-02 (Hero handoff) in a fresh session — read its section in
-`SPRINT_PLAN.md` and the D-10 Lenis question first.
+`SPRINT_PLAN.md` and the D-10 Lenis question first. Do not start an asset
+acquisition inside MOTION-02; if the hero handoff exposes an image-cost problem,
+record it for the separate image-hygiene task in `ASSETS.md` §10.

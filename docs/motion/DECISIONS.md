@@ -10,11 +10,16 @@ decision was made. Revisit only with new measurement.
 **Date:** 2026-10-21 · **Status:** Accepted
 
 **Context.** The site already has a distinct editorial identity: Fraunces display
-serif, JetBrains Mono labels, warm amber accent, a 10-section narrative, and a
+serif, JetBrains Mono labels, a sage/clay accent, a 10-section narrative, and a
 large interactive gallery. The motion brief asked for scroll-driven storytelling,
 parallax, motion graphics, and interactive visual narrative. The hardware
 constraint is real: 4 cores / 3 GB development box, ~606 MB measured GPU floor in
 the audit environment, and a mobile audience.
+
+**Correction (2026-10-21).** Earlier revisions of this document said "warm amber".
+That was stale: the live tokens are sage `#7a8c6f`, brand-text `#5d6b54`, warm
+clay `#c17f59`, near-black `#0e0f0c`, and light `#fafaf8` (`src/styles/theme.css`).
+The direction is unchanged; only the palette description is corrected.
 
 **Decision.** Build motion as an editorial instrument: chaptered reading rhythm,
 typographic pacing, and data moments that behave like measuring instruments.
@@ -199,3 +204,56 @@ fixing: read the inline script and measure under reduced motion.
 
 **Consequences.** The gap is documented, not silently accepted. MOTION-02 must
 either fix it or write a measured exception.
+
+---
+
+## D-11 — Visual assets: evidence first, instrument plates only when they carry an argument
+
+**Date:** 2026-10-21 · **Status:** Accepted as policy; the pilot remains staged
+
+**Context.** The brief asked whether a genuinely free visual asset layer
+(archival plates, illustration, textures, icons, 3D, motion assets) would make the
+portfolio more distinctive. Research measured the current state before evaluating
+sources: the homepage ships **3,147.0 KB of images on desktop and 2,643.0 KB on
+mobile**; **95% of those bytes are three files**, dominated by a 1920×1080 PNG
+shown in a 299–341 px card with no `srcset`. The identity is already coherent
+(Fraunces, mono labels, sage/clay, personal hero, 27 lab thumbnails, SVG
+diagrams). The real weaknesses are **cost** and **structure**, not a lack of
+decoration: Signal Loom's capability column starts 1,236 px below the project
+column, and BootSequence shows a blank terminal for ~3.5–4 s.
+
+**Decision.**
+
+1. **Evidence before decoration.** No stock photography, generic AI illustration,
+   icon pack, texture library, 3D asset library, or Lottie/Rive/Spline runtime.
+   "No new assets" is an acceptable final outcome.
+2. **Optimize owned evidence images first.** Responsive variants for the four
+   homepage project images, explicit dimensions, `srcset`/`sizes`, and a hero
+   compression test. This reduces transfer instead of adding it.
+3. **Fix structural emptiness before adding a visual focus.** Signal Loom column
+   alignment (M5.0) and BootSequence entry (M6.0) are prerequisites.
+4. **At most one archival plate, as a staged pilot, after 1–3.** Only the OBI
+   1883 telephone exchange passed license and narrative review. It must carry a
+   real caption; a plate that reads as vintage decoration is removed.
+5. **Palette discipline.** Sage `#7a8c6f`, brand-text `#5d6b54`, warm clay
+   `#c17f59`, near-black `#0e0f0c`, light `#fafaf8`. The gallery remains the
+   color exception.
+6. **Every external asset must be local, compressed, dimensioned, lazy below the
+   fold, license-verified, and registered in `ASSETS.md`.** No hotlinking, no bulk
+   downloads, no claim without a source.
+
+**Alternatives considered.**
+- *A0 — no new assets.* The default. If the pilot fails, this is the outcome.
+- *Field Atlas — 4–6 archival plates across the narrative.* Deferred, not
+  rejected forever: it risks reading as a vintage skin, competes with evidence,
+  lengthens mobile, and needs per-item rights. Revisit only if a lineage/essay
+  route exists and image hygiene is done.
+- *Generated/3D identity — Haikei backgrounds, 3D icons, Lottie/Rive/Spline.*
+  Rejected: generic, new runtime weight (46 KB–1.6 MB+), GPU cost, Spline
+  watermark, and no narrative job. `/` has only ~7.7 KB reachable-JS headroom.
+
+**Consequences.** The next asset action is image hygiene, not acquisition. Motion
+choreography must not depend on an external asset. Any future asset addition
+needs its own measured image budget (separate from `measure:routes`), a caption
+test, and a row in `ASSETS.md`. The decision does not change the motion sprint
+scope; it adds prerequisites to MOTION-05/06 and a possible post-programme pilot.

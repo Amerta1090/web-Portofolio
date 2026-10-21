@@ -11,6 +11,7 @@ Commands assume the repository root and a 4-core / 3 GB Linux box.
 | Preview server | Start `bun run serve` once (port 4321) before Playwright. Otherwise `webServer` runs `build:fast` and can exceed its 180 s timeout. |
 | MotionScore | Requires `PUPPETEER_EXECUTABLE_PATH=/home/amerta/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome`. Treat the homepage grade as a range (52–63 on identical code). |
 | Reduced motion | Use `page.emulateMedia({ reducedMotion: "reduce" })` and read back `matchMedia`. `test.use({ reducedMotion })` is silently ignored. |
+| Image budget | `measure:routes` counts JS only. Measure image transfer with `performance.getEntriesByType("resource")` in a cold context; record `transferSize` and the top offenders. |
 | Load flakes | A timing-sensitive unit test that fails in a full run must be re-run alone before being called a regression. |
 
 ## 1. Build and type gates
@@ -102,6 +103,24 @@ bun run measure:routes
 | `/` HTML | 74.8 KB | chapter wrappers may add a few bytes; record |
 | Scroll listeners | 16–17 | no new scroll listener from the sprint |
 | MotionScore `/` | B 56–59 | no D/F findings; grade range accepted |
+
+### 4.5 Visual-asset gate
+
+Run only when a change adds, replaces, or optimizes an image. **Asset research is
+not a sprint**; it produces `ASSETS.md` and D-11, not a sprint status.
+
+| Check | Rule |
+| --- | --- |
+| Local derivative | Every shipped asset lives under `public/`; no hotlinks, no runtime CDN. |
+| Format and size | WebP (or AVIF with a WebP/JPEG fallback) for photographs; SVG for diagrams. Target **≤60–80 KB** for a 1200 px plate. |
+| Intrinsic dimensions | `width`/`height` present; `srcset`/`sizes` for screenshots and hero variants. |
+| Loading | `loading="lazy"` + `decoding="async"` below the fold. No lazy hero. |
+| Caption test | A plate that carries an argument has a real caption (`<figcaption>`); a decorative plate has `alt=""` and no caption. If deleting the caption loses nothing, the plate is decoration and does not ship. |
+| Palette | Duotone via grayscale + blend overlay using sage `#7a8c6f` / clay `#c17f59`; no multicolour stock. Gallery thumbnails keep their colour exception. |
+| Runtime | 0 new JS, 0 canvas, 0 Lottie/Rive/Spline, 0 parallax/Ken Burns. At most a one-shot reveal. |
+| Rights row | Item URL, license URL, date checked, attribution requirement, and local path recorded in `ASSETS.md`. No claim without a live source. |
+| Separate measurement | `measure:routes` does not see images. Measure `transferSize` via `performance.getEntriesByType("resource")` at 1440 and 375, and record total + top offenders. |
+| Structural order | No asset may be used to fill the Signal Loom gap (M5.0) or the BootSequence wait (M6.0); those are layout/timing defects. |
 
 ## 5. Accessibility and responsiveness
 

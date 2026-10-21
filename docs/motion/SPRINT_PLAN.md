@@ -287,12 +287,14 @@ with a clear reading order; interaction refines, never gates, the story.
 auto-playing perpetual animation.
 
 **Tasks**
+- [ ] M5.0 Fix the measured column offset before the narrative. At 1440 the capability column starts **3,734 px** while the project column starts **2,498 px** (1,236 px empty left panel; heights 622 vs 3,094). Top-align the columns or use a layout that keeps the capability label/column visible with the first projects. Do not fill the gap with a decorative panel or plate.
 - [ ] M5.1 Define the default narrative path and its copy.
 - [ ] M5.2 Add a one-shot entry sequence for the default path.
 - [ ] M5.3 Keep hover/focus/selection and deep links unchanged.
 - [ ] M5.4 Reduced motion: static map with the same default emphasis.
 
 **Acceptance criteria**
+- At 1440 and 375, the first viewport of `#systems-in-motion` shows both the capability label/column and project evidence; no 1,236 px offset.
 - First paint explains the map without requiring a click.
 - Interaction still selects and announces nodes.
 - No new scroll listener; `measureEdges` remains one pass per layout.
@@ -314,17 +316,19 @@ nothing loops off-screen.
 
 **Dependencies:** MOTION-01; coordinate with `docs/motion-score-baseline.md`.
 
-**Scope:** GitHub Command Center components, Observatory charts.
+**Scope:** GitHub Command Center components, `BootSequence.tsx` entry state, Observatory charts.
 **Exclusions:** no data-layer changes, no fabricated metrics, no perpetual
-animation, no new chart library.
+animation, no new chart library, no decorative terminal/background asset.
 
 **Tasks**
+- [ ] M6.0 Measure and fix the BootSequence entry state. The terminal shows only `$` placeholders at 500/1,500 ms and the first lines arrive **~4 s** after entering `#github`. Shorten the blank interval or render the first meaningful line immediately; keep the boot metaphor. Target: first line within 1 s of the section entering view (measure on the 4-core box). Do not add a texture, background, or stock image to fill the wait.
 - [ ] M6.1 Audit counters and chart animations for loop/off-screen behaviour.
 - [ ] M6.2 Make every counter one-shot and deterministic.
 - [ ] M6.3 Align chart draw timing with the chapter body range.
 - [ ] M6.4 Reduced motion: final values immediately.
 
 **Acceptance criteria**
+- A reader entering `#github` sees a meaningful first line within 1 s (target; measure), not a 3.5–4 s blank terminal.
 - No number changes after settling.
 - No off-screen continuous animation.
 - Values still come from `SiteFacts` / cached GitHub data.

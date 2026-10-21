@@ -16,9 +16,33 @@ Motion carries the argument in three registers:
 
 | Direction | Promise | Why it was/wasn't chosen |
 | --- | --- | --- |
-| **Editorial Instrument** (selected) | Magazine pacing + instrument-grade data motion | Fits the existing Fraunces/mono/amber identity, no new runtime, works on modest hardware |
+| **Editorial Instrument** (selected) | Magazine pacing + instrument-grade data motion | Fits the existing Fraunces/mono/sage-clay identity, no new runtime, works on modest hardware |
 | Kinetic Observatory | Continuous 3D/canvas atmosphere | Duplicates the gallery, expands the GPU-heavy surface, competes with reading |
 | Paper Machine | Print textures, sheet-feed transitions | Asset-heavy, risks being a skin; the site's strength is type + evidence |
+
+## Visual asset direction
+
+Assets are **not** a fourth creative direction. The site keeps "Editorial
+Instrument" and follows D-11: **evidence first, at most one archival plate as a
+pilot.** The measured homepage already ships 3.15 MB of images on desktop; adding
+a decorative layer before optimizing the existing evidence would add cost, not
+identity.
+
+Rules for this storyboard:
+
+- Owned evidence (hero photograph, project screenshots, issuer logos, lab
+  thumbnails) comes before any external asset.
+- An external plate must carry an argument in its caption. If the caption can be
+  deleted without losing meaning, the plate is decoration and does not ship.
+- One plate maximum, and only after the Signal Loom alignment (M5.0) and
+  BootSequence entry (M6.0) are fixed. Placement: `#systems-in-motion`.
+- Palette: sage `#7a8c6f`, brand-text `#5d6b54`, warm clay `#c17f59`, near-black
+  `#0e0f0c`, light `#fafaf8`. The gallery keeps its multi-colour exception.
+- No stock photography, generic AI illustration, icon pack, texture library, 3D
+  asset pack, or Lottie/Rive/Spline runtime.
+- No parallax or Ken Burns on any image. The existing card hover scale is the
+  only image transform; a plate gets at most a one-shot reveal.
+- Full register and pilot spec: `ASSETS.md`.
 
 ## Section-by-section
 
@@ -29,6 +53,9 @@ Motion carries the argument in three registers:
   evidence row arrives after the sentence; the scroll cue breathes once.
 - **Current state:** GSAP entrance + SplitText (hero only), hero metrics row
   from `SiteFacts.github`, reduced-motion path keeps the headline whole.
+- **Asset intent:** keep the personal hero photograph and its 768/1280/1920 WebP
+  variants. It is the only full-bleed image and the strongest identity asset; do
+  not replace it with stock or AI. Compress it before adding any new asset.
 - **Target:** MOTION-02 handoff — the hero reaches a still frame and the first
   chapter begins as the hero leaves. No loop after entrance.
 - **Reduced motion:** static headline, static evidence row, no cue animation.
@@ -54,6 +81,10 @@ Motion carries the argument in three registers:
   dot travels along one edge at a time to show connection, not to decorate.
 - **Current state:** interactive bipartite map, measured edges, GSAP signal dots
   capped at 3, reduced-motion/reduced-data produce static edges.
+- **Asset intent:** optional OBI 1883 telephone-exchange plate as a compact
+  figure, only after M5.0 alignment. The caption connects a manual switchboard to
+  the capability map; the signal dots stay the only moving element. If the plate
+  reads as vintage decoration, remove it.
 - **Target:** a one-shot guided entry (MOTION-05) plus interaction that refines
   the story.
 - **Reduced motion:** static map with default emphasis; no travelling dots.
@@ -80,6 +111,10 @@ Motion carries the argument in three registers:
   filtering swaps cards without replaying a long entrance.
 - **Current state:** static grid + hydrated filter with WAAPI FLIP; reveal is
   chapter-level only.
+- **Asset intent:** the project screenshots are evidence, not atmosphere.
+  Optimize the four homepage sources (1920×1080 / 1856×2561 shown in a
+  299–341 px box, no `srcset`) before adding any stock mockup. No decorative
+  overlays on screenshots.
 - **Target:** explicit primary-first stagger (MOTION-04).
 - **Reduced motion:** instant layout; no fade.
 - **Status:** filtering DONE; card choreography PLANNED.
@@ -91,6 +126,9 @@ Motion carries the argument in three registers:
 - **Motion intent:** the sheet settles like a printed index being laid down;
   thumbnails are lazy and quiet. No autoplay, no carousel.
 - **Current state:** 0 JS, `<details open>` groups, lazy images.
+- **Asset intent:** the 27 lab thumbnails are the intentional color exception;
+  keep them. Do not "harmonize" them to sage — the gallery is where color
+  experiments live. No new decorative assets in the contact sheet.
 - **Target:** CSS-only group/thumbnail ranges (MOTION-07).
 - **Reduced motion:** fully static sheet.
 - **Status:** structure DONE; choreography PLANNED.
@@ -114,6 +152,9 @@ Motion carries the argument in three registers:
 - **Motion intent:** tiles settle without a uniform cascade; the dominant tile
   lands first.
 - **Current state:** 0 JS bento, `<details open>` per issuer.
+- **Asset intent:** 16 issuer logos already exist and are used by the career
+  spine. Keep the bento text-first; do not add logo soup. If logos are added
+  later, they must be owned, small, and consistent with the spine.
 - **Target:** a short dominant-first entry (MOTION-04/07).
 - **Reduced motion:** static bento.
 - **Status:** structure DONE; choreography PLANNED.
@@ -126,6 +167,9 @@ Motion carries the argument in three registers:
   once; the galaxy pauses off-screen.
 - **Current state:** counters and charts are hydrated; off-screen deferral exists;
   `AmbientScene` and R3F have visibility guards.
+- **Asset intent:** no background, texture, or stock "data" image. Fix the
+  BootSequence entry first (M6.0); the contribution grid and charts are the
+  visual. Do not decorate a blank terminal.
 - **Target:** one-shot counters and chart draws aligned to the chapter body
   (MOTION-06).
 - **Reduced motion:** final values immediately, no galaxy orbit.
@@ -162,3 +206,6 @@ Motion carries the argument in three registers:
 - No loop without a visible purpose (signal travel, galaxy orbit) and a pause
   when off-screen.
 - Reduced motion removes scroll-linked movement entirely, not just duration.
+- Images are evidence, not atmosphere: no parallax, no Ken Burns, no attention
+  loop. A plate gets at most a one-shot reveal, and the final state is readable
+  without JavaScript.

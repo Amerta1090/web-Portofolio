@@ -161,6 +161,57 @@ scroll-driven animations case studies.
 - Does not respect `prefers-reduced-motion`; this is a recorded gap (D-10).
 - Decision: keep for now; verify and fix in a dedicated sprint.
 
+### 2.9 Visual assets (2026-10-21)
+
+**Question.** Should the portfolio add a visual asset layer — archival plates,
+illustration, textures, icons, 3D, or motion assets — and if so, which source
+passes license, narrative, and performance review?
+
+**Measured before evaluating sources.** Cold load, full lazy-load scroll,
+`performance.getEntriesByType("resource")` + `transferSize`
+(`.opencode/probe-images.mjs`).
+
+| Finding | Number | Label |
+| --- | --- | --- |
+| Homepage image transfer, 1440×900 | **3,147.0 KB** across 41 images | VERIFIED |
+| Homepage image transfer, 375×812 | **2,643.0 KB** across 44 images | VERIFIED |
+| Three-file share | retro **58.1%** + hero **19.7%** + ijo **17.6%** = **95.4%** desktop; **94.5%** mobile | VERIFIED |
+| Project card render box | 299×168 @1024 · 341×192 @768 · 329×185 @375 | VERIFIED |
+| Project source sizes | `retro` 1920×1080 / 1,873,549 B; `ijo` 1856×2561 / 567,020 B; no `srcset` | VERIFIED |
+| Page height @1440 | **25,542 px**; `#career` 6,015 + `#github` 6,133 = **47.6%** | VERIFIED |
+| Signal Loom offset | capability column top **3,734 px** vs project **2,498 px**; **1,236 px**; 622 vs 3,094 tall | VERIFIED |
+| BootSequence entry | only `$` placeholders at 500/1,500 ms; first lines **~4 s** after entering `#github` | VERIFIED |
+| Owned image inventory | 370 files; projects 4.94 MB / 7; sequence 12.19 MB / 302; audio 5.03 MB / 1; lab 52.5 KB / 27; hero 1.81 MB / 4; logos 49.4 KB / 16 | VERIFIED (`du`/`find`) |
+
+**Source evaluation.**
+- **Old Book Illustrations** is the only source that passed both terms and
+  narrative review. Terms: no use restriction, no warranty, text CC BY-NC-SA,
+  credit requested for structured data. The 1883 telephone-exchange plate
+  (1600×961, 512,290 B; 1200 px 287,725 B) is a literal ancestor of "systems in
+  motion"; the 1882 Trouvelot comet (1600 px 135,269 B; 1200 px 71,198 B) is a
+  weaker, color/portrait fit for `/observatory`.
+- **Heritage Type** was investigated as an example, not preselected. Free-bundle
+  terms live inside ZIPs and some bundles are PNG-only — unverified.
+- **BHL** licensing page returned 404 twice; **LoC** item rights returned 403;
+  **Unsplash** license text returned 401/404. None is usable without a live
+  source. (Report-sourced claims only; do not rely.)
+- **Generative/technical sources**: Haikei is the only credible generator (free
+  commercial, no credit) but generic; Kenney patterns are CC0 but unnecessary;
+  SVGRepo needs per-icon checks and Lucide already covers icons; Poly Haven
+  (~1.6 MB floor), ambientCG (~7.8 MB pack), Sketchfab (attribution/editorial
+  traps), and 3dicons (style break) are rejected on weight/style.
+- **Motion runtimes**: smallest Lottie survivor is 46 KB (529 KB total); Rive
+  433–993 KB; Spline 183–220 KB lazy plus watermark; useAnimations has an
+  MIT-vs-CC-BY conflict. `/` has only ~7.7 KB reachable-JS headroom. Nothing
+  enters the runtime.
+
+**Conclusion.** **Evidence first.** Optimize the images already served, fix the
+two structural defects, and allow at most one OBI plate as a staged pilot with a
+caption test. No stock photography, generic illustration, icon/texture/3D pack,
+or animation runtime. The full register, three-outcome comparison, pilot spec,
+license register, and integration rules are in `docs/motion/ASSETS.md`; the policy
+is D-11.
+
 ## 3. Open research questions
 
 | Question | Why it matters | Owner |
@@ -170,6 +221,10 @@ scroll-driven animations case studies.
 | Does Safari 26 apply `animation-range` percentages the same way? (Chromium normalises `entry 0%` to `entry`; asserted in `motion-chapters.spec.ts`) | Cross-browser narrative timing | MOTION-09 (if a device is available) |
 | Can the career rail progress be expressed without a scroll listener? | Keeps listener count flat | MOTION-03 |
 | Should Lenis be disabled under reduced motion or removed entirely? | Motion sickness vs. brand feel | MOTION-02 |
+| What is the real homepage image-transfer budget after responsive variants? | 3.15 MB desktop / 2.64 MB mobile is the largest asset cost; `measure:routes` counts JS only | Image-hygiene task (separate from motion) |
+| Can the OBI 1200 px telephone plate become a ≤80 KB WebP without visible loss? | The pilot's budget depends on it | Asset pilot (after M5.0/M6.0) |
+| Do BHL, LoC, and Unsplash licenses permit commercial use? | No claim is allowed without a live source; all three were unverifiable this session | Asset research; do not use until verified |
+| What are the Wellcome/IA scan terms for the 1883 plate? | OBI's terms cover OBI; the underlying scan may have its own terms | Asset pilot |
 
 ## 4. Sources
 
@@ -179,3 +234,13 @@ scroll-driven animations case studies.
 - MDN — `animation-timeline`, `animation-range`, `prefers-reduced-motion`.
 - Theatre.js repository and site (public status note).
 - Repository files listed in §1; `docs/motion-score-baseline.md` §13.
+- OBI terms: https://www.oldbookillustrations.com/terms-of-use/
+- OBI telephone exchange: https://www.oldbookillustrations.com/illustrations/opera-telephone-exchange/
+- OBI comet: https://www.oldbookillustrations.com/illustrations/comet-1881/
+- BHL (licensing unverified this session): https://www.biodiversitylibrary.org/
+- Library of Congress (rights unverified this session): https://www.loc.gov/
+- Unsplash (license text unverified this session): https://unsplash.com/
+- Heritage Type (bundle terms unverified): https://www.heritagetype.com/
+- Haikei: https://haikei.app/ · Kenney: https://kenney.nl/assets
+- Lucide: https://lucide.dev/
+- `docs/motion/ASSETS.md` — full asset register and pilot spec.
