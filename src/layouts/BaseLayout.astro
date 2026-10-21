@@ -221,7 +221,10 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
     <AmbientScene client:visible />
     <div class="relative z-10">
       <a href="#main-content" class="skip-to-content">Skip to content</a>
-      <div class="scroll-progress-css" role="progressbar" aria-label="Page scroll progress"></div>
+      {/* Decorative: a CSS-only bar cannot expose a numeric value, so announcing
+          it as a progressbar would promise assistive tech information that does
+          not exist. The chapter/section landmarks already describe position. */}
+      <div class="scroll-progress-css" aria-hidden="true"></div>
 
       <div transition:persist="header">
         <Header currentPath={currentPath} />

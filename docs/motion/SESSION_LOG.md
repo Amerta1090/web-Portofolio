@@ -1,0 +1,123 @@
+# Motion Programme — Session Log
+
+Newest last. Each entry records what was attempted, what was actually measured,
+and what remains.
+
+---
+
+## 2026-10-21 — Programme setup
+
+**Goal:** Turn `prompt.txt` into a durable controller and establish planning docs
+before touching motion code.
+
+**Read:** `prompt.txt` (337 lines), `AGENTS.md` (targeted), `docs/` and
+`docs/archive/`, homepage, organisms, islands, package scripts, Astro/Playwright/
+Vitest config, `src/lib/scroll-animations.css`, `src/components/molecules/Section.astro`,
+`src/layouts/BaseLayout.astro`, `src/styles/global.css`, `src/lib/motion.ts`.
+
+**Measured**
+- `bunx astro check` → 98 errors, 0 warnings, 82 hints.
+- Homepage section order and `sectionIds` → 10 sections.
+- `bunx vitest run src/islands/TimeAwareHero.test.tsx` → 11/11 pass in 44.8 s.
+- A preceding full `bun run test` timed out at >10 min; its partial log showed 3
+  TimeAwareHero failures that disappear in isolation. Classified as load flake,
+  not a regression.
+- `rg 'scroll-progress-js' src` → CSS only, no markup consumer.
+- `rg 'data-reveal-stagger' src` → one consumer (`CapabilityArchitecture.astro`).
+
+**External research**
+- Can I Use scroll-driven animations: Chromium 115+, Safari 26+, Firefox not
+  supported through 161 (checked 2026-10-21).
+- Theatre.js public repo: 1.0 development moved to a private repo; not adopted.
+- ReactBits: copy-paste component collection; patterns only.
+
+**Created:** `docs/motion/README.md`, `STATUS.md`, `ROADMAP.md`, `SPRINT_PLAN.md`,
+`DECISIONS.md`, `RESEARCH.md`, `STORYBOARD.md`, `QA_CHECKLIST.md`,
+`SESSION_LOG.md`.
+
+**Not done:** product code, `prompt.txt` rewrite (next), sprint execution.
+
+---
+
+## 2026-10-21 — MOTION-01: Chapter Reveal System
+
+**Goal:** Chapter head/body reveal, real reduced-motion off switch,
+compositor-only progress bar.
+
+**Files changed**
+- `src/lib/scroll-animations.css`
+- `src/components/molecules/Section.astro`
+- `src/pages/index.astro`
+- `src/layouts/BaseLayout.astro`
+- `src/lib/scroll-animations.guard.test.ts` (new)
+- `e2e/motion-chapters.spec.ts` (new)
+- `docs/motion/*`
+
+**Implementation**
+1. `Section.astro` now accepts `chapter` and emits `data-chapter`,
+   `data-chapter-head` (label/title/subtitle) and `data-chapter-body` (slot).
+   Nine homepage sections switched from `data-reveal` to `chapter`; `#career`
+   keeps `clip={false}`.
+2. `scroll-animations.css` adds separate head/body ranges via custom properties,
+   keeps the legacy `[data-reveal]:not([data-chapter]) > *` path for blog,
+   timeline, skills, observatory, and capability stagger.
+3. Reduced motion (and reduced data) explicitly sets `animation: none`,
+   `opacity: 1`, `transform: none` with `!important`.
+4. Progress bar keyframes changed from `width` to `transform: scaleX()`;
+   progress markup is `aria-hidden="true"` with no fake progressbar role.
+5. Dead `.scroll-progress-js` CSS removed; no-support fallback hides the bar.
+6. Added a source guard unit test and an e2e spec that verifies chapter hooks,
+   split ranges, progress transform, reduced-motion positive/negative controls,
+   and that content is readable without animation.
+
+**Measured results**
+- `bun run build:fast` → 49 pages (3m32s).
+- `bunx astro check` → 98 errors, 0 warnings, 82 hints = baseline; zero
+  diagnostics in the six touched files.
+- `bunx vitest run src/lib/scroll-animations.guard.test.ts` → 9/9.
+  Combined with `TimeAwareHero.test.tsx` → 20/20 (14.1s).
+- `e2e/motion-chapters.spec.ts` → 8 tests: 7 passed + 1 honestly skipped.
+  The skip is the reduced-data case: CDP
+  `Emulation.setEmulatedMedia({ features: [{ name: "prefers-reduced-data",
+  value: "reduce" }] })` is accepted but `matchMedia` stays `false` — Chromium
+  does not implement the query, so the static path cannot be observed at
+  runtime here; the CSS rule is enforced by the source guard.
+- `e2e/career-spine.spec.ts` → 18/18 (combined run with the motion spec:
+  26 tests → 25 passed, 1 skipped).
+- Targeted regression (`navigation` + `hero-metrics` + `craft`) → 17/17.
+- `measure:routes` → `/` initial 202.2 / reachable 556.6 / HTML 74.9 KB
+  (initial & reachable flat vs baseline; HTML +0.1 = chapter wrapper divs +
+  the BaseLayout comment); `/work` 150.6/393.0/18.5; `/gallery`
+  179.1/504.4/20.0; islands 16 (7e/9d); all dist JS 670.7 KB.
+- Guard teeth proven by 2 CSS mutations, each breaking exactly the assertion
+  meant to catch it (head-end token equalled the body token; an
+  `opacity: 0` rule appended outside `@supports`), restored with md5
+  `5ba08d24afea9fb151ab1a0d4f5a01be` identical.
+
+**Lessons**
+- The measured result corrects the plan's assumption: a shortened
+  `animation-duration` does **not** stop a `view()` animation (the mid-scroll
+  read during reconnaissance showed the reveal still progressing), so the
+  explicit `animation: none !important` override is a correction, not a
+  hardening.
+- Chromium normalises `entry 0%` to `entry` in computed
+  `animationRange`; the e2e pins the normalised form.
+- A tall chapter (the career spine) is still inside its `entry` range at its
+  own top (`opacity: 0.65…` right after `scrollIntoView(start)`) — the
+  "settled" assertion uses the shortest chapter (`#about`) plus two viewport
+  heights of extra scroll instead of asserting at a section's own top.
+- The progress bar's `getBoundingClientRect().width` reads `0` at the top
+  because the *transform* is `scaleX(0)`; the layout `width` stays constant —
+  the e2e asserts `styleWidth` is unchanged across scroll and only the
+  transform moves (compositor proof).
+- `browser.newContext({ reducedMotion: "reduce" })` is honoured by this
+  Playwright/Chromium pair, but the repo convention (`emulateMedia` +
+  `matchMedia` readback) was kept anyway; only `test.use({ reducedMotion })`
+  is silently ignored.
+- Override-block guard: the reduced-motion/reduced-data selectors live one
+  level inside the `@media` block (flat CSS, no nested rule header), so the
+  guard asserts the media body *contains* the chapter hooks plus the
+  `!important` declarations rather than parsing a selector preamble — the
+  first draft of that assertion mis-parsed its own file's shape.
+
+**Next:** MOTION-02 — Hero handoff (status `READY`).

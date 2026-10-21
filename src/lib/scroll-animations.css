@@ -1,12 +1,28 @@
+/* ── Scroll-driven motion ──
+ *
+ * Everything here is progressive enhancement. `@supports` gates each feature so
+ * a browser without scroll-driven animations sees the page as if no rule
+ * existed: no opacity is set outside those blocks.
+ *
+ * Chapters (`[data-chapter]`) are the section-level model: a head (label,
+ * title, subtitle) settles first, then its body. The legacy `[data-reveal]`
+ * container path stays for pages that fade their own wrappers.
+ */
+
 @supports (animation-timeline: scroll()) {
-  /* ── CSS Scroll-Driven Progress Bar ── */
+  /* ── CSS scroll progress bar ──
+   * `width` is fixed and only the compositor transform animates: animating a
+   * layout property made every scroll frame do layout work for a 3px bar.
+   */
   .scroll-progress-css {
     position: fixed;
     top: 0;
     left: 0;
+    width: 100%;
     height: 3px;
     background: var(--color-brand);
     z-index: 100;
+    transform: scaleX(0);
     transform-origin: left center;
     animation: progress-grow auto linear;
     animation-timeline: scroll(root);
@@ -14,15 +30,50 @@
 
   @keyframes progress-grow {
     from {
-      width: 0%;
+      transform: scaleX(0);
     }
     to {
-      width: 100%;
+      transform: scaleX(1);
     }
   }
+}
 
-  /* ── CSS View-Timeline Scroll Reveal ── */
-  [data-reveal] > * {
+@supports (animation-timeline: view()) {
+  /* ── Chapter reveal ──
+   * Tokens are exposed on the chapter so a future section can retune its
+   * rhythm without copying selectors. The body starts later in its own entry
+   * range, and because the head sits above the body in the document it
+   * finishes settling before the body arrives.
+   */
+  [data-chapter] {
+    --chapter-head-start: 0%;
+    --chapter-head-end: 45%;
+    --chapter-body-start: 12%;
+    --chapter-body-end: 78%;
+  }
+
+  [data-chapter-head] {
+    opacity: 0;
+    transform: translateY(16px);
+    animation: reveal-fade-up linear forwards;
+    animation-timeline: view();
+    animation-range: entry var(--chapter-head-start) entry var(--chapter-head-end);
+  }
+
+  [data-chapter-body] {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: reveal-fade-up-body linear forwards;
+    animation-timeline: view();
+    animation-range: entry var(--chapter-body-start) entry var(--chapter-body-end);
+  }
+
+  /* ── Legacy container reveal ──
+   * Pages that put `data-reveal` on their own wrapper (blog grids, timeline,
+   * capability architecture) keep the single-beat fade. Chapters use the
+   * two-beat path above and never match this selector.
+   */
+  [data-reveal]:not([data-chapter]) > * {
     opacity: 0;
     transform: translateY(16px);
     animation: reveal-fade-up linear forwards;
@@ -41,7 +92,18 @@
     }
   }
 
-  /* ── Staggered children via animation-delay (set per child) ── */
+  @keyframes reveal-fade-up-body {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* ── Staggered children via animation-range (set per child) ── */
   [data-reveal-stagger] > *:nth-child(1) {
     animation-range: entry 0% entry 40%;
   }
@@ -66,20 +128,44 @@
   [data-reveal-stagger] > *:nth-child(8) {
     animation-range: entry 35% entry 75%;
   }
-
-  /* ── Hide JS progress bar when CSS version is active ── */
-  .scroll-progress-js {
-    display: none;
-  }
 }
 
-/* ── @supports fallback: use JS when CSS API unavailable ── */
+/* ── @supports fallback: no scroll-driven animation → no stuck bar ── */
 @supports not (animation-timeline: scroll()) {
   .scroll-progress-css {
     display: none;
   }
+}
 
-  .scroll-progress-js {
-    display: block;
+/* ── Reduced motion / reduced data: a real off switch ──
+ * The global `animation-duration: 0.01ms` rule cannot stop a scroll-timeline
+ * animation: its progress comes from scroll position, not elapsed time. These
+ * blocks set the final state explicitly, before any scrolling.
+ */
+@media (prefers-reduced-motion: reduce) {
+  [data-chapter-head],
+  [data-chapter-body],
+  [data-reveal] > * {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .scroll-progress-css {
+    animation: none !important;
+  }
+}
+
+@media (prefers-reduced-data: reduce) {
+  [data-chapter-head],
+  [data-chapter-body],
+  [data-reveal] > * {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .scroll-progress-css {
+    animation: none !important;
   }
 }

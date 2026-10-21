@@ -81,25 +81,25 @@ const sectionIds = [
     />
   </section>
 
-  <Section data-reveal id="about" title="About" variant="alt" ariaLabel="About me">
+  <Section chapter id="about" title="About" variant="alt" ariaLabel="About me">
     <About profile={profile} />
     <div class="mt-10">
       <CapabilityGenerator client:load />
     </div>
   </Section>
 
-  <Section data-reveal id="systems-in-motion" title="Systems in Motion" subtitle="A connected view of capabilities and the projects that put them to work" ariaLabel="Systems in motion">
+  <Section chapter id="systems-in-motion" title="Systems in Motion" subtitle="A connected view of capabilities and the projects that put them to work" ariaLabel="Systems in motion">
     <SignalLoom graph={signalLoom} />
   </Section>
 
   {/* `clip={false}` — the spine's rail and year headings pin to the viewport, and
       `overflow: hidden` on the section makes it a scrollport, so sticky resolves
       against the section and scrolls away instead of pinning (see Section.astro). */}
-  <Section data-reveal id="career" clip={false} title="Career Spine" subtitle="Every dated record in one chronological line — work, certifications, honors, volunteering" variant="alt" ariaLabel="Career spine">
+  <Section chapter id="career" clip={false} title="Career Spine" subtitle="Every dated record in one chronological line — work, certifications, honors, volunteering" variant="alt" ariaLabel="Career spine">
     <CareerSpine events={career.events} dropped={career.dropped} />
   </Section>
 
-  <Section data-reveal id="projects" title="Featured Projects" subtitle="Selected work that demonstrates my range" ariaLabel="Featured projects">
+  <Section chapter id="projects" title="Featured Projects" subtitle="Selected work that demonstrates my range" ariaLabel="Featured projects">
     <ProjectCardGrid client:load projects={cardProjects} skillHrefs={skillHrefs} />
     <div class="mt-10 flex justify-center">
       <a
@@ -127,17 +127,17 @@ const sectionIds = [
     </div>
   </Section>
 
-  <Section data-reveal id="creative-lab" title="Creative Lab" subtitle="Experimental playground — interactive visualizations and creative coding experiments" ariaLabel="Creative Lab experiments">
+  <Section chapter id="creative-lab" title="Creative Lab" subtitle="Experimental playground — interactive visualizations and creative coding experiments" ariaLabel="Creative Lab experiments">
     <CreativeLabTeaser lab={facts.lab} />
   </Section>
 
-  <Section data-reveal id="skills" title="Skills" variant="alt" ariaLabel="Skills and technologies">
+  <Section chapter id="skills" title="Skills" variant="alt" ariaLabel="Skills and technologies">
     <SkillsExplorer client:load skills={skills} />
   </Section>
 
   {
     certifications.length > 0 && (
-      <Section data-reveal id="certifications" title="Certifications" ariaLabel="Certifications">
+      <Section chapter id="certifications" title="Certifications" ariaLabel="Certifications">
         <Certifications
           certifications={certifications}
           issuers={facts.certifications.byIssuer}
@@ -147,11 +147,11 @@ const sectionIds = [
     )
   }
 
-  <Section data-reveal id="github" ariaLabel="GitHub universe">
+  <Section chapter id="github" ariaLabel="GitHub universe">
     <GitHubUniverse gitHubData={gitHubData} profileName={profile.name} />
   </Section>
 
-  <Section data-reveal id="contact" title="Contact" subtitle="Have a question or want to work together?" ariaLabel="Contact">
+  <Section chapter id="contact" title="Contact" subtitle="Have a question or want to work together?" ariaLabel="Contact">
     <Contact profile={profile} />
   </Section>
 

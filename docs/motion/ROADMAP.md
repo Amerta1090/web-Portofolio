@@ -1,0 +1,56 @@
+# Motion Programme — Roadmap
+
+The programme treats the portfolio as an **editorial instrument**: a narrative
+read top to bottom, with instrument-grade data moments where evidence lives.
+Motion exists to pace reading, show causality, and make measurements legible. It
+is not a demo reel.
+
+See `DECISIONS.md` D-01 for why this direction was selected over two alternatives
+and `STORYBOARD.md` for the section-by-section treatment.
+
+## Phases
+
+| Phase | Name | Outcome | Exit signal |
+| --- | --- | --- | --- |
+| **M0** | Truth & foundation | Docs, measured audit, reusable chapter reveal, real reduced-motion opt-out, compositor-only progress | MOTION-01 `DONE`; zero new dependencies |
+| **M1** | Narrative spine | Hero hands off to chapters; each chapter has intentional entry rhythm; page reads as one sequence | Every homepage section has head/body/reduced-motion evidence |
+| **M2** | Evidence motion | Projects, career spine, certifications, and metrics reveal the evidence hierarchy instead of every card at once | Motion clarifies which evidence is primary; no uniform card cascade |
+| **M3** | Data as instrument | GitHub and Observatory numbers move like instruments: counters settle once, charts draw once, no perpetual decoration | No continuous off-screen animation; counters are deterministic |
+| **M4** | Interactive storytelling | Signal Loom and Creative Lab become guided reading surfaces, not just interactive widgets | Pointer/keyboard/reduced-motion paths all tell the same story |
+| **M5** | Responsive & performance hardening | Same narrative on 320 px, touch, low-end hardware; measured budgets hold | Payload and listener gates flat or lower; no overflow at 7 widths |
+| **M6** | Accessibility & resilience | No-JS, reduced-motion, reduced-data, keyboard, and contrast are first-class | Positive/negative controls in e2e for every preference |
+| **M7** | Release | Docs, QA, and audit are final; programme closed | All gates green; `SESSION_LOG.md` closes the programme |
+
+## Sequencing rules
+
+1. **M0 before everything.** A chapter model and an honest reduced-motion switch
+   are prerequisites for adding more motion. Adding choreography on top of a
+   blanket fade multiplies the rework.
+2. **CSS first, JS second.** If a technique can be expressed as a scroll-driven
+   CSS animation or a one-shot transform, it must not become a GSAP timeline or
+   a React scroll listener. GSAP is reserved for pinned, scrubbed sequences that
+   CSS cannot express.
+3. **No new full-viewport canvas/R3F** in editorial sections. The existing
+   gallery already owns the experimental canvas budget.
+4. **Every phase must reduce or hold a measured cost.** Candidate gates: initial
+   and reachable payload per route, window scroll listener count, off-screen
+   animation count, MotionScore D/F findings.
+5. **A phase is not complete until its accessibility path is tested**, including
+   a negative control proving the preference was actually applied.
+
+## What is explicitly out of scope
+
+- Rebuilding the site's visual identity or typography.
+- Adding routes, sections, or a CMS.
+- Replacing Astro with a SPA or adding a client-side router beyond the existing
+  `ClientRouter`.
+- Adding Theatre.js, ReactBits, Lottie, or a new animation runtime unless a
+  sprint proves an existing tool cannot do the job.
+- 3D scene expansion beyond the current Repository Galaxy.
+
+## Long-term quality bar
+
+A reader on a mid-range phone should be able to scroll the homepage with motion
+enabled and feel pacing, not turbulence; with reduced motion enabled they should
+get the same information with no scroll-linked movement at all; with JavaScript
+disabled they should still read every section in order.

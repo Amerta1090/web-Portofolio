@@ -6,7 +6,18 @@ export interface Props {
   variant?: "default" | "alt";
   class?: string;
   ariaLabel?: string;
-  "data-reveal"?: boolean;
+  /**
+   * Opt the section into the chapter reveal system.
+   *
+   * A chapter is two beats, not one: the head (label, title, subtitle) settles
+   * first, then the body (the slot) follows. The ranges live in
+   * `src/lib/scroll-animations.css`; this component only publishes the hooks.
+   *
+   * The old `data-reveal` prop faded the section's single layout wrapper as one
+   * block, so a long chapter arrived all at once with no hierarchy cue. Pages
+   * that put `data-reveal` on their own containers keep the legacy path.
+   */
+  chapter?: boolean;
   /**
    * Clip overflowing content to the section's box.
    *
@@ -32,18 +43,21 @@ const {
   variant = "default",
   class: className,
   ariaLabel,
+  chapter = false,
   clip = true,
 } = Astro.props;
 
 const cls = `py-16 md:py-32 relative ${clip ? "overflow-hidden " : ""}container-query-section ${variant === "alt" ? "bg-bg-secondary border-y border-border" : ""} ${className ?? ""}`;
-const revealAttr = Astro.props["data-reveal"] ? { "data-reveal": "" } : {};
+const chapterAttr = chapter ? { "data-chapter": "" } : {};
+const headAttr = chapter ? { "data-chapter-head": "" } : {};
+const bodyAttr = chapter ? { "data-chapter-body": "" } : {};
 ---
 
-<section id={id} class={cls} aria-label={ariaLabel ?? title} {...revealAttr}>
+<section id={id} class={cls} aria-label={ariaLabel ?? title} {...chapterAttr}>
   <div class="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8 relative z-10">
     {
       title && (
-        <div class="mb-12">
+        <div class="mb-12" {...headAttr}>
           <div class="flex items-center gap-3 mb-3">
             <span class="w-1.5 h-1.5 bg-brand rounded-full"></span>
             <span class="section-label text-text-secondary">Section</span>
@@ -59,6 +73,6 @@ const revealAttr = Astro.props["data-reveal"] ? { "data-reveal": "" } : {};
         </div>
       )
     }
-    <slot />
+    <div {...bodyAttr}><slot /></div>
   </div>
 </section>
