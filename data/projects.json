@@ -18,6 +18,11 @@
       ],
       "skills": ["Web Development"],
       "image": "/images/projects/retro-game-portfolio.png",
+      "image_variants": [
+        { "src": "/images/projects/retro-game-portfolio-384.webp", "width": 384 },
+        { "src": "/images/projects/retro-game-portfolio-768.webp", "width": 768 },
+        { "src": "/images/projects/retro-game-portfolio-1152.webp", "width": 1152 }
+      ],
       "images": ["/images/projects/retro-game-portfolio.png"]
     },
     {
@@ -38,6 +43,10 @@
       ],
       "skills": ["Progressive Web Applications (PWAs)", "IndexedDB"],
       "image": "/images/projects/nyatet-duwit.png",
+      "image_variants": [
+        { "src": "/images/projects/nyatet-duwit-384.webp", "width": 384 },
+        { "src": "/images/projects/nyatet-duwit-500.webp", "width": 500 }
+      ],
       "images": ["/images/projects/nyatet-duwit.png", "/images/projects/nyatet-duwit-ui.jpg"]
     },
     {
@@ -59,6 +68,11 @@
       "skills": ["Python (Programming Language)", "Machine Learning"],
       "media": ["IHSG Predictor", "IDR Predictor"],
       "image": "/images/projects/ijo-plis.png",
+      "image_variants": [
+        { "src": "/images/projects/ijo-plis-384.webp", "width": 384 },
+        { "src": "/images/projects/ijo-plis-768.webp", "width": 768 },
+        { "src": "/images/projects/ijo-plis-1152.webp", "width": 1152 }
+      ],
       "images": ["/images/projects/ijo-plis.png", "/images/projects/ijo-plis-usdidr.png"]
     },
     {
@@ -94,6 +108,10 @@
       ],
       "skills": ["Python (Programming Language)", "FastAPI"],
       "image": "/images/projects/red-devil-dynamics.jpg",
+      "image_variants": [
+        { "src": "/images/projects/red-devil-dynamics-384.webp", "width": 384 },
+        { "src": "/images/projects/red-devil-dynamics-702.webp", "width": 702 }
+      ],
       "images": ["/images/projects/red-devil-dynamics.jpg"]
     },
     {

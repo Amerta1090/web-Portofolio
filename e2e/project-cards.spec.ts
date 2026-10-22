@@ -253,3 +253,117 @@ test("clicking the fallback chip scrolls to the section without a node hash", as
   // (and must not) select a specific node from it (M2.4.3).
   await expect(page).toHaveURL(/#systems-in-motion$/);
 });
+
+/**
+ * MOTION-01.5: image hygiene. The card thumbnails used to ship one full-size
+ * PNG/JPEG each (3.1 MB of homepage image transfer). They now ship generated
+ * 16:9 WebP variants chosen by `srcset`/`sizes`, with explicit dimensions. The
+ * assertions below are the externally visible half of that contract: a real
+ * `srcset` with two or more widths, a `sizes` that came from measured card
+ * boxes, and — the point of the whole exercise — no original bitmap download.
+ */
+const THUMBS = `${CARDS} img`;
+
+type Candidate = { src: string; width: number };
+type ThumbContract = {
+  src: string | null;
+  currentSrc: string;
+  candidates: Candidate[];
+  sizes: string | null;
+  width: number | null;
+  height: number | null;
+  naturalWidth: number;
+};
+
+async function readThumbs(page: import("@playwright/test").Page): Promise<ThumbContract[]> {
+  return page.locator(THUMBS).evaluateAll((nodes) =>
+    nodes.map((node) => {
+      const img = node as HTMLImageElement;
+      const candidates = (img.getAttribute("srcset") ?? "")
+        .split(",")
+        .map((entry) => entry.trim())
+        .filter(Boolean)
+        .map((entry) => {
+          const [src = "", descriptor = ""] = entry.split(/\s+/);
+          return { src, width: Number.parseInt(descriptor.replace("w", ""), 10) };
+        });
+      return {
+        src: img.getAttribute("src"),
+        currentSrc: img.currentSrc,
+        candidates,
+        sizes: img.getAttribute("sizes"),
+        width: img.getAttribute("width") ? Number(img.getAttribute("width")) : null,
+        height: img.getAttribute("height") ? Number(img.getAttribute("height")) : null,
+        naturalWidth: img.naturalWidth,
+      };
+    }),
+  );
+}
+
+test.describe("responsive thumbnails (MOTION-01.5)", () => {
+  test("each featured thumbnail ships a WebP srcset of two or more real widths", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await expect(page.locator(CARDS)).toHaveCount(4);
+    const thumbs = await readThumbs(page);
+    expect(thumbs).toHaveLength(4);
+
+    for (const thumb of thumbs) {
+      expect(
+        thumb.candidates.length,
+        `${thumb.src} needs at least two candidates`,
+      ).toBeGreaterThanOrEqual(2);
+      // Every candidate is a generated WebP, never the original bitmap.
+      for (const candidate of thumb.candidates) {
+        expect(candidate.src).toMatch(/\.webp$/);
+        expect(candidate.width).toBeGreaterThan(0);
+      }
+      // Ascending order is what makes the browser's selection deterministic.
+      const widths = thumb.candidates.map((candidate) => candidate.width);
+      expect(widths).toEqual([...widths].sort((a, b) => a - b));
+      // `sizes` must exist, because without it the browser assumes 100vw.
+      expect(thumb.sizes).toBeTruthy();
+      expect(thumb.sizes).toContain("px");
+    }
+  });
+
+  test("every thumbnail declares the largest variant's 16:9 intrinsic size", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator(CARDS)).toHaveCount(4);
+    const thumbs = await readThumbs(page);
+
+    for (const thumb of thumbs) {
+      const largest = Math.max(...thumb.candidates.map((candidate) => candidate.width));
+      expect(thumb.width, `${thumb.src} width`).toBe(largest);
+      expect(thumb.height, `${thumb.src} height`).toBe(Math.round((largest * 9) / 16));
+    }
+  });
+
+  test("no featured card downloads its original PNG/JPEG", async ({ page }) => {
+    const originals: string[] = [];
+    page.on("request", (request) => {
+      // Deliberately narrow: only project bitmaps, and only the raster
+      // originals the variants are generated from.
+      if (/\/images\/projects\/[^/]+\.(png|jpe?g)$/i.test(request.url()))
+        originals.push(request.url());
+    });
+
+    await page.goto("/");
+    await expect(page.locator(CARDS)).toHaveCount(4);
+    // Lazy loading means the cards only fetch once the section is in view.
+    await page.locator("#projects").scrollIntoViewIfNeeded();
+    await expect
+      .poll(async () => (await readThumbs(page)).every((thumb) => thumb.naturalWidth > 0), {
+        timeout: 15000,
+      })
+      .toBe(true);
+
+    const thumbs = await readThumbs(page);
+    for (const thumb of thumbs) {
+      // The browser actually picked a variant, not the `src` fallback.
+      expect(thumb.currentSrc).toMatch(/\.webp$/);
+    }
+    expect(originals).toEqual([]);
+  });
+});

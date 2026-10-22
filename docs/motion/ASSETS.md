@@ -71,6 +71,8 @@ not a new asset decision.
 Cold page load, full lazy-load scroll, `performance.getEntriesByType("resource")`
 and `transferSize` (`.opencode/probe-images.mjs`, 2026-10-21).
 
+Baseline, before MOTION-01.5:
+
 | Viewport | Images | Transfer | Top offenders |
 | --- | --- | --- | --- |
 | 1440 × 900 | 41 | **3,147.0 KB** | retro **1,829.9 KB (58.1%)**, hero **619.7 KB (19.7%)**, ijo **554.0 KB (17.6%)** = **95.4%** |
@@ -78,6 +80,16 @@ and `transferSize` (`.opencode/probe-images.mjs`, 2026-10-21).
 
 The four project images alone are **2,446.0 KB**: 77.7% of desktop image bytes
 and 92.5% of mobile image bytes. The hero is the largest above-the-fold image.
+
+After MOTION-01.5 (2026-10-22, same method and script):
+
+| Viewport | Images | Transfer | Top offenders |
+| --- | --- | --- | --- |
+| 1440 × 900 | 38 | **543.5 KB** (−2,603.5 KB, −82.7%) | hero **437.0 KB (80.4%)**, retro-384 **10.3 KB**, red-devil-384 **8.6 KB**, ijo-384 **6.6 KB** |
+| 375 × 812 | 44 | **187.9 KB** (−2,455.1 KB, −92.9%) | hero **75.9 KB (40.4%)**, retro-384 **10.3 KB**, red-devil-384 **8.6 KB**, ijo-384 **6.6 KB** |
+
+The four project thumbnails now cost **28.3 KB together** (they were 2,446.0 KB),
+and the hero is the only remaining offender. Full byte record: §13.
 
 ### 2.3 Project thumbnail math
 
@@ -96,6 +108,12 @@ A 600–682 px-wide asset is enough at 2× DPR. The 1920 px source is 2.8–3.2�
 linear width needed and roughly 8–10× the pixels. A compressed 80 KB variant is
 an **ASSUMPTION** until measured; the byte ratio is about 7–23× depending on the
 image.
+
+**Resolved by MOTION-01.5.** The card box measures 361 px at ≥1280, 341 px at
+768–1279 in the two-column layout, and `100vw − 46px` on phones (274–384 px
+measured at 320/375/430). Generated 16:9 WebP variants measure 2,238 B (384) to
+56,372 B (1152); the widest card needs 384 px at 1×, 768 px at 2×, 1152 px at 3×.
+Table, `sizes` expression, and the hero A/B: §13.
 
 ### 2.4 Page shape
 
@@ -341,7 +359,7 @@ commercial release. This is honest caution, not a blocker for a portfolio.
 | Question | Why it matters | Owner |
 | --- | --- | --- |
 | Can the 1200 px telephone JPEG become a ≤80 KB WebP without visible loss? | The pilot's budget depends on it | Asset pilot (after steps 1–2) |
-| What is the actual homepage image-transfer target after variants? | Current 3.15/2.64 MB is indefensible; targets in §7 are not measured | Image-hygiene task |
+| ~~What is the actual homepage image-transfer target after variants?~~ **Answered 2026-10-22: 543.5 KB @1440 / 187.9 KB @375 measured** | Current 3.15/2.64 MB is indefensible; targets in §7 are not measured | Closed — §13 |
 | Do BHL/LoC/Unsplash licenses permit commercial use? | No claim is allowed without a source | Asset research; do not use until verified |
 | What are the Wellcome/IA scan terms? | OBI terms cover OBI; the underlying scan may have its own terms | Asset pilot |
 | Should `projects.json` `images[]` count in the Observatory complexity score if the files are not rendered? | Deleting three unserved files would change a displayed number | Data/Observatory owner |
@@ -377,3 +395,119 @@ commercial release. This is honest caution, not a blocker for a portfolio.
    choreography.
 5. Only after 2–4: pilot the OBI telephone plate with the §5.1 kill criteria. If
    it fails, ship A0 (no new assets).
+
+## 13. Shipped: image hygiene (MOTION-01.5, 2026-10-22)
+
+Everything below was measured, not estimated. The whole section is one change:
+generated 16:9 WebP variants for the four featured thumbnails + a re-compressed
+hero set, with the hero accepted only after a full-bleed pixel A/B.
+
+### 13.1 Project variants
+
+Generated from the originals already in `public/images/projects/` (no new
+source asset, D-11). Sharp, WebP effort 6 at quality 88, `.resize(w, h, {fit:
+"cover", position: "center"})` — the crop is 16:9, which `object-cover` was
+already doing in the browser, so the bytes that were never visible are gone.
+
+| Project | Original | 384 | 768 | 1152 | Total served (1× / 2× / 3×) |
+| --- | --- | --- | --- | --- | --- |
+| `retro-game-portfolio` | PNG 1920×1080, 1,873,549 B | 10,218 B (384×216) | 31,174 B (768×432) | 56,372 B (1152×648) | 10,218 / 31,174 / 56,372 |
+| `ijo-plis` | PNG 1856×2561, 567,020 B | 6,442 B | 18,212 B | 31,342 B | 6,442 / 18,212 / 31,342 |
+| `nyatet-duwit` | PNG, 37,340 B | 2,238 B | — | 3,104 B @500 (source is 500 px) | 2,238 / 3,104 |
+| `red-devil-dynamics` | JPG, 25,625 B | 8,466 B | — | 17,918 B @702 (source is 800×395) | 8,466 / 17,918 |
+
+Only two widths exist for `nyatet-duwit` and `red-devil-dynamics` because their
+sources are smaller than 1152 px; upscaling would have added bytes that carry no
+information. Every file is an exact 16:9 crop — 384×216, 500×281, 702×395,
+768×432, 1152×648 — so `height = round(width × 9/16)` is true for all of them.
+
+### 13.2 `sizes` expression
+
+Measured card boxes (`.opencode/probe-card-more.mjs`, `getBoundingClientRect` on
+the rendered `<img>`, all breakpoints with the real grid):
+
+| Viewport | 1440 / 1366 / 1280 | 1100 | 1024 | 900 | 768 | 430 | 375 | 320 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Box width | 361 | 325 | 299 | 263 | 341 (2-col) | 384 | 329 | 274 |
+
+Shipped: `(min-width: 1280px) 361px, (min-width: 768px) 341px, calc(100vw - 46px)`.
+
+The 900–1279 range is described as 341 px while the real box is 263–325 px, i.e.
+the expression deliberately over-declares there. That is not an accident and it
+costs nothing: the candidate steps are 384/768/1152, so 263 px, 325 px, and
+341 px all still select the 384 variant at 1× and the 768 variant at 2×. Verified
+live at 1100 px — `currentSrc` = `retro-game-portfolio-384.webp`, `naturalWidth`
+= 341. A tighter `sizes` would need one more media query to change no bytes.
+
+### 13.3 Explicit dimensions
+
+`width`/`height` come from the largest variant (3× is the ratio the bounding box
+can never exceed), 16:9. The placeholder path (`src` missing) declares the real
+placeholder size, 800×600. A source with no variants declares **no** dimensions:
+inventing a ratio for a file nobody measured is exactly the kind of claim this
+programme refuses (P6). No such card renders today — all four featured projects
+have variants, which the e2e spec pins.
+
+### 13.4 Hero A/B (accepted)
+
+Regenerated from `hero-bg-1920.jpg` (1920×1080, unchanged at 755,619 B) at
+uniform quality 62, effort 6, same dimensions.
+
+| File | Before | After | Delta |
+| --- | --- | --- | --- |
+| `hero-bg-768.webp` | 115,222 B | 77,438 B | −37,784 B (−32.8%) |
+| `hero-bg-1280.webp` | 300,704 B | 208,404 B | −92,300 B (−30.7%) |
+| `hero-bg-1920.webp` | 634,304 B | 447,160 B | −187,144 B (−29.5%) |
+
+Method (`.opencode/probe-hero-ab.mjs`): one build, one preview server; only the
+three `dist/images/hero/*.webp` files are swapped between runs, so a pixel
+difference can only come from the recompression. Fresh browser context per shot
+(no HTTP cache), `reducedMotion: "reduce"` to freeze the entrance, 1440×900 picks
+`hero-bg-1920.webp` and 375×812 picks `hero-bg-768.webp` — asserted from
+`currentSrc`, not assumed.
+
+Quality candidates were also compared against the *source JPEG*, not only against
+each other: MAE 4.771 for the shipped set vs 4.728 for the previous 619 KB WebP —
+statistically the same distance from the original, for 30% fewer bytes. 1:1 crops
+at all three widths are indistinguishable.
+
+Screenshot A/B (whole viewport, the hero image covers it):
+
+| Viewport | Hero-file picked | MAE (hero region) | Max channel Δ (hero region) | Pixels > 8/255 |
+| --- | --- | --- | --- | --- |
+| 1440 | 1920 | **1.544** | 36 | 3.48% |
+| 375 | 768 | **1.382** | 27 | 2.49% |
+
+Whole-viewport MAE is 1.454 / 2.174; the extra comes from the chat FAB and the
+"Lab" pill, which animate on their own clock and therefore differ between two
+shots of the *same* build. Excluding that chrome (bottom-right 260×200 and the
+header) drops the max channel delta from 80/148 to 36/27 — i.e. the largest
+differences in the frame were never the hero image. A 4× amplified diff shows
+only texture noise along leaf edges; no banding in the sky, no structure removed.
+**Accepted.**
+
+### 13.5 Resulting transfer and the JS cost
+
+Image transfer: §2.2 (543.5 KB @1440, 187.9 KB @375 — both from the same method
+as the baseline, so they are comparable).
+
+The change costs **0.4 KB of JS and 0.3 KB of HTML on `/`**, measured A/B by
+rebuilding HEAD's four sources in the same tree (which reproduced the recorded
+baseline exactly: 202.2 / 556.6 / 74.9):
+
+| Metric | Before | After |
+| --- | --- | --- |
+| `/` initial | 202.2 KB | **202.6 KB** (+0.4) |
+| `/` reachable | 556.6 KB | **556.9 KB** (+0.3) |
+| `/` HTML | 74.9 KB | **75.2 KB** (+0.3) |
+| `/work/ai-quranic-tafsir` | 150.6 / 393.0 / 18.5 | 150.8 / 393.2 / 18.5 |
+| `/gallery` | 179.1 / 504.4 / 20.0 | 179.2 / 504.5 / 20.0 |
+| all dist JS | 670.7 KB | 671.0 KB |
+
+Attribution: the `ProjectCardGrid` chunk grew 399 B raw (7,187 → 7,586 B, 3,149 B
+gzip) — the placeholder constant, the dimension derivation, and the `srcset`
+builder. The HTML grows because `srcset`/`sizes`/`width`/`height` now render for
+four cards. The `/work` and `/gallery` shifts are ≤0.2 KB in chunks this change
+does not add: identifiable shared chunks kept their raw size (`data.*.js` is
+7,854 B before and after, different hash), so those two are the rename cascade,
+not new code. **Trade: −2.6 MB of images for +0.4 KB of JS.**

@@ -98,11 +98,12 @@ bun run measure:routes
 
 | Metric | Baseline | Rule |
 | --- | --- | --- |
-| `/` initial | 202.2 KB | must not increase without explanation |
-| `/` reachable | 556.6 KB | same |
-| `/` HTML | 74.8 KB | chapter wrappers may add a few bytes; record |
+| `/` initial | 202.6 KB | must not increase without explanation |
+| `/` reachable | 556.9 KB | same |
+| `/` HTML | 75.2 KB | chapter wrappers and per-card `srcset` add a few bytes; record |
 | Scroll listeners | 16–17 | no new scroll listener from the sprint |
 | MotionScore `/` | B 56–59 | no D/F findings; grade range accepted |
+| Image transfer `/` @1440 / @375 | 543.5 / 187.9 KB | `measure:routes` cannot see this; use `.opencode/probe-images.mjs` |
 
 ### 4.5 Visual-asset gate
 
@@ -120,6 +121,8 @@ not a sprint**; it produces `ASSETS.md` and D-11, not a sprint status.
 | Runtime | 0 new JS, 0 canvas, 0 Lottie/Rive/Spline, 0 parallax/Ken Burns. At most a one-shot reveal. |
 | Rights row | Item URL, license URL, date checked, attribution requirement, and local path recorded in `ASSETS.md`. No claim without a live source. |
 | Separate measurement | `measure:routes` does not see images. Measure `transferSize` via `performance.getEntriesByType("resource")` at 1440 and 375, and record total + top offenders. |
+| Responsive variant | A card thumbnail above ~200 CSS px ships at least two real widths + `sizes`; every variant must be a file that exists (`srcset` points at shipped bytes, never at a guess). |
+| Honest dimensions | `width`/`height` derive from the largest real variant, or from the placeholder; never invent a ratio for a source nobody measured. |
 | Structural order | No asset may be used to fill the Signal Loom gap (M5.0) or the BootSequence wait (M6.0); those are layout/timing defects. |
 
 ## 5. Accessibility and responsiveness

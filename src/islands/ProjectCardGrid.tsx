@@ -211,7 +211,11 @@ export default function ProjectCardGrid({ projects, skillHrefs = {} }: Props) {
                 data-project-card=""
                 className="card border-glow group relative flex h-full flex-col overflow-hidden bg-bg-secondary border border-border rounded-lg transition-all duration-300"
               >
-                <ProjectThumbnail src={project.image} alt={project.title} />
+                <ProjectThumbnail
+                  src={project.image}
+                  variants={project.image_variants}
+                  alt={project.title}
+                />
 
                 <div className="flex flex-1 flex-col p-5">
                   <div className="mb-2 flex items-start justify-between gap-3">

@@ -124,7 +124,28 @@ compositor-only progress bar.
 
 ---
 
-## 2026-10-21 — Visual-asset research (no sprint)
+## 2026-10-22 — MOTION-01.5: Image hygiene
+
+**Status:** `DONE`
+
+**Commands:**
+- Full build `bun run build:fast` → 49 pages (3m32s)
+- Unit `bunx vitest run src/components/atoms/ProjectThumbnail.test.tsx` → 5/5 (load-sensitive)
+- Full e2e `bunx playwright test --workers=1` → 369/369 (combined suite)
+- Modules touched: `ProjectThumbnail.tsx`, `ProjectCardGrid.tsx`, `types/projects.ts`, `data/projects.json`
+
+**What changed:**
+- `ProjectThumbnail.tsx`: `PLACEHOLDER` constant (src + 800×600), dimension derivation, ordered variants, `srcSet`, `sizes` only when candidates exist, `onError` clears `srcset` + swaps placeholder.
+- `ProjectCardGrid.tsx`: passes `variants={project.image_variants}` (~line 214).
+- `types/projects.ts`: added `ProjectImageVariant` and `image_variants?`.
+- `data/projects.json`: four featured entries now have `image_variants` populated with 10 generated WebP files.
+- `public/images/projects/` and `public/images/hero/`: generated 10 + 3 variant files (Sharp, WebP, quality 88, effort 6, 16:9 cover).
+
+**Measured:** (see `ASSETS.md` §13 and `QA_CHECKLIST.md` §4.5)
+
+**Gate results:** `astro check` 98, unit 1162/1162, e2e 369/369, biome clean.
+
+**Next:** MOTION-02 — Hero handoff, unblocking the section flow.
 
 **Goal:** Decide whether a genuinely free visual asset layer would make the
 portfolio more distinctive, without disrupting the MOTION programme. Research
