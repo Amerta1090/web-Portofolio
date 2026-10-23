@@ -151,7 +151,10 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl, metr
   const greeting = isReturning ? "Welcome back" : time.greeting;
 
   return (
-    <section className="relative min-h-[calc(100vh-4rem)] flex flex-col justify-center overflow-hidden z-10">
+    <section
+      className="relative min-h-[calc(100vh-4rem)] flex flex-col justify-center overflow-hidden z-10"
+      data-hero-handoff
+    >
       <motion.picture
         className="absolute inset-0 z-0"
         style={prefersReduced ? {} : { y: bgParallax }}
@@ -191,6 +194,7 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl, metr
       <motion.div
         className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8 relative z-20 flex-1 flex items-center"
         style={prefersReduced ? {} : { y: contentParallax }}
+        data-hero-content
       >
         <div className="flex flex-col items-start gap-6 md:gap-8">
           <motion.div
@@ -303,16 +307,14 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl, metr
         initial={{ opacity: 0 }}
         animate={loaded ? { opacity: 1 } : {}}
         transition={{ delay: duration.slow }}
+        data-hero-scroll-cue
       >
         <span className="text-[10px] text-text-secondary/30">Scroll</span>
         {!prefersReduced && (
           <motion.div
             className="w-px h-8 bg-border"
             animate={{ scaleY: [0.25, 0.75, 0.25] }}
-            transition={{
-              duration: duration.narrative + duration.deliberate,
-              repeat: Number.POSITIVE_INFINITY,
-            }}
+            transition={{ duration: duration.narrative + duration.deliberate }}
           />
         )}
         {prefersReduced && <div className="w-px h-3 bg-border" />}

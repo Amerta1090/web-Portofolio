@@ -328,7 +328,7 @@ requests no original file at 1440 or 375.
 
 ## MOTION-02 — Hero handoff
 
-**Status:** `READY` (dependencies MOTION-01 and MOTION-01.5 are `DONE`)
+**Status:** `DONE` (2026-10-23)
 **Priority:** P1
 **Objective:** Make the hero's entrance end in a deliberate handoff to the first
 chapter instead of stopping at the fold.
@@ -343,11 +343,18 @@ added.
 metrics, no GSAP timeline if CSS scroll-driven can express it.
 
 **Tasks**
-- [ ] M2.1 Measure the current hero entrance timeline and end state.
-- [ ] M2.2 Add an exit/handoff range tied to the hero's own view timeline.
-- [ ] M2.3 Ensure the headline/split-text reduced-motion path stays whole.
-- [ ] M2.4 Add reduced-motion and no-JS evidence to the e2e spec.
-- [ ] M2.5 Verify no added listener, RAF, or payload regression.
+- [x] M2.1 Measure the current hero: 1440×900 inner section is top 64 px /
+      height 836 px; the scroll cue previously repeated and SSR entrance styles
+      left the no-JS hero text at opacity 0.
+- [x] M2.2 Add a named `--hero-handoff` view timeline to the hero section; the
+      cue fades/translates out over `exit 0% → exit 45%` and reaches opacity 0
+      by scrollY 520 px. Hero copy itself has no exit animation.
+- [x] M2.3 Keep reduced-motion's whole headline path; the same preference turns
+      off the cue timeline and the cue's one-shot entrance.
+- [x] M2.4 Add e2e evidence for reduced motion, no-JS hero visibility, and the
+      cue-to-chapter handoff. Existing D-10 tier logic was verified to skip Lenis
+      under reduced motion, so no Lenis implementation change was needed.
+- [x] M2.5 Verify no added listener/RAF and unchanged route payload.
 
 **Acceptance criteria**
 - Hero content is fully visible at rest and after the handoff.
@@ -365,11 +372,35 @@ bunx vitest run src/islands/TimeAwareHero.test.tsx
 bunx playwright test e2e/hero-metrics.spec.ts e2e/motion-chapters.spec.ts --workers=1
 ```
 
+**Completion notes (2026-10-23).** `TimeAwareHero.tsx` marks the hero view
+timeline, keeps its content in a no-JS-visible state while Astro's `ssr`
+attribute is present, and lets the scroll cue's entrance play once. The CSS cue
+exit uses the hero's named timeline with transform/opacity only; the following
+chapter keeps its existing independent entry reveal. The entrance still becomes
+static under reduced motion, and the existing experience-tier detector already
+sets tier 1 for that preference, which prevents the Lenis CDN import (D-10 was
+measured and pinned in e2e; no runtime code was changed for Lenis).
+
+Evidence: hero box 836 px at 1440×900; the cue starts at opacity 1 and is at 0
+by scrollY 520 px; no-JS heading and metric link are visible; reduced motion
+reports `matchMedia=true`, cue `animation-name:none`, and 0 Lenis requests. Unit
+and CSS guard 23/23; combined targeted e2e 18 passed + 1 known Chromium
+reduced-data skip; `astro check` 98 errors / 0 warnings / 82 hints (baseline);
+`build:fast` 49 pages; `/` payload 202.6 / 556.9 / 75.2 KB, unchanged; islands
+16 (7 eager / 9 deferred). No listener or RAF added.
+
+**Deviation:** The no-JS e2e requirement exposed that Motion SSR's inline
+entrance styles hid hero text before hydration. A narrowly scoped CSS override
+now applies only while Astro's `astro-island[ssr]` marker exists; the marker is
+removed on hydration. The first browser probe also showed `view()` on the cue
+would track the cue itself, so the implementation uses a named view timeline
+declared on the hero section, as required by M2.2.
+
 ---
 
 ## MOTION-03 — Career spine choreography
 
-**Status:** `PLANNED`
+**Status:** `READY` (MOTION-01 dependency is `DONE`)
 **Priority:** P1
 **Objective:** Let the career spine read as a timeline being drawn, not a list
 that fades in.
@@ -628,8 +659,8 @@ every gate passes.
 ```
 MOTION-00 (DONE)
   └─ MOTION-01 (DONE)
-       ├─ MOTION-02 (READY)
-       ├─ MOTION-03
+       ├─ MOTION-02 (DONE)
+       ├─ MOTION-03 (READY)
        │    └─ MOTION-05
        ├─ MOTION-04
        ├─ MOTION-06
@@ -640,5 +671,5 @@ MOTION-00 (DONE)
 ```
 
 Priority conflicts resolve in favour of the sprint that removes a measured
-defect or unblocks the most other sprints. MOTION-02 and MOTION-03 are the next
-candidates after MOTION-01.
+defect or unblocks the most other sprints. MOTION-03 is now the next ready
+sprint; MOTION-02 is complete.

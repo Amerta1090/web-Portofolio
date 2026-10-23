@@ -242,3 +242,73 @@ test.describe("Hero headline split (M4.9)", () => {
     expect((await headline.textContent())?.trim().length).toBeGreaterThan(0);
   });
 });
+
+test.describe("MOTION-02 hero handoff", () => {
+  test("the cue follows the hero's exit and settles before the next chapter", async ({ page }) => {
+    await page.goto("/");
+    await waitForIslandHydration(page, "#hero [data-hero-handoff]");
+    const hero = page.locator("#hero [data-hero-handoff]");
+    const cue = hero.locator("[data-hero-scroll-cue]");
+    await expect(hero).toBeAttached();
+    await expect(cue).toBeAttached();
+
+    const atRest = await cue.evaluate((el) => {
+      const style = getComputedStyle(el);
+      return {
+        name: style.animationName,
+        timeline: style.animationTimeline,
+        range: style.animationRange,
+        opacity: Number(style.opacity),
+      };
+    });
+    expect(atRest.name).toBe("hero-cue-exit");
+    expect(atRest.timeline).toBe("--hero-handoff");
+    expect(atRest.range).toContain("exit");
+    expect(atRest.opacity).toBeGreaterThan(0.9);
+
+    await page.evaluate(() => window.scrollTo({ top: 520, behavior: "instant" }));
+    await expect
+      .poll(async () => Number(await cue.evaluate((el) => getComputedStyle(el).opacity)))
+      .toBeLessThan(0.1);
+    await expect(page.locator("#about [data-chapter-head]")).toBeVisible();
+  });
+
+  test("server HTML keeps hero copy visible without JavaScript", async ({ browser }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false });
+    const page = await context.newPage();
+    await page.goto("/");
+
+    const heroContent = page.locator("#hero [data-hero-content]");
+    await expect(heroContent).toBeVisible();
+    await expect(heroContent.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(heroContent.locator("[data-hero-metric]").first()).toBeVisible();
+    const visibility = await heroContent
+      .locator("[data-hero-metric]")
+      .first()
+      .evaluate((el) => ({
+        opacity: getComputedStyle(el).opacity,
+        transform: getComputedStyle(el).transform,
+      }));
+    expect(visibility).toEqual({ opacity: "1", transform: "none" });
+
+    await context.close();
+  });
+
+  test("reduced motion keeps the hero static and skips Lenis", async ({ page }) => {
+    const lenisRequests: string[] = [];
+    page.on("request", (request) => {
+      if (request.url().includes("@studio-freight/lenis")) lenisRequests.push(request.url());
+    });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    await waitForIslandHydration(page, "#hero [data-hero-handoff]");
+
+    expect(await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches)).toBe(
+      true,
+    );
+    await expect(page.locator("#hero [data-hero-content] h1")).toBeVisible();
+    const cue = page.locator("#hero [data-hero-scroll-cue]");
+    expect(await cue.evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
+    expect(lenisRequests).toEqual([]);
+  });
+});

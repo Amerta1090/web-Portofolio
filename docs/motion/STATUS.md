@@ -1,8 +1,8 @@
 # Motion Programme — Status
 
-**Last updated:** 2026-10-22 (MOTION-01.5 image hygiene `DONE`)
-**Branch:** `main` · **HEAD at session start:** `64cd5e0`
-**Active sprint:** none — MOTION-01 and MOTION-01.5 are `DONE`; next is MOTION-02 (`READY`)
+**Last updated:** 2026-10-23 (MOTION-02 `DONE`)
+**Branch:** `main` · **HEAD at session start:** `6cdb495`
+**Active sprint:** none — MOTION-02 is `DONE`; MOTION-03 is `READY`
 
 ## One-paragraph state
 
@@ -56,6 +56,8 @@ JS**; the hero is the only remaining offender.
 | Audit GPU floor ≈ 606 MB; A/B probe showed the page contributes ~0 to it | `motion-score-baseline.md` §M-4.2 | DOCUMENTED |
 | CSS scroll-driven animations: Chromium 115+, Safari 26+, Firefox not supported through 161 (caniuse, 2026-10-21) | `RESEARCH.md` | VERIFIED (external) |
 | `data-reveal-stagger` has exactly one consumer: `CapabilityArchitecture.astro` | `rg 'data-reveal-stagger' src` | VERIFIED |
+| MOTION-02 hero at 1440×900: inner section top 64 px, height 836 px; named `--hero-handoff` cue fades from opacity 1 to 0 by scrollY 520 px | targeted Playwright `MOTION-02 hero handoff` test + Chromium computed styles | VERIFIED (2026-10-23) |
+| MOTION-02: no-JS hero heading/metrics visible; reduced-motion cue has `animation-name: none`; Lenis CDN request count 0 | targeted Playwright `MOTION-02 hero handoff` tests | VERIFIED (2026-10-23) |
 | Homepage image transfer **before** MOTION-01.5: **3,147.0 KB desktop (41 images) / 2,643.0 KB mobile (44 images)**; three files = 95.4% / 94.5% | `performance.getEntriesByType("resource")` + `transferSize`, cold load, full lazy scroll (`.opencode/probe-images.mjs`) | VERIFIED (historical) |
 | Project thumbnails **before** MOTION-01.5: `retro` 1920×1080 / 1,873,549 B, `ijo` 1856×2561 / 567,020 B, rendered 299–341 px wide; raw `<img>`, no `srcset`, no explicit dimensions | `ProjectThumbnail.tsx` + `data/projects.json` + measured card boxes | VERIFIED (historical) |
 | Page height @1440 = **25,542 px**; `#career` 6,015 + `#github` 6,133 = **47.6%** | `.opencode/probe-visual.mjs`, `.opencode/probe-2.mjs` | VERIFIED |
@@ -75,14 +77,20 @@ verified — see `SPRINT_PLAN.md` completion notes and `QA_CHECKLIST.md` §8.
 MOTION-01.5 (image hygiene) is also `DONE`: responsive WebP variants for the four
 featured thumbnails plus a re-encoded hero set, measured in `ASSETS.md` §13 and
 `QA_CHECKLIST.md` §8.
+MOTION-02 (Hero handoff) is `DONE`: the cue uses the hero's named view timeline,
+the hero content stays visible without JavaScript, and the cue entrance plays
+once. Reduced-motion browser evidence confirms the cue is static and Lenis is
+skipped by the existing experience-tier gate. Unit 23/23; targeted e2e 18 passed
++ 1 known reduced-data skip; build 49 pages; `astro check` 98 errors / 0 warnings
+/ 82 hints; `/` payload 202.6 / 556.9 / 75.2 KB, unchanged; islands 16.
 
 **Visual-asset strategy:** research complete (2026-10-21), recorded in
 `ASSETS.md`; policy is D-11. Step 1 of that policy ("fix the assets already
 served") is now done by MOTION-01.5. No external asset was acquired, and none
 should be.
 
-**Next: MOTION-02 — Hero handoff** (`READY` per `SPRINT_PLAN.md`; GSAP/R3F/hero
-scope lives there, untouched by MOTION-01).
+**Next: MOTION-03 — Career spine choreography** (`READY`; dependency MOTION-01
+is `DONE`). Do not start it in the MOTION-02 close-out pass.
 
 ## Open blockers / risks
 
@@ -105,8 +113,9 @@ scope lives there, untouched by MOTION-01).
   surface; not fixed.
 - **DEV-1 `check-budget` red (DOCUMENTED):** the total-dist-JS budget counts
   disjoint route graphs. Use per-route `measure:routes` instead.
-- **Lenis ignores `prefers-reduced-motion` (D-10):** recorded gap; candidate
-  follow-up in MOTION-02.
+- **Lenis and `prefers-reduced-motion` (D-10, RESOLVED):** browser evidence in
+  MOTION-02 confirms the existing experience-tier detector selects tier 1 and
+  skips the Lenis import; see `SPRINT_PLAN.md` completion notes.
 - **Image debt was the largest asset cost (RESOLVED by MOTION-01.5):** the
   homepage went from 3,147.0 KB / 2,643.0 KB of images to **543.5 KB / 187.9 KB**
   for +0.4 KB of JS. The hero is now the single remaining offender
@@ -126,7 +135,7 @@ scope lives there, untouched by MOTION-01).
 
 ## Next action
 
-Start MOTION-02 (Hero handoff) in a fresh session — read its section in
-`SPRINT_PLAN.md` and the D-10 Lenis question first. The image budget is clean
-(543.5 / 187.9 KB), so the hero may be measured against a real baseline instead of
-an inherited 3.15 MB defect. Do not start an asset acquisition inside MOTION-02.
+Start MOTION-03 (Career spine choreography) in the next pass. Read its active
+entry in `SPRINT_PLAN.md`, `STORYBOARD.md`, and the D-02/D-04 constraints before
+editing. MOTION-02 verified that reduced motion already forces experience tier 1,
+which skips Lenis; no Lenis code change was needed.

@@ -26,6 +26,7 @@ const css = read("src/lib/scroll-animations.css");
 const section = read("src/components/molecules/Section.astro");
 const index = read("src/pages/index.astro");
 const layout = read("src/layouts/BaseLayout.astro");
+const hero = read("src/islands/TimeAwareHero.tsx");
 
 /** Extract a balanced `{...}` block that follows `marker`. */
 function blockAfter(source: string, marker: string) {
@@ -79,6 +80,26 @@ describe("scroll-animations.css reveal contract", () => {
     expect(body).toMatch(/entry var\(--chapter-body-end\)/);
   });
 
+  it("ties the hero cue exit to its view timeline with compositor-only motion", () => {
+    const view = blockAfter(css, "@supports (animation-timeline: view())").body;
+    const hero = blockAfter(view, "[data-hero-handoff]").body;
+    const cue = blockAfter(view, "[data-hero-handoff] [data-hero-scroll-cue]").body;
+    const keyframes = blockAfter(view, "@keyframes hero-cue-exit").body;
+
+    expect(hero).toMatch(/view-timeline-name:\s*--hero-handoff/);
+    expect(hero).toMatch(/view-timeline-axis:\s*block/);
+    expect(cue).toMatch(/animation-timeline:\s*--hero-handoff/);
+    expect(cue).toMatch(/animation-range:\s*exit 0% exit 45%/);
+    expect(keyframes).toMatch(/opacity:\s*0/);
+    expect(keyframes).toMatch(/transform:\s*translate\(/);
+    expect(keyframes).not.toMatch(/(^|[;{\s])(width|height|top|left)\s*:/);
+  });
+
+  it("only forces server-rendered hero content visible before Astro hydrates", () => {
+    expect(css).toMatch(/#hero astro-island\[ssr\] \[data-hero-content\]/);
+    expect(css).not.toContain("component-hydrated");
+  });
+
   it("keeps the legacy reveal path for non-chapter containers", () => {
     // Blog/timeline/observatory/capability containers put data-reveal on their
     // own wrappers. Excluding chapters prevents a section from animating twice.
@@ -101,6 +122,7 @@ describe("scroll-animations.css reveal contract", () => {
       expect(media).toMatch(/animation:\s*none\s*!important/);
       expect(media).toMatch(/opacity:\s*1\s*!important/);
       expect(media).toMatch(/transform:\s*none\s*!important/);
+      expect(media).toContain("[data-hero-handoff] [data-hero-scroll-cue]");
     }
   });
 
@@ -135,5 +157,12 @@ describe("progress bar semantics", () => {
     expect(tag).toContain('aria-hidden="true"');
     expect(tag).not.toMatch(/role=/);
     expect(tag).not.toMatch(/aria-label=/);
+  });
+});
+
+describe("hero entrance settles", () => {
+  it("does not loop the scroll cue entrance", () => {
+    expect(hero).toMatch(/data-hero-scroll-cue/);
+    expect(hero).not.toMatch(/\brepeat\s*:/);
   });
 });

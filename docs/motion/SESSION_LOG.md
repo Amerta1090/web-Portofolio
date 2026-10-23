@@ -213,3 +213,53 @@ sprint statuses. MOTION-01 remains `DONE`; MOTION-02 remains `READY`.
 
 **Next:** start MOTION-02. The asset prerequisite (image hygiene) is a separate
 task, documented in `ASSETS.md` §10; do not fold it into a motion sprint.
+
+---
+
+## 2026-10-23 — MOTION-02: Hero handoff
+
+**Goal:** End the hero entrance in a still frame and hand the reader to the first
+chapter with a CSS-only transition tied to the hero's own view timeline.
+
+**Measured before change:** At 1440×900, the inner hero section begins at y=64 px
+and is 836 px tall. The scroll cue repeated its scale animation indefinitely.
+Motion's server-rendered entrance styles also put hero text/evidence at opacity
+0 before hydration, so the no-JS spec now checks visibility rather than only DOM
+presence.
+
+**Changed**
+- `src/islands/TimeAwareHero.tsx`: hero/content/cue hooks; scroll cue entrance is
+  one-shot, then settles. No copy or metrics changed.
+- `src/lib/scroll-animations.css`: named `--hero-handoff` timeline on the hero;
+  cue exits with opacity/transform over `exit 0% → exit 45%`; no-JS server HTML
+  is forced visible only while Astro's `astro-island[ssr]` marker remains.
+- `src/lib/scroll-animations.guard.test.ts`: pins named timeline, compositor-only
+  keyframes, reduced-motion override, and Astro SSR marker contract.
+- `e2e/hero-metrics.spec.ts`: handoff computed behavior, no-JS copy visibility,
+  reduced-motion static cue, and absence of Lenis request.
+
+**Verification**
+- `bunx biome check` on 4 touched product/test files → clean.
+- `bunx vitest run src/lib/scroll-animations.guard.test.ts src/islands/TimeAwareHero.test.tsx`
+  → 23/23.
+- `bunx astro check` → 98 errors / 0 warnings / 82 hints, baseline.
+- `bun run build:fast` → 49 pages (final run 33.89s).
+- Targeted e2e final → 18 passed + 1 known reduced-data skip, 48.0s,
+  `--workers=1`. The new isolated handoff test also passed after fixes.
+- Browser: cue opacity 1 at rest → 0 by scrollY 520; `animation-timeline` is
+  `--hero-handoff`. No-JS heading and evidence are visible. Reduced-motion
+  `matchMedia` is true, cue animation is `none`, and Lenis requests are 0.
+- `bun run measure:routes` → `/` 202.6 / 556.9 / 75.2 KB; `/work`
+  150.8 / 393.2 / 18.5 KB; `/gallery` 179.2 / 504.5 / 20.0 KB; islands stay
+  16 (7 eager / 9 deferred). No listener or RAF was added.
+
+**Decisions / lessons:** The first implementation used `view()` on the cue,
+which tracks the cue rather than its hero; browser evidence drove the named
+timeline on the hero. Astro removes `ssr` on hydration rather than adding a
+`component-hydrated` attribute; the corrected selector now releases after
+hydration. Explicit `from` values are needed because the cue's entrance can
+leave an inline opacity value as the underlying animation state. The existing
+experience-tier script already maps reduced motion to tier 1 and skips Lenis;
+D-10 needed verification, not another runtime guard.
+
+**Next:** MOTION-03 — Career spine choreography (`READY`).

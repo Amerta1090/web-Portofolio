@@ -78,6 +78,8 @@ bunx playwright test --workers=1
   (positive control) and `false` under `no-preference` (negative control).
 - Chapter head/body: `animation-name: none`, `opacity: 1`, no transform, before
   scrolling.
+- Hero scroll cue: `animation-name: none`, `opacity: 1`, no transform under
+  reduced motion; no-JS hero copy and evidence links remain visible.
 - The same static state applies under `prefers-reduced-data: reduce` where the
   engine supports the query.
 
@@ -157,6 +159,21 @@ git diff -- <files>
 - [x] `RESEARCH.md` updated if an assumption became verified. *(§2.1 reduced-motion measured; reduced-data Chromium limitation recorded §2.1/§3)*
 
 ## 8. Sprint results log
+
+### MOTION-02 — 2026-10-23
+
+| Gate | Result |
+| --- | --- |
+| `bun run build:fast` | 49 pages; final run 33.89s. First sandboxed attempt failed on external DNS (`api.fontsource.org`); rerun with network access passed. |
+| `bunx astro check` | 98 errors, 0 warnings, 82 hints = baseline |
+| Biome, touched files | 4 files clean |
+| Unit + CSS guard | 23/23 (`TimeAwareHero.test.tsx` + `scroll-animations.guard.test.ts`) |
+| Targeted e2e, final | 18 passed + 1 known skip; `hero-metrics.spec.ts` + `motion-chapters.spec.ts`, `--workers=1` |
+| Skip reason | Chromium cannot emulate `prefers-reduced-data`; existing source guard covers that path. |
+| Handoff | At 1440×900 hero is top 64 / height 836 px; cue opacity 1 at rest and 0 by scrollY 520, tied to `--hero-handoff`; About chapter head is visible. |
+| No-JS / reduced motion | No-JS heading and evidence link visible; reduced-motion positive control true, cue animation `none`, 0 Lenis CDN requests. |
+| `measure:routes` | `/` 202.6 / 556.9 / 75.2 KB; `/work` 150.8 / 393.2 / 18.5 KB; `/gallery` 179.2 / 504.5 / 20.0 KB; island counts unchanged (16 at `/`). |
+| Listener / RAF | No new listener or RAF; handoff is CSS and cue entrance is finite. |
 
 ### MOTION-01 — 2026-10-21
 

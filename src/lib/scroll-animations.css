@@ -39,6 +39,32 @@
 }
 
 @supports (animation-timeline: view()) {
+  /* The hero cue exits on the hero's own view timeline. The hero's evidence and
+   * copy stay still; the following chapter starts its independent entry reveal
+   * as the hero leaves the viewport. */
+  [data-hero-handoff] {
+    view-timeline-name: --hero-handoff;
+    view-timeline-axis: block;
+  }
+
+  [data-hero-handoff] [data-hero-scroll-cue] {
+    animation: hero-cue-exit linear both;
+    animation-timeline: --hero-handoff;
+    animation-range: exit 0% exit 45%;
+  }
+
+  @keyframes hero-cue-exit {
+    from {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    to {
+      opacity: 0;
+      transform: translate(-50%, 12px);
+    }
+  }
+
   /* ── Chapter reveal ──
    * Tokens are exposed on the chapter so a future section can retune its
    * rhythm without copying selectors. The body starts later in its own entry
@@ -145,7 +171,8 @@
 @media (prefers-reduced-motion: reduce) {
   [data-chapter-head],
   [data-chapter-body],
-  [data-reveal] > * {
+  [data-reveal] > *,
+  [data-hero-handoff] [data-hero-scroll-cue] {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
@@ -159,7 +186,8 @@
 @media (prefers-reduced-data: reduce) {
   [data-chapter-head],
   [data-chapter-body],
-  [data-reveal] > * {
+  [data-reveal] > *,
+  [data-hero-handoff] [data-hero-scroll-cue] {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
@@ -168,4 +196,14 @@
   .scroll-progress-css {
     animation: none !important;
   }
+}
+
+/* Server-rendered hero text must remain available when the island never runs.
+ * Motion's SSR styles describe its entrance start state, so remove those inline
+ * presentation values only while the island is still unhydrated. */
+#hero astro-island[ssr] [data-hero-content],
+#hero astro-island[ssr] [data-hero-content] *,
+#hero astro-island[ssr] [data-hero-scroll-cue] {
+  opacity: 1 !important;
+  transform: none !important;
 }
