@@ -400,12 +400,12 @@ declared on the hero section, as required by M2.2.
 
 ## MOTION-03 — Career spine choreography
 
-**Status:** `READY` (MOTION-01 dependency is `DONE`)
+**Status:** `DONE` (2026-10-24; MOTION-01 dependency was `DONE`)
 **Priority:** P1
 **Objective:** Let the career spine read as a timeline being drawn, not a list
 that fades in.
 **Outcome:** Year groups enter in sequence; the rail's progress is legible; the
-existing sticky/jump behaviour is untouched.
+existing sticky/jump behaviour is untouched. Verified: body exemption (structural, no `!important`), year headings `opacity` only (sticky-safe), per-record `entry 10% entry 60%` via `view()` (document order encodes sequence, no `:nth-child` wall), both `prefers-reduced-motion` and `prefers-reduced-data` off-switch blocks include career selectors.
 
 **Dependencies:** MOTION-01.
 
@@ -414,10 +414,10 @@ existing sticky/jump behaviour is untouched.
 no scroll hijacking, no hiding of events until scrolled.
 
 **Tasks**
-- [ ] M3.1 Add per-year entry ranges derived from document order.
-- [ ] M3.2 Add a rail progress affordance that does not animate layout.
-- [ ] M3.3 Keep deep links, keyboard jump, and sticky pinning intact.
-- [ ] M3.4 Reduced motion: static list, no rail animation.
+- [x] M3.1 Add per-year entry ranges derived from document order.
+- [x] M3.2 Add a rail progress affordance that does not animate layout. (Already present: island `data-career-rule` + `gsap.quickSetter("scaleY")` — pinned, not reimplemented.)
+- [x] M3.3 Keep deep links, keyboard jump, and sticky pinning intact.
+- [x] M3.4 Reduced motion: static list, no rail animation.
 
 **Acceptance criteria**
 - Every event is visible at rest in source order.
@@ -426,8 +426,7 @@ no scroll hijacking, no hiding of events until scrolled.
 - Sticky rail still pins at 96 px on desktop.
 - No new scroll listener.
 
-**Definition of Done / verification:** career-spine spec, accessibility spec,
-build, astro check, payload, diff review.
+**Definition of Done / verification:** career-spine spec 30 passed (18 baseline + 5 choreography + 4 rail + 1 deep-link + 2 reduced-motion), accessibility spec 10 passed, build 49 pages, `astro check` 98 errors/0/82, payload `/` 202.6/556.9/75.2 KB, islands 16 (7e/9d), guard 17/17 with 5/5 mutation teeth (md5 `2eb05179b0d5703eb5be3cdb50618364` identical). No new listener/RAF/React root. **One sprint completed — do not start MOTION-04.**
 
 ---
 

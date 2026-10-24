@@ -120,6 +120,70 @@ function collapsedRecords(page: Page) {
   );
 }
 
+/**
+ * Records whose entry beat has not finished yet.
+ *
+ * `collapsedRecords` above asks a layout question (width/height/display) and is
+ * blind to an element that is fully laid out but still transparent — which is
+ * exactly what a reveal does. This reads the settled state instead: opacity 1
+ * and a zero Y offset, with `fill: forwards` holding that state past the range.
+ * `transform` is the computed matrix, not `"none"`, once a keyframe has run.
+ */
+function unsettledRecords(page: Page) {
+  return page.locator("#career [data-career-spine]").evaluate((spine) =>
+    [...spine.querySelectorAll("li[data-career-kind]")]
+      .filter((node) => {
+        const style = getComputedStyle(node);
+        const offset = style.transform === "none" ? 0 : new DOMMatrixReadOnly(style.transform).m42;
+        return Number(style.opacity) < 1 || Math.abs(offset) > 0.01;
+      })
+      .map((node) => node.getAttribute("data-career-id")),
+  );
+}
+
+/**
+ * Reading state of one year group: its sticky heading and the first record under it.
+ *
+ * Read as one snapshot because the claim is *relative* — the heading settled while
+ * the record below it has not — and two reads separated by a poll could straddle a
+ * scroll commit and compare two different moments.
+ */
+function yearGroupState(page: Page, year: number) {
+  return page.evaluate((groupYear) => {
+    const group = document.querySelector(`#career li[data-career-year='${groupYear}']`);
+    if (!group) throw new Error(`missing year group ${groupYear}`);
+    const read = (node: Element | null) => {
+      if (!node) throw new Error("missing node in year group");
+      const style = getComputedStyle(node);
+      return {
+        opacity: Number(style.opacity),
+        viewportTop: Math.round(node.getBoundingClientRect().top),
+      };
+    };
+    return {
+      heading: read(group.querySelector("h3")),
+      record: read(group.querySelector("li[data-career-kind]")),
+    };
+  }, year);
+}
+
+/** Computed motion state of one element, in the shape every assertion reads. */
+function motionOf(page: Page, selector: string) {
+  return page
+    .locator(selector)
+    .first()
+    .evaluate((node) => {
+      const style = getComputedStyle(node);
+      return {
+        opacity: style.opacity,
+        transform: style.transform,
+        animationName: style.animationName,
+        animationTimeline: style.animationTimeline,
+        animationRange: style.animationRange,
+      };
+    });
+}
+
 test.describe("career spine — server-rendered shape", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
@@ -638,6 +702,40 @@ test.describe("career spine — rail", () => {
     expect(end.drawn).toBeCloseTo(1, 2);
   });
 
+  test("keeps the rail track height constant while the fill moves", async ({ page }) => {
+    // M3.2's "does not animate layout" claim. The fill is `absolute inset-0`
+    // inside a `w-px` track and is scaled with `scaleY`, so the drawn line can
+    // never resize the rail's column and shift the list beside it. Measured as
+    // rect heights at two scroll positions rather than as a source reading:
+    // a `height`-driven implementation would also compute a matrix.
+    const read = () =>
+      page.evaluate(() => {
+        const rule = document.querySelector("#career [data-career-rule]");
+        const track = rule?.parentElement ?? null;
+        return {
+          track: track ? Math.round(track.getBoundingClientRect().height) : null,
+          fill: rule ? Math.round(rule.getBoundingClientRect().height) : null,
+        };
+      });
+
+    const before = await read();
+    expect(before.track).toBeGreaterThan(0);
+    expect(before.fill).toBe(0);
+
+    const target = await page
+      .locator("#career li[data-career-year='2023']")
+      .evaluate((node) => node.getBoundingClientRect().top + window.scrollY - 300);
+    await scrollToInstant(page, target);
+
+    // The fill is written by ScrollTrigger's rAF ticker, so poll for it instead
+    // of reading the previous frame (same reason as the proportional test).
+    await expect.poll(async () => (await read()).fill, { timeout: 8000 }).toBeGreaterThan(0);
+
+    const after = await read();
+    expect(after.track, "the rail's track changed height while the fill moved").toBe(before.track);
+    expect(after.fill).toBeGreaterThan(before.fill);
+  });
+
   test("resolves an event deep link to its own year on arrival", async ({ page }) => {
     // NOTE: this test must perform a real cross-document load. The `rail`
     // describe's `beforeEach` already did `goto("/")`, so a bare
@@ -679,6 +777,136 @@ test.describe("career spine — rail", () => {
   });
 });
 
+test.describe("career spine — choreography (MOTION-03)", () => {
+  test("reveals each record instead of fading the whole chapter body", async ({ page }) => {
+    // The MOTION-01 defect measured on this section: `[data-chapter-body]` wraps
+    // ~6,000 px of records, so its single beat dims and shifts the entire spine
+    // while the reader is already inside it (probe: opacity 0.94 at the section
+    // top, still translating). The fix is structural, so both halves are
+    // asserted: the body is out, the records own the beat.
+    await page.setViewportSize(DESKTOP);
+    await page.goto("/");
+    const sectionTop = await page
+      .locator("#career")
+      .evaluate((node) => node.getBoundingClientRect().top + window.scrollY);
+    await scrollToInstant(page, sectionTop);
+
+    const body = await motionOf(page, "#career [data-chapter-body]");
+    expect(body.animationName).toBe("none");
+    expect(body.opacity).toBe("1");
+    expect(body.transform).toBe("none");
+
+    const first = await motionOf(page, "#career li[data-career-kind]");
+    expect(first.animationName).toBe("reveal-fade-up");
+    expect(first.animationTimeline).toBe("view()");
+    expect(first.animationRange).toBe("entry 10% entry 60%");
+    // The first record is on screen at the section top, so its beat is over.
+    await expect
+      .poll(async () => (await motionOf(page, "#career li[data-career-kind]")).opacity, {
+        timeout: 8000,
+      })
+      .toBe("1");
+
+    // The last record is ~5,000 px below and holds its own start state. That is
+    // the whole point: it has not entered, so nothing has faded it in advance.
+    const last = await page.locator("#career li[data-career-kind]").last();
+    expect(
+      await last.evaluate((node) => node.getBoundingClientRect().top - window.innerHeight),
+    ).toBeGreaterThan(0);
+    expect((await last.evaluate((node) => getComputedStyle(node).opacity)) === "0").toBe(true);
+  });
+
+  test("settles every year heading before the first record under it", async ({ page }) => {
+    // M3.1's ordering claim, measured per group rather than argued from CSS
+    // order. Each heading is parked 4 px above the viewport's bottom edge: its
+    // own `entry` is complete (opacity 1) while the first record below it is
+    // still below the fold (opacity 0). A single shared body beat cannot do
+    // this — it moves the whole spine at once.
+    await page.setViewportSize(DESKTOP);
+    await page.goto("/");
+
+    for (const year of YEARS) {
+      const target = await page
+        .locator(`#career li[data-career-year='${year}'] > h3`)
+        .evaluate((node) => {
+          const rect = node.getBoundingClientRect();
+          return rect.top + window.scrollY - (window.innerHeight - rect.height - 4);
+        });
+      await scrollToInstant(page, target);
+
+      // Polled, not read once: headless Chromium can commit the scroll many
+      // frames before the scroll timeline's style is recomputed, which reads as
+      // "the heading never settled" when it has (the same late-frame trap the
+      // rail tests handle with `expect.poll`).
+      await expect
+        .poll(async () => (await yearGroupState(page, year)).heading.opacity, { timeout: 8000 })
+        .toBe(1);
+
+      const state = await yearGroupState(page, year);
+
+      expect(state.heading.viewportTop, `${year} heading is not at the fold`).toBeGreaterThan(0);
+      expect(state.heading.opacity, `${year} heading did not settle first`).toBe(1);
+      expect(
+        state.record.viewportTop,
+        `${year} first record is not below the fold`,
+      ).toBeGreaterThan(DESKTOP.height - 1);
+      expect(state.record.opacity, `${year} first record settled with its heading`).toBeLessThan(1);
+    }
+  });
+
+  test("settles all 26 records once the reader passes the spine", async ({ page }) => {
+    // "Every event is visible at rest in source order" is a claim about the
+    // settled state, so it is measured after the last record: `fill: forwards`
+    // holds the final keyframe, and the reading line is past every entry range.
+    await page.setViewportSize(DESKTOP);
+    await page.goto("/");
+
+    const target = await page.evaluate(() => {
+      const records = [...document.querySelectorAll("#career li[data-career-kind]")];
+      const last = records[records.length - 1];
+      return last.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.25;
+    });
+    await scrollToInstant(page, target);
+
+    // Polled: entry progress is recomputed on the next frame after the scroll.
+    await expect.poll(() => unsettledRecords(page), { timeout: 8000 }).toEqual([]);
+    expect(await unsettledRecords(page)).toHaveLength(0);
+    // The count is pinned, not derived, so a record that never settles cannot
+    // hide behind a shorter list.
+    await expect(page.locator("#career li[data-career-kind]")).toHaveCount(EVENT_COUNT);
+  });
+
+  test("shows a deep-linked record on arrival instead of fading it in", async ({ page }) => {
+    // M3.3 + the reveal's `forwards` fill: a reader who arrives on
+    // `#career-<id>` is already past that record's entry range when the page
+    // loads, so it must be fully visible without scrolling.
+    await page.setViewportSize(DESKTOP);
+    await page.goto("/");
+    const eventId = await page
+      .locator("#career li[data-career-year='2025'] li[data-career-id]")
+      .first()
+      .getAttribute("data-career-id");
+    // Cross-document load: a bare `goto` from `/` would only fire `hashchange`.
+    await page.goto("/gallery");
+    await page.goto(`/#career-${eventId}`);
+
+    const record = page.locator(`#career-${eventId}`);
+    await expect(record).toBeVisible();
+    await expect
+      .poll(() => motionOf(page, `#career-${eventId}`).then((state) => state.opacity), {
+        timeout: 10_000,
+      })
+      .toBe("1");
+    const placement = await record.evaluate((node) => {
+      const rect = node.getBoundingClientRect();
+      return { top: rect.top, bottom: rect.bottom, height: window.innerHeight };
+    });
+    expect(placement.top).toBeGreaterThanOrEqual(0);
+    expect(placement.top).toBeLessThan(placement.height);
+    expect(placement.bottom).toBeGreaterThan(0);
+  });
+});
+
 test.describe("career spine — reduced motion", () => {
   test("keeps the whole spine and the rail, drops the scrub", async ({ page }) => {
     // `page.emulateMedia`, never `test.use({ reducedMotion })`: on this
@@ -688,6 +916,29 @@ test.describe("career spine — reduced motion", () => {
     await page.setViewportSize(DESKTOP);
     await page.goto("/");
     await waitForRail(page);
+
+    // Positive control for the emulation itself. The fixture that this test
+    // deliberately does not use is ignored silently, so "the preference was not
+    // applied" and "the styles are correct" are indistinguishable without a
+    // read-back (Task 5.2, Q4.2 #1).
+    expect(await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches)).toBe(
+      true,
+    );
+
+    // MOTION-03: the two new career reveals are off switches, not just
+    // non-issues. Read at the top of the page, before the section is scrolled
+    // to, so "opacity 1" cannot be the settled end of a beat that ran anyway.
+    for (const selector of [
+      "#career [data-chapter-body]",
+      "#career li[data-career-year] > h3",
+      "#career li[data-career-kind]",
+    ]) {
+      expect(await motionOf(page, selector), `${selector} still animates`).toMatchObject({
+        animationName: "none",
+        opacity: "1",
+        transform: "none",
+      });
+    }
 
     // M1.3.5: the spine is complete, not degraded into a summary.
     await expect(page.locator("#career li[data-career-kind]")).toHaveCount(EVENT_COUNT);
