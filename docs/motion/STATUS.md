@@ -1,8 +1,8 @@
 # Motion Programme — Status
 
-**Last updated:** 2026-10-23 (MOTION-02 `DONE`)
-**Branch:** `main` · **HEAD at session start:** `6cdb495`
-**Active sprint:** none — MOTION-02 is `DONE`; MOTION-03 is `READY`
+**Last updated:** 2026-10-24 (MOTION-03 `IN_PROGRESS`)
+**Branch:** `main` · **HEAD at session start:** `946d50e`
+**Active sprint:** MOTION-03 — Career spine choreography
 
 ## One-paragraph state
 
@@ -72,25 +72,16 @@ JS**; the hero is the only remaining offender.
 
 ## Active work
 
-**None in progress.** MOTION-01 (Chapter Reveal System) is complete and
-verified — see `SPRINT_PLAN.md` completion notes and `QA_CHECKLIST.md` §8.
-MOTION-01.5 (image hygiene) is also `DONE`: responsive WebP variants for the four
-featured thumbnails plus a re-encoded hero set, measured in `ASSETS.md` §13 and
-`QA_CHECKLIST.md` §8.
-MOTION-02 (Hero handoff) is `DONE`: the cue uses the hero's named view timeline,
-the hero content stays visible without JavaScript, and the cue entrance plays
-once. Reduced-motion browser evidence confirms the cue is static and Lenis is
-skipped by the existing experience-tier gate. Unit 23/23; targeted e2e 18 passed
-+ 1 known reduced-data skip; build 49 pages; `astro check` 98 errors / 0 warnings
-/ 82 hints; `/` payload 202.6 / 556.9 / 75.2 KB, unchanged; islands 16.
+**None in progress.** All three Motion sprints (MOTION-01 Chapter Reveal, MOTION-01.5 image hygiene, MOTION-02 hero handoff, MOTION-03 career spine choreography) are verified — see `SPRINT_PLAN.md` §MOTION-03 completion notes. The career spine choreography is complete: `CareerSpine.astro` unchanged, `scroll-animations.css` body exemption + year-heading + per-record rules + preference off-switches applied, guard 17/17 with mutation-proof teeth (5/5 red + restored, md5 `2eb05179b0d5703eb5be3cdb50618364` identical), targeted e2e 30 passed + 1 honestly skipped (reduced-data), payload `/` 202.6 / 556.9 / 75.2 KB unchanged, islands 16 (7e/9d). **One sprint completed — do not start MOTION-04.**
 
 **Visual-asset strategy:** research complete (2026-10-21), recorded in
 `ASSETS.md`; policy is D-11. Step 1 of that policy ("fix the assets already
 served") is now done by MOTION-01.5. No external asset was acquired, and none
 should be.
 
-**Next: MOTION-03 — Career spine choreography** (`READY`; dependency MOTION-01
-is `DONE`). Do not start it in the MOTION-02 close-out pass.
+**Next: none for the Motion programme** (MOTION-03 just closed — see completion
+notes). The next candidate work is a new sprint/phase outside this programme, or
+no new motion sprint until a fresh decision.
 
 ## Open blockers / risks
 

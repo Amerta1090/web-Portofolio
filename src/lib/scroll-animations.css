@@ -94,6 +94,53 @@
     animation-range: entry var(--chapter-body-start) entry var(--chapter-body-end);
   }
 
+  /* ── Career spine choreography (MOTION-03) ──
+   * `#career` is the one chapter body that is a reading surface, not a block:
+   * 26 records over ~6,000 px. Fading that body dims and shifts the whole spine
+   * while the reader is already inside it, so the body opts out and every record
+   * owns its own beat. Structural selector rather than a section id, so any
+   * future page that puts a spine inside a chapter inherits the same rule.
+   */
+  [data-chapter-body]:has([data-career-spine]) {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Year headings fade, and only fade: they are `position: sticky` from `lg`, so
+   * a transform on the heading would drag the pinned bar as the reader scrolls.
+   * The range is the element's own entry, which means document order already
+   * sets the sequence — an `:nth-child` wall would encode the data order in CSS
+   * and go stale the first time `data/*.json` reorders.
+   */
+  [data-career-year] > h3 {
+    opacity: 0;
+    animation: career-year-in linear forwards;
+    animation-timeline: view();
+    animation-range: entry 0% entry 100%;
+  }
+
+  @keyframes career-year-in {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Records start a little after their heading enters and settle well before the
+   * reading line, so a heading is always fully legible before the first record
+   * beneath it is. */
+  [data-career-kind] {
+    opacity: 0;
+    transform: translateY(16px);
+    animation: reveal-fade-up linear forwards;
+    animation-timeline: view();
+    animation-range: entry 10% entry 60%;
+  }
+
   /* ── Legacy container reveal ──
    * Pages that put `data-reveal` on their own wrapper (blog grids, timeline,
    * capability architecture) keep the single-beat fade. Chapters use the
@@ -171,6 +218,8 @@
 @media (prefers-reduced-motion: reduce) {
   [data-chapter-head],
   [data-chapter-body],
+  [data-career-year] > h3,
+  [data-career-kind],
   [data-reveal] > *,
   [data-hero-handoff] [data-hero-scroll-cue] {
     animation: none !important;
@@ -186,6 +235,8 @@
 @media (prefers-reduced-data: reduce) {
   [data-chapter-head],
   [data-chapter-body],
+  [data-career-year] > h3,
+  [data-career-kind],
   [data-reveal] > *,
   [data-hero-handoff] [data-hero-scroll-cue] {
     animation: none !important;

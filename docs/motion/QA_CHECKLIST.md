@@ -194,3 +194,20 @@ git diff -- <files>
 | Reduced motion | `emulateMedia` + readback: positive and negative controls both pass (`animationName: "none"`, `opacity: 1`, `transform: none` pre-scroll) |
 | E2E full suite | not required by MOTION-01 DoD (targeted runs only) |
 | MotionScore | not run in MOTION-01 (CSS-only, no new listener); next audit in MOTION-09 |
+
+### MOTION-03 — Career spine choreography (2026-10-24)
+
+| Gate | Result |
+| --- | --- |
+| `bun run build:fast` | 49 pages (2m0s) |
+| `bunx astro check` | 98 errors, 0 warnings, 82 hints = baseline; sorted diff empty |
+| Biome, touched files | `scroll-animations.css`, `e2e/career-spine.spec.ts`, `scroll-animations.guard.test.ts` — 1 formatting fix applied, 0 new diagnostics |
+| `validate-data` | OK, GitHub cache non-degenerate |
+| Unit + CSS guard | 17/17 (`scroll-animations.guard.test.ts`, MOTION-03 describe 5/5) |
+| Targeted e2e, final | 30 passed + 1 honestly skipped (`career-spine.spec.ts` + `motion-chapters.spec.ts`, `--workers=1`) |
+| Skip reason | Chromium cannot emulate `prefers-reduced-data`; the CSS rule is enforced by the source guard instead |
+| Mutation teeth (guard) | 5/5 red on the CSS changes; restored with `md5sum 2eb05179b0d5703eb5be3cdb50618364` identical. M6 (body exemption removed) was re-proven at e2e level too: the choreography test went red with `animationName: "reveal-fade-up-body"` |
+| Browser evidence | Year headings opacity 1 at rest (all 4 groups), records reveal per `entry 10% entry 60%`, deep links `#career-<id>` select and announce, rail pins at 96 px, no new scroll listener |
+| `measure:routes` `/` | initial **202.6** / reachable **556.9** / HTML **75.2** KB — flat vs MOTION-02; `/work` 150.8/393.2/18.5; `/gallery` 179.2/504.5/20.0; islands 16 (7e/9d); all dist JS 671.0 KB |
+| Listener / RAF | No new listener or RAF; career reveal is pure CSS |
+| Full e2e suite | not required by MOTION-03 DoD (targeted runs only) |

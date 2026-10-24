@@ -262,4 +262,40 @@ leave an inline opacity value as the underlying animation state. The existing
 experience-tier script already maps reduced motion to tier 1 and skips Lenis;
 D-10 needed verification, not another runtime guard.
 
-**Next:** MOTION-03 — Career spine choreography (`READY`).
+**Next:** MOTION-04 — Evidence card hierarchy (`PLANNED`). The MOTION-03 sprint
+(2026-10-23 → 2026-10-24) is complete.
+
+---
+
+## 2026-10-24 — MOTION-03 — Career spine choreography
+
+**Goal:** Make the career spine read as a timeline being drawn, not a list that
+fades in. Year groups enter in sequence; the rail's progress is legible;
+existing sticky/jump behavior untouched. Restricted CSS reveal to transform/opacity;
+reduced motion/reduced data are real off-switches; no scroll hijacking; evidence
+from data layer; guard lock; no new runtime dependency.
+
+**Completed**
+- Body exemption in `src/lib/scroll-animations.css`: `[data-chapter-body]:has([data-career-spine]) { animation: none; opacity: 1; transform: none; }`
+- Year headings: `[data-career-year] > h3 { animation: career-year-in linear forwards; animation-range: entry 0% entry 100%; }` (opacity-only, sticky-safe)
+- Per-record cards: `[data-career-kind] { animation: reveal-fade-up linear forwards; animation-range: entry 10% entry 60%; }` (entry ranges derived from document order, not `:nth-child`)
+- Both preference blocks include career selectors (`prefers-reduced-motion`, `prefers-reduced-data`) → `animation-name: none`, `opacity: 1`, `transform: none`
+- Guard in `src/lib/scroll-animations.guard.test.ts`: 17 tests (5 MOTION-03 specific) all 17/17, 5 mutation teeth preserved (md5 `2eb05179b0d5703eb5be3cdb50618364` identical), reduced-motion e2e 10 passed / 1 honestly skipped
+- e2e spec `e2e/career-spine.spec.ts`: 30 passed (18 baseline + 5 choreography + 4 rail + 1 deep-link + 2 reduced-motion)
+- Build: `bun run build:fast` 49 pages, `astro check` 98/0/82, lint baseline, payload `/` 202.6/556.9/75.2 KB unchanged, islands 16 (7e/9d)
+- Browser evidence: year headings opacity 1 at rest, records reveal as per entry ranges, deep links `#career-<id>` selects and announces, rail pins at 96 px, no new scroll listeners.
+
+**Exclusions**
+- Career data contract unchanged.
+- No canvas, R3F, full-viewport, new dependencies or routes in editorial sections.
+- No `on*` inline handlers; exactly one `astro-island` for scrub rail, no scripts in section.
+
+**Deviations honored**
+- Heading span: kept pure `<h3>` with `career-year-in` keyframes (no inner span, no transform).
+- Per-element range: using `view()` ranges (entry 10% entry 60%) instead of `:nth-child` index wall (saves from stale data reordering).
+- `prefers-reduced-data` cannot be emulated in Chromium; source-guard enforced only.
+- No ':nth-child' wall: preserve document order from data.
+- `prefers-reduced-data` not emulatable; source guard enforced.
+- No `:nth-child` wall: document order from data preserved.
+
+**Next:** MOTION-04 — Evidence card hierarchy (`PLANNED`). The MOTION-03 sprint (2026-10-23 → 2026-10-24) is complete.

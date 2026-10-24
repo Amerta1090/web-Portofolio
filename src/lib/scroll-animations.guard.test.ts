@@ -27,6 +27,7 @@ const section = read("src/components/molecules/Section.astro");
 const index = read("src/pages/index.astro");
 const layout = read("src/layouts/BaseLayout.astro");
 const hero = read("src/islands/TimeAwareHero.tsx");
+const career = read("src/components/organisms/CareerSpine.astro");
 
 /** Extract a balanced `{...}` block that follows `marker`. */
 function blockAfter(source: string, marker: string) {
@@ -123,6 +124,10 @@ describe("scroll-animations.css reveal contract", () => {
       expect(media).toMatch(/opacity:\s*1\s*!important/);
       expect(media).toMatch(/transform:\s*none\s*!important/);
       expect(media).toContain("[data-hero-handoff] [data-hero-scroll-cue]");
+      expect(media, `${preference} overrides the career headings`).toContain(
+        "[data-career-year] > h3",
+      );
+      expect(media, `${preference} overrides the career records`).toContain("[data-career-kind]");
     }
   });
 
@@ -131,6 +136,75 @@ describe("scroll-animations.css reveal contract", () => {
     // that never ran (Rule 6).
     expect(css).not.toContain("scroll-progress-js");
     expect(layout).not.toContain("scroll-progress-js");
+  });
+});
+
+describe("career spine choreography (MOTION-03)", () => {
+  const view = () => blockAfter(css, "@supports (animation-timeline: view())").body;
+
+  it("takes the spine's chapter body out of the single-beat reveal", () => {
+    // `#career` is a 6,000 px reading surface. The chapter body beat would dim
+    // and translate the whole spine while the reader is already inside it (the
+    // measured MOTION-01 defect: body opacity 0.94 at the section top, still
+    // shifting), so the structural opt-out must set the final state explicitly.
+    const body = blockAfter(view(), "[data-chapter-body]:has([data-career-spine])").body;
+
+    expect(body).toMatch(/animation:\s*none/);
+    expect(body).toMatch(/opacity:\s*1/);
+    expect(body).toMatch(/transform:\s*none/);
+    // Specificity alone beats `[data-chapter-body]`; `!important` here would
+    // also beat the reduced-motion switch and hide a real defect.
+    expect(body).not.toMatch(/!important/);
+  });
+
+  it("fades year headings with opacity only, because they are sticky", () => {
+    const heading = blockAfter(view(), "[data-career-year] > h3").body;
+
+    expect(heading).toMatch(/animation:\s*career-year-in/);
+    expect(heading).toMatch(/animation-timeline:\s*view\(\)/);
+    expect(heading).toMatch(/animation-range:\s*entry 0% entry 100%/);
+    // A transform on a `position: sticky` heading drags the pinned bar with it.
+    expect(heading).not.toMatch(/transform:/);
+
+    const keyframes = blockAfter(css, "@keyframes career-year-in").body;
+    expect(keyframes).toMatch(/opacity:\s*0/);
+    expect(keyframes).toMatch(/opacity:\s*1/);
+    expect(keyframes).not.toMatch(/transform:/);
+  });
+
+  it("gives every record its own entry beat, sequenced by document order", () => {
+    const record = blockAfter(view(), "[data-career-kind]").body;
+
+    expect(record).toMatch(/animation:\s*reveal-fade-up/);
+    expect(record).toMatch(/animation-timeline:\s*view\(\)/);
+    expect(record).toMatch(/animation-range:\s*entry 10% entry 60%/);
+    expect(record).toMatch(/transform:\s*translateY\(/);
+
+    // The timeline is per element, so the reading order is the document order.
+    // An `:nth-child` index wall would duplicate that order in CSS and go stale
+    // the first time `projects`/`certifications` reorder (the same trap the
+    // contract tests exist for).
+    expect(view()).not.toMatch(/\[data-career-(?:year|kind)\][^{]*:nth-child/);
+  });
+
+  it("animates only compositor properties in every career rule", () => {
+    const blocks = [
+      blockAfter(view(), "[data-chapter-body]:has([data-career-spine])").body,
+      blockAfter(view(), "[data-career-year] > h3").body,
+      blockAfter(view(), "[data-career-kind]").body,
+      blockAfter(css, "@keyframes career-year-in").body,
+    ];
+
+    for (const block of blocks) {
+      expect(block).not.toMatch(/(^|[;{\s])(width|height|top|left|right|margin|padding)\s*:/);
+    }
+  });
+
+  it("hooks the choreography to markup that actually exists", () => {
+    // `:has([data-career-spine])` and `> h3` are structural assumptions; a
+    // wrapper rename would silently drop both rules back to the body beat.
+    expect(career).toMatch(/data-career-spine/);
+    expect(career).toMatch(/<li data-career-year=\{row\.year\}[^>]*>\s*<h3/);
   });
 });
 
