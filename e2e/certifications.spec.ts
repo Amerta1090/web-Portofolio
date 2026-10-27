@@ -139,12 +139,13 @@ test.describe("certifications bento", () => {
   });
 
   test("a closed group still opens natively, no JavaScript required", async ({ page }) => {
-    const tile = page.locator(`${SECTION} [data-cert-issuer]`).first();
+    // The first tile is open (`open` attr); pick the second to test the native
+    // toggle from a genuinely closed state.
+    const tile = page.locator(`${SECTION} [data-cert-issuer]`).nth(1);
     const summary = tile.locator("summary");
-    expect(await tile.evaluate((el) => el instanceof HTMLDetailsElement && el.open)).toBe(false);
-
+    expect(await tile.evaluate((el) => (el as HTMLDetailsElement).open)).toBe(false);
     await summary.click();
-    expect(await tile.evaluate((el) => el instanceof HTMLDetailsElement && el.open)).toBe(true);
+    expect(await tile.evaluate((el) => (el as HTMLDetailsElement).open)).toBe(true);
     await expect(tile.locator("[data-cert-entry]").first()).toBeVisible();
   });
 
