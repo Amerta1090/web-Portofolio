@@ -367,3 +367,141 @@ test.describe("responsive thumbnails (MOTION-01.5)", () => {
     expect(originals).toEqual([]);
   });
 });
+
+// MOTION-04 — evidence card hierarchy.
+//
+// `#projects` is four pieces of evidence, not one rectangle. The chapter body
+// used to fade all four cards in as a single block; now each card owns a
+// `view()` beat, and the *order* comes from the data (`--project-card-order`,
+// lead card = 0), never from a `:nth-child` wall that would go stale on a
+// reorder. Two defects are pinned here at the same time, because they share one
+// cause: `Section.astro` used to ship `overflow-hidden`, which made every
+// section a scroll container and degenerated nested `view()` timelines to
+// `progress: 1` — so no card (and no chapter body) ever animated. `overflow:
+// clip` clips the same pixels without a scrollport.
+const WRAPPERS = "#projects [data-project-card-reveal]";
+const CHIPS = "#projects [data-filter-chip]";
+
+/** Scroll offset at which a card wrapper first reads as fully opaque. */
+async function settleOffsets(page: import("@playwright/test").Page, indices: number[]) {
+  return page.evaluate(async (wanted) => {
+    const wrappers = Array.from(
+      document.querySelectorAll<HTMLElement>("#projects [data-project-card-reveal]"),
+    );
+
+    const frame = () =>
+      new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    const settleOffset = async (el: HTMLElement) => {
+      const opacityAt = async (y: number) => {
+        window.scrollTo({ top: y, behavior: "instant" });
+        await frame();
+        return Number.parseFloat(getComputedStyle(el).opacity);
+      };
+
+      // Document offsets are constant while the page scrolls, so one read is
+      // enough; `entry 0%` starts with the wrapper's top at the viewport bottom.
+      const rect = el.getBoundingClientRect();
+      const top = rect.top + window.scrollY;
+      let low = Math.floor(top - window.innerHeight);
+      let high = Math.ceil(low + rect.height + 80);
+      if ((await opacityAt(high)) < 0.99) return null;
+
+      // Opacity is monotonic in scroll offset for a linear view() timeline, so
+      // a bisection finds the crossing in ~9 samples instead of ~120 stepped
+      // ones (a stepped scan measured 0.99 at the same offsets but took 14s).
+      while (high - low > 2) {
+        const mid = Math.floor((low + high) / 2);
+        if ((await opacityAt(mid)) >= 0.99) high = mid;
+        else low = mid;
+      }
+      return high;
+    };
+
+    // Both offsets come from one atomic pass: hydrating the filter chips inserts
+    // a fieldset above the grid (~45px), and measuring one card before that
+    // reflow and the next after it would read as a fake 80px gap.
+    const offsets: (number | null)[] = [];
+    for (const index of wanted) {
+      const el = wrappers[index];
+      offsets.push(el ? await settleOffset(el) : null);
+    }
+    return offsets;
+  }, indices);
+}
+
+test("clipped chapters clip without becoming scroll containers", async ({ page }) => {
+  await page.goto("/");
+  const overflow = await page.evaluate(() =>
+    ["#projects", "#skills", "#career", "#about"].map((selector) => {
+      const el = document.querySelector(selector);
+      if (!el) return { selector, overflow: "missing" };
+      return { selector, overflow: getComputedStyle(el).overflow };
+    }),
+  );
+
+  for (const chapter of overflow) {
+    expect(chapter.overflow, `${chapter.selector} overflow`).toBe("clip");
+  }
+});
+
+test("the project chapter body is not faded as one block", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(CARDS)).toHaveCount(4);
+  await expect(page.locator(WRAPPERS)).toHaveCount(4);
+
+  const body = await page.locator("#projects [data-chapter-body]").evaluate((el) => {
+    const cs = getComputedStyle(el);
+    return { animationName: cs.animationName, opacity: cs.opacity };
+  });
+  expect(body.animationName).toBe("none");
+  expect(body.opacity).toBe("1");
+
+  // Order is data, published as a custom property by the island.
+  const wrappers = await page.locator(WRAPPERS).evaluateAll((nodes) =>
+    nodes.map((node) => ({
+      order: getComputedStyle(node).getPropertyValue("--project-card-order").trim(),
+      primary: node.hasAttribute("data-project-primary"),
+      animation: getComputedStyle(node).animationName,
+    })),
+  );
+  expect(wrappers.map((wrapper) => wrapper.order)).toEqual(["0", "1", "2", "3"]);
+  expect(wrappers.filter((wrapper) => wrapper.primary)).toHaveLength(1);
+  expect(wrappers[0].primary).toBe(true);
+  for (const wrapper of wrappers) expect(wrapper.animation).toBe("reveal-fade-up");
+});
+
+test("the lead card settles before its row neighbour", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 720 });
+  await page.goto("/");
+  await expect(page.locator(WRAPPERS)).toHaveCount(4);
+  // Wait for hydration before measuring: the filter fieldset appears above the
+  // grid once React attaches, so any measurement straddling that reflow would
+  // report a gap that is layout, not choreography.
+  await waitForIslandHydration(page, "[data-project-card]");
+  await expect(page.locator(CHIPS)).toHaveCount(6);
+
+  // Cards 0–2 share a row, so their view() timelines start together; the order
+  // token (8% of the beat ≙ ~37px here) is the only thing sequencing them.
+  const [lead, neighbour] = await settleOffsets(page, [0, 1]);
+  if (lead === null || neighbour === null || neighbour === undefined) {
+    throw new Error(`no settle offset: lead=${lead} neighbour=${neighbour}`);
+  }
+
+  expect(lead).toBeLessThan(neighbour);
+  expect(neighbour - lead).toBeGreaterThanOrEqual(24);
+  expect(neighbour - lead).toBeLessThanOrEqual(52);
+
+  // Mid-flight proof that the pair is not a single beat: 12px before the
+  // neighbour settles, the lead is already fully opaque.
+  const mid = await page.evaluate(async (y) => {
+    const wrappers = Array.from(
+      document.querySelectorAll<HTMLElement>("#projects [data-project-card-reveal]"),
+    );
+    window.scrollTo({ top: y, behavior: "instant" });
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    return wrappers.slice(0, 2).map((el) => Number.parseFloat(getComputedStyle(el).opacity));
+  }, neighbour - 12);
+
+  expect(mid[0]).toBe(1);
+  expect(mid[1]).toBeLessThan(1);
+});

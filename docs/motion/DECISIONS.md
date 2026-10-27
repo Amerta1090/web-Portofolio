@@ -257,3 +257,30 @@ choreography must not depend on an external asset. Any future asset addition
 needs its own measured image budget (separate from `measure:routes`), a caption
 test, and a row in `ASSETS.md`. The decision does not change the motion sprint
 scope; it adds prerequisites to MOTION-05/06 and a possible post-programme pilot.
+
+## D-12 — Section overflow is `clip`, never `hidden`
+
+**Decision (2026-10-27, MOTION-04).** `Section.astro` clips with
+`overflow: clip`. No `clip` prop exists, and no section may reintroduce
+`overflow: hidden`.
+
+**Why.** `overflow: hidden` establishes a scroll container. Two measured
+consequences on this site: `position: sticky` inside a section resolves against
+the section instead of the viewport (career rail stopped pinning), and every
+`view()` timeline inside it degenerates to `playState: "finished"`,
+`progress: 1`, `opacity: 1` at all scroll offsets — the reveal is installed but
+never runs, so it fails silently. `overflow: clip` clips the box without creating
+a scroll container; sticky pins at 96 px and the timelines run.
+
+**Alternatives considered.**
+- *Keep `overflow: hidden` and opt sections out one by one* — that is what the
+  `clip` prop did, and it left every other clipped section's reveal inert. The
+  bug was in the shared primitive, not in the pages.
+- *Remove clipping entirely* — decorative bleed would escape the section; clip
+  is wanted, just not the scroll container that came with it.
+
+**Consequences.** A chapter body whose component owns its own beats opts out of
+the block reveal structurally (`:has()`), not by unclipping the section. The
+guard test pins both the `overflow-clip` declaration and the absence of the
+`clip` prop; the e2e test asserts `overflow: clip` computed and that scrolling
+the section leaves `scrollTop` at 0.

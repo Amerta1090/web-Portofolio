@@ -141,6 +141,52 @@
     animation-range: entry 10% entry 60%;
   }
 
+  /* ── Evidence card hierarchy (MOTION-04) ──
+   * `#projects` is a grid of four evidence cards. The chapter-body beat faded
+   * all four in as one rectangle, which said "one block of content" about four
+   * separate pieces of evidence. The body opts out with the same structural
+   * rule the career spine uses, and every card owns a beat on its own view
+   * timeline.
+   *
+   * Order comes from the island as `--project-card-order` (0 = the lead card),
+   * never from `:nth-child`: a child-index wall would encode the data order in
+   * CSS and go stale the first time `data/projects.json` reorders (the trap
+   * MOTION-03 documented). Cards share a row, so their own `view()` timelines
+   * start together; the order token is what makes the lead card settle first.
+   */
+  [data-chapter-body]:has([data-project-grid]) {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  [data-project-grid] {
+    --card-beat-start: 0%;
+    --card-beat-span: 30%;
+    --card-order-step: 8%;
+  }
+
+  [data-project-card-reveal] {
+    opacity: 0;
+    transform: translateY(16px);
+    animation: reveal-fade-up linear forwards;
+    animation-timeline: view();
+    animation-range: entry
+      calc(var(--card-beat-start) + var(--project-card-order, 0) * var(--card-order-step)) entry
+      calc(var(--card-beat-span) + var(--project-card-order, 0) * var(--card-order-step));
+  }
+
+  /* A filter interaction *replaces* the entry choreography. The reader is
+   * already at the grid, so re-running the scroll beat would be a second
+   * animation: the FLIP's opacity tween wins while it runs, then the card snaps
+   * back to whatever reveal progress the reflow gave it. Settling the wrappers
+   * leaves exactly one animation — the FLIP. */
+  [data-project-grid][data-project-revealed] [data-project-card-reveal] {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
   /* ── Legacy container reveal ──
    * Pages that put `data-reveal` on their own wrapper (blog grids, timeline,
    * capability architecture) keep the single-beat fade. Chapters use the
@@ -220,6 +266,7 @@
   [data-chapter-body],
   [data-career-year] > h3,
   [data-career-kind],
+  [data-project-card-reveal],
   [data-reveal] > *,
   [data-hero-handoff] [data-hero-scroll-cue] {
     animation: none !important;
@@ -237,6 +284,7 @@
   [data-chapter-body],
   [data-career-year] > h3,
   [data-career-kind],
+  [data-project-card-reveal],
   [data-reveal] > *,
   [data-hero-handoff] [data-hero-scroll-cue] {
     animation: none !important;

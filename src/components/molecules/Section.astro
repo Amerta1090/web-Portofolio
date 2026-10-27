@@ -18,22 +18,6 @@ export interface Props {
    * that put `data-reveal` on their own containers keep the legacy path.
    */
   chapter?: boolean;
-  /**
-   * Clip overflowing content to the section's box.
-   *
-   * `true` by default, which is what every section has always done. But
-   * `overflow: hidden` makes the section a **scroll container**, and `position:
-   * sticky` resolves against the nearest scrollport — so a sticky descendant of a
-   * clipping section never pins: it scrolls away with the page, silently, with its
-   * computed `position` still saying `sticky`. Measured on `#career`: the rail's
-   * wrapper tracked scroll 1:1 (371 → −29 → −429 → −829) instead of holding 96px,
-   * and the four year headings never reached their 80px pin.
-   *
-   * Pass `false` for a section whose content needs to pin to the viewport.
-   * Nothing inside a `Section` relies on the clip for legibility, so this is a
-   * layout decision for the caller rather than a safety net worth defaulting on.
-   */
-  clip?: boolean;
 }
 
 const {
@@ -44,10 +28,27 @@ const {
   class: className,
   ariaLabel,
   chapter = false,
-  clip = true,
 } = Astro.props;
 
-const cls = `py-16 md:py-32 relative ${clip ? "overflow-hidden " : ""}container-query-section ${variant === "alt" ? "bg-bg-secondary border-y border-border" : ""} ${className ?? ""}`;
+// `overflow: clip`, never `overflow: hidden`: both clip the same pixels, but
+// `hidden` also makes the section a **scroll container**, and two things resolve
+// against the nearest scrollport:
+//
+// - `position: sticky` descendants stop pinning (they scroll away with the page
+//   while their computed `position` still says `sticky`). Measured on `#career`
+//   in MOTION-03: the rail's wrapper tracked scroll 1:1 (371 → −29 → −429 →
+//   −829) instead of holding 96px.
+// - `animation-timeline: view()` descendants lose their timeline. A section that
+//   never scrolls yields a degenerate range, so every reveal inside it reports
+//   `playState: "finished"` and sits at its `to` keyframe — the chapter reveal
+//   system was silently inert in every clipped section. Measured in MOTION-04:
+//   with `overflow: hidden` on `#projects`, the card wrapper read `opacity: 1 /
+//   progress: 1` at every scroll offset; `overflow: clip` on the same element
+//   restored the beat (0 → 0.115 → 0.543 → 0.971 → 1 across 200 px of scroll).
+//
+// Nothing inside a `Section` relies on being unclipped, so clipping stays the
+// default and there is no per-section escape hatch to keep in sync.
+const cls = `py-16 md:py-32 relative overflow-clip container-query-section ${variant === "alt" ? "bg-bg-secondary border-y border-border" : ""} ${className ?? ""}`;
 const chapterAttr = chapter ? { "data-chapter": "" } : {};
 const headAttr = chapter ? { "data-chapter-head": "" } : {};
 const bodyAttr = chapter ? { "data-chapter-body": "" } : {};

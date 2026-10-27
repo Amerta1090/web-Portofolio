@@ -1,8 +1,8 @@
 # Motion Programme — Status
 
-**Last updated:** 2026-10-24 (MOTION-03 `IN_PROGRESS`)
-**Branch:** `main` · **HEAD at session start:** `946d50e`
-**Active sprint:** MOTION-03 — Career spine choreography
+**Last updated:** 2026-10-27 (MOTION-04 `DONE`)
+**Branch:** `main` · **HEAD at session start:** `bc807e6`
+**Active sprint:** none — MOTION-04 (evidence card hierarchy) is closed; do not start MOTION-05
 
 ## One-paragraph state
 
@@ -17,9 +17,23 @@ are explicit chapters (head settles before body via separate `animation-range`
 tokens), reduced motion (and reduced data, where the engine supports the query)
 is a true `animation: none` off switch, and the progress bar runs on the
 compositor via `transform: scaleX()` as a decorative `aria-hidden` element.
-Verified: guard 9/9 (teeth proven by 2 CSS mutations), targeted e2e 25 passed +
-1 honestly skipped (Chromium cannot emulate `prefers-reduced-data`) + 18/18
-career-spine, payload flat, islands unchanged at 16 (7e/9d). **Visual-asset
+MOTION-02 gave the hero a named `--hero-handoff` cue that fades to 0 by scrollY
+520, and MOTION-03 sequenced the career spine with per-year and per-record
+ranges. **MOTION-04 closed the project grid:** each card now owns a `view()` beat
+sequenced by `--project-card-order` from data (lead card = 0, never
+`:nth-child`), the chapter body is exempt so the grid never fades as one
+rectangle, and filtering replaces the reveal with a settled state so the WAAPI
+FLIP is the only animation left. It also fixed a latent site-wide defect:
+`Section.astro` used `overflow: hidden`, which made every section a scroll
+container — breaking sticky and degenerating every `view()` timeline inside it
+(measured `playState: "finished"`, `progress: 1`, `opacity: 1` at all offsets,
+so the reveal was silently inert). It is now `overflow: clip`, and the `clip`
+prop was deleted with its last consumer.
+MOTION-04 verification: guard 23/23 (5 new tests, teeth proven by 6/6
+mutations), unit 1176/1176, full e2e 381 passed + 1 honestly skipped (Chromium
+cannot emulate `prefers-reduced-data`), lead card settles ~37 px ahead of its row
+neighbour, payload flat at 202.7 / 557.1 / 75.3 KB, islands unchanged at 16
+(7e/9d). **Visual-asset
 research (2026-10-21) found a larger problem than decoration:** the homepage
 ships **3,147.0 KB desktop / 2,643.0 KB mobile** of images, **95% from three
 files**, and the strategy is evidence-first with no new external layer (D-11).
@@ -43,8 +57,17 @@ JS**; the hero is the only remaining offender.
 | Four featured thumbnails ship 16:9 WebP variants (10 files, 2,238 B @384 to 56,372 B @1152), `srcset` ascending, `sizes` from measured boxes (361/341/`100vw−46px`), explicit `width`/`height` from the largest variant | `data/projects.json`, `ProjectThumbnail.tsx`, `e2e/project-cards.spec.ts` | VERIFIED |
 | Hero set re-encoded at quality 62: 768 77,438 B · 1280 208,404 B · 1920 447,160 B (−29.5% at the widest); A/B MAE 1.544 @1440 / 1.382 @375, max channel Δ 36 / 27 | `.opencode/probe-hero-ab.mjs`, `ASSETS.md` §13.4 | VERIFIED |
 | Image transfer is still measured outside `measure:routes` (JS only), so it needs its own probe at 1440 and 375 | script source + §4.5 of `QA_CHECKLIST.md` | VERIFIED |
-| Full e2e suite after MOTION-01.5 = 369 tests, `--workers=1`, 0 failed | `bunx playwright test --workers=1` | VERIFIED |
-| Unit suite after MOTION-01.5 = 1162 tests / 102 files (HEAD 1157/101 + 5 `ProjectThumbnail.test.tsx`) | `bunx vitest run` | VERIFIED |
+| Full e2e suite after MOTION-01.5 = 369 tests, `--workers=1`, 0 failed | `bunx playwright test --workers=1` | VERIFIED (historical) |
+| Unit suite after MOTION-01.5 = 1162 tests / 102 files (HEAD 1157/101 + 5 `ProjectThumbnail.test.tsx`) | `bunx vitest run` | VERIFIED (historical) |
+| MOTION-04 shipped: per-card `view()` beats (`--card-beat-start/span`, `--card-order-step`, `--project-card-order` from data), chapter body exempt, filter settle rule | `src/lib/scroll-animations.css`, `ProjectCardGrid.tsx`, guard describe `evidence card hierarchy (MOTION-04)` 5/5 | VERIFIED (2026-10-27) |
+| `Section` now clips with `overflow: clip`: sections are not scroll containers, sticky still pins at 96 px (depths 400/1200/2400), and `view()` timelines are no longer degenerate | `e2e/project-cards.spec.ts` "clipped chapters clip without becoming scroll containers"; `.opencode/probe-sticky-clip.mjs` | VERIFIED (2026-10-27) |
+| Lead card settles ~37 px before its row neighbour (lead fully opaque while neighbour is `0.74`); order token, not `:nth-child` | `e2e/project-cards.spec.ts` "the lead card settles before its row neighbour" (atomic bisection) | VERIFIED (2026-10-27) |
+| Filtering replaces the reveal: wrappers compute `animation: none`, `opacity: 1`, `transform: none`; the WAAPI FLIP is the only animation | `e2e/project-filter.spec.ts` "filtering settles the card entry beats…" | VERIFIED (2026-10-27) |
+| Reduced motion stops both animations: entry beat `animation-name: none` and `Element.animate` count 0 | `e2e/project-filter.spec.ts` via `page.emulateMedia` + `matchMedia` readback | VERIFIED (2026-10-27) |
+| Payload after MOTION-04 `/` = 202.7 / 557.1 / 75.3 KB (+0.1 / +0.2 / +0.1 vs MOTION-03, new island logic); islands 16 (7e/9d); all dist JS 671.2 KB / 102 files | `bun run measure:routes` | VERIFIED (2026-10-27) |
+| Full e2e suite after MOTION-04 = 382 tests / 35 files (`--list`), 381 passed + 1 skipped | `bunx playwright test --workers=1` | VERIFIED (2026-10-27) |
+| Unit suite after MOTION-04 = 1176 tests / 102 files | `bunx vitest run` | VERIFIED (2026-10-27) |
+| `astro check` = 98 errors, 0 warnings, 82 hints | `bunx astro check` | VERIFIED (2026-10-27) |
 | Full e2e suite after MOTION-01 ran targeted only (motion 8, career 18, nav+hero+craft 17); suite baseline stays 358/34 | `playwright --list` history | DOCUMENTED |
 | Homepage has 10 sections: hero, about, systems-in-motion, career, projects, creative-lab, skills, certifications, github, contact | `src/pages/index.astro` `sectionIds` | VERIFIED |
 | `astro check` = 98 errors, 0 warnings, 82 hints | `bunx astro check` | VERIFIED |
@@ -72,14 +95,23 @@ JS**; the hero is the only remaining offender.
 
 ## Active work
 
-**None in progress.** All three Motion sprints (MOTION-01 Chapter Reveal, MOTION-01.5 image hygiene, MOTION-02 hero handoff, MOTION-03 career spine choreography) are verified — see `SPRINT_PLAN.md` §MOTION-03 completion notes. The career spine choreography is complete: `CareerSpine.astro` unchanged, `scroll-animations.css` body exemption + year-heading + per-record rules + preference off-switches applied, guard 17/17 with mutation-proof teeth (5/5 red + restored, md5 `2eb05179b0d5703eb5be3cdb50618364` identical), targeted e2e 30 passed + 1 honestly skipped (reduced-data), payload `/` 202.6 / 556.9 / 75.2 KB unchanged, islands 16 (7e/9d). **One sprint completed — do not start MOTION-04.**
+**None in progress.** All four Motion sprints (MOTION-01 Chapter Reveal,
+MOTION-01.5 image hygiene, MOTION-02 hero handoff, MOTION-03 career spine,
+MOTION-04 evidence card hierarchy) are verified — see `SPRINT_PLAN.md`
+§MOTION-04 completion notes. MOTION-04 is complete: the grid holds one reveal
+wrapper per card (order from data), the chapter body is exempt, filtering
+replaces the reveal with a settled state, reduced motion stops both the beat and
+the FLIP, and the site-wide `overflow: hidden` → `overflow: clip` defect is
+fixed. Guard 23/23, unit 1176/1176, full e2e 381 passed + 1 honestly skipped,
+payload `/` 202.7 / 557.1 / 75.3 KB, islands 16 (7e/9d). **One sprint
+completed — do not start MOTION-05.**
 
 **Visual-asset strategy:** research complete (2026-10-21), recorded in
 `ASSETS.md`; policy is D-11. Step 1 of that policy ("fix the assets already
 served") is now done by MOTION-01.5. No external asset was acquired, and none
 should be.
 
-**Next: none for the Motion programme** (MOTION-03 just closed — see completion
+**Next: none for the Motion programme** (MOTION-04 just closed — see completion
 notes). The next candidate work is a new sprint/phase outside this programme, or
 no new motion sprint until a fresh decision.
 
@@ -126,7 +158,10 @@ no new motion sprint until a fresh decision.
 
 ## Next action
 
-Start MOTION-03 (Career spine choreography) in the next pass. Read its active
-entry in `SPRINT_PLAN.md`, `STORYBOARD.md`, and the D-02/D-04 constraints before
-editing. MOTION-02 verified that reduced motion already forces experience tier 1,
-which skips Lenis; no Lenis code change was needed.
+**Stop here.** MOTION-04 is closed; do not start MOTION-05 in this pass. When the
+programme resumes, read the MOTION-05 entry in `SPRINT_PLAN.md` with
+`STORYBOARD.md` and the D-02/D-04 constraints before editing. Carry-over facts
+worth knowing first: `Section` now uses `overflow: clip` (a section is not a
+scroll container), `view()` timelines inside chapters work, reduced motion is an
+`animation: none` off switch, and the full-suite harness uses arrival polling
+(`arriveTop`) rather than stability polling.

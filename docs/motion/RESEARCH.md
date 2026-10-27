@@ -12,7 +12,7 @@ Labelled evidence: `VERIFIED` = read/measured this session with a named source;
 | --- | --- | --- |
 | Homepage | 10 sections in document order: `hero`, `about`, `systems-in-motion`, `career`, `projects`, `creative-lab`, `skills`, `certifications`, `github`, `contact` | VERIFIED (`src/pages/index.astro`) |
 | Hero | `TimeAwareHero.tsx`, `client:idle`, GSAP entrance + SplitText (hero only), hero evidence row from `SiteFacts.github` | VERIFIED |
-| Chapters | Nine `Section` instances with `data-reveal`; `#career` passes `clip={false}` because `overflow: hidden` breaks sticky | VERIFIED |
+| Chapters | Nine `Section` instances with `data-reveal`; `Section.astro` clips with `overflow: clip`, so a section is **not** a scroll container (sticky works and `view()` timelines do not degenerate). Previously `overflow: hidden` + a `clip` prop on `#career`; both removed 2026-10-27 | VERIFIED (MOTION-04) |
 | Other pages using `data-reveal` | blog index, blog tag, timeline, skills, observatory, projects index (via Section without reveal) | VERIFIED (`rg 'data-reveal' src/pages src/components`) |
 | Stagger | `data-reveal-stagger` only on `CapabilityArchitecture.astro` `<ol class="cap-stages">` with an 8-child `nth-child` table | VERIFIED |
 
@@ -95,6 +95,14 @@ Labelled evidence: `VERIFIED` = read/measured this session with a named source;
   as partial.
 - Consequence: the technique is an enhancement only. All hiding rules stay inside
   `@supports`; unsupported browsers see the final state.
+- **An ancestor with `overflow: hidden` is a scroll container** (CSS Overflow 3:
+  the computed value `hidden` establishes a scroll container, unlike `clip`). A
+  `view()` timeline inside it degenerates: measured on the real site 2026-10-27,
+  `playState: "finished"`, `progress: 1`, `opacity: 1` at every scroll offset —
+  the reveal looks installed but never runs, and `position: sticky` resolves
+  against the section instead of the viewport. `overflow: clip` clips without
+  creating a scroll container and fixes both. Any section-level `overflow` in
+  this repo must therefore be `clip`.
 
 **Sources:** caniuse.com/wf-scroll-driven-animations; Mozilla Connect
 "Implement CSS Scroll-Driven Animations" thread (Jan 2026); Chrome for Developers

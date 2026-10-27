@@ -156,3 +156,104 @@ test("filtering glides surviving cards from their old slots (FLIP)", async ({ pa
   await expect(page.locator(CARDS)).toHaveCount(2);
   await expect(page.locator('[data-filter-chip="ml"]')).toHaveAttribute("aria-pressed", "true");
 });
+
+// MOTION-04 — the filter interaction replaces the scroll entry beat.
+//
+// Re-running the arrival choreography after a click would be a second
+// animation on a card the reader is already looking at, and the FLIP tween
+// would snap back to whatever progress the reflow gave it. So `applyFilter`
+// settles the wrappers: exactly one animation remains, the FLIP.
+test("filtering settles the card entry beats so only the FLIP animates", async ({ page }) => {
+  await gotoHydrated(page);
+
+  await page.locator('[data-filter-chip="ml"]').click();
+  await expect(page.locator(CARDS)).toHaveCount(2);
+  await expect(page.locator("#projects [data-project-grid]")).toHaveAttribute(
+    "data-project-revealed",
+    "",
+  );
+
+  await expect
+    .poll(() =>
+      page.locator("#projects [data-project-card-reveal]").evaluateAll((nodes) =>
+        nodes.map((node) => {
+          const cs = getComputedStyle(node);
+          return { animation: cs.animationName, opacity: cs.opacity, transform: cs.transform };
+        }),
+      ),
+    )
+    .toEqual([
+      { animation: "none", opacity: "1", transform: "none" },
+      { animation: "none", opacity: "1", transform: "none" },
+    ]);
+
+  // And "All" keeps them settled — the entry beat does not replay either.
+  await page.locator('[data-filter-chip="all"]').click();
+  await expect(page.locator(CARDS)).toHaveCount(4);
+  await expect
+    .poll(() =>
+      page
+        .locator("#projects [data-project-card-reveal]")
+        .evaluateAll((nodes) =>
+          nodes.every((node) => getComputedStyle(node).animationName === "none"),
+        ),
+    )
+    .toBe(true);
+});
+
+test("reduced motion is an off switch for the entry beat and the FLIP", async ({ page }) => {
+  // `test.use({ reducedMotion })` is silently ignored in this Playwright
+  // version, so emulate per-page and read the preference back (Q4.2 #1).
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await gotoHydrated(page);
+
+  const preference = await page.evaluate(
+    () => matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+  expect(preference).toBe(true);
+
+  const probe = await page.evaluate(async () => {
+    const orig = Element.prototype.animate;
+    let cardTweens = 0;
+    Element.prototype.animate = function patched(
+      this: Element,
+      ...args: Parameters<Element["animate"]>
+    ) {
+      if (this.hasAttribute("data-project-card")) cardTweens += 1;
+      return orig.apply(this, args);
+    };
+    try {
+      document.querySelector<HTMLButtonElement>('#projects [data-filter-chip="ml"]')?.click();
+      const deadline = Date.now() + 2000;
+      while (
+        document.querySelectorAll("#projects [data-project-card]").length !== 2 &&
+        Date.now() < deadline
+      ) {
+        await new Promise((resolve) => setTimeout(resolve, 16));
+      }
+      // Give a regression a window to fire the tween before restoring.
+      await new Promise((resolve) => setTimeout(resolve, 400));
+    } finally {
+      Element.prototype.animate = orig;
+    }
+
+    return {
+      cardTweens,
+      cards: document.querySelectorAll("#projects [data-project-card]").length,
+      wrappers: Array.from(document.querySelectorAll("#projects [data-project-card-reveal]")).map(
+        (node) => {
+          const cs = getComputedStyle(node);
+          return { animation: cs.animationName, opacity: cs.opacity, transform: cs.transform };
+        },
+      ),
+    };
+  });
+
+  // The filter still works — reduced motion removes the movement, not the
+  // feature (a duration of 0 would still run the tween).
+  expect(probe.cards).toBe(2);
+  expect(probe.cardTweens).toBe(0);
+  for (const wrapper of probe.wrappers) {
+    expect(wrapper).toEqual({ animation: "none", opacity: "1", transform: "none" });
+  }
+});

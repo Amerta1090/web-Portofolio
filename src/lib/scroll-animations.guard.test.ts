@@ -128,6 +128,9 @@ describe("scroll-animations.css reveal contract", () => {
         "[data-career-year] > h3",
       );
       expect(media, `${preference} overrides the career records`).toContain("[data-career-kind]");
+      expect(media, `${preference} overrides the project evidence cards`).toContain(
+        "[data-project-card-reveal]",
+      );
     }
   });
 
@@ -219,8 +222,81 @@ describe("chapter authoring hooks", () => {
     const chapterProps = index.match(/\bchapter\b/g) ?? [];
     expect(chapterProps).toHaveLength(9);
     expect(index).not.toContain("data-reveal");
-    // The sticky rail only works without a clipping scroll container.
-    expect(index).toMatch(/<Section\s+chapter\s+id="career"\s+clip=\{false\}/);
+    // `overflow: clip` keeps sticky rails and view() timelines alive, so the
+    // per-section escape hatch MOTION-03 added has no reason to exist (Rule 6).
+    expect(index).not.toContain("clip={false}");
+    expect(section).not.toMatch(/^\s*clip\?:/m);
+  });
+
+  it("clips sections without turning them into scroll containers", () => {
+    // Measured in MOTION-04: `overflow: hidden` made every Section a scrollport,
+    // which (a) unpinned sticky children and (b) degenerated every nested
+    // `animation-timeline: view()` to `playState: "finished"` / `progress: 1`,
+    // i.e. the chapter reveal was silently inert in all clipped sections.
+    expect(section).toMatch(/\boverflow-clip\b/);
+    expect(section).not.toMatch(/\boverflow-hidden\b/);
+  });
+});
+
+describe("evidence card hierarchy (MOTION-04)", () => {
+  const view = () => blockAfter(css, "@supports (animation-timeline: view())").body;
+  const island = read("src/islands/ProjectCardGrid.tsx");
+
+  it("takes the project grid's chapter body out of the single-beat reveal", () => {
+    // Four evidence cards are four pieces of evidence, not one rectangle.
+    const body = blockAfter(view(), "[data-chapter-body]:has([data-project-grid])").body;
+
+    expect(body).toMatch(/animation:\s*none/);
+    expect(body).toMatch(/opacity:\s*1/);
+    expect(body).toMatch(/transform:\s*none/);
+  });
+
+  it("gives every card a beat ordered by data instead of child index", () => {
+    const grid = view();
+
+    expect(grid).toMatch(/--card-beat-start:\s*0%/);
+    expect(grid).toMatch(/--card-beat-span:\s*30%/);
+    expect(grid).toMatch(/--card-order-step:\s*8%/);
+
+    const wrapper = blockAfter(grid, "[data-project-card-reveal]").body;
+    expect(wrapper).toMatch(/animation-timeline:\s*view\(\)/);
+    expect(wrapper).toMatch(/--project-card-order/);
+    expect(wrapper).toMatch(/entry\s+calc\(/);
+    // A `:nth-child` wall would encode today's data order in CSS and go stale
+    // the first time `data/projects.json` reorders (the MOTION-03 trap).
+    expect(wrapper).not.toMatch(/nth-child/);
+  });
+
+  it("lets a filter replace the entry beat instead of stacking on it", () => {
+    const settled = blockAfter(
+      view(),
+      "[data-project-grid][data-project-revealed] [data-project-card-reveal]",
+    ).body;
+
+    expect(settled).toMatch(/animation:\s*none/);
+    expect(settled).toMatch(/opacity:\s*1/);
+    expect(settled).toMatch(/transform:\s*none/);
+  });
+
+  it("publishes the order token and the filtered state from the island", () => {
+    expect(island).toMatch(/data-project-grid=""/);
+    expect(island).toMatch(/data-project-revealed=\{revealed \? "" : undefined\}/);
+    expect(island).toMatch(/data-project-card-reveal=""/);
+    expect(island).toMatch(/data-project-primary=\{order === 0 \? "" : undefined\}/);
+    expect(island).toMatch(/style=\{\{ "--project-card-order": order \}/);
+    expect(island).toMatch(/setRevealed\(true\)/);
+  });
+
+  it("keeps the scroll beat and the FLIP on different elements", () => {
+    // A WAAPI tween beats a CSS animation while it runs, then hands control
+    // back; sharing one node makes the card snap to its scroll progress when
+    // the tween ends (M4.1). The reveal wrapper must therefore be an ancestor
+    // of the `<article>` the FLIP measures, not the article itself.
+    const wrapper = island.slice(island.indexOf('data-project-card-reveal=""'));
+    const article = wrapper.indexOf('data-project-card=""');
+
+    expect(article).toBeGreaterThan(0);
+    expect(wrapper.slice(0, article)).toMatch(/<TiltCard/);
   });
 });
 

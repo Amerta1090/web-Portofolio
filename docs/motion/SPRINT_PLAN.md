@@ -432,33 +432,65 @@ no scroll hijacking, no hiding of events until scrolled.
 
 ## MOTION-04 — Evidence card hierarchy
 
-**Status:** `PLANNED`
+**Status:** `DONE` (2026-10-27)
 **Priority:** P2
 **Objective:** Project cards should reveal as evidence with a primary card, not
 as a uniform cascade.
-**Outcome:** The featured card settles first; supporting cards follow; skill
-chips and external links remain interactive throughout.
+**Outcome:** Each card carries its own `view()` beat, sequenced by
+`--project-card-order` derived from data (lead card = 0), so the lead card
+settles first and its row neighbours follow. The chapter body is exempt from the
+block-level reveal, so the grid never fades as one rectangle. Filtering replaces
+the reveal with a settled state (`data-project-revealed`) and leaves the WAAPI
+FLIP as the only animation. Reduced motion turns both off — no fade and
+`Element.animate` count 0.
 
-**Dependencies:** MOTION-01 (and ideally MOTION-02).
+**Dependencies:** MOTION-01 (and ideally MOTION-02). Both `DONE`.
 
 **Scope:** `ProjectCardGrid.tsx`, card CSS, `scroll-animations.css`.
 **Exclusions:** no change to card data, filtering semantics, or link structure;
 no per-card IntersectionObserver; no new React root.
 
 **Tasks**
-- [ ] M4.1 Measure current card reveal and filter FLIP interaction.
-- [ ] M4.2 Add a chapter-body stagger with an explicit primary index.
-- [ ] M4.3 Make filtering replace the reveal state without double animation.
-- [ ] M4.4 Reduced motion: instant layout, no fade.
+- [x] M4.1 Measure current card reveal and filter FLIP interaction. (Baseline: the grid was inside the chapter body's single `reveal-fade-up-body`, and `Section.astro`'s `overflow: hidden` made the timeline degenerate — see deviation 2.)
+- [x] M4.2 Add a chapter-body stagger with an explicit primary index. (Implemented as per-card beats with an explicit data-derived order token; see deviation 1.)
+- [x] M4.3 Make filtering replace the reveal state without double animation.
+- [x] M4.4 Reduced motion: instant layout, no fade.
 
 **Acceptance criteria**
-- Primary card is visually first to settle.
+- Primary card is visually first to settle. (Measured: lead fully opaque at scroll offset 185 while the next card in the same row is still `0.74`; ~37 px ahead.)
 - Filtering still swaps cards and preserves `aria-pressed` and `?f=`.
-- No new listener/observer per card; grid-level guard only.
-- Reduced motion and no-JS show all cards.
+- No new listener/observer per card; grid-level guard only. (CSS `view()` only; no new scroll listener, RAF, observer, or React root.)
+- Reduced motion and no-JS show all cards. (4 cards / 4 wrappers with JS disabled; reduced motion `animation-name: none`, `opacity: 1`, `transform: none`, 0 card tweens.)
 
-**Definition of Done / verification:** project-cards and project-filter specs,
-unit tests for the grid, build, payload, diff review.
+**Definition of Done / verification:** project-cards (clip, body-exemption, lead-settle) and project-filter (filter settle, reduced motion) specs, guard 23/23 (5 new MOTION-04 tests), unit 1176/1176 (102 files), build 49 pages, `astro check` 98/0/82, payload `/` 202.7 / 557.1 / 75.3 KB, islands 16 (7e/9d), responsive 7/7 (320→2560), full e2e 381 passed + 1 honestly skipped, mutation teeth 6/6 on the intended assertions, diff review.
+
+**Deviations**
+1. **Per-card beats instead of a body-wide stagger.** A body stagger animates the
+   grid as one block — the exact defect MOTION-01 fixed for chapter bodies. Each
+   card is wrapped in its own `[data-project-card-reveal]` element (a separate
+   element from the `[data-project-card]` article that owns the FLIP) with
+   `animation-range: entry calc(...) entry calc(...)` using
+   `--card-beat-start: 0%`, `--card-beat-span: 30%`, `--card-order-step: 8%` and
+   `--project-card-order` written from the data-derived index. Order never comes
+   from `:nth-child`, so reordering data reorders the sequence.
+2. **`Section.astro` `overflow: hidden` was a latent site-wide defect.** It made
+   every section a scroll container, which (a) broke `position: sticky` and
+   (b) degenerated every `view()` timeline inside it: measured
+   `playState: "finished"`, `progress: 1`, `opacity: 1` at all scroll offsets, so
+   the chapter reveal was silently inert in every clipped section. Fixed with
+   `overflow: clip`, which clips the box without creating a scroll container.
+   Sticky was re-measured at depths 400/1200/2400 (still 96 px). Because the only
+   remaining consumer of the `clip` prop was `#career`, the prop was deleted and
+   `clip={false}` removed from `index.astro`.
+3. **Reduced motion also disables the filter FLIP.** The island early-returns
+   before `Element.animate`, so reduced motion is a real off switch for both
+   animations, not just a shorter one.
+4. **Harness fix outside the sprint scope.** The full suite exposed
+   `navigation.spec.ts:162` reading frame starvation as "stable" at the
+   pre-scroll position (`Expected < 120, Received 11636.296875`). `settleTop`
+   was replaced with an arrival poll (`arriveTop`, 15 s, `absolute: false` for
+   the mobile case); the unused helper was deleted and its two call sites
+   updated. Teeth proven by mutating the 120 px limit to 1.
 
 ---
 

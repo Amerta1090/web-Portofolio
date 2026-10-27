@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { type CSSProperties, useEffect, useLayoutEffect, useRef, useState } from "react";
 import ProjectThumbnail from "../components/atoms/ProjectThumbnail";
 import {
   PROJECT_CATEGORY_LABELS,
@@ -60,6 +60,13 @@ export default function ProjectCardGrid({ projects, skillHrefs = {} }: Props) {
   // before it, so there is never a dead button, with or without JS).
   const [hydrated, setHydrated] = useState(false);
   const [filter, setFilter] = useState<ProjectFilter>("all");
+  // MOTION-04: filtering is an interaction, not an arrival. Once the reader has
+  // filtered, the entry choreography has done its work and the wrappers settle;
+  // the FLIP tween becomes the only animation on a card (see the CSS note on
+  // `[data-project-revealed]`). This is state, not an inline style write, so it
+  // lands in the same commit as the filter change — no flash of a re-hidden
+  // card between the two.
+  const [revealed, setRevealed] = useState(false);
 
   // M2.3.2: the filter is shareable via `?f=<slug>`. The read happens in a
   // post-mount effect because the server HTML must start at "all" (a search
@@ -112,6 +119,24 @@ export default function ProjectCardGrid({ projects, skillHrefs = {} }: Props) {
 
   const visible = filter === "all" ? projects : projects.filter((p) => p.category === filter);
 
+  // MOTION-04 (M4.2): the reveal order comes from the data the server handed
+  // us, not from DOM position. The first featured project is the lead evidence
+  // and settles first; the supporting cards keep their reading position. The
+  // values ride a CSS custom property (`--project-card-order`), so a reorder in
+  // `data/projects.json` changes the order without touching a selector, and a
+  // filtered view never renumbers a surviving card (its order is fixed by the
+  // full list, not by what is visible right now).
+  const primaryIndex = Math.max(
+    0,
+    projects.findIndex((project) => project.featured),
+  );
+  const revealOrder = new Map<string, number>(
+    projects.map((project, index) => [
+      project.title,
+      index === primaryIndex ? 0 : index + (index < primaryIndex ? 1 : 0),
+    ]),
+  );
+
   // M2.3.4 — manual FLIP (First → Last → Invert → Play) on the Web Animations
   // API. GSAP's `Flip` plugin was measured at 13,709 B gzip; importing it into
   // this `client:load` island would raise the homepage's initial payload (gate:
@@ -135,6 +160,7 @@ export default function ProjectCardGrid({ projects, skillHrefs = {} }: Props) {
       }
     }
     beforeRectsRef.current = first;
+    setRevealed(true);
     setFilter(next);
   };
 
@@ -169,7 +195,12 @@ export default function ProjectCardGrid({ projects, skillHrefs = {} }: Props) {
   });
 
   return (
-    <div ref={gridRef} className="container-query-grid">
+    <div
+      ref={gridRef}
+      data-project-grid=""
+      data-project-revealed={revealed ? "" : undefined}
+      className="container-query-grid"
+    >
       {hydrated && (
         <fieldset
           data-project-filter
@@ -197,110 +228,126 @@ export default function ProjectCardGrid({ projects, skillHrefs = {} }: Props) {
       <div className="cq-grid-item grid gap-5">
         {visible.map((project) => {
           const links = (project.links ?? []).filter((link) => link.url);
+          const order = revealOrder.get(project.title) ?? 0;
 
           return (
-            <TiltCard
+            // Two animations, two elements (MOTION-04): the scroll-driven
+            // reveal owns this wrapper, and the filter FLIP keeps animating the
+            // `<article>` inside it. A WAAPI tween beats a CSS animation while
+            // it runs, then hands control back — put both on one node and the
+            // card snaps to its scroll progress when the tween ends (M4.1).
+            <div
               key={project.title}
-              maxTilt={3}
-              perspective={1000}
-              scale={1.02}
-              spotlight={!guard.paused}
+              data-project-card-reveal=""
+              data-project-primary={order === 0 ? "" : undefined}
               className="h-full"
+              style={{ "--project-card-order": order } as CSSProperties}
             >
-              <article
-                data-project-card=""
-                className="card border-glow group relative flex h-full flex-col overflow-hidden bg-bg-secondary border border-border rounded-lg transition-all duration-300"
+              <TiltCard
+                maxTilt={3}
+                perspective={1000}
+                scale={1.02}
+                spotlight={!guard.paused}
+                className="h-full"
               >
-                <ProjectThumbnail
-                  src={project.image}
-                  variants={project.image_variants}
-                  alt={project.title}
-                />
+                <article
+                  data-project-card=""
+                  className="card border-glow group relative flex h-full flex-col overflow-hidden bg-bg-secondary border border-border rounded-lg transition-all duration-300"
+                >
+                  <ProjectThumbnail
+                    src={project.image}
+                    variants={project.image_variants}
+                    alt={project.title}
+                  />
 
-                <div className="flex flex-1 flex-col p-5">
-                  <div className="mb-2 flex items-start justify-between gap-3">
-                    {project.category && (
-                      <span className="text-xs text-text-secondary">
-                        {projectCategoryLabel(project.category)}
-                      </span>
-                    )}
-                    {project.featured && (
-                      <span className="featured-badge text-[10px] text-brand border border-brand/30 px-1.5 py-0.5 rounded">
-                        Featured
-                      </span>
-                    )}
-                  </div>
-
-                  <h3 className="mb-2 text-lg font-semibold leading-tight text-text-primary">
-                    <a
-                      href={project.href}
-                      className="transition-colors after:absolute after:inset-0 group-hover:text-brand"
-                    >
-                      {project.title}
-                    </a>
-                  </h3>
-
-                  {project.association && (
-                    <p data-project-association className="mb-2 text-xs text-text-secondary">
-                      {project.association}
-                    </p>
-                  )}
-
-                  <p className="mb-3 text-sm leading-relaxed text-text-secondary line-clamp-2">
-                    {project.description}
-                  </p>
-
-                  {project.period && (
-                    <p className="mb-1 text-xs text-text-secondary/50">{project.period}</p>
-                  )}
-
-                  <div className="relative z-10 mt-auto space-y-3 pt-3">
-                    <div className="flex flex-wrap gap-1.5">
-                      {project.skills.length > 0 ? (
-                        <>
-                          {project.skills.slice(0, 4).map((skill) => (
-                            <a
-                              key={skill}
-                              href={skillHrefs[skill]}
-                              className="text-[10px] px-1.5 py-0.5 border border-border text-text-secondary rounded"
-                            >
-                              {skill.length > 18 ? `${skill.slice(0, 18)}…` : skill}
-                            </a>
-                          ))}
-                          {project.skills.length > 4 && (
-                            <span className="text-[10px] px-1.5 py-0.5 border border-border text-text-secondary rounded">
-                              +{project.skills.length - 4}
-                            </span>
-                          )}
-                        </>
-                      ) : (
-                        <span data-project-no-skills className="text-[10px] text-text-secondary/60">
-                          No skills listed
+                  <div className="flex flex-1 flex-col p-5">
+                    <div className="mb-2 flex items-start justify-between gap-3">
+                      {project.category && (
+                        <span className="text-xs text-text-secondary">
+                          {projectCategoryLabel(project.category)}
+                        </span>
+                      )}
+                      {project.featured && (
+                        <span className="featured-badge text-[10px] text-brand border border-brand/30 px-1.5 py-0.5 rounded">
+                          Featured
                         </span>
                       )}
                     </div>
 
-                    {links.length > 0 && (
-                      <div className="flex flex-wrap gap-3">
-                        {links.map((link) => (
-                          <a
-                            key={`${link.label}-${link.url}`}
-                            href={link.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs font-medium text-brand transition-colors hover:text-accent"
-                          >
-                            {link.label}
-                            <span aria-hidden="true"> ↗</span>
-                            <span className="sr-only"> (opens in a new tab)</span>
-                          </a>
-                        ))}
-                      </div>
+                    <h3 className="mb-2 text-lg font-semibold leading-tight text-text-primary">
+                      <a
+                        href={project.href}
+                        className="transition-colors after:absolute after:inset-0 group-hover:text-brand"
+                      >
+                        {project.title}
+                      </a>
+                    </h3>
+
+                    {project.association && (
+                      <p data-project-association className="mb-2 text-xs text-text-secondary">
+                        {project.association}
+                      </p>
                     )}
+
+                    <p className="mb-3 text-sm leading-relaxed text-text-secondary line-clamp-2">
+                      {project.description}
+                    </p>
+
+                    {project.period && (
+                      <p className="mb-1 text-xs text-text-secondary/50">{project.period}</p>
+                    )}
+
+                    <div className="relative z-10 mt-auto space-y-3 pt-3">
+                      <div className="flex flex-wrap gap-1.5">
+                        {project.skills.length > 0 ? (
+                          <>
+                            {project.skills.slice(0, 4).map((skill) => (
+                              <a
+                                key={skill}
+                                href={skillHrefs[skill]}
+                                className="text-[10px] px-1.5 py-0.5 border border-border text-text-secondary rounded"
+                              >
+                                {skill.length > 18 ? `${skill.slice(0, 18)}…` : skill}
+                              </a>
+                            ))}
+                            {project.skills.length > 4 && (
+                              <span className="text-[10px] px-1.5 py-0.5 border border-border text-text-secondary rounded">
+                                +{project.skills.length - 4}
+                              </span>
+                            )}
+                          </>
+                        ) : (
+                          <span
+                            data-project-no-skills
+                            className="text-[10px] text-text-secondary/60"
+                          >
+                            No skills listed
+                          </span>
+                        )}
+                      </div>
+
+                      {links.length > 0 && (
+                        <div className="flex flex-wrap gap-3">
+                          {links.map((link) => (
+                            <a
+                              key={`${link.label}-${link.url}`}
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs font-medium text-brand transition-colors hover:text-accent"
+                            >
+                              {link.label}
+                              <span aria-hidden="true"> ↗</span>
+                              <span className="sr-only"> (opens in a new tab)</span>
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </article>
-            </TiltCard>
+                </article>
+              </TiltCard>
+            </div>
           );
         })}
         {/* M2.3.3: never a blank grid. `<output>` is an implicit live region, so

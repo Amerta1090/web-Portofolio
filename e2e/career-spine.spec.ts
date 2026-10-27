@@ -466,6 +466,9 @@ test.describe("career spine — rail", () => {
     // against the section instead of the page and every pin scrolled away while
     // still *computing* as `sticky`. Measured before the fix, the rail's wrapper
     // tracked the scroll 1:1 (371 → −29 → −429 → −829) instead of holding 96px.
+    // The section now ships `overflow-clip` (same pixels, no scroll container),
+    // and MOTION-04 removed the per-section opt-out — so this assertion is the
+    // only thing keeping the class from drifting back to `hidden`.
     //
     // Asserted at a real reading depth, not at the section's top: before the
     // section reaches `top`, sticky legitimately has nothing to do.

@@ -299,3 +299,89 @@ from data layer; guard lock; no new runtime dependency.
 - No `:nth-child` wall: document order from data preserved.
 
 **Next:** MOTION-04 — Evidence card hierarchy (`PLANNED`). The MOTION-03 sprint (2026-10-23 → 2026-10-24) is complete.
+
+---
+
+## 2026-10-27 — MOTION-04 — Evidence card hierarchy
+
+**Goal:** Project cards reveal as evidence with a primary card, not a uniform
+cascade. The lead card settles first, its neighbours follow, skill chips and
+external links stay interactive throughout, filtering does not double-animate,
+and reduced motion is a real off switch. No new dependency, no per-card
+observer, no new React root.
+
+**Completed**
+- `src/lib/scroll-animations.css`: chapter-body opt-out via
+  `[data-chapter-body]:has([data-project-grid])`; grid tokens
+  `--card-beat-start: 0%`, `--card-beat-span: 30%`, `--card-order-step: 8%`;
+  wrapper rule `[data-project-card-reveal]` with
+  `animation-range: entry calc(...) entry calc(...)` driven by
+  `--project-card-order`; settle rule under `[data-project-revealed]`
+  (`animation: none; opacity: 1; transform: none`); both preference blocks list
+  the wrapper.
+- `src/islands/ProjectCardGrid.tsx`: one reveal wrapper per card, order map from
+  the data-derived index (lead = 0), `revealed` state set in `applyFilter`, and
+  a FLIP early-return under reduced motion (`Element.animate` count 0).
+- `src/components/molecules/Section.astro`: `overflow: hidden` → `overflow: clip`
+  (see defect below); the `clip` prop was deleted and `clip={false}` removed
+  from `index.astro` in `src/pages/index.astro`.
+- Guard `src/lib/scroll-animations.guard.test.ts` → 23 tests, including
+  `describe("evidence card hierarchy (MOTION-04)")` (5) and the replacement for
+  the old `clip={false}` pin.
+- e2e: `e2e/project-cards.spec.ts` +3 (clip-not-scroll-container, body not faded
+  as one block, lead settles before its row neighbour with an atomic bisection
+  helper); `e2e/project-filter.spec.ts` +2 (filter settles the entry beats,
+  reduced motion stops beat + FLIP).
+- Comments that quoted the removed opt-out were corrected:
+  `e2e/career-spine.spec.ts:464`, `e2e/responsive.spec.ts:129`.
+
+**Defect found while measuring (site-wide, pre-existing)**
+`Section.astro` used `overflow: hidden`, so every section was a scroll container.
+Two consequences, both measured: (a) `position: sticky` resolved against the
+section, (b) every `view()` timeline inside it degenerated —
+`playState: "finished"`, `progress: 1`, `opacity: 1` at all scroll offsets — so
+the chapter reveal was silently inert in every clipped section. `overflow: clip`
+clips the box without creating a scroll container; sticky was re-verified at
+depths 400/1200/2400 (96 px). Reproducible probe: `.opencode/probe-m04f.mjs`
+(stepped scan vs bisection, plus the ~45 px hydration reflow that makes a
+non-atomic measurement read 87 px instead of 37 px).
+
+**Evidence**
+- Lead card: wrappers `0,1,2,3`; ranges `entry..entry 30%` / `8–38%` / `16–46%` /
+  `24–54%`; lead fully opaque while its row neighbour is still `0.74`, ~37 px
+  ahead (bisection, ~9 samples instead of a 14 s stepped scan).
+- Filtering: wrappers compute `animation: none`, `opacity: 1`,
+  `transform: none`; `aria-pressed` and `?f=` unchanged.
+- Reduced motion: `matchMedia` readback true, beat `animation-name: none`,
+  `Element.animate` count 0.
+- No-JS: 4 cards / 4 wrappers, all visible.
+- Sections compute `overflow: clip`; no section is a scroll container.
+- Mutation teeth **6/6 red on the intended assertions** (M1 body opt-out removed,
+  M2 `overflow-clip`→`overflow-hidden`, M3 island order forced to 0,
+  M4 `:nth-child` in the wrapper selector, M5 reduced-motion block drops the
+  wrapper, M6 settle rule loses `animation: none`); every restore `md5sum`
+  identical, final rebuild clean. Harness: `/tmp/opencode/m04-mutations.py`.
+- Gates: `validate-data` OK · build 49 pages · `astro check` 98/0/82 ·
+  biome clean on 9 touched files · unit **1176/1176 (102 files)** ·
+  `measure:routes` `/` **202.7 / 557.1 / 75.3 KB**, islands 16 (7e/9d), all dist
+  JS 671.2 KB/102 files · responsive 7/7 (0 overflow 320→2560) ·
+  full e2e **381 passed + 1 honestly skipped** (382 tests / 35 files).
+
+**Harness fix forced by the full suite**
+`e2e/navigation.spec.ts:162` failed with `Expected: < 120, Received:
+11636.296875`: `settleTop` treated frame starvation as stability at the
+pre-scroll position. Replaced with an arrival poll `arriveTop` (15 s,
+`absolute: false` for the mobile case), deleted the now-unused helper, updated
+both call sites. Teeth proven by mutating the 120 px limit to 1 (fails at
+`arriveTop`), then restored.
+
+**Deviations honored**
+- "Chapter-body stagger with an explicit primary index" became per-card beats:
+  a body stagger animates the grid as one block, which is the defect MOTION-01
+  fixed for chapter bodies.
+- Order comes from `--project-card-order` written from data, never `:nth-child`.
+- The reveal wrapper is a different element from the `[data-project-card]`
+  article that owns the FLIP, so the two animations cannot fight.
+- `prefers-reduced-data` remains non-emulatable in Chromium; source guard only.
+
+**Next:** none — MOTION-04 is closed; do not start MOTION-05 in this pass.

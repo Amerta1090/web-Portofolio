@@ -14,25 +14,31 @@ import { type Page, expect, test } from "@playwright/test";
  */
 
 /**
- * Poll until the target's viewport top stops moving (two consecutive reads
- * within 1px), then return it. The old fixed `waitForTimeout(1200)` missed
- * fast scrolls on this machine — the section top was still 138px when the
- * page had already settled ~80px. Polling removes the timing assumption
- * without loosening the <120px assertion.
+ * Arrival-polled, not settle-polled. The old helper returned the target's top
+ * once two reads landed within 1px, which reads frame starvation as "stable":
+ * in a full-suite run the smooth scroll paused for >100ms before it started, so
+ * two reads at the *pre-scroll* position looked settled and the test measured
+ * 11636px (the section's document offset) as if the click had done nothing.
+ * Polling the distance to the known target cannot pass early; it can only time
+ * out on a real miss (same class as `career-spine.spec.ts`, MOTION-03).
  */
-const settleTop = async (page: Page, selector: string, timeoutMs = 5000): Promise<number> => {
-  const start = Date.now();
-  let prev = Number.POSITIVE_INFINITY;
-  let stableRuns = 0;
-  while (Date.now() - start < timeoutMs) {
-    const top = await page.locator(selector).evaluate((el) => el.getBoundingClientRect().top);
-    if (Math.abs(top - prev) < 1) stableRuns += 1;
-    else stableRuns = 0;
-    prev = top;
-    if (stableRuns >= 2) return top;
-    await page.waitForTimeout(100);
-  }
-  return prev;
+const arriveTop = async (
+  page: Page,
+  selector: string,
+  { limit = 120, absolute = true, timeoutMs = 15000 } = {},
+): Promise<number> => {
+  const read = () => page.locator(selector).evaluate((el) => el.getBoundingClientRect().top);
+  let observed = await read();
+  await expect
+    .poll(
+      async () => {
+        observed = await read();
+        return absolute ? Math.abs(observed) : observed;
+      },
+      { timeout: timeoutMs },
+    )
+    .toBeLessThan(limit);
+  return observed;
 };
 
 /**
@@ -168,7 +174,7 @@ test.describe("Navigation hierarchy — one primary nav, one position readout", 
     expect(start?.trim()).toBe("01 / 10");
 
     await page.locator("nav[aria-label='Primary'] a[href='/#projects']").click();
-    const top = await settleTop(page, "#projects");
+    const top = await arriveTop(page, "#projects");
 
     // #projects sits under the 65px fixed header, so its top settles just above 0.
     expect(Math.abs(top)).toBeLessThan(120);
@@ -212,7 +218,7 @@ test.describe("Navigation hierarchy — below lg", () => {
     const sheet = page.getByRole("dialog", { name: "Menu navigasi", exact: true });
     await expect(sheet).toBeVisible();
     await sheet.getByRole("link", { name: "Projects", exact: true }).click();
-    const mobileTop = await settleTop(page, "#projects");
+    const mobileTop = await arriveTop(page, "#projects", { absolute: false });
     await expect(sheet).toBeHidden();
     expect(mobileTop).toBeLessThan(120);
   });

@@ -126,8 +126,9 @@ test("career spine pins only from lg up, stays a single column below (M5.3.4)", 
   await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), target);
 
   // `lg:top-24` — the declared header offset (96px). If the pin were relative to
-  // the section's own overflow (the `overflow-hidden` bug Task 1.3 fixed) the
-  // rail would have slid away instead of holding this value.
+  // the section's own overflow (the `overflow-hidden` bug Task 1.3 fixed, now
+  // prevented by `overflow-clip` in `Section.astro`) the rail would have slid
+  // away instead of holding this value.
   await expect
     .poll(() => rail.evaluate((el) => Math.round(el.getBoundingClientRect().top)), {
       timeout: 8000,

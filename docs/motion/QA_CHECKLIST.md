@@ -40,7 +40,7 @@ bun run test
 
 | Gate | Baseline | Rule |
 | --- | --- | --- |
-| Unit suite | 1148 tests / 100 files | no new failures |
+| Unit suite | 1176 tests / 102 files | no new failures |
 | TimeAwareHero alone | 11/11 | must stay green |
 | Source guards | new in MOTION-01 | must fail when the guarded rule is violated |
 
@@ -56,7 +56,7 @@ bunx playwright test --workers=1
 
 | Gate | Baseline | Rule |
 | --- | --- | --- |
-| E2E suite | 358 tests / 34 files | no new failures |
+| E2E suite | 382 tests / 35 files | no new failures |
 | `motion-chapters` | new | must have a reduced-motion positive control |
 | `career-spine` | 18 tests | sticky/jump/deep-link must stay green |
 
@@ -71,6 +71,11 @@ bunx playwright test --workers=1
 - Legacy `[data-reveal]:not([data-chapter]) > *` still animates blog/timeline/
   capability containers.
 - `data-reveal-stagger` still applies to `CapabilityArchitecture`.
+- A chapter body whose component owns its own beats opts out of the block
+  reveal (`:has([data-project-grid])`, `:has([data-career-spine])`).
+- `Section.astro` clips with `overflow: clip`, never `overflow: hidden` — a
+  hidden overflow makes the section a scroll container, which breaks sticky and
+  degenerates every `view()` timeline inside it. There is no `clip` prop.
 
 ### 4.2 Reduced motion / reduced data
 
@@ -100,9 +105,9 @@ bun run measure:routes
 
 | Metric | Baseline | Rule |
 | --- | --- | --- |
-| `/` initial | 202.6 KB | must not increase without explanation |
-| `/` reachable | 556.9 KB | same |
-| `/` HTML | 75.2 KB | chapter wrappers and per-card `srcset` add a few bytes; record |
+| `/` initial | 202.7 KB | must not increase without explanation |
+| `/` reachable | 557.1 KB | same |
+| `/` HTML | 75.3 KB | chapter wrappers and per-card `srcset` add a few bytes; record |
 | Scroll listeners | 16–17 | no new scroll listener from the sprint |
 | MotionScore `/` | B 56–59 | no D/F findings; grade range accepted |
 | Image transfer `/` @1440 / @375 | 543.5 / 187.9 KB | `measure:routes` cannot see this; use `.opencode/probe-images.mjs` |
@@ -159,6 +164,26 @@ git diff -- <files>
 - [x] `RESEARCH.md` updated if an assumption became verified. *(§2.1 reduced-motion measured; reduced-data Chromium limitation recorded §2.1/§3)*
 
 ## 8. Sprint results log
+
+### MOTION-04 — 2026-10-27
+
+| Gate | Result |
+| --- | --- |
+| `bun run validate-data` | OK, GitHub cache non-degenerate |
+| `bun run build:fast` | 49 pages |
+| `bunx astro check` | 98 errors, 0 warnings, 82 hints = baseline |
+| Biome, touched files | 9 files clean |
+| Unit suite | **1176/1176, 102 files** |
+| Guard | 23/23 (`scroll-animations.guard.test.ts`, MOTION-04 describe 5/5) |
+| Targeted e2e | project-cards + project-filter + navigation, `--workers=1` |
+| Full e2e | **381 passed + 1 honestly skipped** (382 tests / 35 files) |
+| Skip reason | Chromium cannot emulate `prefers-reduced-data`; the CSS rule is enforced by the source guard |
+| Mutation teeth | 6/6 red on the intended assertions (body opt-out, `overflow-clip`, order token, no `:nth-child`, reduced-motion wrapper, settle `animation: none`); every restore `md5sum` identical |
+| Browser evidence | Lead card ~37 px ahead of its row neighbour (opaque vs `0.74`); wrappers `0,1,2,3` with ranges `0–30/8–38/16–46/24–54%`; filtered wrappers `animation: none / opacity 1 / transform: none`; reduced motion `cardTweens: 0`; no-JS 4 cards / 4 wrappers; sections `overflow: clip` |
+| `measure:routes` `/` | initial **202.7** / reachable **557.1** / HTML **75.3** KB (+0.1 / +0.2 / +0.1 = new island logic); islands 16 (7e/9d); all dist JS 671.2 KB / 102 files |
+| Responsive | `e2e/responsive.spec.ts` 7/7, 0 horizontal overflow @320→2560 |
+| Listener / RAF | No new scroll listener, RAF, observer, or React root |
+| Harness fix | `navigation.spec.ts` `settleTop` → arrival poll `arriveTop` (starvation read as stability at 11636 px); teeth proven by mutating the limit to 1 |
 
 ### MOTION-02 — 2026-10-23
 
