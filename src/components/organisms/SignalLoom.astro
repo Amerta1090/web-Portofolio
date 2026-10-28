@@ -1,20 +1,90 @@
 ---
 import SignalLoom from "../../islands/SignalLoom";
 import type { SignalLoomGraph } from "../../lib/creative/signal-loom";
+import { defaultNarrative } from "../../lib/creative/signal-loom";
 
 interface Props {
   graph: SignalLoomGraph;
 }
 
 const { graph } = Astro.props;
+
+/**
+ * M5.1 — the section must explain itself before a click.
+ *
+ * Rendered by Astro, not by the island: zero JS, visible with scripts off, and
+ * the anchors are real (`#signal-<nodeId>` already exists on every card, and the
+ * island resolves those clicks once it hydrates). Every number is derived from
+ * the graph above — no count is typed into this file.
+ *
+ * It sits beside the intro copy rather than above the map so explaining the
+ * section does not push the first project evidence out of the first viewport
+ * (M5.0 acceptance). Below `md` the two blocks simply stack.
+ */
+const narrative = defaultNarrative(graph);
+const listed = narrative?.steps.length ?? 0;
+const unlisted = narrative ? narrative.connectedProjects - listed : 0;
 ---
 
 <div class="signal-loom" data-signal-loom data-default-node={graph.defaultNodeId}>
-  <div class="signal-loom__copy">
-    <p class="section-label text-text-secondary">A connected practice</p>
-    <p class="mt-4 max-w-2xl text-lg leading-relaxed text-text-secondary">
-      Projects are evidence of a system: capabilities combine, constraints shape the build, and the result has to work in the world. Select any node to trace the link between a capability and the projects that use it.
-    </p>
+  <div class="grid grid-cols-1 gap-6 md:grid-cols-2 md:items-start md:gap-10">
+    <div class="signal-loom__copy">
+      <p class="section-label text-text-secondary">A connected practice</p>
+      <p class="mt-4 max-w-2xl text-lg leading-relaxed text-text-secondary">
+        Projects are evidence of a system: capabilities combine, constraints shape the build, and the result has to work in the world. Select any node to trace the link between a capability and the projects that use it.
+      </p>
+    </div>
+
+    {
+      narrative && (
+        <div data-signal-narrative>
+          <p class="section-label text-text-secondary">Default path</p>
+          <p class="mt-4 text-sm leading-relaxed text-text-secondary">
+            <span data-signal-narrative-capability class="font-display text-h4 text-text-primary">
+              {narrative.capabilityLabel}
+            </span>{" "}
+            connects to {narrative.connectedProjects} projects in the map. The strongest
+            ties come first:
+          </p>
+          <ol
+            data-signal-narrative-steps
+            class="mt-3 grid list-none grid-cols-1 gap-2.5"
+          >
+            {narrative.steps.map((step, index) => (
+              <li
+                data-signal-narrative-step
+                class="flex items-baseline gap-2.5 border-l border-border/70 pl-3"
+              >
+                <span aria-hidden="true" class="section-label shrink-0 text-brand">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <span class="min-w-0">
+                  <a
+                    href={`#signal-${step.id}`}
+                    class="line-clamp-1 text-sm font-medium text-text-primary underline decoration-border decoration-1 underline-offset-2 transition-colors hover:text-brand hover:decoration-brand focus-visible:outline-2 focus-visible:outline-brand focus-visible:outline-offset-2 motion-reduce:transition-none md:line-clamp-none"
+                  >
+                    {step.label}
+                  </a>
+                  <span class="mt-0.5 block text-xs text-text-secondary">
+                    {step.weight} shared {step.weight === 1 ? "skill" : "skills"}
+                  </span>
+                </span>
+              </li>
+            ))}
+          </ol>
+          {/* The connector lines only exist at md+ (the SVG is `hidden md:block`),
+              so the thickness note would describe something a phone reader cannot
+              see. It is hidden there instead of explaining a missing line. */}
+          <p class="mt-3 hidden text-xs leading-relaxed text-text-secondary md:block">
+            {
+              unlisted > 0
+                ? `The ${listed} strongest are listed; select any other card to trace the rest. Line thickness counts the skills a project and a capability share.`
+                : "Line thickness counts the skills a project and a capability share."
+            }
+          </p>
+        </div>
+      )
+    }
   </div>
 
   <SignalLoom graph={graph} client:visible />

@@ -295,6 +295,134 @@ export function capabilityNodeIdForSkill(
 const CAPABILITY_SECTION_ANCHOR = "#systems-in-motion";
 
 /**
+ * One step of the default reading path (M5.1): a project the default capability
+ * connects to, with the real number of shared skills that put it there.
+ */
+export interface SignalLoomNarrativeStep {
+  id: string;
+  label: string;
+  href: string;
+  /** Declared skill overlaps with the capability — the edge weight, unchanged. */
+  weight: number;
+}
+
+/**
+ * The default path the section explains before any interaction (M5.1).
+ *
+ * Every field is derived from the graph the section draws, so the sentence and
+ * the list can never disagree with the map: `capabilityLabel` comes from the
+ * chosen node, `connectedProjects` is the number of edges incident to it, and
+ * `steps` are the strongest of those edges with the weights that produced them.
+ * `null` means "there is no honest story to tell" (no capability node, or no
+ * edge) and the caller must render nothing rather than invent one.
+ */
+export interface SignalLoomNarrative {
+  capabilityId: string;
+  capabilityLabel: string;
+  connectedProjects: number;
+  steps: SignalLoomNarrativeStep[];
+}
+
+/**
+ * The capability the section opens on.
+ *
+ * `graph.defaultNodeId` is the first choice when it is a capability, because
+ * the island already selects it. When a fixture (or a graph whose strongest
+ * node is a project) points elsewhere, fall back to the most connected
+ * capability — tie-break is node order, so the answer is deterministic and the
+ * narrative still describes a hub that exists.
+ */
+function narrativeCapabilityId(graph: SignalLoomGraph): string | null {
+  const preferred = graph.nodes.find(
+    (node) => node.id === graph.defaultNodeId && node.kind === "capability",
+  );
+  if (preferred) return preferred.id;
+
+  const degree = new Map<string, number>();
+  for (const edge of graph.edges) {
+    degree.set(edge.from, (degree.get(edge.from) ?? 0) + 1);
+    degree.set(edge.to, (degree.get(edge.to) ?? 0) + 1);
+  }
+
+  let best: string | null = null;
+  let bestDegree = -1;
+  for (const node of graph.nodes) {
+    if (node.kind !== "capability") continue;
+    const nodeDegree = degree.get(node.id) ?? 0;
+    if (nodeDegree > bestDegree) {
+      best = node.id;
+      bestDegree = nodeDegree;
+    }
+  }
+
+  return bestDegree > 0 ? best : null;
+}
+
+/**
+ * The default path's edges in reading order: heaviest overlap first, then graph
+ * order so equal weights keep the data's sequence. Exported because the entry
+ * choreography (M5.2) must draw these edges first — the animation follows the
+ * narrative, not the DOM.
+ */
+export function defaultPathEdgeIds(graph: SignalLoomGraph): string[] {
+  const capabilityId = narrativeCapabilityId(graph);
+  if (!capabilityId) return [];
+
+  const order = new Map(graph.nodes.map((node, index) => [node.id, index]));
+  return graph.edges
+    .filter((edge) => edge.from === capabilityId || edge.to === capabilityId)
+    .sort((a, b) => {
+      if (b.weight !== a.weight) return b.weight - a.weight;
+      const aIndex = order.get(a.from === capabilityId ? a.to : a.from) ?? 0;
+      const bIndex = order.get(b.from === capabilityId ? b.to : b.from) ?? 0;
+      return aIndex - bIndex;
+    })
+    .map((edge) => edge.id);
+}
+
+/**
+ * Build the default narrative path (M5.1).
+ *
+ * `limit` caps how many projects the copy names — the count of connected
+ * projects is reported separately and in full, so "3 of 9" can never be read as
+ * "there are only 3 projects". The limit is clamped to at least 1: a narrative
+ * that lists nothing is not a narrative, and the caller checks for `null`
+ * instead.
+ */
+export function defaultNarrative(graph: SignalLoomGraph, limit = 3): SignalLoomNarrative | null {
+  const capabilityId = narrativeCapabilityId(graph);
+  if (!capabilityId) return null;
+
+  const capability = graph.nodes.find((node) => node.id === capabilityId);
+  if (!capability) return null;
+
+  const cap = Math.max(1, Math.floor(limit));
+  const nodesById = new Map(graph.nodes.map((node) => [node.id, node]));
+  const pathIds = defaultPathEdgeIds(graph);
+  const edgesById = new Map(graph.edges.map((edge) => [edge.id, edge]));
+
+  const steps: SignalLoomNarrativeStep[] = [];
+  for (const edgeId of pathIds) {
+    if (steps.length >= cap) break;
+    const edge = edgesById.get(edgeId);
+    if (!edge) continue;
+    const targetId = edge.from === capabilityId ? edge.to : edge.from;
+    const node = nodesById.get(targetId);
+    if (!node || node.kind !== "project" || !node.href) continue;
+    steps.push({ id: node.id, label: node.label, href: node.href, weight: edge.weight });
+  }
+
+  if (steps.length === 0) return null;
+
+  return {
+    capabilityId,
+    capabilityLabel: capability.label,
+    connectedProjects: pathIds.length,
+    steps,
+  };
+}
+
+/**
  * Map every project skill to its Capability Map link.
  *
  * A skill a declared capability describes links to that node (`#signal-<nodeId>`);

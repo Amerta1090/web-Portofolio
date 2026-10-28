@@ -6,7 +6,7 @@ import type {
   SignalLoomGraph,
   SignalLoomNode,
 } from "../lib/creative/signal-loom";
-import { edgeStrokeWidth } from "../lib/creative/signal-loom";
+import { defaultPathEdgeIds, edgeStrokeWidth } from "../lib/creative/signal-loom";
 import { choreographyMode, signalDotEdges } from "../lib/creative/signal-loom-choreo";
 import { SIGNAL_LOOPS, SIGNAL_TRAVEL_SECONDS } from "../lib/creative/signal-loom-choreo";
 import {
@@ -98,6 +98,10 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
     () => (animated ? signalDotEdges(graph, selectedId) : []),
     [animated, graph, selectedId],
   );
+  // M5.2: the entry draws the default reading path first. The order is derived
+  // from the graph (heaviest overlap first), not from DOM order, so the sequence
+  // matches the sentence the server renders above the map.
+  const entryEdgeIds = useMemo(() => defaultPathEdgeIds(graph), [graph]);
 
   useEffect(() => {
     setHydrated(true);
@@ -210,20 +214,31 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
     };
   }, [hydrated, measureEdges]);
 
-  // One-shot entry: connector edges fade in. Skipped entirely for reduced
-  // motion, before hydration, or while off-screen.
+  // One-shot entry: connector edges fade in, default path first. Skipped
+  // entirely for reduced motion, before hydration, or while off-screen.
   useGSAP(() => {
     if (!hydrated || prefersReduced || guard.paused) return;
     const svg = svgRef.current;
     if (!svg || Object.keys(edgeCoords).length === 0) return;
+    // Stable sort: the default path's edges lead in reading order, everything
+    // else keeps the DOM order the graph produced.
+    const priority = new Map(entryEdgeIds.map((id, index) => [id, index]));
+    const lines = Array.from(svg.querySelectorAll<SVGLineElement>("[data-edge]")).sort((a, b) => {
+      const aIndex = priority.get(a.dataset.edge ?? "");
+      const bIndex = priority.get(b.dataset.edge ?? "");
+      if (aIndex !== undefined && bIndex !== undefined) return aIndex - bIndex;
+      if (aIndex !== undefined) return -1;
+      if (bIndex !== undefined) return 1;
+      return 0;
+    });
     const tl = gsap.timeline({ delay: 0.06 });
     tl.fromTo(
-      svg.querySelectorAll("[data-edge]"),
+      lines,
       { opacity: 0.3 },
       { opacity: 1, duration: duration.slow, stagger: 0.04, ease: "power1.out" },
     );
     timelineRef.current = tl;
-  }, [hydrated, prefersReduced, guard.paused, edgeCoords]);
+  }, [hydrated, prefersReduced, guard.paused, edgeCoords, entryEdgeIds]);
 
   // Selection choreography: pulse a finite signal dot from the selected card
   // to each capped connected target, travelling along the measured edge.
@@ -413,7 +428,7 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
   return (
     <div
       ref={containerRef}
-      className="relative mt-8 overflow-hidden rounded-lg border border-border/70 bg-bg-primary/40"
+      className="relative mt-8 overflow-clip rounded-lg border border-border/70 bg-bg-primary/40"
     >
       {/* Connector plane (md+): edges run from each capability card's right
           edge to each connected project card's left edge. Coordinates are
@@ -440,6 +455,8 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
               <line
                 key={edge.id}
                 data-edge={edge.id}
+                data-edge-from={edge.from}
+                data-edge-to={edge.to}
                 data-edge-weight={edge.weight}
                 x1={coords.x1}
                 y1={coords.y1}
@@ -471,8 +488,8 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
         </g>
       </svg>
 
-      <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-[1fr_2.75rem_1fr] md:gap-3">
-        <section aria-label="Capability nodes" className="relative z-10 md:self-center">
+      <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-[1fr_2.75rem_1fr] md:gap-3 md:items-start">
+        <section aria-label="Capability nodes" className="relative z-10">
           <h3 className="section-label text-text-secondary">Capability groups</h3>
           <ul
             aria-label="Capabilities"

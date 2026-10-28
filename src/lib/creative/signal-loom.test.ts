@@ -7,11 +7,17 @@ import {
   buildSignalLoomGraph,
   buildSkillHrefs,
   capabilityNodeIdForSkill,
+  defaultNarrative,
+  defaultPathEdgeIds,
   edgeStrokeWidth,
   mostConnectedNodeId,
   projectHref,
 } from "./signal-loom";
-import type { SignalEdgeEmphasis, SignalLoomProjectDetail } from "./signal-loom";
+import type {
+  SignalEdgeEmphasis,
+  SignalLoomGraph,
+  SignalLoomProjectDetail,
+} from "./signal-loom";
 
 const skills: SkillsData = {
   categories: [
@@ -466,5 +472,197 @@ describe("Task 3.3 — real portfolio detail", () => {
   it("carries no media label anywhere, though four projects still hold them", () => {
     for (const detail of details) expect(detail).not.toHaveProperty("media");
     expect(projects.filter((project) => (project.media ?? []).length > 0)).toHaveLength(4);
+  });
+});
+
+/**
+ * MOTION-05 (M5.1) — the default narrative path.
+ *
+ * The section must explain the map before a click, and that sentence has to be
+ * the map: the capability it names is the one the island selects, the count is
+ * the number of edges incident to it, and the steps are the heaviest of those
+ * edges in the order the entry choreography (M5.2) draws them. Nothing here is
+ * typed copy — every field comes from `buildSignalLoomGraph`.
+ */
+describe("MOTION-05 — default narrative path", () => {
+  const fixtureSkills: SkillsData = {
+    categories: [
+      { name: "Machine Learning & AI", icon: "brain", skills: [{ name: "Machine Learning", proficiency: 5 }] },
+      { name: "Web Development", icon: "code", skills: [{ name: "React.js", proficiency: 3 }] },
+    ],
+  };
+  const fixtureProjects: Project[] = [
+    {
+      title: "Light Overlap",
+      category: "ml",
+      period: "2026",
+      description: "Shares one skill.",
+      links: [],
+      skills: ["Machine Learning"],
+    },
+    {
+      title: "Heavy Overlap",
+      category: "ml",
+      period: "2026",
+      description: "Shares two skills.",
+      links: [],
+      skills: ["Machine Learning", "Python"],
+    },
+    {
+      title: "Heaviest Overlap",
+      category: "ml",
+      period: "2025",
+      description: "Shares all three skills.",
+      links: [],
+      skills: ["Machine Learning", "Python", "Deep Learning"],
+    },
+    {
+      title: "Web Only",
+      category: "web",
+      period: "2026",
+      description: "Belongs to another capability.",
+      links: [],
+      skills: ["React.js"],
+    },
+  ];
+  const heavySkills: SkillsData = {
+    categories: [
+      {
+        name: "Machine Learning & AI",
+        icon: "brain",
+        skills: [
+          { name: "Machine Learning", proficiency: 5 },
+          { name: "Python", proficiency: 5 },
+          { name: "Deep Learning", proficiency: 5 },
+        ],
+      },
+      { name: "Web Development", icon: "code", skills: [{ name: "React.js", proficiency: 3 }] },
+    ],
+  };
+
+  it("names the capability the map opens on and counts its real edges", () => {
+    const graph = buildSignalLoomGraph(fixtureProjects, fixtureSkills);
+    const narrative = defaultNarrative(graph);
+
+    expect(narrative).not.toBeNull();
+    expect(narrative?.capabilityId).toBe(graph.defaultNodeId);
+    expect(narrative?.capabilityLabel).toBe("Machine Learning & AI");
+    expect(narrative?.connectedProjects).toBe(3);
+  });
+
+  it("orders steps by overlap weight, breaking ties with graph order", () => {
+    const graph = buildSignalLoomGraph(fixtureProjects, heavySkills);
+    const narrative = defaultNarrative(graph);
+
+    expect(narrative?.steps.map((step) => step.weight)).toEqual([3, 2, 1]);
+    expect(narrative?.steps.map((step) => step.label)).toEqual([
+      "Heaviest Overlap",
+      "Heavy Overlap",
+      "Light Overlap",
+    ]);
+    // The href is the real project page, resolved by the same rule the cards use.
+    const first = fixtureProjects.find((project) => project.title === "Heaviest Overlap");
+    expect(narrative?.steps[0].id).toBe(`project-${"heaviest-overlap"}`);
+    expect(narrative?.steps[0].href).toBe(first ? projectHref(first) : "");
+  });
+
+  it("caps the named steps without shrinking the connected count", () => {
+    const graph = buildSignalLoomGraph(fixtureProjects, heavySkills);
+
+    expect(defaultNarrative(graph, 2)?.steps).toHaveLength(2);
+    expect(defaultNarrative(graph, 2)?.connectedProjects).toBe(3);
+    // A limit below one would render an empty list; clamp to one step instead of
+    // returning a narrative with nothing in it.
+    expect(defaultNarrative(graph, 0)?.steps).toHaveLength(1);
+    expect(defaultNarrative(graph, -5)?.steps).toHaveLength(1);
+  });
+
+  it("falls back to the most connected capability when the default node is a project", () => {
+    const graph = buildSignalLoomGraph(fixtureProjects, fixtureSkills);
+    const projectDefault: SignalLoomGraph = {
+      ...graph,
+      defaultNodeId: "project-light-overlap",
+    };
+
+    expect(defaultNarrative(projectDefault)?.capabilityId).toBe(
+      "capability-machine-learning-ai",
+    );
+  });
+
+  it("returns null when there is no story to tell", () => {
+    const orphanProject: Project = {
+      title: "Orphan",
+      category: "cli",
+      period: "2026",
+      description: "Shares no declared skill.",
+      links: [],
+      skills: ["Rust"],
+    };
+    const graph = buildSignalLoomGraph([orphanProject], fixtureSkills);
+
+    expect(graph.edges).toEqual([]);
+    expect(defaultNarrative(graph)).toBeNull();
+    expect(defaultPathEdgeIds(graph)).toEqual([]);
+  });
+
+  it("orders the entry path the way the narrative reads", () => {
+    const graph = buildSignalLoomGraph(fixtureProjects, heavySkills);
+
+    expect(defaultPathEdgeIds(graph)).toEqual([
+      "capability-machine-learning-ai->project-heaviest-overlap",
+      "capability-machine-learning-ai->project-heavy-overlap",
+      "capability-machine-learning-ai->project-light-overlap",
+    ]);
+  });
+});
+
+/**
+ * The same narrative on the 22 projects as they exist now. These are
+ * measurement pins, not copy: if the data changes, the sentence changes, and
+ * these numbers must change with it.
+ */
+describe("MOTION-05 — real portfolio narrative", () => {
+  const skills = skillsData as SkillsData;
+  const projects = projectsData.projects as Project[];
+  const graph = buildSignalLoomGraph(projects, skills);
+  const narrative = defaultNarrative(graph);
+
+  it("opens on the Machine Learning & AI hub with its nine projects", () => {
+    expect(narrative?.capabilityId).toBe("capability-machine-learning-ai");
+    expect(narrative?.connectedProjects).toBe(9);
+    expect(narrative?.steps).toHaveLength(3);
+  });
+
+  it("names the three heaviest ties, all two shared skills", () => {
+    expect(narrative?.steps.map((step) => step.weight)).toEqual([2, 2, 2]);
+    const labels = narrative?.steps.map((step) => step.label) ?? [];
+    // The label is the node label the map renders — no shortened copy invented
+    // for the narrative.
+    expect(labels).toEqual([
+      "TemuSehat ADK – Herbal AI Agent for Early Symptom Triage",
+      "Pathwise Career AI: Personalized Guidance Through Data-Driven Insights",
+      "SweetLife Mobile App – AI-Powered Wellness & Diabetes-Friendly Lifestyle Companion",
+    ]);
+  });
+
+  it("keeps every step anchored to the node the map renders", () => {
+    const nodeIds = new Set(graph.nodes.map((node) => node.id));
+    for (const step of narrative?.steps ?? []) {
+      expect(nodeIds.has(step.id)).toBe(true);
+      expect(step.href.startsWith("/projects/")).toBe(true);
+    }
+  });
+
+  it("orders the whole default path by weight, not by edge list order", () => {
+    const pathIds = defaultPathEdgeIds(graph);
+    expect(pathIds).toHaveLength(9);
+    const weights = pathIds.map(
+      (id) => graph.edges.find((edge) => edge.id === id)?.weight ?? 0,
+    );
+    expect([...weights].sort((a, b) => b - a)).toEqual(weights);
+    // The first three are exactly the steps the narrative names.
+    expect(pathIds.slice(0, 3)).toEqual(
+      (narrative?.steps ?? []).map((step) => `capability-machine-learning-ai->${step.id}`),
+    );
   });
 });

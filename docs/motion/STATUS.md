@@ -1,8 +1,8 @@
 # Motion Programme — Status
 
-**Last updated:** 2026-10-27 (MOTION-04 `DONE`)
+**Last updated:** 2026-10-28 (MOTION-05 `DONE`)
 **Branch:** `main` · **HEAD at session start:** `bc807e6`
-**Active sprint:** none — MOTION-04 (evidence card hierarchy) is closed; do not start MOTION-05
+**Active sprint:** none — MOTION-05 (capability map narrative) is closed; do not start MOTION-06
 
 ## One-paragraph state
 
@@ -92,26 +92,33 @@ JS**; the hero is the only remaining offender.
 | OBI comet plate: 1882, Trouvelot, NYPL, 1600 px JPEG 135,269 B; 1200 px 71,198 B | OBI item + `HEAD` | VERIFIED (external) |
 | Image budget gate absent: `measure:routes` counts JS only | script source | VERIFIED |
 | BHL/LoC/Unsplash/Heritage Type licenses | BHL 404, LoC 403, Unsplash 401/404, Heritage Type terms inside ZIPs | TODO — do not claim |
+| MOTION-05 shipped: default narrative (`defaultNarrative` + `defaultPathEdgeIds` from graph data), server-rendered beside intro copy (`md:grid-cols-2`, stacks at 375), entry fade draws strongest edges first (weight desc, tie by node order); no new scroll listener, `measureEdges` one pass, 30 nodes / 31 edges unchanged, reduced motion keeps emphasis + drops dots; H-1 BorderGlow fail-closed guard (`@supports (mask-composite: intersect)` + `mask-image`) | `src/lib/creative/signal-loom.ts`, `SignalLoom.astro`, `SignalLoom.tsx`, `layout-queries.css`, `signal-loom.test.ts`, `SignalLoom.entry.test.tsx`, `border-glow.guard.test.ts`, `e2e/signal-loom-narrative.spec.ts`, `e2e/project-cards.spec.ts` | VERIFIED (2026-10-28) |
+| H-1 hover flood reproduced and fixed: forcing `mask-composite: add` floods the card; `@supports` gate ensures decoration may be lost, content may not; e2e ships the `@supports` prelude and the mask-composite cycle | `.opencode/probe-hover-nocomposite.mjs`, `e2e/project-cards.spec.ts` | VERIFIED (2026-10-28) |
+| MOTION-05 layout: at 1440 capabilityTop = projectTop = 2698.77 (offset 0), first-row bottom 816.25 < 900; at 375 narrative top 2667.3 (480.5 into section), narrativeHeight 230, sectionToFirstCard 1936 (columns stacked, honest gate = narrative fully in first viewport) | `.opencode/probe-m05.mjs` | VERIFIED (2026-10-28) |
+| Payload after MOTION-05 `/` = 202.7 KB initial / 557.4 KB reachable / 75.8 KB HTML (+1.0 / +5.8 / +4.5 vs MOTION-04); `/work` 150.8/393.2/18.5; `/gallery` 179.2/504.5/20.0; islands 16 (7e/9d); all dist JS 671.5 KB / 102 files | `bun run measure:routes` | VERIFIED (2026-10-28) |
+| Full e2e suite after MOTION-05 = 407 tests / 36 files, 407 passed | `bunx playwright test --workers=1` | VERIFIED (2026-10-28) |
+| Unit suite after MOTION-05 = 1192 tests / 104 files | `bunx vitest run` | VERIFIED (2026-10-28) |
+| `astro check` = 98 errors, 0 warnings, 82 hints | `bunx astro check` | VERIFIED (2026-10-28) |
 
 ## Active work
 
-**None in progress.** All four Motion sprints (MOTION-01 Chapter Reveal,
+**None in progress.** All five Motion sprints (MOTION-01 Chapter Reveal,
 MOTION-01.5 image hygiene, MOTION-02 hero handoff, MOTION-03 career spine,
-MOTION-04 evidence card hierarchy) are verified — see `SPRINT_PLAN.md`
-§MOTION-04 completion notes. MOTION-04 is complete: the grid holds one reveal
-wrapper per card (order from data), the chapter body is exempt, filtering
-replaces the reveal with a settled state, reduced motion stops both the beat and
-the FLIP, and the site-wide `overflow: hidden` → `overflow: clip` defect is
-fixed. Guard 23/23, unit 1176/1176, full e2e 381 passed + 1 honestly skipped,
-payload `/` 202.7 / 557.1 / 75.3 KB, islands 16 (7e/9d). **One sprint
-completed — do not start MOTION-05.**
+MOTION-04 evidence card hierarchy, MOTION-05 capability map narrative) are
+verified — see `SPRINT_PLAN.md` §MOTION-05 completion notes. MOTION-05 is
+complete: the Signal Loom has a default narrative path from graph data,
+server-rendered copy, a one-shot entry fade for the strongest three edges,
+preserved hover/focus/selection/deep links, reduced motion as a real off switch,
+and the H-1 BorderGlow fail-closed guard. Guard 27/27 (4 new), unit 1192/1192,
+full e2e 407 passed, payload `/` 202.7 / 557.4 / 75.8 KB, islands 16 (7e/9d).
+**One sprint completed — do not start MOTION-06.**
 
 **Visual-asset strategy:** research complete (2026-10-21), recorded in
 `ASSETS.md`; policy is D-11. Step 1 of that policy ("fix the assets already
 served") is now done by MOTION-01.5. No external asset was acquired, and none
 should be.
 
-**Next: none for the Motion programme** (MOTION-04 just closed — see completion
+**Next: none for the Motion programme** (MOTION-05 just closed — see completion
 notes). The next candidate work is a new sprint/phase outside this programme, or
 no new motion sprint until a fresh decision.
 

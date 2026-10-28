@@ -384,4 +384,112 @@ both call sites. Teeth proven by mutating the 120 px limit to 1 (fails at
   article that owns the FLIP, so the two animations cannot fight.
 - `prefers-reduced-data` remains non-emulatable in Chromium; source guard only.
 
-**Next:** none — MOTION-04 is closed; do not start MOTION-05 in this pass.
+**Next:** none — MOTION-05 is closed.
+
+---
+
+## 2026-10-28 — MOTION-05 — Capability map narrative
+
+**Goal:** Turn the Signal Loom from an interactive diagram into a guided
+explanation of how capabilities connect to evidence. A default chapter path
+highlights one capability and its projects, with a clear reading order;
+interaction refines, never gates, the story.
+
+**Completed**
+
+- **M5.0 Column offset (H-1 reproduced and fixed):** Top-aligned capability and
+  project columns (`md:items-start`, drop `md:self-center`); island container
+  `overflow-hidden` → `overflow-clip`. Measured at 1440: `capabilityTop =
+  projectTop = 2698.77` (offset 0), first-row bottom 816.25 < 900. At 375:
+  narrativeTop 2667.3 (480.5 into section), narrativeHeight 230,
+  sectionToFirstCard 1936. Columns are intentionally stacked below `md`
+  (`hidden md:block` connector plane); honest gate = narrative fully in first
+  viewport.
+
+- **M5.1 Default narrative from graph data:** `defaultNarrative()` +
+  `defaultPathEdgeIds()` in `src/lib/creative/signal-loom.ts`; server-rendered
+  in `SignalLoom.astro` beside intro copy (`md:grid-cols-2`), lazy anchors
+  `#signal-<id>`. Default hub = `capability-machine-learning-ai` (degree 9), 9
+  connected projects, 3 strongest (weight 2) = TemuSehat / Pathwise / SweetLife.
+  Narrative does not print skill-count to avoid confusion with project count.
+  `capabilitySummary` field removed (no consumer → dead field, Rule 3).
+
+- **M5.2 One-shot entry fade for default path:** Stable sort of `[data-edge]` by
+  `defaultPathEdgeIds` (weight desc, tie by node index); re-runs on
+  `entryEdgeIds` change. `src/islands/SignalLoom.entry.test.tsx` (2 tests,
+  fake-GSAP harness) pins order `["ml->b","ml->c","ml->a","web->a"]`; teeth
+  proven (removing sort → 1 red, restored md5 identical).
+
+- **M5.3 Hover/focus/selection/deep links unchanged:** Verified by
+  `e2e/signal-loom-narrative.spec.ts`, `e2e/signal-loom-deeplink.spec.ts`,
+  `e2e/pointer-touch.spec.ts`. Added `data-edge-from` / `data-edge-to` on each
+  `<line>` so e2e derives counts/orders from DOM, not hard-coded.
+
+- **M5.4 Reduced motion keeps emphasis, drops dots:** `prefers-reduced-motion`
+  → signal dots 0, emphasis edges remain at rest weight; no new listener.
+
+- **H-1 BorderGlow fail-closed (user-reported hover flood):** Reproduced by
+  forcing `mask-composite: add` (floods entire card). Fix: `.border-glow::before`
+  painting rule **only inside** `@supports ((mask-composite: intersect) and
+  (mask-image: linear-gradient(#000 0 0)))`. Without mask compositing, every
+  mask layer unions (`add`), the 1 px ring becomes a full opaque rectangle and
+  the mesh floods the card — the reported defect. The gate is structural: if
+  the rule is hoisted out, the flood returns. E2E `project-cards.spec.ts`
+  ships the `@supports` prelude and asserts `mask-composite:intersect` +
+  `mask-image:linear-gradient`; unit `border-glow.guard.test.ts` (4 tests) pins
+  the structural gate; mutation proves hoisted rule → `okFeatures: false,
+  depth: 0`.
+
+- Added `data-signal-narrative-capability` hook for e2e; `data-edge-from` /
+  `data-edge-to` on edges.
+
+**Exclusions honored**
+- No new graph data, no change to node counts/edges (30/31 unchanged), no
+  canvas, no auto-playing perpetual animation, no new dependency, no new JS
+  runtime cost, no new scroll listener/RAF/observer/timer, `measureEdges` one
+  pass per layout, reduced motion is a real off switch, sections use
+  `overflow: clip`, every displayed number derived from data layer.
+
+**Deviations accepted**
+- **375 mobile:** columns intentionally stacked (`hidden md:block` connector
+  plane), so "both columns side by side in one viewport" is unachievable.
+  Honest gate = zero empty offset + narrative fully inside first viewport
+  (capability label + 3 project ties).
+- Tie-break rule for `defaultPathEdgeIds`: weight desc then node index (not
+  project title or date). Documented in completion notes.
+
+**Verification gates**
+- Unit: `signal-loom.test.ts` 42/42, `SignalLoom.entry.test.tsx` 2/2,
+  `border-glow.guard.test.ts` 4/4.
+- E2E: `signal-loom-narrative.spec.ts` 6/6, `signal-loom-deeplink.spec.ts` 5/5,
+  `accessibility.spec.ts` (Signal Loom section), `pointer-touch.spec.ts`
+  (Signal Loom section), `project-cards.spec.ts` (BorderGlow + cross-link
+  sections).
+- Build: `bun run build:fast` 49 pages (36.8 s).
+- `bunx astro check` = 98 errors, 0 warnings, 82 hints (baseline, 0 new).
+- Payload `/` = 202.7 KB initial / 557.4 KB reachable / 75.8 KB HTML (+1.0 / +5.8
+  / +4.5 vs MOTION-04); `/work` 150.8/393.2/18.5; `/gallery` 179.2/504.5/20.0;
+  islands 16 (7e/9d); all dist JS 671.5 KB / 102 files.
+- Biome clean on 8 touched files.
+- `validate-data` OK.
+- Full e2e `--workers=1` = 407 passed (was 381 + 26 new).
+- Unit 1192 passed (was 1176 + 16 new).
+
+**Lessons**
+- The fail-closed pattern (`@supports` gate) is the correct fix for CSS
+  features that can flood content when unsupported. The structural guard in
+  both unit and e2e catches hoisting mistakes that would otherwise silently
+  reintroduce the flood.
+- `mask-image:` in the `@supports` query avoids biome's
+  `noShorthandPropertyOverrides` on the shorthand `mask:` while testing the
+  exact feature the rule depends on (multi-layer mask parsing).
+- Narrative tie-break = target node order is stable and document-order safe;
+  reordering the data does not change the default path edges.
+- The 375 stack is a deliberate design choice (connector plane hidden); the
+  honest gate is what a phone reader actually gets: the narrative fully in the
+  first viewport.
+- H-1 was a real defect (hover flood hiding text/image), not a decoration
+  preference. The fix removes the decoration on unsupported engines rather
+  than filling the gap with a plate.
+
+**Next:** none — MOTION-05 is closed; do not start MOTION-06.

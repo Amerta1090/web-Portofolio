@@ -35,50 +35,54 @@
    older WebKit. It only paints while the guard is live
    (`[data-tilt-spotlight]`) and is hidden entirely for reduced motion or
    reduced data. */
-.border-glow::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background:
-    radial-gradient(at 80% 55%, rgb(var(--color-brand-rgb) / 0.9) 0px, transparent 50%),
-    radial-gradient(at 69% 34%, rgb(var(--color-brand-warm-rgb) / 0.9) 0px, transparent 50%),
-    radial-gradient(at 8% 6%, rgb(var(--color-brand-muted-rgb) / 0.9) 0px, transparent 50%),
-    radial-gradient(at 41% 38%, rgb(var(--color-brand-rgb) / 0.9) 0px, transparent 50%),
-    radial-gradient(at 86% 85%, rgb(var(--color-brand-warm-rgb) / 0.9) 0px, transparent 50%),
-    radial-gradient(at 82% 18%, rgb(var(--color-brand-muted-rgb) / 0.9) 0px, transparent 50%),
-    radial-gradient(at 51% 4%, rgb(var(--color-brand-rgb) / 0.9) 0px, transparent 50%),
-    linear-gradient(rgb(var(--color-brand-rgb)) 0 100%);
-  -webkit-mask:
-    conic-gradient(
-      from 0deg at var(--glow-x, 50%) var(--glow-y, 50%),
-      #000 0%,
-      #000 22%,
-      transparent 38%,
-      transparent 100%
-    ),
-    linear-gradient(#000 0 0),
-    linear-gradient(#000 0 0) content-box;
-  -webkit-mask-composite: source-in, source-out;
-  mask:
-    conic-gradient(
-      from 0deg at var(--glow-x, 50%) var(--glow-y, 50%),
-      #000 0%,
-      #000 22%,
-      transparent 38%,
-      transparent 100%
-    ),
-    linear-gradient(#000 0 0),
-    linear-gradient(#000 0 0) content-box;
-  mask-composite: intersect, subtract;
-  opacity: 0;
-  pointer-events: none;
-  z-index: 1;
-}
-.tilt-card[data-tilt-spotlight] .border-glow::before,
-.border-glow[data-tilt-spotlight="on"]::before {
-  opacity: 1;
+/* FAIL CLOSED (H-1, 2026-10-28). `mask-composite` is what cuts the mesh down to
+   a 1 px ring. In a browser that ignores it (or applies only the legacy
+   `-webkit-mask-composite`), every mask layer composites with `add`: the cones
+   union into a full rectangle and the gradient floods the whole card at
+   `opacity: 1`, hiding text and image. That is the exact defect reproduced by
+   forcing `mask-composite: add`. So the layer is defined **only** inside a
+   support query for the two features that make a ring possible; everywhere else
+   the pseudo-element does not exist and no paint can happen. Decoration may be
+   lost; content may not. */
+@supports ((mask-composite: intersect) and (mask-image: linear-gradient(#000 0 0))) {
+  .border-glow::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: radial-gradient(at 80% 55%, rgb(var(--color-brand-rgb) / 0.9) 0px, transparent 50%),
+      radial-gradient(at 69% 34%, rgb(var(--color-brand-warm-rgb) / 0.9) 0px, transparent 50%),
+      radial-gradient(at 8% 6%, rgb(var(--color-brand-muted-rgb) / 0.9) 0px, transparent 50%),
+      radial-gradient(at 41% 38%, rgb(var(--color-brand-rgb) / 0.9) 0px, transparent 50%),
+      radial-gradient(at 86% 85%, rgb(var(--color-brand-warm-rgb) / 0.9) 0px, transparent 50%),
+      radial-gradient(at 82% 18%, rgb(var(--color-brand-muted-rgb) / 0.9) 0px, transparent 50%),
+      radial-gradient(at 51% 4%, rgb(var(--color-brand-rgb) / 0.9) 0px, transparent 50%),
+      linear-gradient(rgb(var(--color-brand-rgb)) 0 100%);
+    -webkit-mask: conic-gradient(
+        from 0deg at var(--glow-x, 50%) var(--glow-y, 50%),
+        #000 0%,
+        #000 22%,
+        transparent 38%,
+        transparent 100%
+      ), linear-gradient(#000 0 0), linear-gradient(#000 0 0) content-box;
+    -webkit-mask-composite: source-in, source-out;
+    mask: conic-gradient(
+        from 0deg at var(--glow-x, 50%) var(--glow-y, 50%),
+        #000 0%,
+        #000 22%,
+        transparent 38%,
+        transparent 100%
+      ), linear-gradient(#000 0 0), linear-gradient(#000 0 0) content-box;
+    mask-composite: intersect, subtract;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .tilt-card[data-tilt-spotlight] .border-glow::before,
+  .border-glow[data-tilt-spotlight="on"]::before {
+    opacity: 1;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .border-glow::before {

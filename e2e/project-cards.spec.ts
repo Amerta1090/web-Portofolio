@@ -194,6 +194,28 @@ test("BorderGlow ring is a pure-CSS conic-masked ::before reading --glow-x/--glo
   expect(shipped).toContain("-webkit-mask-composite:source-in,source-out;");
   expect(shipped).toContain("mask-composite:intersect,subtract");
   expect(shipped).toContain("var(--glow-x,50%)var(--glow-y,50%)");
+
+  // H-1 (MOTION-05): the ring fails closed. Without mask compositing every mask
+  // layer unions (`add`), the 1 px ring becomes a full opaque rectangle and the
+  // mesh floods the card — the defect the user reported, reproduced by forcing
+  // `mask-composite: add`. The painting rule must therefore live exactly one
+  // brace level inside an `@supports` for both features, never at top level.
+  const ruleAt = shipped.indexOf(".border-glow:before{content");
+  expect(ruleAt, "the ring rule must ship at least once").toBeGreaterThan(-1);
+  const beforeRule = shipped.slice(0, ruleAt);
+  const supportsAt = beforeRule.lastIndexOf("@supports");
+  expect(supportsAt, "the ring rule must sit inside an @supports block").toBeGreaterThan(-1);
+  const preludeEnd = beforeRule.indexOf("{", supportsAt);
+  expect(preludeEnd).toBeGreaterThan(-1);
+  const prelude = beforeRule.slice(supportsAt, preludeEnd);
+  expect(prelude).toContain("mask-composite:intersect");
+  expect(prelude).toContain("mask-image:linear-gradient(");
+  // Depth 1 = the prelude's own `{` is the only unclosed brace at the rule, so
+  // the rule is a direct child of the query. A hoisted rule reads as depth 0;
+  // one buried in a nested block reads higher.
+  const body = beforeRule.slice(preludeEnd);
+  const depth = (body.match(/\{/g) ?? []).length - (body.match(/\}/g) ?? []).length;
+  expect(depth, "the ring rule must be a direct child of the @supports block").toBe(1);
 });
 
 // Task 2.4 (M6a): each skill chip is a cross-link into the Capability Map. The

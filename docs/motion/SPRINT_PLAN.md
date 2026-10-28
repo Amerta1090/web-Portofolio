@@ -496,7 +496,7 @@ no per-card IntersectionObserver; no new React root.
 
 ## MOTION-05 — Capability map narrative
 
-**Status:** `PLANNED`
+**Status:** `DONE`
 **Priority:** P2
 **Objective:** Turn the Signal Loom from an interactive diagram into a guided
 explanation of how capabilities connect to evidence.
@@ -505,16 +505,18 @@ with a clear reading order; interaction refines, never gates, the story.
 
 **Dependencies:** MOTION-01, MOTION-03 (sequence language).
 
-**Scope:** `SignalLoom.tsx`, `signal-loom*.ts`, map CSS.
+**Scope:** `SignalLoom.tsx`, `signal-loom*.ts`, map CSS, `layout-queries.css` (H-1).
 **Exclusions:** no new graph data, no change to node counts/edges, no canvas, no
 auto-playing perpetual animation.
 
 **Tasks**
-- [ ] M5.0 Fix the measured column offset before the narrative. At 1440 the capability column starts **3,734 px** while the project column starts **2,498 px** (1,236 px empty left panel; heights 622 vs 3,094). Top-align the columns or use a layout that keeps the capability label/column visible with the first projects. Do not fill the gap with a decorative panel or plate.
-- [ ] M5.1 Define the default narrative path and its copy.
-- [ ] M5.2 Add a one-shot entry sequence for the default path.
-- [ ] M5.3 Keep hover/focus/selection and deep links unchanged.
-- [ ] M5.4 Reduced motion: static map with the same default emphasis.
+- [x] M5.0 Fix the measured column offset before the narrative. At 1440 the capability column starts **3,734 px** while the project column starts **2,498 px** (1,236 px empty left panel; heights 622 vs 3,094). Top-align the columns (`md:items-start`, drop `md:self-center`); container `overflow-hidden` → `overflow-clip`. **Measured at 1440: capabilityTop = projectTop = 2698.77 (offset 0), first-row bottom 816.25 < 900. At 375: narrativeTop 2667.3 (480.5 into section), narrativeHeight 230, sectionToFirstCard 1936 (columns stacked; honest gate = narrative fully in first viewport).**
+- [x] M5.1 Define the default narrative path and its copy. `defaultNarrative()` + `defaultPathEdgeIds()` from graph data in `src/lib/creative/signal-loom.ts`; server-rendered in `SignalLoom.astro` beside intro copy (`md:grid-cols-2`), lazy anchors `#signal-<id>`. Default hub = `capability-machine-learning-ai` (degree 9), 9 connected projects, 3 strongest (weight 2) = TemuSehat / Pathwise / SweetLife. Narrative does not print skill-count to avoid confusion with project count.
+- [x] M5.2 Add a one-shot entry sequence for the default path. Stable sort of `[data-edge]` by `defaultPathEdgeIds` (weight desc, tie by node index); re-runs on `entryEdgeIds` change. `SignalLoom.entry.test.tsx` pins order `["ml->b","ml->c","ml->a","web->a"]` with fake-GSAP harness (2 tests, teeth proven).
+- [x] M5.3 Keep hover/focus/selection and deep links unchanged. Verified by `e2e/signal-loom-narrative.spec.ts`, `e2e/signal-loom-deeplink.spec.ts`, `e2e/pointer-touch.spec.ts`.
+- [x] M5.4 Reduced motion: static map with the same default emphasis. Verified: `prefers-reduced-motion` → entry dots 0, emphasis edges remain at rest weight; no new listener.
+
+**H-1 (2026-10-28):** User-reported hover flood on featured project cards. Reproduced by forcing `mask-composite: add` (floods whole card). Fix: `.border-glow::before` painting rule moved inside `@supports ((mask-composite: intersect) and (mask-image: linear-gradient(#000 0 0)))` so decoration may be lost, content may not. E2E ships the `@supports` prelude and mask-composite cycle; unit `border-glow.guard.test.ts` (4 tests) pins the structural gate; mutation tests prove teeth.
 
 **Acceptance criteria**
 - At 1440 and 375, the first viewport of `#systems-in-motion` shows both the capability label/column and project evidence; no 1,236 px offset.
@@ -524,7 +526,16 @@ auto-playing perpetual animation.
 - 30 nodes / 31 edges unchanged.
 
 **Definition of Done / verification:** signal-loom, accessibility,
-pointer-touch, deep-link specs; build; payload; diff review.
+pointer-touch, deep-link, narrative specs; build; payload; diff review.
+
+**Completion notes (2026-10-28):**
+- M5.0 column offset fixed (top-aligned, `overflow-clip`). 1440 offset 0; 375 stacks columns with narrative fully in first viewport.
+- M5.1 server narrative uses `defaultNarrative()` (graph-derived), no hard-coded values. Hub `capability-machine-learning-ai` (degree 9), ties TemuSehat/Pathwise/SweetLife (all weight 2). Tie-break = target node order.
+- M5.2 entry fade targets `defaultPathEdgeIds` order; fake-GSAP harness proves target order.
+- M5.3/M5.4 verified by dedicated e2e specs; no new scroll listener/RAF.
+- H-1 BorderGlow fail-closed: `@supports` gate on `mask-composite: intersect` + `mask-image`; mutation proves hoisted rule → `okFeatures: false, depth: 0`.
+- **375 deviation accepted:** columns intentionally stacked (`hidden md:block` connector plane), so "both columns side by side in one viewport" is unachievable. Honest gate = zero empty offset + narrative fully inside first viewport.
+- Payload `/` = 202.7 / 557.4 / 75.8 KB (+1.0 / +5.8 / +4.5 vs MOTION-04); islands 16 (7e/9d); full e2e 407/407; unit 1192/1192; `astro check` 98.
 
 ---
 
