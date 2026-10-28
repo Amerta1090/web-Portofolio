@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-10-28 (MOTION-05 `DONE`)
 **Branch:** `main` · **HEAD at session start:** `bc807e6`
-**Active sprint:** none — MOTION-05 (capability map narrative) is closed; do not start MOTION-06
+**Active sprint:** none — MOTION-05 (capability map narrative) is closed; MOTION-06 READY
 
 ## One-paragraph state
 
