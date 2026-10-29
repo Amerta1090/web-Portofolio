@@ -2,7 +2,7 @@ import { motion, useInView, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import TypewriterText from "../components/atoms/TypewriterText";
 import { gsap } from "../lib/gsap";
-import { duration, easing } from "../lib/motion";
+import { duration } from "../lib/motion";
 import type { GitHubData } from "../types/github";
 
 interface Props {
@@ -18,10 +18,11 @@ export default function BootSequence({ gitHubData, profileName, onComplete }: Pr
   const sectionRef = useRef<HTMLDivElement>(null);
   const glitchRef = useRef<HTMLSpanElement>(null);
   const onCompleteRef = useRef(onComplete);
-  const currentLineRef = useRef(0);
+  const currentLineRef = useRef(1);
   const isInView = useInView(sectionRef, { once: true, margin: "-64px" });
   const [phase, setPhase] = useState<"idle" | "typing" | "glitch" | "complete">("idle");
-  const [currentLine, setCurrentLine] = useState(0);
+  // Line one is real SSR content; the animation starts with the next line.
+  const [currentLine, setCurrentLine] = useState(1);
   const [started, setStarted] = useState(false);
   const [skipped, setSkipped] = useState(false);
 
@@ -44,11 +45,12 @@ export default function BootSequence({ gitHubData, profileName, onComplete }: Pr
     } catch {}
   }, []);
 
+  // Start typing immediately when in view — no 400 ms delay, no opacity gate.
+  // The first meaningful line renders in SSR, so the terminal is never blank.
   useEffect(() => {
     if (isInView && !skipped && phase === "idle") {
       setPhase("typing");
-      const t = setTimeout(() => setStarted(true), 400);
-      return () => clearTimeout(t);
+      setStarted(true);
     }
   }, [isInView, skipped, phase]);
 
@@ -69,8 +71,6 @@ export default function BootSequence({ gitHubData, profileName, onComplete }: Pr
       return;
     }
 
-    // M4.10.2: owned via gsap.context (scoped kill on revert) instead of a
-    // bare by-reference kill — same single timeline, consistent scoping.
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         onComplete: () => {
@@ -138,6 +138,7 @@ export default function BootSequence({ gitHubData, profileName, onComplete }: Pr
 
   const showSkip = started && !skipped && phase !== "complete";
 
+  // SSR / reduced motion: render all lines statically (final state, no animation)
   if (skipped || prefersReduced) {
     return (
       <div ref={sectionRef} className="w-full py-8 md:py-12">
@@ -169,12 +170,7 @@ export default function BootSequence({ gitHubData, profileName, onComplete }: Pr
       }}
     >
       <TerminalFrame>
-        <motion.div
-          className="font-mono text-sm space-y-2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: started ? 1 : 0 }}
-          transition={{ duration: duration.normal, ease: easing["ease-out-expo"] }}
-        >
+        <div className="font-mono text-sm space-y-2">
           {lines.map((line, i) => {
             const isLast = i === lines.length - 1;
             const lineState =
@@ -210,7 +206,7 @@ export default function BootSequence({ gitHubData, profileName, onComplete }: Pr
               </div>
             );
           })}
-        </motion.div>
+        </div>
 
         {showSkip && (
           <motion.div

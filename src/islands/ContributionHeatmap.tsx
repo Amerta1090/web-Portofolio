@@ -1,7 +1,8 @@
-import { motion, useInView, useReducedMotion } from "motion/react";
-import { useRef, useState } from "react";
 import { Flame } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
+import { useState } from "react";
 import ChartDataTable from "../components/atoms/ChartDataTable";
+import { useInstrumentEntry } from "../lib/useInstrumentEntry";
 import type { ContributionCalendar } from "../types/github";
 
 interface Props {
@@ -14,9 +15,8 @@ const CELL_GAP = 2;
 const DAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
 
 export default function ContributionHeatmap({ data, longestStreak = 0 }: Props) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-64px" });
   const prefersReduced = useReducedMotion();
+  const { phase, ref } = useInstrumentEntry();
   const [tooltip, setTooltip] = useState<{
     count: number;
     date: string;
@@ -33,9 +33,9 @@ export default function ContributionHeatmap({ data, longestStreak = 0 }: Props) 
     return (
       <div className="flex flex-col">
         <h3 className="text-sm text-text-secondary font-medium mb-4">Contribution Activity</h3>
-        <div className="text-center py-8 text-text-secondary text-sm" role="status">
+        <output className="text-center py-8 text-text-secondary text-sm">
           No contribution data available.
-        </div>
+        </output>
       </div>
     );
   }
@@ -58,137 +58,314 @@ export default function ContributionHeatmap({ data, longestStreak = 0 }: Props) 
     });
   };
 
+  // SSR / reduced motion / settled: render final static grid
+  if (prefersReduced || phase === "settled") {
+    return (
+      <div className="relative">
+        <h3 className="text-sm text-text-secondary font-medium mb-4">Contribution Activity</h3>
+        <div ref={ref}>
+          <div className="overflow-x-auto pb-2">
+            <div
+              className="flex gap-0.5 mx-auto"
+              style={{ width: `${data.weeks.length * (CELL_SIZE + CELL_GAP)}px` }}
+            >
+              <div className="flex flex-col gap-0.5 pr-1 pt-2 shrink-0">
+                {DAY_LABELS.map((day) => (
+                  <div
+                    key={day}
+                    className="text-[10px] text-text-secondary/60 leading-none"
+                    style={{ height: CELL_SIZE }}
+                  >
+                    {day}
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-0.5">
+                {data.weeks.map((week, wi) => (
+                  <div key={week.days[0]?.date ?? wi} className="flex flex-col gap-0.5">
+                    {week.days.map((day) => {
+                      const cellKey = day.date || `${wi}`;
+                      return (
+                        <div
+                          key={cellKey}
+                          className="rounded-[2px]"
+                          style={{
+                            width: CELL_SIZE,
+                            height: CELL_SIZE,
+                            backgroundColor: getCellColor(day.level, day.count),
+                          }}
+                          title={`${day.count} contributions on ${day.date}`}
+                        />
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {tooltip && (
+            <div
+              className="absolute pointer-events-none z-20"
+              style={{
+                left: tooltip.x,
+                top: tooltip.y - 8,
+                transform: "translate(-50%, -100%)",
+              }}
+            >
+              <div className="bg-[#0f0f11]/90 backdrop-blur-md border border-border/50 rounded-lg px-3 py-2 shadow-xl whitespace-nowrap">
+                <p className="text-sm font-semibold text-text-primary">
+                  {tooltip.count} contribution{tooltip.count !== 1 ? "s" : ""}
+                </p>
+                <p className="text-xs text-text-secondary/60">{tooltip.date}</p>
+              </div>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between mt-3">
+            <div className="flex items-center gap-4 text-xs">
+              <span className="text-text-secondary/60">
+                {totalContributions} contributions in the last year
+              </span>
+              {longestStreak > 0 && (
+                <span className="flex items-center gap-1.5 text-text-secondary/80">
+                  <Flame className="w-3.5 h-3.5 text-orange-400" aria-hidden="true" />
+                  {longestStreak}-day streak
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-1 text-[10px] text-text-secondary/50">
+              <span>Less</span>
+              {[0, 1, 2, 3, 4].map((level) => (
+                <div
+                  key={level}
+                  className="rounded-[2px]"
+                  style={{
+                    width: 10,
+                    height: 10,
+                    backgroundColor: getCellColor(level as 0 | 1 | 2 | 3 | 4, level),
+                  }}
+                />
+              ))}
+              <span>More</span>
+            </div>
+          </div>
+          {/* M4.7: same weeks the grid draws — one row per week, daily counts as columns (identical data, tabular shape). */}
+          <ChartDataTable
+            id="contribution-weeks"
+            caption="Contributions per week with daily counts"
+            headers={["Week starting", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]}
+            rows={data.weeks.map((week) => [
+              week.days[0]?.date ?? "week",
+              ...week.days.map((d) => d.count),
+            ])}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Armed: render empty grid (no cells visible yet)
+  if (phase === "armed") {
+    return (
+      <div className="relative">
+        <h3 className="text-sm text-text-secondary font-medium mb-4">Contribution Activity</h3>
+        <div ref={ref}>
+          <div className="overflow-x-auto pb-2">
+            <div
+              className="flex gap-0.5 mx-auto"
+              style={{ width: `${data.weeks.length * (CELL_SIZE + CELL_GAP)}px` }}
+            >
+              <div className="flex flex-col gap-0.5 pr-1 pt-2 shrink-0">
+                {DAY_LABELS.map((day) => (
+                  <div
+                    key={day}
+                    className="text-[10px] text-text-secondary/60 leading-none"
+                    style={{ height: CELL_SIZE }}
+                  >
+                    {day}
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-0.5">
+                {data.weeks.map((week, wi) => (
+                  <div key={week.days[0]?.date ?? wi} className="flex flex-col gap-0.5">
+                    {week.days.map((day) => (
+                      <div
+                        key={day.date || `${wi}`}
+                        className="rounded-[2px]"
+                        style={{
+                          width: CELL_SIZE,
+                          height: CELL_SIZE,
+                          backgroundColor: "var(--bg-tertiary, #27272a)",
+                        }}
+                      />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center justify-between mt-3">
+            <div className="flex items-center gap-4 text-xs">
+              <span className="text-text-secondary/60">
+                {totalContributions} contributions in the last year
+              </span>
+              {longestStreak > 0 && (
+                <span className="flex items-center gap-1.5 text-text-secondary/80">
+                  <Flame className="w-3.5 h-3.5 text-orange-400" aria-hidden="true" />
+                  {longestStreak}-day streak
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-1 text-[10px] text-text-secondary/50">
+              <span>Less</span>
+              {[0, 1, 2, 3, 4].map((level) => (
+                <div
+                  key={level}
+                  className="rounded-[2px]"
+                  style={{
+                    width: 10,
+                    height: 10,
+                    backgroundColor: getCellColor(level as 0 | 1 | 2 | 3 | 4, level),
+                  }}
+                />
+              ))}
+              <span>More</span>
+            </div>
+          </div>
+          <ChartDataTable
+            id="contribution-weeks"
+            caption="Contributions per week with daily counts"
+            headers={["Week starting", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]}
+            rows={data.weeks.map((week) => [
+              week.days[0]?.date ?? "week",
+              ...week.days.map((d) => d.count),
+            ])}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Drawing: animate cells in with stagger
   return (
     <div className="relative">
       <h3 className="text-sm text-text-secondary font-medium mb-4">Contribution Activity</h3>
-    <div ref={ref}>
-      <div className="overflow-x-auto pb-2">
-        <div className="flex gap-0.5 mx-auto" style={{ width: `${data.weeks.length * (CELL_SIZE + CELL_GAP)}px` }}>
-          <div className="flex flex-col gap-0.5 pr-1 pt-2 shrink-0">
-            {DAY_LABELS.map((day) => (
-              <div
-                key={day}
-                className="text-[10px] text-text-secondary/60 leading-none"
-                style={{ height: CELL_SIZE }}
-              >
-                {day}
-              </div>
-            ))}
-          </div>
-          <div className="flex gap-0.5">
-            {data.weeks.map((week, wi) => (
-              <div key={week.days[0]?.date ?? wi} className="flex flex-col gap-0.5">
-                {week.days.map((day) => {
-                  const cellKey = day.date || `${wi}`;
-                  if (prefersReduced) {
+      <div ref={ref}>
+        <div className="overflow-x-auto pb-2">
+          <div
+            className="flex gap-0.5 mx-auto"
+            style={{ width: `${data.weeks.length * (CELL_SIZE + CELL_GAP)}px` }}
+          >
+            <div className="flex flex-col gap-0.5 pr-1 pt-2 shrink-0">
+              {DAY_LABELS.map((day) => (
+                <div
+                  key={day}
+                  className="text-[10px] text-text-secondary/60 leading-none"
+                  style={{ height: CELL_SIZE }}
+                >
+                  {day}
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-0.5">
+              {data.weeks.map((week, wi) => (
+                <div key={week.days[0]?.date ?? wi} className="flex flex-col gap-0.5">
+                  {week.days.map((day) => {
+                    const cellKey = day.date || `${wi}`;
                     return (
-                      <div
+                      <motion.div
                         key={cellKey}
-                        className="rounded-[2px]"
+                        className="rounded-[2px] cursor-pointer"
                         style={{
                           width: CELL_SIZE,
                           height: CELL_SIZE,
                           backgroundColor: getCellColor(day.level, day.count),
                         }}
-                        title={`${day.count} contributions on ${day.date}`}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{
+                          scale: 1,
+                          opacity: 1,
+                          transition: {
+                            duration: 0.15,
+                            delay: (wi * week.days.length + week.days.indexOf(day)) * 0.001,
+                            ease: [0.16, 1, 0.3, 1],
+                          },
+                        }}
+                        whileHover={{
+                          scale: 1.8,
+                          zIndex: 10,
+                          transition: { duration: 0.12 },
+                        }}
+                        onMouseEnter={(e) => handleCellHover(day.count, day.date, e)}
+                        onMouseLeave={() => setTooltip(null)}
                       />
                     );
-                  }
-                  return (
-                    <motion.div
-                      key={cellKey}
-                      className="rounded-[2px] cursor-pointer"
-                      style={{
-                        width: CELL_SIZE,
-                        height: CELL_SIZE,
-                        backgroundColor: getCellColor(day.level, day.count),
-                      }}
-                      initial={isInView ? { scale: 0, opacity: 0 } : false}
-                      animate={
-                        isInView
-                          ? {
-                              scale: 1,
-                              opacity: 1,
-                              transition: {
-                                duration: 0.15,
-                                delay: (wi * week.days.length + week.days.indexOf(day)) * 0.001,
-                                ease: [0.16, 1, 0.3, 1],
-                              },
-                            }
-                          : {}
-                      }
-                      whileHover={{
-                        scale: 1.8,
-                        zIndex: 10,
-                        transition: { duration: 0.12 },
-                      }}
-                      onMouseEnter={(e) => handleCellHover(day.count, day.date, e)}
-                      onMouseLeave={() => setTooltip(null)}
-                    />
-                  );
-                })}
-              </div>
-            ))}
+                  })}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
-      {tooltip && (
-        <div
-          className="absolute pointer-events-none z-20"
-          style={{
-            left: tooltip.x,
-            top: tooltip.y - 8,
-            transform: "translate(-50%, -100%)",
-          }}
-        >
-          <div className="bg-[#0f0f11]/90 backdrop-blur-md border border-border/50 rounded-lg px-3 py-2 shadow-xl whitespace-nowrap">
-            <p className="text-sm font-semibold text-text-primary">
-              {tooltip.count} contribution{tooltip.count !== 1 ? "s" : ""}
-            </p>
-            <p className="text-xs text-text-secondary/60">{tooltip.date}</p>
+        {tooltip && (
+          <div
+            className="absolute pointer-events-none z-20"
+            style={{
+              left: tooltip.x,
+              top: tooltip.y - 8,
+              transform: "translate(-50%, -100%)",
+            }}
+          >
+            <div className="bg-[#0f0f11]/90 backdrop-blur-md border border-border/50 rounded-lg px-3 py-2 shadow-xl whitespace-nowrap">
+              <p className="text-sm font-semibold text-text-primary">
+                {tooltip.count} contribution{tooltip.count !== 1 ? "s" : ""}
+              </p>
+              <p className="text-xs text-text-secondary/60">{tooltip.date}</p>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <div className="flex items-center justify-between mt-3">
-        <div className="flex items-center gap-4 text-xs">
-          <span className="text-text-secondary/60">{totalContributions} contributions in the last year</span>
-          {longestStreak > 0 && (
-            <span className="flex items-center gap-1.5 text-text-secondary/80">
-              <Flame className="w-3.5 h-3.5 text-orange-400" aria-hidden="true" />
-              {longestStreak}-day streak
+        <div className="flex items-center justify-between mt-3">
+          <div className="flex items-center gap-4 text-xs">
+            <span className="text-text-secondary/60">
+              {totalContributions} contributions in the last year
             </span>
-          )}
+            {longestStreak > 0 && (
+              <span className="flex items-center gap-1.5 text-text-secondary/80">
+                <Flame className="w-3.5 h-3.5 text-orange-400" aria-hidden="true" />
+                {longestStreak}-day streak
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-1 text-[10px] text-text-secondary/50">
+            <span>Less</span>
+            {[0, 1, 2, 3, 4].map((level) => (
+              <div
+                key={level}
+                className="rounded-[2px]"
+                style={{
+                  width: 10,
+                  height: 10,
+                  backgroundColor: getCellColor(level as 0 | 1 | 2 | 3 | 4, level),
+                }}
+              />
+            ))}
+            <span>More</span>
+          </div>
         </div>
-        <div className="flex items-center gap-1 text-[10px] text-text-secondary/50">
-          <span>Less</span>
-          {[0, 1, 2, 3, 4].map((level) => (
-            <div
-              key={level}
-              className="rounded-[2px]"
-              style={{
-                width: 10,
-                height: 10,
-                backgroundColor: getCellColor(level as 0 | 1 | 2 | 3 | 4, level),
-              }}
-            />
-          ))}
-          <span>More</span>
-        </div>
+        {/* M4.7: same weeks the grid draws — one row per week, daily counts as columns (identical data, tabular shape). */}
+        <ChartDataTable
+          id="contribution-weeks"
+          caption="Contributions per week with daily counts"
+          headers={["Week starting", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]}
+          rows={data.weeks.map((week) => [
+            week.days[0]?.date ?? "week",
+            ...week.days.map((d) => d.count),
+          ])}
+        />
       </div>
-      {/* M4.7: same weeks the grid draws — one row per week, daily counts as
-          columns (identical data, tabular shape). */}
-      <ChartDataTable
-        id="contribution-weeks"
-        caption="Contributions per week with daily counts"
-        headers={["Week starting", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]}
-        rows={data.weeks.map((week) => [
-          week.days[0]?.date ?? "week",
-          ...week.days.map((d) => d.count),
-        ])}
-      />
-    </div>
     </div>
   );
 }

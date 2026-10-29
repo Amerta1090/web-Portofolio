@@ -5,11 +5,11 @@ import CodeDNAHelix from "../../islands/CodeDNAHelix";
 import GitHubCommandCenter from "../../islands/GitHubCommandCenter";
 import GitHubPhase3 from "../../islands/GitHubPhase3";
 import PhaseIndicator from "../../islands/PhaseIndicator";
+import { getBuildInfo } from "../../lib/github";
 import type { GitHubData } from "../../types/github";
 import Container from "../atoms/Container.astro";
 import DataFreshness from "../atoms/DataFreshness.astro";
 import Section from "../molecules/Section.astro";
-import { getBuildInfo } from "../../lib/github";
 
 export interface Props {
   gitHubData: GitHubData;
@@ -74,7 +74,9 @@ const buildTime = buildInfo?.fetched_at || buildInfo?.built_at || new Date().toI
               <p class="text-text-secondary text-sm">Aggregated stats from all public repositories</p>
               <DataFreshness fetchedAt={buildTime} label="Built" />
             </div>
-            <GitHubCommandCenter client:visible gitHubData={gitHubData} />
+            <div class="contents" data-github-instruments>
+              <GitHubCommandCenter client:visible gitHubData={gitHubData} />
+            </div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div class="group relative overflow-hidden rounded-xl border border-border/40 bg-gradient-to-br from-bg-secondary/80 to-bg-secondary/40 p-5 transition-all duration-300 hover:border-brand/30 hover:shadow-lg hover:shadow-brand/5">
                 <div class="flex items-start gap-4">

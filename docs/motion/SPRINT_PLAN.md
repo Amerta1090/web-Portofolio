@@ -541,7 +541,7 @@ pointer-touch, deep-link, narrative specs; build; payload; diff review.
 
 ## MOTION-06 — Data instruments
 
-**Status:** `PLANNED`
+**Status:** `DONE` (2026-10-29) — see completion notes
 **Priority:** P2
 **Objective:** Make GitHub and Observatory numbers feel measured rather than
 decorative.
@@ -555,11 +555,21 @@ nothing loops off-screen.
 animation, no new chart library, no decorative terminal/background asset.
 
 **Tasks**
-- [ ] M6.0 Measure and fix the BootSequence entry state. The terminal shows only `$` placeholders at 500/1,500 ms and the first lines arrive **~4 s** after entering `#github`. Shorten the blank interval or render the first meaningful line immediately; keep the boot metaphor. Target: first line within 1 s of the section entering view (measure on the 4-core box). Do not add a texture, background, or stock image to fill the wait.
-- [ ] M6.1 Audit counters and chart animations for loop/off-screen behaviour.
-- [ ] M6.2 Make every counter one-shot and deterministic.
-- [ ] M6.3 Align chart draw timing with the chapter body range.
-- [ ] M6.4 Reduced motion: final values immediately.
+- [x] M6.0 Measure and fix the BootSequence entry state. The first meaningful
+      line is present in server HTML and remains visible; typing starts with line
+      two when the section enters. E2E confirms it in under 1 s.
+- [x] M6.1 Audit counters and chart animations for loop/off-screen behaviour.
+      Observatory charts are static Astro SVG; GitHub instruments use one-shot
+      `IntersectionObserver` entry and no off-screen loop.
+- [x] M6.2 Make every counter one-shot and deterministic. `MetricCounter` starts
+      with the data-derived final SSR value and runs one bounded 600 ms count-up
+      only after an off-screen entry. Removed the unused/broken fallback path.
+- [x] M6.3 Align chart draw timing with the chapter body range. GitHub's chapter
+      body opts out of the block reveal because its instruments own entry; their
+      observer uses the same 64 px inset convention and fires once.
+- [x] M6.4 Reduced motion: final values immediately. The hook settles without
+      observation when reduced motion is active; chart branches render final
+      static geometry and counters render final values.
 
 **Acceptance criteria**
 - A reader entering `#github` sees a meaningful first line within 1 s (target; measure), not a 3.5–4 s blank terminal.
@@ -571,11 +581,36 @@ animation, no new chart library, no decorative terminal/background asset.
 **Definition of Done / verification:** observatory, chart-tables, hero-metrics
 specs; build; payload; listener count.
 
+**Completion notes (2026-10-29):**
+- BootSequence's first line is real SSR content; its typewriter starts at line
+  two on entry. Removed the old 400 ms delay and opacity gate; kept the remaining
+  terminal sequence and skip behavior.
+- Added shared `useInstrumentEntry` contract for GitHub charts and all
+  `MetricCounter` consumers (including Observatory). Entry observer disconnects
+  after first intersection; without `IntersectionObserver`, final state remains.
+- GitHub's chapter body opts out of the broad CSS reveal while its instruments
+  own entry. Accessible chart tables remain the same data as each visual.
+- Observatory visuals are SVG/static Astro; no loop or chart library was added.
+- New `e2e/motion-instruments.spec.ts` proves terminal first line under 1 s,
+  reduced-motion metrics stay final, Observatory data remains available with
+  JavaScript disabled, and GitHub instruments own their timing over the chapter.
+- Gates: `validate-data` OK; `build:fast` 49 pages; `astro check` 98 errors,
+  0 warnings, 81 hints (one fewer hint than baseline); Biome clean on touched files; unit 1192/1192;
+  targeted e2e 29/29 (`motion-instruments`, `observatory`, `chart-tables`,
+  `hero-metrics`).
+- Payload `/` 202.7 / 556.1 / 77.2 KB (initial/reachable/HTML); islands 16
+  (7e/9d); all dist JS 671.3 KB / 100 files. Runtime after scroll: 16 scroll
+  listeners (baseline 16), 79 rectReads (documentary baseline 74; delta not
+  attributed), one canvas and one WebGL context. No continuous instrument RAF.
+- Deviations: entry is `IntersectionObserver` with a 64 px root inset rather
+  than CSS animation because charts must draw once and reduced motion must be a
+  full static branch. `data-github-instruments` scopes the chapter-body opt-out.
+
 ---
 
 ## MOTION-07 — Creative Lab contact sheet
 
-**Status:** `PLANNED`
+**Status:** `READY`
 **Priority:** P3
 **Objective:** Make the 27-experiment contact sheet feel like a printed index
 being scanned, without turning it into a carousel.

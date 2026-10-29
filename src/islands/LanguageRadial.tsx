@@ -1,6 +1,7 @@
-import { motion, useInView, useReducedMotion } from "motion/react";
-import { useRef, useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
+import { useState } from "react";
 import ChartDataTable from "../components/atoms/ChartDataTable";
+import { useInstrumentEntry } from "../lib/useInstrumentEntry";
 import type { GitHubLangStats } from "../types/github";
 
 interface Props {
@@ -42,33 +43,20 @@ function describeArc(
   const end = polarToCartesian(cx, cy, r, startAngle);
   const largeArc = endAngle - startAngle > 180 ? 1 : 0;
   if (returnPath) {
-    return [
-      "M", start.x, start.y,
-      "A", r, r, 0, largeArc, 0, end.x, end.y,
-    ].join(" ");
+    return ["M", start.x, start.y, "A", r, r, 0, largeArc, 0, end.x, end.y].join(" ");
   }
-  return [
-    "M", cx, cy,
-    "L", start.x, start.y,
-    "A", r, r, 0, largeArc, 0, end.x, end.y,
-    "Z",
-  ].join(" ");
+  return ["M", cx, cy, "L", start.x, start.y, "A", r, r, 0, largeArc, 0, end.x, end.y, "Z"].join(
+    " ",
+  );
 }
 
-function describeOuterArc(
-  cx: number,
-  cy: number,
-  r: number,
-  startAngle: number,
-  endAngle: number,
-) {
+function describeOuterArc(cx: number, cy: number, r: number, startAngle: number, endAngle: number) {
   return describeArc(cx, cy, r, startAngle, endAngle, true);
 }
 
 export default function LanguageRadial({ languages }: Props) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-64px" });
   const prefersReduced = useReducedMotion();
+  const { phase, ref } = useInstrumentEntry();
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
   const total = languages.reduce((s, l) => s + l.percentage, 0);
@@ -103,159 +91,234 @@ export default function LanguageRadial({ languages }: Props) {
 
   const size = 400;
 
-  if (prefersReduced || !isInView) {
+  // SSR / reduced motion / settled: render final static chart with center label
+  if (prefersReduced || phase === "settled") {
     return (
       <div ref={ref} className="flex flex-col">
         <h3 className="text-sm text-text-secondary font-medium mb-4">Language Breakdown</h3>
         <div className="flex flex-col md:flex-row items-center">
-        <div className="w-3/4 flex justify-center">
-          <div className="relative">
-        <svg
-          width={size}
-          height={size}
-          viewBox={`0 0 ${CX * 2} ${CY * 2}`}
-          role="img"
-          aria-label="Language usage breakdown"
-        >
-          {slices.map((slice) => (
-            <path
-              key={slice.lang.language}
-              d={describeArc(CX, CY, R, slice.startAngle, slice.endAngle)}
-              fill={slice.color}
-              opacity={0.8}
-            />
-          ))}
-          <circle cx={CX} cy={CY} r={INNER_R} fill="var(--bg-secondary, #18181b)" />
-        </svg>
-      </div>
-      </div>
-        <div className="w-1/4 space-y-2 text-right">
-          {slices.map((slice) => (
-            <div
-              key={slice.lang.language}
-              className="flex items-center gap-3 px-3 py-1.5 rounded-lg justify-end"
-            >
-              <span className="text-sm text-text-secondary font-medium tabular-nums">
-                {slice.lang.percentage}%
-              </span>
-              <span className="text-sm text-text-primary">{slice.lang.language}</span>
-              <span
-                className="w-3 h-3 rounded-sm shrink-0"
-                style={{ backgroundColor: slice.color }}
-              />
+          <div className="w-3/4 flex justify-center">
+            <div className="relative">
+              <svg
+                width={size}
+                height={size}
+                viewBox={`0 0 ${CX * 2} ${CY * 2}`}
+                role="img"
+                aria-label="Language usage breakdown"
+              >
+                {slices.map((slice) => (
+                  <path
+                    key={slice.lang.language}
+                    d={describeArc(CX, CY, R, slice.startAngle, slice.endAngle)}
+                    fill={slice.color}
+                    opacity={0.8}
+                  />
+                ))}
+                <circle cx={CX} cy={CY} r={INNER_R} fill="var(--bg-secondary, #18181b)" />
+                {/* Center label rendered statically (no motion) */}
+                <text
+                  x={CX}
+                  y={CY - 6}
+                  textAnchor="middle"
+                  fill="var(--text-primary, #fafafa)"
+                  fontSize="14"
+                  fontWeight="700"
+                >
+                  {centerPct}%
+                </text>
+                <text
+                  x={CX}
+                  y={CY + 16}
+                  textAnchor="middle"
+                  fill="var(--text-secondary, #a1a1aa)"
+                  fontSize="9"
+                >
+                  {centerLabel}
+                </text>
+              </svg>
             </div>
-          ))}
+          </div>
+          <div className="w-1/4 space-y-2 text-right">
+            {slices.map((slice) => (
+              <div
+                key={slice.lang.language}
+                className="flex items-center gap-3 px-3 py-1.5 rounded-lg justify-end"
+              >
+                <span className="text-sm text-text-secondary font-medium tabular-nums">
+                  {slice.lang.percentage}%
+                </span>
+                <span className="text-sm text-text-primary">{slice.lang.language}</span>
+                <span
+                  className="w-3 h-3 rounded-sm shrink-0"
+                  style={{ backgroundColor: slice.color }}
+                />
+              </div>
+            ))}
+          </div>
         </div>
+        {/* M4.7: same table in the reduced/static branch — data parity. */}
+        <ChartDataTable
+          id="languages-radial"
+          caption="Programming languages by share"
+          headers={["Language", "Share (%)"]}
+          rows={languages.map((l) => [l.language, l.percentage])}
+        />
       </div>
-      {/* M4.7: same table in the reduced/static branch — data parity. */}
-      <ChartDataTable
-        id="languages-radial"
-        caption="Programming languages by share"
-        headers={["Language", "Share (%)"]}
-        rows={languages.map((l) => [l.language, l.percentage])}
-      />
-    </div>
     );
   }
 
+  // Armed: render static donut without center percentage/label (will animate in on intersection)
+  if (phase === "armed") {
+    return (
+      <div ref={ref} className="flex flex-col">
+        <h3 className="text-sm text-text-secondary font-medium mb-4">Language Breakdown</h3>
+        <div className="flex flex-col md:flex-row items-center">
+          <div className="w-3/4 flex justify-center">
+            <div className="relative">
+              <svg
+                width={size}
+                height={size}
+                viewBox={`0 0 ${CX * 2} ${CY * 2}`}
+                role="img"
+                aria-label="Language usage breakdown radial chart"
+              >
+                {slices.map((slice) => (
+                  <path
+                    key={slice.lang.language}
+                    d={describeArc(CX, CY, R, slice.startAngle, slice.endAngle)}
+                    fill={slice.color}
+                    opacity={0.75}
+                  />
+                ))}
+                <circle cx={CX} cy={CY} r={INNER_R} fill="var(--bg-secondary, #18181b)" />
+              </svg>
+            </div>
+          </div>
+          <div className="w-1/4 space-y-2 text-right">
+            {slices.map((slice) => (
+              <div
+                key={slice.lang.language}
+                className="flex items-center gap-3 px-3 py-1.5 rounded-lg justify-end"
+              >
+                <span className="text-sm text-text-secondary font-medium tabular-nums">
+                  {slice.lang.percentage}%
+                </span>
+                <span className="text-sm text-text-primary">{slice.lang.language}</span>
+                <span
+                  className="w-3 h-3 rounded-sm shrink-0"
+                  style={{ backgroundColor: slice.color }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+        <ChartDataTable
+          id="languages-radial"
+          caption="Programming languages by share"
+          headers={["Language", "Share (%)"]}
+          rows={languages.map((l) => [l.language, l.percentage])}
+        />
+      </div>
+    );
+  }
+
+  // Drawing: animate slices, dots, and center label
   return (
     <div ref={ref} className="flex flex-col">
       <h3 className="text-sm text-text-secondary font-medium mb-4">Language Breakdown</h3>
       <div className="flex flex-col md:flex-row items-center">
-      <div className="w-3/4 flex justify-center">
-        <div className="relative">
-        <svg
-          width={size}
-          height={size}
-          viewBox={`0 0 ${CX * 2} ${CY * 2}`}
-          role="img"
-          aria-label="Language usage breakdown radial chart"
-        >
-          <defs>
-            <filter id="lang-glow">
-              <feGaussianBlur stdDeviation="2" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
-          {slices.map((slice) => {
-            const isHovered = hoveredIdx === slice.index;
-            const midAngle = (slice.startAngle + slice.endAngle) / 2;
-            const dotPos = polarToCartesian(CX, CY, R + 10, midAngle);
+        <div className="w-3/4 flex justify-center">
+          <div className="relative">
+            <svg
+              width={size}
+              height={size}
+              viewBox={`0 0 ${CX * 2} ${CY * 2}`}
+              role="img"
+              aria-label="Language usage breakdown radial chart"
+            >
+              <defs>
+                <filter id="lang-glow">
+                  <feGaussianBlur stdDeviation="2" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+              {slices.map((slice) => {
+                const isHovered = hoveredIdx === slice.index;
+                const midAngle = (slice.startAngle + slice.endAngle) / 2;
+                const dotPos = polarToCartesian(CX, CY, R + 10, midAngle);
 
-            return (
-              <g key={slice.lang.language}>
-                <motion.path
-                  d={describeArc(CX, CY, R, slice.startAngle, slice.endAngle)}
-                  fill={slice.color}
-                  opacity={isHovered ? 1 : 0.75}
-                  animate={{
-                    scale: isHovered ? 1.04 : 1,
-                    opacity: isHovered ? 1 : 0.75,
-                  }}
-                  transition={{ type: "spring", stiffness: 200, damping: 18 }}
-                  style={{ transformOrigin: `${CX}px ${CY}px`, cursor: "pointer" }}
-                  onMouseEnter={() => handleHover(slice.index)}
-                  onMouseLeave={() => handleHover(null)}
-                  filter={isHovered ? "url(#lang-glow)" : undefined}
-                />
-                <motion.circle
-                  cx={dotPos.x}
-                  cy={dotPos.y}
-                  r={3}
-                  fill={slice.color}
-                  animate={{
-                    opacity: isHovered ? 1 : 0.4,
-                    scale: isHovered ? 1.5 : 1,
-                  }}
-                  transition={{ duration: 0.3 }}
-                />
-              </g>
-            );
-          })}
-          <circle cx={CX} cy={CY} r={INNER_R} fill="var(--bg-secondary, #18181b)" />
-          <motion.text
-            x={CX}
-            y={CY - 6}
-            textAnchor="middle"
-            fill="var(--text-primary, #fafafa)"
-            fontSize="14"
-            fontWeight="700"
-            key={centerPct}
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            {centerPct}%
-          </motion.text>
-          <motion.text
-            x={CX}
-            y={CY + 16}
-            textAnchor="middle"
-            fill="var(--text-secondary, #a1a1aa)"
-            fontSize="9"
-            key={centerLabel}
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            {centerLabel}
-          </motion.text>
-        </svg>
-      </div>
-      </div>
-      <div className="w-1/4 space-y-2 text-right">
+                return (
+                  <g key={slice.lang.language}>
+                    <motion.path
+                      d={describeArc(CX, CY, R, slice.startAngle, slice.endAngle)}
+                      fill={slice.color}
+                      opacity={isHovered ? 1 : 0.75}
+                      animate={{
+                        scale: isHovered ? 1.04 : 1,
+                        opacity: isHovered ? 1 : 0.75,
+                      }}
+                      transition={{ type: "spring", stiffness: 200, damping: 18 }}
+                      style={{ transformOrigin: `${CX}px ${CY}px`, cursor: "pointer" }}
+                      onMouseEnter={() => handleHover(slice.index)}
+                      onMouseLeave={() => handleHover(null)}
+                      filter={isHovered ? "url(#lang-glow)" : undefined}
+                    />
+                    <motion.circle
+                      cx={dotPos.x}
+                      cy={dotPos.y}
+                      r={3}
+                      fill={slice.color}
+                      animate={{
+                        opacity: isHovered ? 1 : 0.4,
+                        scale: isHovered ? 1.5 : 1,
+                      }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </g>
+                );
+              })}
+              <circle cx={CX} cy={CY} r={INNER_R} fill="var(--bg-secondary, #18181b)" />
+              <motion.text
+                x={CX}
+                y={CY - 6}
+                textAnchor="middle"
+                fill="var(--text-primary, #fafafa)"
+                fontSize="14"
+                fontWeight="700"
+                key={centerPct}
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                {centerPct}%
+              </motion.text>
+              <motion.text
+                x={CX}
+                y={CY + 16}
+                textAnchor="middle"
+                fill="var(--text-secondary, #a1a1aa)"
+                fontSize="9"
+                key={centerLabel}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                {centerLabel}
+              </motion.text>
+            </svg>
+          </div>
+        </div>
+        <div className="w-1/4 space-y-2 text-right">
           {slices.map((slice) => (
             <motion.div
               key={slice.lang.language}
               className="flex items-center gap-3 px-3 py-1.5 rounded-lg cursor-pointer justify-end"
               animate={{
                 backgroundColor:
-                  hoveredIdx === slice.index
-                    ? "var(--bg-tertiary, #27272a)"
-                    : "transparent",
+                  hoveredIdx === slice.index ? "var(--bg-tertiary, #27272a)" : "transparent",
               }}
               onMouseEnter={() => handleHover(slice.index)}
               onMouseLeave={() => handleHover(null)}
@@ -271,6 +334,7 @@ export default function LanguageRadial({ languages }: Props) {
             </motion.div>
           ))}
         </div>
+      </div>
       {/* M4.7: same languages array the donut + legend render. */}
       <ChartDataTable
         id="languages-radial"
@@ -278,7 +342,6 @@ export default function LanguageRadial({ languages }: Props) {
         headers={["Language", "Share (%)"]}
         rows={languages.map((l) => [l.language, l.percentage])}
       />
-    </div>
     </div>
   );
 }

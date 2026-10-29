@@ -1,5 +1,5 @@
-import { motion } from "motion/react";
 import type { LucideIcon } from "lucide-react";
+import { motion } from "motion/react";
 import { duration, easing, stagger } from "../lib/motion";
 import MetricCounter from "./MetricCounter";
 

@@ -165,6 +165,23 @@ git diff -- <files>
 
 ## 8. Sprint results log
 
+### MOTION-06 — 2026-10-29
+
+| Gate | Result |
+| --- | --- |
+| `bun run validate-data` | OK, GitHub cache non-degenerate |
+| `bun run build:fast` | 49 pages; first sandbox run blocked by external font DNS, rerun with network access passed |
+| `bunx astro check` | 98 errors, 0 warnings, 81 hints (−1 hint); no new errors in changed React instruments/hook |
+| Biome, touched files | 11 files clean |
+| Unit suite | **1192/1192, 104 files** |
+| Targeted e2e | `motion-instruments`, `observatory`, `chart-tables`, `hero-metrics`, `--workers=1`: **29/29** |
+| BootSequence | First meaningful SSR line visible on `#github` entry in <1 s (JS-disabled control); typewriter continues from line 2 |
+| Reduced motion / no-JS | Observatory metric values stable after 700 ms; no `NaN`; data visible with JavaScript disabled |
+| `measure:routes` `/` | initial **202.7** / reachable **556.1** / HTML **77.2** KB; islands 16 (7e/9d); all dist JS **671.3 KB / 100 files** |
+| Runtime after scroll `/` | 16 scroll listeners (= baseline); 79 rectReads (baseline documentary 74, un-attributed +5); 1 canvas / 1 WebGL |
+| Instrument animation | One-shot IntersectionObserver; no perpetual/off-screen counter/chart loop; Observatory SVGs are static Astro |
+| Build/e2e harness note | Playwright fallback build overlapped manual preview once and left partial `dist`; rebuilt, then reused a verified preview (HTTP 200) for final 29/29 run |
+
 ### MOTION-04 — 2026-10-27
 
 | Gate | Result |

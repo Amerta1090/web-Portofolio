@@ -187,6 +187,19 @@
     transform: none;
   }
 
+  /* ── GitHub Command Center instruments (MOTION-06) ──
+   * `#github` chapter body contains the Command Center (MetricCards, LanguageRadial,
+   * ActivityWave, ContributionHeatmap). These instruments own their entry via
+   * IntersectionObserver (not CSS scroll-driven), so the chapter-body beat must
+   * opt out. Structural selector so any future page with instruments inside a
+   * chapter inherits the same rule.
+   */
+  [data-chapter-body]:has([data-github-instruments]) {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
   /* ── Legacy container reveal ──
    * Pages that put `data-reveal` on their own wrapper (blog grids, timeline,
    * capability architecture) keep the single-beat fade. Chapters use the

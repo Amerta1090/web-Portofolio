@@ -1,8 +1,8 @@
 # Motion Programme — Status
 
-**Last updated:** 2026-10-28 (MOTION-05 `DONE`)
-**Branch:** `main` · **HEAD at session start:** `bc807e6`
-**Active sprint:** none — MOTION-05 (capability map narrative) is closed; MOTION-06 READY
+**Last updated:** 2026-10-29 (MOTION-06 `DONE`)
+**Branch:** `main` · **HEAD at session start:** `f07fee5`
+**Active sprint:** none — MOTION-06 (data instruments) is closed; MOTION-07 READY
 
 ## One-paragraph state
 
@@ -99,28 +99,31 @@ JS**; the hero is the only remaining offender.
 | Full e2e suite after MOTION-05 = 407 tests / 36 files, 407 passed | `bunx playwright test --workers=1` | VERIFIED (2026-10-28) |
 | Unit suite after MOTION-05 = 1192 tests / 104 files | `bunx vitest run` | VERIFIED (2026-10-28) |
 | `astro check` = 98 errors, 0 warnings, 82 hints | `bunx astro check` | VERIFIED (2026-10-28) |
+| MOTION-06 terminal: first meaningful line is in server HTML and present immediately on entering `#github` | `e2e/motion-instruments.spec.ts` + built HTML | VERIFIED (2026-10-29; under 1 s) |
+| MOTION-06 instruments: final values ship in SSR, counters animate once on first off-screen entry, reduced motion is static; chart tables remain data-parallel | `useInstrumentEntry.ts`, `MetricCounter.tsx`; e2e/unit gates | VERIFIED (2026-10-29) |
+| Observatory charts are static Astro SVG; GitHub charts use one-shot entry observers and have no perpetual loop | source audit + `e2e/chart-tables.spec.ts` | VERIFIED (2026-10-29) |
+| MOTION-06 gates: validate-data OK; build 49 pages; astro check 98 errors / 0 warnings / 81 hints (−1 hint); unit 1192/1192; target e2e 29/29 | commands in `SESSION_LOG.md` | VERIFIED (2026-10-29) |
+| Payload `/` = 202.7 KB initial / 556.1 KB reachable / 77.2 KB HTML; islands 16 (7e/9d); all dist JS 671.3 KB / 100 files | `bun run measure:routes` | VERIFIED (2026-10-29) |
+| Runtime after scroll `/`: 16 scroll listeners (baseline 16), 79 rectReads (documentary baseline 74), 1 canvas / 1 WebGL; no continuous off-screen instrument loop | `bun run measure:runtime` + source audit | VERIFIED (2026-10-29; rectReads delta un-attributed) |
 
 ## Active work
 
-**None in progress.** All five Motion sprints (MOTION-01 Chapter Reveal,
-MOTION-01.5 image hygiene, MOTION-02 hero handoff, MOTION-03 career spine,
-MOTION-04 evidence card hierarchy, MOTION-05 capability map narrative) are
-verified — see `SPRINT_PLAN.md` §MOTION-05 completion notes. MOTION-05 is
-complete: the Signal Loom has a default narrative path from graph data,
-server-rendered copy, a one-shot entry fade for the strongest three edges,
-preserved hover/focus/selection/deep links, reduced motion as a real off switch,
-and the H-1 BorderGlow fail-closed guard. Guard 27/27 (4 new), unit 1192/1192,
-full e2e 407 passed, payload `/` 202.7 / 557.4 / 75.8 KB, islands 16 (7e/9d).
-**One sprint completed — do not start MOTION-06.**
+**None in progress.** MOTION-01 Chapter Reveal, MOTION-01.5 image hygiene,
+MOTION-02 hero handoff, MOTION-03 career spine, MOTION-04 evidence card
+hierarchy, MOTION-05 capability map narrative, and MOTION-06 data instruments
+are verified. MOTION-06 puts the first terminal line in SSR, removes the 3.5–4 s
+blank wait, uses one-shot instrument entry, and keeps final values available with
+JavaScript off or reduced motion. Target e2e 29/29, unit 1192/1192, build 49
+pages, payload `/` 202.7 / 556.1 / 77.2 KB. **One sprint completed — do not
+start MOTION-07.**
 
 **Visual-asset strategy:** research complete (2026-10-21), recorded in
 `ASSETS.md`; policy is D-11. Step 1 of that policy ("fix the assets already
 served") is now done by MOTION-01.5. No external asset was acquired, and none
 should be.
 
-**Next: none for the Motion programme** (MOTION-05 just closed — see completion
-notes). The next candidate work is a new sprint/phase outside this programme, or
-no new motion sprint until a fresh decision.
+**Next: MOTION-07 is READY** — Creative Lab contact sheet. Execute it in a new
+session only; this session closed after one sprint.
 
 ## Open blockers / risks
 
@@ -152,8 +155,9 @@ no new motion sprint until a fresh decision.
   (437.0 / 75.9 KB) and is already inside the §7 budget. See `ASSETS.md` §13.
 - **Signal Loom first-view emptiness (VERIFIED):** 1,236 px offset; owner M5.0.
   Do not paper over it with a plate or background.
-- **BootSequence blank entry (VERIFIED):** ~3.5–4 s; owner M6.0. Do not decorate
-  the terminal before fixing the wait.
+- **BootSequence blank entry (RESOLVED by MOTION-06):** the first meaningful
+  line ships in SSR and is visible on chapter entry; later lines retain the
+  terminal typing metaphor.
 - **No image-budget gate (VERIFIED, still true):** `measure:routes` counts JS
   only, so image transfer must be measured with resource timing
   (`.opencode/probe-images.mjs`, 1440 and 375). The task that needed it is done;
@@ -165,10 +169,8 @@ no new motion sprint until a fresh decision.
 
 ## Next action
 
-**Stop here.** MOTION-04 is closed; do not start MOTION-05 in this pass. When the
-programme resumes, read the MOTION-05 entry in `SPRINT_PLAN.md` with
-`STORYBOARD.md` and the D-02/D-04 constraints before editing. Carry-over facts
-worth knowing first: `Section` now uses `overflow: clip` (a section is not a
-scroll container), `view()` timelines inside chapters work, reduced motion is an
-`animation: none` off switch, and the full-suite harness uses arrival polling
-(`arriveTop`) rather than stability polling.
+**Stop here.** MOTION-06 is closed; MOTION-07 is `READY`. When the programme
+resumes, read MOTION-07 in `SPRINT_PLAN.md` and preserve D-02/D-04. Carry-over
+facts: the GitHub terminal first line is server-rendered, instrument entry is
+one-shot, reduced motion is static, chart tables contain the same data as their
+visuals, and `Section` uses `overflow: clip`.

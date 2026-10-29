@@ -493,3 +493,63 @@ interaction refines, never gates, the story.
   than filling the gap with a plate.
 
 **Next:** none — MOTION-05 is closed; do not start MOTION-06.
+
+## 2026-10-29 — MOTION-06 — Data instruments
+
+**Goal:** Make counters and charts behave like bounded data instruments and
+remove the blank terminal wait without replacing the boot metaphor.
+
+**Completed**
+
+- BootSequence now renders `> INITIALIZING DEVELOPER PROFILE... OK` in server
+  HTML. The entry typewriter begins with line 2; removed the 400 ms delay and
+  opacity gate. Reduced motion / previously-seen path still shows all lines.
+- Added `useInstrumentEntry` as the shared one-shot observer contract. SSR and
+  unsupported-IO fallback stay settled; off-screen instruments arm and draw
+  once on entry; reduced motion remains settled. Removed duplicate observer and
+  dead fallback logic from counters.
+- MetricCounter keeps the final data-derived number in SSR/off-screen markup and
+  performs one bounded 600 ms count-up only when an off-screen counter enters.
+  Reduced motion returns the final number immediately (no zero-duration RAF or
+  `NaN`).
+- GitHub chart islands use the shared entry phase. Their reduced/static branches
+  preserve the existing `ChartDataTable` data; Observatory charts were verified
+  as static Astro SVG with no chart loop. GitHub chapter body opts out of its
+  block reveal while the instruments own their entry timing.
+- Added `e2e/motion-instruments.spec.ts`: terminal visible under 1 s, Observatory
+  metrics stable under reduced motion, and SSR data visible with JavaScript off.
+
+**Verification (2026-10-29)**
+
+- `bun run validate-data`: OK, cache non-degenerate.
+- `bun run build:fast`: 49 pages. First sandbox build could not fetch the OG
+  font; escalated rerun succeeded. A failed Playwright fallback build once
+  overlapped the manual preview and left partial `dist`; rebuilt cleanly, then
+  used a verified preview on port 4321 for final e2e.
+- `bunx astro check`: 98 errors, 0 warnings, 81 hints (one fewer hint than
+  baseline); no new
+  diagnostics in changed instrument components/hook. Existing diagnostics in
+  `GitHubUniverse.astro` remain part of baseline.
+- Biome: 11 touched files clean.
+- Targeted unit: 23/23; full unit: **1192/1192, 104 files**.
+- E2E `motion-instruments`, `observatory`, `chart-tables`, `hero-metrics`,
+  `--workers=1`: **29/29 passed**. Terminal is separately checked with JS
+  disabled; a computed-style assertion confirms instrument-owned chapter timing.
+- `measure:routes`: `/` **202.7 / 556.1 / 77.2 KB** initial/reachable/HTML;
+  islands 16 (7e/9d); all dist JS 671.3 KB / 100 files.
+- `measure:runtime`: after-scroll **16 scroll listeners**, **79 rectReads**,
+  one canvas / one WebGL. Scroll listeners match the recorded baseline 16;
+  rectReads are +5 vs documentary baseline 74 and remain un-attributed. Source
+  audit found no perpetual/off-screen counter or chart animation.
+
+**Deviations / notes**
+
+- Entry timing uses a one-shot `IntersectionObserver` with the existing 64 px
+  inset convention. The GitHub chapter's broad reveal is disabled structurally
+  because its instruments own entry choreography.
+- No new runtime/chart dependency, route, section, data field, or asset.
+- Code-graph tools were unavailable in this session; structure was followed by
+  direct imports and source inspection.
+
+**Next:** MOTION-06 is closed. MOTION-07 (Creative Lab contact sheet) is `READY`;
+do not begin it in this execution.

@@ -1,6 +1,7 @@
-import { motion, useInView, useReducedMotion } from "motion/react";
-import { useRef, useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
+import { useState } from "react";
 import ChartDataTable from "../components/atoms/ChartDataTable";
+import { useInstrumentEntry } from "../lib/useInstrumentEntry";
 import type { WeeklyPattern } from "../types/github";
 
 interface Props {
@@ -17,15 +18,7 @@ const DAY_LABELS: Record<string, string> = {
   sat: "Sat",
   sun: "Sun",
 };
-const COLORS = [
-  "#7A8C6F",
-  "#7A8C6F",
-  "#7A8C6F",
-  "#7A8C6F",
-  "#7A8C6F",
-  "#C17F59",
-  "#C17F59",
-];
+const COLORS = ["#7A8C6F", "#7A8C6F", "#7A8C6F", "#7A8C6F", "#7A8C6F", "#C17F59", "#C17F59"];
 
 const WIDTH = 600;
 const HEIGHT = 180;
@@ -34,16 +27,14 @@ const CHART_W = WIDTH - PADDING.left - PADDING.right;
 const CHART_H = HEIGHT - PADDING.top - PADDING.bottom;
 
 export default function ActivityWave({ data }: Props) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-64px" });
   const prefersReduced = useReducedMotion();
+  const { phase, ref } = useInstrumentEntry();
   const [hoveredBar, setHoveredBar] = useState<number | null>(null);
 
   const values = DAYS.map((d) => data[d]);
   const maxVal = Math.max(...values, 1);
 
   const barWidth = CHART_W / DAYS.length - 8;
-  const gap = 8;
 
   const pathPoints = values.map((v, i) => {
     const x = PADDING.left + (i * CHART_W) / (DAYS.length - 1);
@@ -51,38 +42,86 @@ export default function ActivityWave({ data }: Props) {
     return { x, y, val: v, day: DAYS[i] };
   });
 
-  const pathD = pathPoints
-    .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`)
-    .join(" ");
+  const pathD = pathPoints.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
 
-  if (prefersReduced) {
+  // SSR / reduced motion / settled: render final static chart
+  if (prefersReduced || phase === "settled") {
     return (
       <div className="flex flex-col">
         <h3 className="text-sm text-text-secondary font-medium mb-4">Weekly Activity</h3>
-      <div ref={ref} className="w-full">
-        <svg
-          viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-          className="w-full h-auto"
-          role="img"
-          aria-label="Weekly activity chart"
-        >
-          {values.map((v, i) => {
-            const barH = (v / maxVal) * CHART_H;
-            const x = PADDING.left + i * (CHART_W / DAYS.length) + (CHART_W / DAYS.length - barWidth) / 2;
-            const y = PADDING.top + CHART_H - barH;
-            return (
-              <g key={DAYS[i]}>
-                <rect
-                  x={x}
-                  y={y}
-                  width={barWidth}
-                  height={barH}
-                  rx={3}
-                  fill={COLORS[i]}
-                  opacity={0.8}
-                />
+        <div ref={ref} className="w-full">
+          <svg
+            viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+            className="w-full h-auto"
+            role="img"
+            aria-label="Weekly activity chart"
+          >
+            {values.map((v, i) => {
+              const barH = (v / maxVal) * CHART_H;
+              const x =
+                PADDING.left + i * (CHART_W / DAYS.length) + (CHART_W / DAYS.length - barWidth) / 2;
+              const y = PADDING.top + CHART_H - barH;
+              return (
+                <g key={DAYS[i]}>
+                  <rect
+                    x={x}
+                    y={y}
+                    width={barWidth}
+                    height={barH}
+                    rx={3}
+                    fill={COLORS[i]}
+                    opacity={0.8}
+                  />
+                  <text
+                    x={PADDING.left + i * (CHART_W / DAYS.length) + CHART_W / DAYS.length / 2}
+                    y={HEIGHT - 6}
+                    textAnchor="middle"
+                    fill="var(--text-secondary, #a1a1aa)"
+                    fontSize="10"
+                  >
+                    {DAY_LABELS[DAYS[i]]}
+                  </text>
+                </g>
+              );
+            })}
+          </svg>
+        </div>
+        {/* M4.7: same table in the reduced/settled branch — data parity. */}
+        <ChartDataTable
+          id="weekly-activity"
+          caption="Commits per weekday"
+          headers={["Day", "Commits"]}
+          rows={DAYS.map((d) => [DAY_LABELS[d] ?? d, data[d]])}
+        />
+      </div>
+    );
+  }
+
+  // Armed: render empty chart (axes only) — no bars, no path
+  if (phase === "armed") {
+    return (
+      <div className="flex flex-col">
+        <h3 className="text-sm text-text-secondary font-medium mb-4">Weekly Activity</h3>
+        <div ref={ref} className="w-full relative">
+          <svg
+            viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+            className="w-full h-auto"
+            role="img"
+            aria-label="Weekly activity wave chart"
+          >
+            <defs>
+              <linearGradient id="wave-gradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#7A8C6F" stopOpacity={0.3} />
+                <stop offset="100%" stopColor="#7A8C6F" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            {/* Empty chart — axes only */}
+            {values.map((_, i) => {
+              const x = PADDING.left + i * (CHART_W / DAYS.length) + CHART_W / DAYS.length / 2;
+              return (
                 <text
-                  x={PADDING.left + i * (CHART_W / DAYS.length) + (CHART_W / DAYS.length) / 2}
+                  key={DAYS[i]}
+                  x={x}
                   y={HEIGHT - 6}
                   textAnchor="middle"
                   fill="var(--text-secondary, #a1a1aa)"
@@ -90,40 +129,38 @@ export default function ActivityWave({ data }: Props) {
                 >
                   {DAY_LABELS[DAYS[i]]}
                 </text>
-              </g>
-            );
-          })}
-        </svg>
-      </div>
-      {/* M4.7: same table in the reduced branch — data parity. */}
-      <ChartDataTable
-        id="weekly-activity"
-        caption="Commits per weekday"
-        headers={["Day", "Commits"]}
-        rows={DAYS.map((d) => [DAY_LABELS[d] ?? d, data[d]])}
-      />
+              );
+            })}
+          </svg>
+        </div>
+        <ChartDataTable
+          id="weekly-activity"
+          caption="Commits per weekday"
+          headers={["Day", "Commits"]}
+          rows={DAYS.map((d) => [DAY_LABELS[d] ?? d, data[d]])}
+        />
       </div>
     );
   }
 
+  // Drawing: animate in the wave path, area, and bars
   return (
     <div className="flex flex-col">
       <h3 className="text-sm text-text-secondary font-medium mb-4">Weekly Activity</h3>
-    <div ref={ref} className="w-full relative">
-      <svg
-        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-        className="w-full h-auto"
-        role="img"
-        aria-label="Weekly activity wave chart"
-      >
-        <defs>
-          <linearGradient id="wave-gradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#7A8C6F" stopOpacity={0.3} />
-            <stop offset="100%" stopColor="#7A8C6F" stopOpacity={0} />
-          </linearGradient>
-        </defs>
+      <div ref={ref} className="w-full relative">
+        <svg
+          viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+          className="w-full h-auto"
+          role="img"
+          aria-label="Weekly activity wave chart"
+        >
+          <defs>
+            <linearGradient id="wave-gradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#7A8C6F" stopOpacity={0.3} />
+              <stop offset="100%" stopColor="#7A8C6F" stopOpacity={0} />
+            </linearGradient>
+          </defs>
 
-        {isInView && (
           <motion.path
             d={pathD}
             fill="none"
@@ -135,9 +172,7 @@ export default function ActivityWave({ data }: Props) {
             animate={{ pathLength: 1, opacity: 1 }}
             transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
           />
-        )}
 
-        {isInView && (
           <motion.path
             d={`${pathD} L ${pathPoints[pathPoints.length - 1].x} ${PADDING.top + CHART_H} L ${pathPoints[0].x} ${PADDING.top + CHART_H} Z`}
             fill="url(#wave-gradient)"
@@ -145,17 +180,16 @@ export default function ActivityWave({ data }: Props) {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           />
-        )}
 
-        {values.map((v, i) => {
-          const barH = (v / maxVal) * CHART_H;
-          const barX = PADDING.left + i * (CHART_W / DAYS.length) + (CHART_W / DAYS.length - barWidth) / 2;
-          const barY = PADDING.top + CHART_H - barH;
-          const isHovered = hoveredBar === i;
+          {values.map((v, i) => {
+            const barH = (v / maxVal) * CHART_H;
+            const barX =
+              PADDING.left + i * (CHART_W / DAYS.length) + (CHART_W / DAYS.length - barWidth) / 2;
+            const barY = PADDING.top + CHART_H - barH;
+            const isHovered = hoveredBar === i;
 
-          return (
-            <g key={DAYS[i]}>
-              {isInView && (
+            return (
+              <g key={DAYS[i]}>
                 <motion.rect
                   x={barX}
                   width={barWidth}
@@ -178,43 +212,42 @@ export default function ActivityWave({ data }: Props) {
                   onMouseLeave={() => setHoveredBar(null)}
                   className="cursor-pointer"
                 />
-              )}
-              <text
-                x={PADDING.left + i * (CHART_W / DAYS.length) + (CHART_W / DAYS.length) / 2}
-                y={HEIGHT - 6}
-                textAnchor="middle"
-                fill="var(--text-secondary, #a1a1aa)"
-                fontSize="10"
-              >
-                {DAY_LABELS[DAYS[i]]}
-              </text>
-              {isHovered && (
-                <motion.text
-                  x={barX + barWidth / 2}
-                  y={barY - 8}
+                <text
+                  x={PADDING.left + i * (CHART_W / DAYS.length) + CHART_W / DAYS.length / 2}
+                  y={HEIGHT - 6}
                   textAnchor="middle"
-                  fill="var(--text-primary, #fafafa)"
-                  fontSize="11"
-                  fontWeight="700"
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.15 }}
+                  fill="var(--text-secondary, #a1a1aa)"
+                  fontSize="10"
                 >
-                  {v}
-                </motion.text>
-              )}
-            </g>
-          );
-        })}
-      </svg>
-      {/* M4.7: same WeeklyPattern the bars encode (day → commits). */}
-      <ChartDataTable
-        id="weekly-activity"
-        caption="Commits per weekday"
-        headers={["Day", "Commits"]}
-        rows={DAYS.map((d) => [DAY_LABELS[d] ?? d, data[d]])}
-      />
-    </div>
+                  {DAY_LABELS[DAYS[i]]}
+                </text>
+                {isHovered && (
+                  <motion.text
+                    x={barX + barWidth / 2}
+                    y={barY - 8}
+                    textAnchor="middle"
+                    fill="var(--text-primary, #fafafa)"
+                    fontSize="11"
+                    fontWeight="700"
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    {v}
+                  </motion.text>
+                )}
+              </g>
+            );
+          })}
+        </svg>
+        {/* M4.7: same WeeklyPattern the bars encode (day → commits). */}
+        <ChartDataTable
+          id="weekly-activity"
+          caption="Commits per weekday"
+          headers={["Day", "Commits"]}
+          rows={DAYS.map((d) => [DAY_LABELS[d] ?? d, data[d]])}
+        />
+      </div>
     </div>
   );
 }
