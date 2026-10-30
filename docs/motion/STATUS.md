@@ -1,8 +1,8 @@
 # Motion Programme — Status
 
-**Last updated:** 2026-10-29 (MOTION-06 `DONE`)
-**Branch:** `main` · **HEAD at session start:** `f07fee5`
-**Active sprint:** none — MOTION-06 (data instruments) is closed; MOTION-07 READY
+**Last updated:** 2026-10-30 (MOTION-07 `DONE`)
+**Branch:** `main` · **HEAD at session start:** `2d18345`
+**Active sprint:** none — MOTION-07 (Creative Lab contact sheet) is closed; MOTION-08 READY
 
 ## One-paragraph state
 
@@ -33,7 +33,12 @@ MOTION-04 verification: guard 23/23 (5 new tests, teeth proven by 6/6
 mutations), unit 1176/1176, full e2e 381 passed + 1 honestly skipped (Chromium
 cannot emulate `prefers-reduced-data`), lead card settles ~37 px ahead of its row
 neighbour, payload flat at 202.7 / 557.1 / 75.3 KB, islands unchanged at 16
-(7e/9d). **Visual-asset
+(7e/9d). **MOTION-06 closed the data instruments** (final values in SSR,
+one-shot entry, static under reduced motion) and **MOTION-07 closed the Creative
+Lab index**: the 27-thumbnail sheet no longer fades as one 2,030 px / 2,492 px
+rectangle; headings and cards own `view()` beats sequenced by server-emitted
+`--lab-group-order` / `--lab-card-order`, so 27 cards settle 0 → 4 → 10 → 18 →
+22 → 27 instead of sharing one opacity. Zero JS was added. **Visual-asset
 research (2026-10-21) found a larger problem than decoration:** the homepage
 ships **3,147.0 KB desktop / 2,643.0 KB mobile** of images, **95% from three
 files**, and the strategy is evidence-first with no new external layer (D-11).
@@ -105,25 +110,34 @@ JS**; the hero is the only remaining offender.
 | MOTION-06 gates: validate-data OK; build 49 pages; astro check 98 errors / 0 warnings / 81 hints (−1 hint); unit 1192/1192; target e2e 29/29 | commands in `SESSION_LOG.md` | VERIFIED (2026-10-29) |
 | Payload `/` = 202.7 KB initial / 556.1 KB reachable / 77.2 KB HTML; islands 16 (7e/9d); all dist JS 671.3 KB / 100 files | `bun run measure:routes` | VERIFIED (2026-10-29) |
 | Runtime after scroll `/`: 16 scroll listeners (baseline 16), 79 rectReads (documentary baseline 74), 1 canvas / 1 WebGL; no continuous off-screen instrument loop | `bun run measure:runtime` + source audit | VERIFIED (2026-10-29; rectReads delta un-attributed) |
+| MOTION-07 contact sheet: chapter body computes `animation-name: none`, headings and cards own `view()` beats ordered by `--lab-group-order` / `--lab-card-order` (inline, from data order); 27 cards settle **0 → 4 → 10 → 18 → 22 → 27** across entry 0–100 % desktop and **0 → 4 → 8 → 14 → 22 → 27** mobile, 2–5 distinct card opacities mid-range (before: always 1) | `.opencode/probe-m07.mjs`, `/tmp/opencode/m07-before.json` + `m07-after.json` | VERIFIED (2026-10-30) |
+| Contact sheet still ships **0 islands / 0 inline handlers**, 27 `/gallery#<id>` links, `details open`, `loading="lazy"`, `alt=""`; both widths keep the same card counts | built `dist/index.html` + probe (`islands: 0`, `inlineHandlers: 0`, `deepLinks: 27`, `lazy: true`, `altEmpty: true`) | VERIFIED (2026-10-30) |
+| Contact-sheet reduced motion: 33 nodes (1 body + 5 headings + 27 cards) compute `none` / `1` / `none` with `matchMedia` read back `true` | `e2e/creative-lab.spec.ts` via `page.emulateMedia` | VERIFIED (2026-10-30) |
+| Contact-sheet guard: 5 source tests; teeth proven 3/3 mutations (opt-out deleted → 2 red; order token dropped → 1 guard + 1 e2e red; reduced-motion hook removed → 1 e2e red) | `src/lib/scroll-animations.guard.test.ts` (28/28), `e2e/creative-lab.spec.ts` | VERIFIED (2026-10-30) |
+| MOTION-07 gates: validate-data OK; build 49 pages; astro check 98 / 0 / 81 = baseline; biome clean on 4 touched files; unit **1197/1197, 104 files** | commands in `SESSION_LOG.md` | VERIFIED (2026-10-30) |
+| Payload `/` = 202.7 KB initial / 556.1 KB reachable / **77.3** KB HTML (JS flat, HTML +0.1 for 32 inline order properties); islands 16 (7e/9d); all dist JS 671.3 KB / 100 files = unchanged | `bun run measure:routes` | VERIFIED (2026-10-30) |
+| Full e2e after MOTION-07 = **394 tests / 37 files** (`--list`), 393 passed + 1 skipped (`--workers=1`); the earlier documentary "407 / 36" was not reproducible (392 at HEAD + 2 new) | `bunx playwright test --workers=1` / `--list` | VERIFIED (2026-10-30) |
 
 ## Active work
 
-**None in progress.** MOTION-01 Chapter Reveal, MOTION-01.5 image hygiene,
+**None in progress.** MOTION-00 Chapter Reveal, MOTION-01.5 image hygiene,
 MOTION-02 hero handoff, MOTION-03 career spine, MOTION-04 evidence card
-hierarchy, MOTION-05 capability map narrative, and MOTION-06 data instruments
-are verified. MOTION-06 puts the first terminal line in SSR, removes the 3.5–4 s
-blank wait, uses one-shot instrument entry, and keeps final values available with
-JavaScript off or reduced motion. Target e2e 29/29, unit 1192/1192, build 49
-pages, payload `/` 202.7 / 556.1 / 77.2 KB. **One sprint completed — do not
-start MOTION-07.**
+hierarchy, MOTION-05 capability map narrative, MOTION-06 data instruments, and
+MOTION-07 Creative Lab contact sheet are verified. MOTION-07 replaces the single
+block fade over the 27-experiment index with per-heading and per-thumbnail
+`view()` beats ordered by server-emitted tokens, adds **zero** JS (0 islands,
+0 inline handlers, 27 deep links intact), and is a true off switch under reduced
+motion. Unit 1197/1197, build 49 pages, payload `/` 202.7 / 556.1 / 77.3 KB
+(JS unchanged at 671.3 KB / 100 files). **One sprint completed — do not start
+MOTION-08.**
 
 **Visual-asset strategy:** research complete (2026-10-21), recorded in
 `ASSETS.md`; policy is D-11. Step 1 of that policy ("fix the assets already
 served") is now done by MOTION-01.5. No external asset was acquired, and none
 should be.
 
-**Next: MOTION-07 is READY** — Creative Lab contact sheet. Execute it in a new
-session only; this session closed after one sprint.
+**Next: MOTION-08 is READY** — Cross-page continuity. Execute it in a new session
+only; this session closed after one sprint.
 
 ## Open blockers / risks
 
@@ -169,8 +183,9 @@ session only; this session closed after one sprint.
 
 ## Next action
 
-**Stop here.** MOTION-06 is closed; MOTION-07 is `READY`. When the programme
-resumes, read MOTION-07 in `SPRINT_PLAN.md` and preserve D-02/D-04. Carry-over
-facts: the GitHub terminal first line is server-rendered, instrument entry is
-one-shot, reduced motion is static, chart tables contain the same data as their
-visuals, and `Section` uses `overflow: clip`.
+**Stop here.** MOTION-07 is closed; MOTION-08 is `READY`. When the programme
+resumes, read MOTION-08 in `SPRINT_PLAN.md` and preserve D-02/D-04. Carry-over
+facts: page transitions run through `ClientRouter`, every reveal rule stays inside
+`@supports (animation-timeline: view())`, ordered choreography uses
+server-emitted tokens (never `:nth-child`), reduced motion is `animation: none`
+verified with `page.emulateMedia`, and `Section` uses `overflow: clip`.

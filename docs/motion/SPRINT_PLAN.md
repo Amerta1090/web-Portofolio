@@ -610,7 +610,7 @@ specs; build; payload; listener count.
 
 ## MOTION-07 — Creative Lab contact sheet
 
-**Status:** `READY`
+**Status:** `DONE` (2026-10-30) — see completion notes
 **Priority:** P3
 **Objective:** Make the 27-experiment contact sheet feel like a printed index
 being scanned, without turning it into a carousel.
@@ -624,10 +624,29 @@ links remain the only navigation.
 thumbnails.
 
 **Tasks**
-- [ ] M7.1 Measure the current static sheet and its height.
-- [ ] M7.2 Add CSS-only group/thumbnail entry ranges.
-- [ ] M7.3 Keep `details open`, lazy images, and deep links intact.
-- [ ] M7.4 Reduced motion: static sheet.
+- [x] M7.1 Measure the current static sheet and its height. Before: sheet
+      **2,030.5 px** desktop (section 2,449.13) and **2,492.19 px** mobile
+      (section 2,783.58), 5 groups of 6/8/8/3/2, cards 275×195.56 in 4 columns
+      (160.5×131.16 in 2 columns). The whole sheet was one `reveal-fade-up-body`
+      beat (`entry 12% → entry 78%`) whose opacity ran 0 → 0.27 → 0.769 → 1
+      across 810 px of scroll, with all 27 cards at the same opacity at every
+      sample (distinct values = 1).
+- [x] M7.2 Add CSS-only group/thumbnail entry ranges. `[data-lab-sheet]` publishes
+      the tokens (`--lab-group-start/span/step` 0 %/25 %/4 %,
+      `--lab-card-start/span/step` 10 %/32 %/5 %); group headings and cards each
+      own a `view()` beat inside the existing `@supports` block. Order comes from
+      server-emitted `--lab-group-order` / `--lab-card-order`, never
+      `:nth-child` (MOTION-03 trap). The `<details>` container is deliberately
+      not animated: opacity there composites into every card, so no card could
+      ever read as settled.
+- [x] M7.3 Keep `details open`, lazy images, and deep links intact. Built page
+      keeps 27 `/gallery#<id>` links, `details open`, `loading="lazy"`,
+      `alt=""`, **0 islands** and **0 inline handlers** in the section.
+- [x] M7.4 Reduced motion: static sheet. Per-card ramps measure each card
+      starting 0–76 px past its own viewport-edge crossing and settling within
+      ~40 px; headings settle within ~8 px. Under `prefers-reduced-motion` all
+      33 nodes compute `animation-name: none`, `opacity: 1`, `transform: none`
+      with `matchMedia` read back as `true` and 27 cards still present.
 
 **Acceptance criteria**
 - Zero JS added (no `astro-island`, no `on*`).
@@ -637,11 +656,50 @@ thumbnails.
 **Definition of Done / verification:** creative-lab e2e (or equivalent), build,
 payload, diff review.
 
+**Completion notes (2026-10-30):**
+- The sheet now settles as an index. After the change the chapter body computes
+  `animation-name: none` (opacity 1, transform none) at both widths, group
+  headings settle 0 → 1 in data order, and cards settle serially: **0 → 4 → 10 →
+  18 → 22 → 27** settled at entry 0/20/40/60/80/100 % desktop and **0 → 4 → 8 →
+  14 → 22 → 27** mobile, with 2–5 distinct card opacities through the middle of
+  the range (before: always 1).
+- Structural rules added beside the existing chapter opt-outs:
+  `[data-chapter-body]:has([data-lab-sheet])` disables the block beat, and both
+  reduced-motion and reduced-data media blocks now list the two new hooks.
+- Guard describe `creative lab contact sheet (MOTION-07)` adds 5 source tests
+  (`scroll-animations.guard.test.ts` 28/28) and the reduced-motion block test now
+  covers the contact sheet. Teeth proven by 3 mutations, each restored to an
+  identical `md5sum`: **A** delete the `:has([data-lab-sheet])` opt-out → 2 guard
+  tests red; **B** drop `--lab-card-order` from the template → 1 guard test + the
+  product-level e2e "settles the sheet as an index instead of one rectangle" red
+  (all orders collapsed to `""`); **D** remove `[data-lab-card-reveal]` from the
+  reduced-motion block → e2e "reduced motion shows the full sheet immediately"
+  red (`reveal-fade-up`, opacity 0, `translateY(16px)`).
+- Gates: `validate-data` OK; `build:fast` 49 pages; `astro check` 98 errors / 0
+  warnings / 81 hints (= baseline); Biome clean on 4 touched files; unit
+  **1197/1197, 104 files** (1192 + 5); targeted `creative-lab` e2e 7/7; full e2e
+  `--workers=1` **393 passed + 1 skipped** of **394 tests / 37 files**.
+- Payload `/` 202.7 / 556.1 / **77.3** KB (initial and reachable flat; HTML
+  +0.1 KB for the 32 inline order properties); islands 16 (7e/9d); all dist JS
+  **671.3 KB / 100 files = unchanged**. Runtime after scroll: 16 scroll
+  listeners and 79 rectReads, both equal to baseline; rafCalls vary per run.
+- Deviations: (1) the group container is not animated — a beat on `<details>`
+  multiplies into every card's opacity, which is the defect this sprint removes;
+  the group beat lives on the `<summary>` instead. (2) Order tokens are emitted
+  inline by the template rather than derived from DOM position, so reordering
+  `lab-registry.ts` cannot silently reorder the choreography. (3) The
+  documentary "full e2e = 407 tests / 36 files" in `STATUS.md` was not
+  reproducible: `--list` on this tree gives **394 / 37** (392 at HEAD + 2 new),
+  so the measured number is recorded instead. (4) Probe endpoints had to be
+  measured in the same `evaluate` as the node positions because `entry` ranges
+  resolve against the scrollport edge; "settled" is only true ~30–60 px after a
+  node clears it.
+
 ---
 
 ## MOTION-08 — Cross-page continuity
 
-**Status:** `PLANNED`
+**Status:** `READY`
 **Priority:** P3
 **Objective:** Make navigation between the homepage and detail pages feel like
 turning a page rather than a hard cut.
@@ -737,16 +795,16 @@ every gate passes.
 MOTION-00 (DONE)
   └─ MOTION-01 (DONE)
        ├─ MOTION-02 (DONE)
-       ├─ MOTION-03 (READY)
-       │    └─ MOTION-05
-       ├─ MOTION-04
-       ├─ MOTION-06
-       ├─ MOTION-07
-       └─ MOTION-08
+       ├─ MOTION-03 (DONE)
+       │    └─ MOTION-05 (DONE)
+       ├─ MOTION-04 (DONE)
+       ├─ MOTION-06 (DONE)
+       ├─ MOTION-07 (DONE)
+       └─ MOTION-08 (READY)
             └─ MOTION-09
                  └─ MOTION-10
 ```
 
 Priority conflicts resolve in favour of the sprint that removes a measured
-defect or unblocks the most other sprints. MOTION-03 is now the next ready
-sprint; MOTION-02 is complete.
+defect or unblocks the most other sprints. MOTION-08 is now the next ready
+sprint; MOTION-07 is complete.

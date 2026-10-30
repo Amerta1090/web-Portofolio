@@ -40,7 +40,7 @@ bun run test
 
 | Gate | Baseline | Rule |
 | --- | --- | --- |
-| Unit suite | 1176 tests / 102 files | no new failures |
+| Unit suite | 1197 tests / 104 files (2026-10-30) | no new failures |
 | TimeAwareHero alone | 11/11 | must stay green |
 | Source guards | new in MOTION-01 | must fail when the guarded rule is violated |
 
@@ -56,7 +56,7 @@ bunx playwright test --workers=1
 
 | Gate | Baseline | Rule |
 | --- | --- | --- |
-| E2E suite | 382 tests / 35 files | no new failures |
+| E2E suite | 394 tests / 37 files (2026-10-30) | no new failures |
 | `motion-chapters` | new | must have a reduced-motion positive control |
 | `career-spine` | 18 tests | sticky/jump/deep-link must stay green |
 
@@ -72,7 +72,14 @@ bunx playwright test --workers=1
   capability containers.
 - `data-reveal-stagger` still applies to `CapabilityArchitecture`.
 - A chapter body whose component owns its own beats opts out of the block
-  reveal (`:has([data-project-grid])`, `:has([data-career-spine])`).
+  reveal (`:has([data-project-grid])`, `:has([data-career-spine])`,
+  `:has([data-github-instruments])`, `:has([data-lab-sheet])`).
+- Ordered beats use server-emitted tokens (`--card-order`, `--lab-group-order`,
+  `--lab-card-order`), never `:nth-child`, so a data reorder cannot silently
+  reorder the choreography.
+- The Creative Lab group container (`<details>`) carries no opacity beat: it
+  composites into every thumbnail, which would stop any card from reading as
+  settled. The group beat lives on its `<summary>`.
 - `Section.astro` clips with `overflow: clip`, never `overflow: hidden` — a
   hidden overflow makes the section a scroll container, which breaks sticky and
   degenerates every `view()` timeline inside it. There is no `clip` prop.
@@ -87,6 +94,9 @@ bunx playwright test --workers=1
   reduced motion; no-JS hero copy and evidence links remain visible.
 - The same static state applies under `prefers-reduced-data: reduce` where the
   engine supports the query.
+- Contact sheet: all 33 nodes (body + 5 headings + 27 cards) compute
+  `animation-name: none`, `opacity: 1`, `transform: none` with 27 cards present,
+  so the index is never blank.
 
 ### 4.3 Progress bar
 
@@ -164,6 +174,26 @@ git diff -- <files>
 - [x] `RESEARCH.md` updated if an assumption became verified. *(§2.1 reduced-motion measured; reduced-data Chromium limitation recorded §2.1/§3)*
 
 ## 8. Sprint results log
+
+### MOTION-07 — 2026-10-30
+
+| Gate | Result |
+| --- | --- |
+| `bun run validate-data` | OK, GitHub cache non-degenerate |
+| `bun run build:fast` | 49 pages; dist emits 27 `data-lab-card-reveal`, 5 `data-lab-group-reveal`, 1 `data-lab-sheet`, 27 `--lab-card-order` + 5 `--lab-group-order` inline values |
+| `bunx astro check` | 98 errors, 0 warnings, 81 hints = baseline |
+| Biome, touched files | 4 files clean (`scroll-animations.css`, `CreativeLabTeaser.astro`, guard test, e2e spec) |
+| Guard | `scroll-animations.guard.test.ts` **28/28** (5 new MOTION-07 source tests) |
+| Mutation teeth | 3/3 red on the named assertions, each restored to identical `md5sum` |
+| Unit suite | **1197/1197, 104 files** (1192 + 5) |
+| Targeted e2e | `creative-lab`, `--workers=1`: **7/7** |
+| Full e2e | `--workers=1`: **393 passed + 1 skipped** of **394 tests / 37 files** (`--list`); the documentary 407/36 was not reproducible |
+| Contact sheet behaviour | Body `animation-name: none`; headings settle 0→1 in data order; cards settle **0 → 4 → 10 → 18 → 22 → 27** desktop / **0 → 4 → 8 → 14 → 22 → 27** mobile with 2–5 distinct opacities mid-range (before: 1, one rectangle) |
+| No-JS contract | 0 islands, 0 inline handlers, 27 deep links, `details open`, `loading="lazy"`, `alt=""` |
+| Reduced motion | 33 nodes compute `none` / `1` / `none`, `matchMedia` read back `true` |
+| `measure:routes` `/` | initial **202.7** / reachable **556.1** / HTML **77.3** KB; islands 16 (7e/9d); all dist JS **671.3 KB / 100 files** (unchanged) |
+| Runtime after scroll `/` | 16 scroll listeners (= baseline), 79 rectReads (= baseline); no new RAF, canvas, or listener |
+| Probe note | `entry` percentages resolve against the scrollport edge, so "settled" is true ~30–60 px after a node clears it; node positions and samples must come from the same `evaluate` |
 
 ### MOTION-06 — 2026-10-29
 

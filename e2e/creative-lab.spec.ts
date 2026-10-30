@@ -131,4 +131,98 @@ test.describe("creative lab contact sheet", () => {
     // (which is the experiment body itself), so assert on the panel.
     await expect(page.locator("[data-modal-panel]")).toContainText(title);
   });
+
+  /**
+   * MOTION-07. Before the change the sheet was one chapter-body rectangle:
+   * measured opacity 0 → 0.27 → 0.77 → 1 across 810 px of scroll, and all 27
+   * cards shared whatever value the body had. The assertions below are the
+   * shape of the fix, not a restatement of the CSS: the body is settled, every
+   * thumbnail owns a `view()` beat, and the order token sequences each group's
+   * cards by data order.
+   */
+  test("settles the sheet as an index instead of one rectangle", async ({ page }) => {
+    const state = await page.evaluate(() => {
+      const section = document.querySelector("#creative-lab") as HTMLElement;
+      const read = (el: HTMLElement) => {
+        const css = getComputedStyle(el);
+        return {
+          name: css.animationName,
+          timeline: css.animationTimeline,
+          range: css.animationRange,
+          opacity: css.opacity,
+        };
+      };
+      const body = section.querySelector("[data-chapter-body]") as HTMLElement;
+      const headings = [...section.querySelectorAll("[data-lab-group-reveal]")] as HTMLElement[];
+      const cards = [...section.querySelectorAll("[data-lab-card-reveal]")] as HTMLElement[];
+      return {
+        body: read(body),
+        headings: headings.map(read),
+        cards: cards.map((el) => ({
+          ...read(el),
+          order: el.style.getPropertyValue("--lab-card-order"),
+        })),
+        groups: [...section.querySelectorAll("[data-lab-group]")].map((group) => ({
+          heading: group.querySelector("[data-lab-group-reveal]")
+            ? getComputedStyle(group.querySelector("[data-lab-group-reveal]") as HTMLElement)
+                .animationName
+            : null,
+          orders: [...group.querySelectorAll("[data-lab-card-reveal]")].map((el) =>
+            (el as HTMLElement).style.getPropertyValue("--lab-card-order"),
+          ),
+        })),
+      };
+    });
+
+    // The chapter body is out of the single-beat reveal …
+    expect(state.body.name).toBe("none");
+    expect(state.body.opacity).toBe("1");
+
+    // … every heading and thumbnail owns a beat on its own view timeline …
+    expect(state.headings).toHaveLength(LAB_CATEGORIES.length);
+    for (const heading of state.headings) expect(heading.name).toBe("reveal-fade-up");
+    expect(state.cards.length).toBe(LAB_EXPERIMENTS.length);
+    for (const card of state.cards) {
+      expect(card.name).toBe("reveal-fade-up");
+      expect(card.timeline).toBe("view()");
+    }
+
+    // … and the order token, not `:nth-child`, sequences a group's cards.
+    for (const group of state.groups) {
+      const expected = Array.from({ length: group.orders.length }, (_, i) => String(i));
+      expect(group.orders).toEqual(expected);
+    }
+    const distinctRanges = new Set(state.cards.map((c) => c.range));
+    expect(distinctRanges.size).toBeGreaterThanOrEqual(LAB_CATEGORIES.length);
+  });
+
+  test("reduced motion shows the full sheet immediately", async ({ page }) => {
+    // `test.use({ reducedMotion })` is silently ignored in this Playwright
+    // version, so emulate and read the preference back (positive control).
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.reload();
+    expect(await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches)).toBe(
+      true,
+    );
+
+    const states = await page.evaluate(() => {
+      const section = document.querySelector("#creative-lab") as HTMLElement;
+      const read = (el: HTMLElement) => {
+        const css = getComputedStyle(el);
+        return { name: css.animationName, opacity: css.opacity, transform: css.transform };
+      };
+      const nodes = [
+        section.querySelector("[data-chapter-body]"),
+        ...section.querySelectorAll("[data-lab-group-reveal]"),
+        ...section.querySelectorAll("[data-lab-card-reveal]"),
+      ] as HTMLElement[];
+      return nodes.map(read);
+    });
+
+    // Nothing is scrolled and nothing is hidden: the sheet is a printed index.
+    expect(states).toHaveLength(1 + LAB_CATEGORIES.length + LAB_EXPERIMENTS.length);
+    for (const state of states) {
+      expect(state).toEqual({ name: "none", opacity: "1", transform: "none" });
+    }
+  });
 });

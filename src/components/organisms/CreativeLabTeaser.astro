@@ -17,6 +17,13 @@
  * same registry, so a category row and the cards underneath it cannot
  * disagree without `lab-gallery.test.ts` going red first — and
  * `creative-lab.spec.ts` checks the agreement on the built page.
+ *
+ * MOTION-07 adds two presentation hooks and nothing else: `data-lab-sheet`
+ * on the wrapper (the chapter body opts out of its single-beat reveal through
+ * it), `data-lab-group-reveal` on each heading and `data-lab-card-reveal` on
+ * each thumbnail, with `--lab-group-order` / `--lab-card-order` emitted from
+ * the loop index. Order therefore comes from the data order, never from
+ * `:nth-child`, and no JavaScript is added.
  */
 import type { LabCategoryCount } from "../../lib/facts";
 import { LAB_GALLERY_EXPERIMENTS } from "../../lib/lab-gallery";
@@ -44,7 +51,7 @@ const groups = lab.byCategory.map((category) => ({
 }));
 ---
 
-<div class="space-y-8">
+<div class="space-y-8" data-lab-sheet>
   <div class="flex flex-wrap items-end justify-between gap-4">
     <p class="max-w-2xl text-sm text-text-secondary">
       <span class="font-mono tabular-nums text-text-primary" data-lab-count>{lab.count}</span>
@@ -78,9 +85,13 @@ const groups = lab.byCategory.map((category) => ({
   </div>
 
   {
-    groups.map((group) => (
+    groups.map((group, groupIndex) => (
       <details open class="group" data-lab-group>
-        <summary class="flex cursor-pointer list-none select-none items-center gap-2 py-1 [&::-webkit-details-marker]:hidden">
+        <summary
+          data-lab-group-reveal
+          style={{ "--lab-group-order": String(groupIndex) }}
+          class="flex cursor-pointer list-none select-none items-center gap-2 py-1 [&::-webkit-details-marker]:hidden"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="14"
@@ -106,8 +117,11 @@ const groups = lab.byCategory.map((category) => ({
           </span>
         </summary>
         <ul class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {group.experiments.map((exp) => (
-            <li>
+          {group.experiments.map((exp, cardIndex) => (
+            <li
+              data-lab-card-reveal
+              style={{ "--lab-card-order": String(cardIndex) }}
+            >
               <a
                 href={`/gallery#${exp.id}`}
                 data-lab-card

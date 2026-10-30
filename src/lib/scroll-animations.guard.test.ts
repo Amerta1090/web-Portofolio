@@ -28,6 +28,7 @@ const index = read("src/pages/index.astro");
 const layout = read("src/layouts/BaseLayout.astro");
 const hero = read("src/islands/TimeAwareHero.tsx");
 const career = read("src/components/organisms/CareerSpine.astro");
+const creativeLab = read("src/components/organisms/CreativeLabTeaser.astro");
 
 /** Extract a balanced `{...}` block that follows `marker`. */
 function blockAfter(source: string, marker: string) {
@@ -130,6 +131,12 @@ describe("scroll-animations.css reveal contract", () => {
       expect(media, `${preference} overrides the career records`).toContain("[data-career-kind]");
       expect(media, `${preference} overrides the project evidence cards`).toContain(
         "[data-project-card-reveal]",
+      );
+      expect(media, `${preference} overrides the Creative Lab group headings`).toContain(
+        "[data-lab-group-reveal]",
+      );
+      expect(media, `${preference} overrides the Creative Lab thumbnails`).toContain(
+        "[data-lab-card-reveal]",
       );
     }
   });
@@ -297,6 +304,80 @@ describe("evidence card hierarchy (MOTION-04)", () => {
 
     expect(article).toBeGreaterThan(0);
     expect(wrapper.slice(0, article)).toMatch(/<TiltCard/);
+  });
+});
+
+describe("creative lab contact sheet (MOTION-07)", () => {
+  const view = () => blockAfter(css, "@supports (animation-timeline: view())").body;
+
+  it("takes the contact sheet's chapter body out of the single-beat reveal", () => {
+    // 27 thumbnails over ~2,030 px (desktop) / ~2,492 px (mobile). Measured
+    // before the change: the body beat drove the whole sheet from opacity 0 to
+    // 1 across 810 px of scroll, with all 27 cards sharing one value, so the
+    // reader scrolled into a blank panel that settled as a single rectangle.
+    const body = blockAfter(view(), "[data-chapter-body]:has([data-lab-sheet])").body;
+
+    expect(body).toMatch(/animation:\s*none/);
+    expect(body).toMatch(/opacity:\s*1/);
+    expect(body).toMatch(/transform:\s*none/);
+    // `!important` here would also beat the reduced-motion switch.
+    expect(body).not.toMatch(/!important/);
+  });
+
+  it("gives group headings and thumbnails their own beats, ordered by data", () => {
+    const sheet = view();
+
+    expect(sheet).toMatch(/--lab-group-start:\s*0%/);
+    expect(sheet).toMatch(/--lab-group-span:\s*25%/);
+    expect(sheet).toMatch(/--lab-group-step:\s*4%/);
+    expect(sheet).toMatch(/--lab-card-start:\s*10%/);
+    expect(sheet).toMatch(/--lab-card-span:\s*32%/);
+    expect(sheet).toMatch(/--lab-card-step:\s*5%/);
+
+    const group = blockAfter(sheet, "[data-lab-group-reveal]").body;
+    expect(group).toMatch(/animation-timeline:\s*view\(\)/);
+    expect(group).toMatch(/--lab-group-order/);
+
+    const card = blockAfter(sheet, "[data-lab-card-reveal]").body;
+    expect(card).toMatch(/animation-timeline:\s*view\(\)/);
+    expect(card).toMatch(/--lab-card-order/);
+    expect(card).toMatch(/entry\s+calc\(/);
+    // A `:nth-child` wall would encode today's gallery order in CSS and go
+    // stale the first time `data/lab-registry.ts` reorders (MOTION-03 trap).
+    expect(card).not.toMatch(/nth-child/);
+    expect(group).not.toMatch(/nth-child/);
+  });
+
+  it("does not fade the group container into its own thumbnails", () => {
+    // An opacity on `<details>` composites with every card's beat, so a card
+    // could never read as settled until its whole group had. The measured
+    // rhythm lives on the heading and the cards only.
+    expect(view()).not.toMatch(/\[data-lab-group\](?![-\w])/);
+  });
+
+  it("publishes the hooks and the order tokens from the server template", () => {
+    // Astro copies inline `on*` handlers into the output and the section must
+    // stay at zero JS, so the hooks are `data-` attributes plus a custom
+    // property — counted here because a rename would silently drop both rules
+    // back to the body beat.
+    expect(creativeLab).toMatch(/data-lab-sheet/);
+    expect(creativeLab).toMatch(/data-lab-group-reveal/);
+    expect(creativeLab).toMatch(/data-lab-card-reveal/);
+    expect(creativeLab).toMatch(/"--lab-group-order":\s*String\(groupIndex\)/);
+    expect(creativeLab).toMatch(/"--lab-card-order":\s*String\(cardIndex\)/);
+    expect(creativeLab).not.toMatch(/\son[a-z]+=/);
+  });
+
+  it("animates only compositor properties in every contact-sheet rule", () => {
+    const blocks = [
+      blockAfter(view(), "[data-chapter-body]:has([data-lab-sheet])").body,
+      blockAfter(view(), "[data-lab-group-reveal]").body,
+      blockAfter(view(), "[data-lab-card-reveal]").body,
+    ];
+
+    for (const block of blocks) {
+      expect(block).not.toMatch(/(^|[;{\s])(width|height|top|left|right|margin|padding)\s*:/);
+    }
   });
 });
 

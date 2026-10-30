@@ -553,3 +553,99 @@ remove the blank terminal wait without replacing the boot metaphor.
 
 **Next:** MOTION-06 is closed. MOTION-07 (Creative Lab contact sheet) is `READY`;
 do not begin it in this execution.
+
+---
+
+## 2026-10-30 — MOTION-07 — Creative Lab contact sheet
+
+**Scope:** `src/components/organisms/CreativeLabTeaser.astro` and
+`src/lib/scroll-animations.css`. No new JS, no autoplay, no hover-only
+information, no new thumbnails.
+
+**What was measured first (M7.1)**
+
+- HEAD `2d18345`, preview on :4321, probe `.opencode/probe-m07.mjs`, evidence in
+  `/tmp/opencode/m07-before.json`.
+- The sheet is **2,030.5 px** tall desktop (section 2,449.13) and **2,492.19 px**
+  mobile (section 2,783.58): 5 groups of 6/8/8/3/2, cards 275×195.56 in 4
+  columns (160.5×131.16 in 2 columns).
+- Defect: the whole index was one `reveal-fade-up-body` beat
+  (`animation-range: entry 12% → entry 78%`). Body opacity ran
+  **0 → 0.27 → 0.769 → 1** across scrollY 12,833 → 13,643 (desktop) and
+  15,416 → 16,147 (mobile), and **all 27 cards shared the same opacity at every
+  sample (distinct values = 1)** — a 2,000 px panel fading as one rectangle.
+
+**What changed (M7.2/M7.3)**
+
+- `[data-lab-sheet]` publishes the beat tokens (`--lab-group-start/span/step`
+  0 %/25 %/4 %, `--lab-card-start/span/step` 10 %/32 %/5 %).
+  `[data-lab-group-reveal]` (on each `<summary>`) and `[data-lab-card-reveal]`
+  (on each `<li>`) own a `view()` beat inside the existing
+  `@supports (animation-timeline: view())` block.
+- Order is published by the template as inline `--lab-group-order` /
+  `--lab-card-order` from the data order — never `:nth-child`, which would bake
+  today's registry order into CSS (MOTION-03 trap).
+- `[data-chapter-body]:has([data-lab-sheet])` opts the chapter body out, next to
+  the career spine, project grid, and GitHub instruments rules.
+- Both reduced-motion and reduced-data media blocks now list the two new hooks.
+- The `<details>` container is deliberately not animated: opacity there
+  composites into every thumbnail, so no card could ever read as settled. The
+  group beat lives on its `<summary>`.
+- Markup contract untouched: `details open`, `loading="lazy"`, `alt=""`, 27
+  `/gallery#<id>` links, 0 islands, 0 inline handlers.
+
+**After the change (`/tmp/opencode/m07-after.json`)**
+
+- Body: `animation-name: none`, `opacity: 1`, `transform: none` at both widths.
+- Headings settle 0 → 1 in data order; cards settle serially:
+  **0 → 4 → 10 → 18 → 22 → 27** settled at entry 0/20/40/60/80/100 % desktop and
+  **0 → 4 → 8 → 14 → 22 → 27** mobile, with 2–5 distinct card opacities through
+  the middle of the range.
+- Per-node ramps: each card starts **0–76 px** after its own viewport-edge
+  crossing and finishes within ~40 px; headings within ~8 px.
+- Reduced motion: 33 nodes compute `none` / `1` / `none`, `matchMedia` read back
+  `true`, 27 cards present.
+
+**Verification**
+
+- `bun run validate-data`: OK, GitHub cache non-degenerate.
+- `bun run build:fast`: 49 pages; dist emits 27 `data-lab-card-reveal`,
+  5 `data-lab-group-reveal`, 1 `data-lab-sheet`, 27 `--lab-card-order` and
+  5 `--lab-group-order` values.
+- `bunx astro check`: **98 errors, 0 warnings, 81 hints = baseline**.
+- Biome: 4 touched files clean.
+- `src/lib/scroll-animations.guard.test.ts`: **28/28** (5 new MOTION-07 source
+  tests, reduced-motion block now covers the contact sheet).
+- Mutation teeth, 3/3 red on the named assertions, each restored to an identical
+  `md5sum`: **A** delete `[data-chapter-body]:has([data-lab-sheet])` → 2 guard
+  tests red; **B** drop `--lab-card-order` from the template → 1 guard test plus
+  e2e "settles the sheet as an index instead of one rectangle" red (orders read
+  `""`); **D** remove `[data-lab-card-reveal]` from the reduced-motion block →
+  e2e "reduced motion shows the full sheet immediately" red (`reveal-fade-up`,
+  opacity 0, `translateY(16px)`).
+- Targeted e2e `e2e/creative-lab.spec.ts` `--workers=1`: **7/7**.
+- Full unit: **1197/1197, 104 files** (1192 + 5).
+- Full e2e `--workers=1`: **393 passed, 1 skipped** of **394 tests / 37 files**
+  (`--list`). The skip is the documented Chromium `prefers-reduced-data` case.
+- `measure:routes`: `/` **202.7 / 556.1 / 77.3 KB** (initial and reachable
+  flat; HTML +0.1 for the 32 inline order properties); `/work` 150.8/393.2/18.5;
+  `/gallery` 179.2/504.5/20.0; islands 16 (7e/9d); all dist JS
+  **671.3 KB / 100 files = unchanged**.
+- `measure:runtime`: after-scroll **16 scroll listeners** and **79 rectReads**,
+  both equal to baseline; no new canvas, WebGL context, or RAF path.
+
+**Deviations / notes**
+
+- The documentary "full e2e = 407 tests / 36 files" was **not reproducible**:
+  `--list` gives **394 / 37** on this tree (392 at HEAD + 2 new). The measured
+  number is recorded; `QA_CHECKLIST.md` baselines were corrected.
+- Probe endpoints matter: `entry` percentages resolve against the scrollport
+  edge, so "settled" is only true ~30–60 px after a node clears it. Earlier
+  "not settled" readings were probe endpoints measured against a stale sheet
+  height, not a product defect. Node positions and samples must come from the
+  same `evaluate`.
+- No dependency, route, section, data field, asset, island, or listener was
+  added.
+
+**Next:** MOTION-07 is closed. MOTION-08 (Cross-page continuity) is `READY`; do
+not begin it in this execution.

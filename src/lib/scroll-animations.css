@@ -200,6 +200,60 @@
     transform: none;
   }
 
+  /* ── Creative Lab contact sheet (MOTION-07) ──
+   * 27 thumbnails over ~2,030 px (desktop) / ~2,492 px (mobile). The
+   * chapter-body beat faded all of it as one rectangle and finished by
+   * scrollY +810 (measured: body opacity 0 → 1 across four offsets), so a
+   * reader scrolling the index saw an empty 2,000 px panel settle once.
+   *
+   * The body opts out with the same structural rule the career spine, the
+   * project grid, and the GitHub instruments use. The *group container* is
+   * deliberately not animated: an opacity on `<details>` multiplies into every
+   * card's own beat (composite), so a card could never read as settled until
+   * its whole group had. The group beat therefore lives on its heading, and
+   * every thumbnail owns a beat on its own view timeline.
+   *
+   * Order comes from `--lab-group-order` / `--lab-card-order`, emitted by the
+   * server template from the data order — never `:nth-child`, which would
+   * encode today's `data/*.json` order in CSS (the MOTION-03 trap).
+   */
+  [data-chapter-body]:has([data-lab-sheet]) {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  [data-lab-sheet] {
+    --lab-group-start: 0%;
+    --lab-group-span: 25%;
+    --lab-group-step: 4%;
+    --lab-card-start: 10%;
+    --lab-card-span: 32%;
+    --lab-card-step: 5%;
+  }
+
+  [data-lab-group-reveal] {
+    opacity: 0;
+    transform: translateY(12px);
+    animation: reveal-fade-up linear forwards;
+    animation-timeline: view();
+    animation-range: entry
+      calc(var(--lab-group-start) + var(--lab-group-order, 0) * var(--lab-group-step)) entry
+      calc(var(--lab-group-span) + var(--lab-group-order, 0) * var(--lab-group-step));
+  }
+
+  /* Cards share a row, so their own timelines start together; the order token
+   * is what makes the lead thumbnail settle before its neighbours. */
+  [data-lab-card-reveal] {
+    opacity: 0;
+    transform: translateY(16px);
+    animation: reveal-fade-up linear forwards;
+    animation-timeline: view();
+    animation-range: entry
+      calc(var(--lab-card-start) + var(--lab-card-order, 0) * var(--lab-card-step)) entry
+      calc(var(--lab-card-span) + var(--lab-card-order, 0) * var(--lab-card-step));
+  }
+
   /* ── Legacy container reveal ──
    * Pages that put `data-reveal` on their own wrapper (blog grids, timeline,
    * capability architecture) keep the single-beat fade. Chapters use the
@@ -280,6 +334,8 @@
   [data-career-year] > h3,
   [data-career-kind],
   [data-project-card-reveal],
+  [data-lab-group-reveal],
+  [data-lab-card-reveal],
   [data-reveal] > *,
   [data-hero-handoff] [data-hero-scroll-cue] {
     animation: none !important;
@@ -298,6 +354,8 @@
   [data-career-year] > h3,
   [data-career-kind],
   [data-project-card-reveal],
+  [data-lab-group-reveal],
+  [data-lab-card-reveal],
   [data-reveal] > *,
   [data-hero-handoff] [data-hero-scroll-cue] {
     animation: none !important;
