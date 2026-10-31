@@ -828,7 +828,7 @@ not a generic placeholder.
 `/images/placeholder/project.svg` either ship an owned, captioned evidence image
 or render an intentional no-image layout. No generic placeholder reaches a page.
 
-**Dependencies:** MOTION-01.5 (variant pipeline, `ProjectThumbnail` `srcset`),
+**Dependencies:** MOTION-09, MOTION-01.5 (variant pipeline, `ProjectThumbnail` `srcset`),
 D-11 (evidence first, owned assets only).
 
 **Scope:** `data/projects.json` `images[]`, `public/images/projects/`,
@@ -879,12 +879,13 @@ motion signature instead of nine identical chapter fades.
 **Outcome:** A recorded tells score before/after, a short list of removed
 devices, and one documented signature move.
 
-**Dependencies:** MOTION-09 (QA numbers to compare against).
+**Dependencies:** MOTION-14 (final palette), MOTION-09 (QA numbers to compare against).
 
 **Scope:** `src/styles/*`, `scroll-animations.css`, section organisms,
 `DECISIONS.md`.
-**Exclusions:** no rebrand (Fraunces / Inter / JetBrains Mono and sage/clay stay
-unless a new decision is written with evidence), no new route or section.
+**Exclusions:** no rebrand (Fraunces / Inter / JetBrains Mono stay unless a new
+decision is written with evidence; colour belongs to MOTION-14), no new route or
+section.
 
 **Tasks**
 - [ ] M12.1 Run taste `scripts/inspect.mjs` + impeccable `audit` on `/`,
@@ -921,7 +922,7 @@ targeted e2e, build, payload.
 **Objective:** Every always-on decorative effect must justify its cost or go.
 **Outcome:** A measured keep/remove decision for each ambient effect.
 
-**Dependencies:** MOTION-09.
+**Dependencies:** MOTION-12.
 
 **Scope:** `AmbientScene` (R3F, every page), `CustomCursor`, `.noise-overlay`,
 infinite loops in `LanguageNebula.tsx` and `CreativeLabPill.tsx`, the
@@ -946,6 +947,134 @@ reduced-motion e2e with `emulateMedia` + `matchMedia` readback, docs.
 
 ---
 
+## MOTION-14 — Colour system (triadic, OKLCH)
+
+**Status:** `PLANNED` (added 2026-10-31, `RESEARCH.md` §7.4)
+**Priority:** P2
+**Objective:** Replace the accidental sage + clay pair with a palette derived
+from a named scheme, legible in both themes.
+**Outcome:** Rubric V3 = 2: tokens generated from OKLCH, every text/UI pair
+≥ AA in light and dark, hex and `-rgb` tokens agree.
+
+**Dependencies:** MOTION-11 (new imagery must be judged against the new
+palette). Runs before MOTION-12 so the taste pass reviews final colours.
+
+**Scope:** `src/styles/theme.css`, `global.css`, `lab-gallery.ts` only if a
+chart/category colour moves, `palette-gate.test.ts`, contrast e2e,
+`DECISIONS.md`.
+**Exclusions:** gallery experiment colours (documented exception), typography,
+layout. No colour library at runtime.
+
+**Tasks**
+- [ ] M14.1 Fix the measured token drift first: light `:root`
+      `--color-brand-rgb` is `93 107 84` while `--color-brand` is `#7a8c6f`;
+      add a unit gate that every `--x` hex equals its `--x-rgb` triplet.
+- [ ] M14.2 Build the scheme in OKLCH from the sage anchor (H 133.7°): neutrals
+      60 %, sage 30 % (C ~0.08), triad partner 10 % as the single UI accent,
+      third triad hue for data/category only. Candidates and contrasts are in
+      `RESEARCH.md` §7.4; record the chosen L/C/H per token.
+- [ ] M14.3 Screenshot A/B (current vs triadic vs analogous) at 1440 and 375 in
+      both themes; pick with the rubric (V3, V1) and write the decision.
+- [ ] M14.4 Contrast gate: every text token on every surface token ≥ 4.5:1,
+      UI/border-meaningful ≥ 3:1, both themes, read from computed styles in
+      the browser (Sprint 4 lesson: never from constants in the test).
+- [ ] M14.5 Re-run the palette grep gate and the existing contrast specs.
+
+**Acceptance criteria**
+- 0 AA failures for text pairs in either theme (today: sage 3.46, muted 2.62,
+  clay 3.12 on the light surface).
+- hex/`-rgb` parity gate green.
+- Payload flat (tokens only).
+
+**Definition of Done / verification:** contrast e2e both themes, palette gate,
+unit, build, screenshots in `SESSION_LOG.md`.
+
+---
+
+## MOTION-15 — Evidence-first project detail pages
+
+**Status:** `PLANNED` (added 2026-10-31, `RESEARCH.md` §7.3)
+**Priority:** P2
+**Objective:** A project page shows what was built before it explains it.
+**Outcome:** Rubric A5 = 2 and V2 holds on detail routes: evidence (image,
+diagram, or headline metric) above the fold on every `/projects/[slug]`;
+highlights read as structured problem → approach → result, not one paragraph
+in a box.
+
+**Dependencies:** MOTION-11 (the evidence), MOTION-14 (palette).
+
+**Scope:** `src/pages/projects/[slug].astro`, project data fields that already
+exist (`highlights`, `skills`, `links`, `period`, `association`), the type
+hierarchy from MOTION-12.
+**Exclusions:** no new route, no invented metric (Rule 7), no CMS.
+
+**Tasks**
+- [ ] M15.1 Measure today: per detail page, what sits above the fold at 1440
+      and 375 (expected: title + date + chip + text box).
+- [ ] M15.2 Evidence block above the fold from MOTION-11 assets, or a
+      data-derived figure (stack diagram from `skills`, timeline from
+      `period`) when no image exists — derived, never invented.
+- [ ] M15.3 Split `highlights` into readable structure only where the source
+      text already has labelled parts ("Logic & Parsing:", "Efficiency Gain:");
+      otherwise keep prose, set at reading measure (65ch).
+- [ ] M15.4 Apply the MOTION-12 type hierarchy (display face for the page
+      title if that is the decision) and verify no-JS and reduced motion.
+
+**Acceptance criteria**
+- Evidence above the fold on 22/22 detail pages at 1440 and 375.
+- No text box wider than the reading measure.
+- `projects-detail` e2e extended; no dead control (Task 0.5 guard stays green).
+
+**Definition of Done / verification:** e2e, screenshots, build, payload.
+
+---
+
+## MOTION-16 — Rating gate (KKM 8.5)
+
+**Status:** `PLANNED` (added 2026-10-31)
+**Priority:** P1 (blocks MOTION-10)
+**Objective:** Re-rate the site with the rubric and decide whether the
+programme may release.
+**Outcome:** A scored rubric with evidence per criterion and one of three
+verdicts.
+
+**Dependencies:** MOTION-09, -11, -12, -13, -14, -15.
+
+**Scope:** `RESEARCH.md` §7, screenshots, probes; no product code unless a
+follow-up sprint is created.
+
+**Tasks**
+- [ ] M16.1 Build the evidence bundle: screenshots at 375 / 1440 / 2560 in both
+      themes for `/`, `/projects`, two `/projects/[slug]`, `/work/[slug]`,
+      `/observatory`, `/gallery`; image probe; `measure:routes`;
+      `measure:runtime`; MotionScore range; taste `inspect.mjs` and impeccable
+      `audit` output.
+- [ ] M16.2 Independent scoring: a fresh sub-agent with no implementation
+      context scores all 15 criteria from the rubric and the bundle, citing
+      evidence per score. The implementer may challenge a score only with new
+      evidence, recorded in `SESSION_LOG.md`.
+- [ ] M16.3 Verdict:
+      - **≥ 8.5 — PASS.** Set MOTION-10 `READY`.
+      - **8.0 – 8.49 — ACCEPTED (mentok).** Allowed only if every criterion below
+        2 has a written blocker showing the next point needs work outside the
+        roadmap (e.g. no owned evidence exists for a project, GPU floor is
+        environmental). Then MOTION-10 `READY`.
+      - **< 8.0, or 8.0–8.49 without written blockers — LOOP.** Create
+        `MOTION-17`, `-18`, … one per lowest-scoring criterion (objective = that
+        criterion's "2" anchor), set the first `READY`, and add a fresh
+        MOTION-16 re-run after them. After two loops below 8.0, stop and ask the
+        user before adding more.
+- [ ] M16.4 Record the score history (today 5.05 → each gate) in
+      `RESEARCH.md` §7 and `STATUS.md`.
+
+**Acceptance criteria**
+- 15/15 criteria scored with evidence by a reviewer other than the implementer.
+- Verdict follows M16.3 exactly; no score rounded up into a band.
+
+**Definition of Done:** rubric table, verdict, next sprint set `READY`.
+
+---
+
 ## MOTION-10 — Programme release
 
 **Status:** `PLANNED`
@@ -954,7 +1083,7 @@ reduced-motion e2e with `emulateMedia` + `matchMedia` readback, docs.
 **Outcome:** The motion language is documented for future contributors, the
 backlog is empty or explicitly deferred, and the site is deployed.
 
-**Dependencies:** MOTION-09, MOTION-11, MOTION-12, MOTION-13.
+**Dependencies:** MOTION-16 verdict PASS or ACCEPTED (which implies MOTION-09, -11 … -15).
 
 **Scope:** docs, release checklist.
 **Exclusions:** new features.
@@ -987,15 +1116,22 @@ MOTION-00 (DONE)
        ├─ MOTION-06 (DONE)
        ├─ MOTION-07 (DONE)
        └─ MOTION-08 (DONE)
-            └─ MOTION-09 (READY)
-                 ├─ MOTION-11 (project evidence imagery)
-                 ├─ MOTION-12 (taste pass)
-                 ├─ MOTION-13 (ambient decoration audit)
-                 └─ MOTION-10 (release, after 11–13)
+            └─ MOTION-09 (READY)  QA sweep
+                 └─ MOTION-11  project evidence imagery
+                      └─ MOTION-14  colour system (triadic, OKLCH)
+                           └─ MOTION-12  taste pass
+                                └─ MOTION-13  ambient decoration audit
+                                     └─ MOTION-15  evidence-first detail pages
+                                          └─ MOTION-16  rating gate (KKM 8.5)
+                                               ├─ PASS / ACCEPTED → MOTION-10 release
+                                               └─ LOOP → MOTION-17+ → MOTION-16 again
 ```
 
 Priority conflicts resolve in favour of the sprint that removes a measured
 defect or unblocks the most other sprints. MOTION-08 is complete; MOTION-09 is
 the next ready sprint. MOTION-11–13 were added on 2026-10-31 from the
 visual/asset/motion audit (`RESEARCH.md` §6) and run after the QA sweep so their
-deltas are measured against its numbers.
+deltas are measured against its numbers. MOTION-14/15/16 were added the same day
+after the rubric projection (`RESEARCH.md` §7.3) showed 11–13 alone land near
+8.4 (pessimistic 7.75), under the 8.5 bar. Sprint numbers are not the execution
+order — the tree above is.

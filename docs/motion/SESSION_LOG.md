@@ -717,3 +717,17 @@ MOTION-09, before MOTION-10.
 
 **Next:** MOTION-09 is `READY`. Do not start it in this execution.
 
+### 2026-10-31 (follow-up) — rubric, projection, colour, rating gate
+
+User asked for an estimate after the three new sprints, a re-rating at the end
+with a loop below KKM 8.5 (8.0 acceptable if stuck), and allowed a colour fix
+based on colour theory. Added `RESEARCH.md` §7: a 15-criterion rubric (0/1/2
+anchors), calibration of today's site (**5.05**), per-sprint projection (8.40
+after 11–13, 9.35 after 14–15; pessimistic 7.75 / 8.70), and an OKLCH colour
+analysis computed with a scratch script (sRGB → OKLab → OKLCH, WCAG relative
+luminance). Found and recorded a token defect: light `--color-brand-rgb`
+`93 107 84` disagrees with `--color-brand` `#7a8c6f`. Added MOTION-14 (triadic
+colour system), MOTION-15 (evidence-first detail pages), MOTION-16 (rating
+gate with PASS / ACCEPTED / LOOP verdicts, scored by a fresh sub-agent). No
+product code changed.
+

@@ -326,3 +326,96 @@ evidence listed — label: DOCUMENTED (judgement), with every cited count VERIFI
 | Uniform chapter beat, no signature move | `scroll-animations.css` | MOTION-12 |
 | Ambient layers + infinite loops + global `0.01ms` rule | `BaseLayout.astro`, islands, `global.css` | MOTION-13 |
 
+## 7. Rating rubric, projection, and the 8.5 gate (2026-10-31)
+
+The §6.1 scores were a holistic judgement. A gate needs something a second
+reviewer can reproduce, so from here on the **rubric below is the authority**:
+three areas, five criteria each, every criterion scored **0 / 1 / 2** with a
+written anchor, area = sum (0–10), overall = 0.35 × visual + 0.30 × assets +
+0.35 × motion. Each score cites evidence (screenshot, count, probe, test).
+Scored by a reviewer that did not implement the sprint under review (a fresh
+sub-agent given the rubric and the evidence bundle, see MOTION-16).
+
+### 7.1 Rubric
+
+| # | Criterion | 0 | 1 | 2 |
+| --- | --- | --- | --- | --- |
+| V1 | Identity & token discipline | ad-hoc values | tokens exist, some drift | one token system, no hard-coded colour/space in product code |
+| V2 | Type system | 3+ unrelated voices | coherent but split roles (e.g. display face in hero, bold sans for h2/h1) | one documented hierarchy used on every route |
+| V3 | Colour scheme & contrast | no scheme, AA failures in body text | scheme implicit, or AA failures in one theme / token drift | palette derived from a named scheme in OKLCH; every text/UI pair ≥ AA in **both** themes; hex and `-rgb` tokens agree |
+| V4 | Information-bearing chrome | ornament labels present (e.g. literal "Section") | tells reduced, some kept without reason | 0 banned tells from the taste registry, or each kept one has a written reason |
+| V5 | Layout quality | defects at 1440 or 375 (overlap, crop, empty controls) | no defects, one layout family everywhere | no defects at 7 widths, composition varies by content |
+| A1 | Project evidence coverage | < 50 % of projects have owned evidence | ≥ 80 % | 100 %, or an honest no-image layout for the rest |
+| A2 | Hero art direction | breaks at a width | works at desktop only | subject legible at 375 → 2560 |
+| A3 | Image budget | over §7 budget | within, unmeasured route | within budget at 1440 and 375, probe recorded |
+| A4 | Provenance | assets without a source | register incomplete | every served image has an `ASSETS.md` row |
+| A5 | Evidence on detail pages | wall of text, no evidence | evidence below the fold | image/diagram/metric above the fold on every detail page |
+| M1 | Technical quality | layout-property animation, listeners per frame | mostly compositor-only | compositor-only, `@supports`-gated, data-ordered, one-shot where it should be |
+| M2 | Accessibility | reduced motion ignored | shortened durations somewhere (`0.01ms` global) | explicit `animation: none` everywhere, verified with `emulateMedia` + `matchMedia` |
+| M3 | Restraint | decorative loops run off-screen | loops paused off-screen | no decorative loop without a measured reason; ambient layers justified |
+| M4 | Expressive identity | uniform fade on every block | some sections have their own beat | one documented signature move; rhythm varies with content |
+| M5 | Measured health | D/F MotionScore findings | 0 D/F, home below A | 0 D/F and home ≥ A, or the gap is proven environmental (§M-4.2) |
+
+### 7.2 Calibration — today's site against the rubric
+
+| Area | Scores | Total | Main reason |
+| --- | --- | ---: | --- |
+| Visual | V1 2 · V2 1 · V3 1 · V4 0 · V5 1 | **5** | literal "Section" ×9 (V4); light mode: sage `#7a8c6f` on `#fafaf8` 3.46:1, muted 2.62:1, clay 3.12:1, and `:root` `--color-brand-rgb` = `93 107 84` while `--color-brand` = `#7a8c6f` (V3); hero "Scroll" overlap + 0-count chips (V5) |
+| Assets | A1 0 · A2 1 · A3 2 · A4 1 · A5 0 | **4** | 5/22 projects have owned images; 375 px hero crops the subject |
+| Motion | M1 2 · M2 1 · M3 1 · M4 1 · M5 1 | **6** | global `0.01ms` rule; ambient R3F/cursor/loops; home MotionScore B 56–59 |
+| **Overall** | 0.35·5 + 0.30·4 + 0.35·6 | **5.05** | stricter than the holistic 6.5 in §6.1 — the rubric counts defects the judgement forgave |
+
+### 7.3 Projection per sprint (estimate, not evidence)
+
+Which criteria each sprint is designed to move; *pessimistic* assumes A1 lands at 1 (owned evidence missing for some projects)
+and V5 at 1 (a layout defect survives); the table shows central scores.
+
+| After | Moves | Visual | Assets | Motion | Overall (central / pessimistic) |
+| --- | --- | ---: | ---: | ---: | --- |
+| Today | — | 5 | 4 | 6 | **5.05** |
+| MOTION-09 QA | M5 documented (stays 1 unless home reaches A) | 5 | 4 | 6 | 5.05 |
+| MOTION-11 imagery | A1 0→2 (risk: owned evidence may not exist for every project → 1), A2 1→2, A4 1→2 | 5 | 7 | 6 | 5.95 / 5.65 |
+| MOTION-12 taste pass | V2 1→2, V4 0→2, V5 1→2 (risk → 1), M4 1→2 | 9 | 7 | 7 | 7.70 / 7.05 |
+| MOTION-13 ambient | M2 1→2, M3 1→2 | 9 | 7 | 9 | **8.40 / 7.75** ← the three originally planned sprints |
+| **MOTION-14 colour system** | V3 1→2 | 10 | 7 | 9 | 8.75 / 8.10 |
+| **MOTION-15 evidence detail pages** | A5 0→2 | 10 | 9 | 9 | **9.35 / 8.70** |
+
+Reading: the three sprints from §6 alone land around **8.4 (pessimistic 7.75)** —
+just under the 8.5 bar, because they leave two criteria untouched (colour V3 and
+detail-page evidence A5). MOTION-14 and MOTION-15 close those. The largest
+uncertainty is A1: if real screenshots/terminal captures cannot be produced for
+most projects, assets stays at 7–8 and the overall result sits near 8.5.
+
+### 7.4 Colour analysis (input to MOTION-14)
+
+Computed in OKLCH (`color.py` method recorded in `SESSION_LOG.md`, 2026-10-31):
+
+| Token | Hex | L | C | H | vs dark `#0e0f0c` | vs light `#fafaf8` |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| brand sage | `#7a8c6f` | 0.62 | 0.047 | 133.7° | 5.32 | **3.46** |
+| brand-text (light) | `#5d6b54` | 0.51 | 0.039 | 133.3° | 3.38 | 5.44 |
+| muted | `#8fa284` | 0.69 | 0.048 | 134.1° | 7.02 | **2.62** |
+| warm clay | `#c17f59` | 0.66 | 0.098 | 50.3° | 5.90 | **3.12** |
+
+- Sage chroma 0.047 is close to grey; clay sits **83.4°** from sage on the hue
+  wheel — neither analogous (≤ 30°), complementary (180°), split (±150°) nor
+  triadic (120°). The pair works by accident, not by a scheme, and the clay
+  accent is exactly the "terracotta" tell in the taste registry.
+- Candidates at equal lightness (accent L 0.62 / C 0.09, dark-mode text L 0.70,
+  light-mode text L 0.50), sage hue kept as the anchor:
+
+| Scheme | Hues | Dark-mode accents (contrast) | Light-mode text (contrast) |
+| --- | --- | --- | --- |
+| Analogous ±30° | 104° / 134° / 164° | `#a8a15d` 7.25 · `#88ab71` 7.43 · `#66b08f` 7.48 | `#6b6529` 5.71 · `#506d3c` 5.59 · `#307256` 5.48 |
+| **Triadic (segitiga warna) 120°** | 134° / 254° / 14° | `#88ab71` 7.43 · `#77a2d6` 7.25 · `#d0878e` 6.90 | `#506d3c` 5.59 · `#416591` 5.75 · `#8b4f55` 6.00 |
+| Split-complementary | 134° / 284° / 344° | `#88ab71` 7.43 · `#9797d5` 7.05 · `#c688ad` 6.89 | `#506d3c` 5.59 · `#5d5d90` 5.85 · `#84506f` 5.98 |
+| Complementary | 134° / 314° | `#88ab71` 7.43 · `#b38ec6` 6.96 | `#506d3c` 5.59 · `#745584` 5.95 |
+
+- Recommendation for MOTION-14: **triadic, applied 60 / 30 / 10** — neutrals
+  60 % (current near-black / off-white, unchanged), sage 30 % (chroma raised
+  0.047 → ~0.08, still calm), one triad partner as the 10 % accent; the third
+  triad hue only as a data/category colour (Observatory charts, project
+  categories), never as UI chrome. Every candidate above clears AA in both
+  themes at the stated lightness. The final pick is a screenshot A/B at 1440
+  and 375 in both themes, scored by V3.
+

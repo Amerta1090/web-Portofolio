@@ -19,7 +19,7 @@ and `STORYBOARD.md` for the section-by-section treatment.
 | **M4** | Interactive storytelling | Signal Loom and Creative Lab become guided reading surfaces, not just interactive widgets | Pointer/keyboard/reduced-motion paths all tell the same story |
 | **M5** | Responsive & performance hardening | Same narrative on 320 px, touch, low-end hardware; measured budgets hold | Payload and listener gates flat or lower; no overflow at 7 widths |
 | **M6** | Accessibility & resilience | No-JS, reduced-motion, reduced-data, keyboard, and contrast are first-class | Positive/negative controls in e2e for every preference |
-| **M6.5** | Visual depth (added 2026-10-31) | Project evidence imagery, tells audit with one signature move, ambient-effect cost audit (MOTION-11/12/13) | No placeholder project image; tells report before/after; every ambient effect has a measured cost |
+| **M6.5** | Visual depth (added 2026-10-31) | Project evidence imagery, triadic OKLCH colour system, tells audit with one signature move, ambient-effect cost audit, evidence-first detail pages (MOTION-11/14/12/13/15) | Rubric (`RESEARCH.md` §7) ≥ 8.5 at the MOTION-16 rating gate, or 8.0–8.49 with written blockers; otherwise loop with MOTION-17+ |
 | **M7** | Release | Docs, QA, and audit are final; programme closed | All gates green; `SESSION_LOG.md` closes the programme |
 
 ## Sequencing rules
@@ -68,7 +68,8 @@ register and the measured baseline.
 
 ## What is explicitly out of scope
 
-- Rebuilding the site's visual identity or typography.
+- Rebuilding the site's typography or identity wholesale. (Colour is re-derived
+  from the existing sage anchor in MOTION-14 — a scheme fix, not a rebrand.)
 - Adding routes, sections, or a CMS.
 - Replacing Astro with a SPA or adding a client-side router beyond the existing
   `ClientRouter`.

@@ -130,6 +130,7 @@ MOTION-11 (project evidence imagery), MOTION-12 (taste pass) and MOTION-13
 | Lenis never ran in production (UMD has no default export → `TypeError` every tier-2/3 visit); bootstrap deleted | `.opencode/probe-m08-lenis.mjs`, D-12 | VERIFIED (2026-10-31) |
 | MOTION-08 gates: astro check 98; unit **1205/1205**; payload `/` 202.7 / 556.1 / **77.2** KB; runtime 16 scroll listeners / 79 rectReads | `SESSION_LOG.md` | VERIFIED (2026-10-31) |
 | Audit rating: visual 6.5, assets 5, motion 7.5, overall 6.5 / 10; 17/22 projects placeholder-only; literal "Section" eyebrow ×9 | `RESEARCH.md` §6 | DOCUMENTED (judgement; counts VERIFIED) |
+| Rubric calibration: visual 5 · assets 4 · motion 6 → **5.05**; light-mode AA failures sage 3.46 / muted 2.62 / clay 3.12 on `#fafaf8`; `:root` `--color-brand-rgb` `93 107 84` ≠ `--color-brand` `#7a8c6f` | `RESEARCH.md` §7.2/§7.4 (OKLCH + WCAG computed) | VERIFIED (contrast, tokens) / DOCUMENTED (scores) |
 
 ## Active work
 
@@ -144,8 +145,14 @@ completed — do not start MOTION-09 in the same execution.**
 `RESEARCH.md` §5.
 
 **Next: MOTION-09 is READY** — Motion QA & budget sweep (now includes the full
-e2e run MOTION-08 skipped and the skill-based review inputs). Then MOTION-11,
--12, -13 (PLANNED), then MOTION-10 release.
+e2e run MOTION-08 skipped and the skill-based review inputs). Execution order
+after it: MOTION-11 → 14 → 12 → 13 → 15 → **16 rating gate (KKM 8.5)** → 10.
+
+**Quality target (2026-10-31):** rubric in `RESEARCH.md` §7. Today **5.05 / 10**
+(visual 5, assets 4, motion 6 — stricter than the holistic 6.5). Projection:
+8.40 after 11–13 (pessimistic 7.75), **9.35 after 14–15 (pessimistic 8.70)**.
+MOTION-16 passes at ≥ 8.5, accepts 8.0–8.49 only with written blockers, and
+otherwise loops with MOTION-17+.
 
 ## Open blockers / risks
 
