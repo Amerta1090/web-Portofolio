@@ -1,8 +1,8 @@
 # Motion Programme — Status
 
-**Last updated:** 2026-10-30 (MOTION-07 `DONE`)
-**Branch:** `main` · **HEAD at session start:** `2d18345`
-**Active sprint:** none — MOTION-07 (Creative Lab contact sheet) is closed; MOTION-08 READY
+**Last updated:** 2026-10-31 (MOTION-08 `DONE`)
+**Branch:** `main` · **HEAD at session start:** `016608f`
+**Active sprint:** none — MOTION-08 (Cross-page continuity) is closed; MOTION-09 READY
 
 ## One-paragraph state
 
@@ -46,7 +46,14 @@ files**, and the strategy is evidence-first with no new external layer (D-11).
 thumbnails ship 16:9 WebP variants with `srcset`/`sizes`/explicit dimensions, and
 the hero set was re-encoded after a measured pixel A/B. Image transfer is now
 **543.5 KB @1440 (−82.7%) / 187.9 KB @375 (−92.9%)**, bought with **+0.4 KB of
-JS**; the hero is the only remaining offender.
+JS**; the hero is the only remaining offender. **MOTION-08 closed cross-page
+continuity:** only `<main>` turns (140/240 ms, directional), back restores the
+exact scroll position instantly and refocuses the activated link, the persisted
+header's `aria-current` follows the page, and the never-working Lenis bootstrap
+was deleted (D-12). **A visual/asset/motion audit (2026-10-31, `RESEARCH.md` §6)
+rated the site 6.5/10 overall** (visual 6.5, assets 5, motion 7.5) and added
+MOTION-11 (project evidence imagery), MOTION-12 (taste pass) and MOTION-13
+(ambient decoration audit) after the MOTION-09 sweep.
 
 ## Verified baseline (2026-10-21 unless noted)
 
@@ -117,27 +124,28 @@ JS**; the hero is the only remaining offender.
 | MOTION-07 gates: validate-data OK; build 49 pages; astro check 98 / 0 / 81 = baseline; biome clean on 4 touched files; unit **1197/1197, 104 files** | commands in `SESSION_LOG.md` | VERIFIED (2026-10-30) |
 | Payload `/` = 202.7 KB initial / 556.1 KB reachable / **77.3** KB HTML (JS flat, HTML +0.1 for 32 inline order properties); islands 16 (7e/9d); all dist JS 671.3 KB / 100 files = unchanged | `bun run measure:routes` | VERIFIED (2026-10-30) |
 | Full e2e after MOTION-07 = **394 tests / 37 files** (`--list`), 393 passed + 1 skipped (`--workers=1`); the earlier documentary "407 / 36" was not reproducible (392 at HEAD + 2 new) | `bunx playwright test --workers=1` / `--list` | VERIFIED (2026-10-30) |
+| MOTION-08 shipped: `<main>` page turn (`page-turn-out` 140 ms / `page-turn-in` 240 ms, `-back` variants), root snapshot not animated, reduced motion 0 view-transition animations | `e2e/page-continuity.spec.ts` (getAnimations sampler + `emulateMedia`/`matchMedia`) | VERIFIED (2026-10-31) |
+| Back restores scroll instantly (12,140 → 12,140; before: smooth fly-through, 10,338 px after 2 s) and focuses the activated link (before: `<body>`) | `.opencode/probe-m08*.mjs`, `e2e/page-continuity.spec.ts` | VERIFIED (2026-10-31) |
+| Persisted header `aria-current` follows client navigation; server render matches trailing-slash paths | `e2e/page-continuity.spec.ts`, built `/observatory/` HTML | VERIFIED (2026-10-31) |
+| Lenis never ran in production (UMD has no default export → `TypeError` every tier-2/3 visit); bootstrap deleted | `.opencode/probe-m08-lenis.mjs`, D-12 | VERIFIED (2026-10-31) |
+| MOTION-08 gates: astro check 98; unit **1205/1205**; payload `/` 202.7 / 556.1 / **77.2** KB; runtime 16 scroll listeners / 79 rectReads | `SESSION_LOG.md` | VERIFIED (2026-10-31) |
+| Audit rating: visual 6.5, assets 5, motion 7.5, overall 6.5 / 10; 17/22 projects placeholder-only; literal "Section" eyebrow ×9 | `RESEARCH.md` §6 | DOCUMENTED (judgement; counts VERIFIED) |
 
 ## Active work
 
-**None in progress.** MOTION-00 Chapter Reveal, MOTION-01.5 image hygiene,
-MOTION-02 hero handoff, MOTION-03 career spine, MOTION-04 evidence card
-hierarchy, MOTION-05 capability map narrative, MOTION-06 data instruments, and
-MOTION-07 Creative Lab contact sheet are verified. MOTION-07 replaces the single
-block fade over the 27-experiment index with per-heading and per-thumbnail
-`view()` beats ordered by server-emitted tokens, adds **zero** JS (0 islands,
-0 inline handlers, 27 deep links intact), and is a true off switch under reduced
-motion. Unit 1197/1197, build 49 pages, payload `/` 202.7 / 556.1 / 77.3 KB
-(JS unchanged at 671.3 KB / 100 files). **One sprint completed — do not start
-MOTION-08.**
+**None in progress.** MOTION-00 … MOTION-08 are verified. MOTION-08 tuned
+ClientRouter navigation into one page turn on `<main>`, made back/forward
+restore scroll instantly with focus on the activated link, fixed the persisted
+header's `aria-current`, and deleted the dead Lenis bootstrap. **One sprint
+completed — do not start MOTION-09 in the same execution.**
 
-**Visual-asset strategy:** research complete (2026-10-21), recorded in
-`ASSETS.md`; policy is D-11. Step 1 of that policy ("fix the assets already
-served") is now done by MOTION-01.5. No external asset was acquired, and none
-should be.
+**Agent skills (2026-10-31):** 13 review/design skills installed user-level
+(taste, impeccable, Emil ×5, GSAP ×5, web-design-guidelines); usage rules in
+`RESEARCH.md` §5.
 
-**Next: MOTION-08 is READY** — Cross-page continuity. Execute it in a new session
-only; this session closed after one sprint.
+**Next: MOTION-09 is READY** — Motion QA & budget sweep (now includes the full
+e2e run MOTION-08 skipped and the skill-based review inputs). Then MOTION-11,
+-12, -13 (PLANNED), then MOTION-10 release.
 
 ## Open blockers / risks
 
@@ -160,9 +168,10 @@ only; this session closed after one sprint.
   surface; not fixed.
 - **DEV-1 `check-budget` red (DOCUMENTED):** the total-dist-JS budget counts
   disjoint route graphs. Use per-route `measure:routes` instead.
-- **Lenis and `prefers-reduced-motion` (D-10, RESOLVED):** browser evidence in
-  MOTION-02 confirms the existing experience-tier detector selects tier 1 and
-  skips the Lenis import; see `SPRINT_PLAN.md` completion notes.
+- **Lenis (D-10 → D-12, RESOLVED by removal):** the bootstrap never ran (UMD
+  build, no default export); deleted in MOTION-08.
+- **Project imagery gap (VERIFIED, owner MOTION-11):** 17/22 projects ship only
+  `placeholder/project.svg`; hero crops the subject out at 375 px.
 - **Image debt was the largest asset cost (RESOLVED by MOTION-01.5):** the
   homepage went from 3,147.0 KB / 2,643.0 KB of images to **543.5 KB / 187.9 KB**
   for +0.4 KB of JS. The hero is now the single remaining offender
@@ -183,9 +192,10 @@ only; this session closed after one sprint.
 
 ## Next action
 
-**Stop here.** MOTION-07 is closed; MOTION-08 is `READY`. When the programme
-resumes, read MOTION-08 in `SPRINT_PLAN.md` and preserve D-02/D-04. Carry-over
-facts: page transitions run through `ClientRouter`, every reveal rule stays inside
+**Stop here.** MOTION-08 is closed; MOTION-09 is `READY`. When the programme
+resumes, read MOTION-09 in `SPRINT_PLAN.md`. Carry-over facts: page transitions
+animate `<main>` only and restore scroll instantly (`src/lib/page-continuity.ts`),
+there is no smooth-scroll library, every reveal rule stays inside
 `@supports (animation-timeline: view())`, ordered choreography uses
-server-emitted tokens (never `:nth-child`), reduced motion is `animation: none`
-verified with `page.emulateMedia`, and `Section` uses `overflow: clip`.
+server-emitted tokens, reduced motion is `animation: none` verified with
+`page.emulateMedia`, and `Section` uses `overflow: clip`.

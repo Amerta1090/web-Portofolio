@@ -168,6 +168,9 @@ scroll-driven animations case studies.
   `visibilitychange` guard.
 - Does not respect `prefers-reduced-motion`; this is a recorded gap (D-10).
 - Decision: keep for now; verify and fix in a dedicated sprint.
+- **Update 2026-10-31 (MOTION-08, D-12):** measured that it never ran — the
+  CDN's UMD build has no default export, so the bootstrap threw
+  `Lenis is not a constructor` on every tier-2/3 visit. Removed.
 
 ### 2.9 Visual assets (2026-10-21)
 
@@ -228,7 +231,7 @@ is D-11.
 | What is the real cost of `will-change` on many reveal elements? | Avoid GPU memory growth on mobile | MOTION-05/09 |
 | Does Safari 26 apply `animation-range` percentages the same way? (Chromium normalises `entry 0%` to `entry`; asserted in `motion-chapters.spec.ts`) | Cross-browser narrative timing | MOTION-09 (if a device is available) |
 | Can the career rail progress be expressed without a scroll listener? | Keeps listener count flat | MOTION-03 |
-| Should Lenis be disabled under reduced motion or removed entirely? | Motion sickness vs. brand feel | MOTION-02 |
+| ~~Should Lenis be disabled under reduced motion or removed entirely?~~ Removed (D-12, 2026-10-31) | — | closed |
 | What is the real homepage image-transfer budget after responsive variants? | 3.15 MB desktop / 2.64 MB mobile is the largest asset cost; `measure:routes` counts JS only | Image-hygiene task (separate from motion) |
 | Can the OBI 1200 px telephone plate become a ≤80 KB WebP without visible loss? | The pilot's budget depends on it | Asset pilot (after M5.0/M6.0) |
 | Do BHL, LoC, and Unsplash licenses permit commercial use? | No claim is allowed without a live source; all three were unverifiable this session | Asset research; do not use until verified |
@@ -252,3 +255,74 @@ is D-11.
 - Haikei: https://haikei.app/ · Kenney: https://kenney.nl/assets
 - Lucide: https://lucide.dev/
 - `docs/motion/ASSETS.md` — full asset register and pilot spec.
+
+## 5. Agent skill research (2026-10-31)
+
+Goal: find agent skills that raise the design/motion bar of this portfolio, and
+install only the ones whose job is not already covered. Stars read live with
+`gh api repos/<repo>` on 2026-10-31 (VERIFIED); install counts come from
+third-party aggregators that disagree with each other, so they were used only as
+a tie-breaker (DOCUMENTED, not trusted).
+
+| Repo | Stars | Last push | License | Verdict |
+| --- | ---: | --- | --- | --- |
+| `anthropics/skills` (`frontend-design`) | 185,425 | 2026-10-28 | per-skill | Skip — generation-only guidance, fully overlapped by the two taste skills below |
+| `Leonxlnx/taste-skill` (`design-taste-frontend` v2) | 106,429 | 2026-10-31 | MIT | **Installed** — anti-slop art direction; dated "tells" registry + browser inspector; names portfolios and Astro explicitly |
+| `pbakaus/impeccable` | 97,248 | 2026-10-30 | Apache-2.0 | **Installed** — `audit` / `critique` / `animate` / `polish` / `harden` commands with 0–4 scoring; complements taste (review, not direction) |
+| `emilkowalski/skills` | 52,076 | 2026-10-28 | MIT | **Installed 5 of 16**: `emil-design-eng`, `review-animations`, `animation-performance`, `improve-animations`, `find-animation-opportunities` (Swift/Expo/Sonner skills irrelevant) |
+| `vercel-labs/agent-skills` (`web-design-guidelines`) | 33,272 | 2026-10-28 | — | **Installed** — `file:line` audit against Web Interface Guidelines (a11y, focus, forms) |
+| `greensock/gsap-skills` (official) | 17,602 | 2026-07-29 | MIT | **Installed 5 of 8**: `gsap-core`, `gsap-react`, `gsap-scrolltrigger`, `gsap-performance`, `gsap-plugins` — the repo already ships GSAP 3.15 (SplitText, ScrollTrigger) |
+| `kylezantos/design-motion-principles` | 1,465 | 2026-05-30 | MIT | Skip — overlapped by Emil's skills, far smaller community |
+| `superdesigndev/superdesign-skill` | 923 | 2026-08-21 | MIT | Skip — tied to a hosted service |
+| `funboy322/avoid-ai-design` | 136 | 2026-09-24 | MIT | Skip — subset of taste/impeccable tells |
+| `iart-ai/web-animation-skills` | 64 | 2026-06-22 | MIT | Skip — low adoption, overlaps GSAP official |
+| `tenacityinc/design-taste-frontend` | 0 | 2026-10-16 | — | Skip — repackaging of taste-skill |
+
+Install: `npx skills add <repo> -s <skill> -a claude-code -g -y --copy`
+(skills CLI 1.5.18), **user-level** (`~/.claude/skills/`, 13 skills), so the
+repository's working tree stays clean. Two of them (taste, impeccable) carry
+Node scripts (browser inspector / live mode); they run only when the skill is
+invoked. Review cadence: `npx skills update -g`.
+
+How the programme uses them (binding on future sprints that touch visuals):
+taste `references/tells.md` and impeccable `audit` are the **visual review
+gate** (§6); Emil `review-animations` + GSAP `gsap-performance` are the
+**motion review gate**; `web-design-guidelines` runs over touched files in the
+a11y step of `QA_CHECKLIST.md` §5. A skill's verdict is an input, not a ruling:
+where it conflicts with a decision in `DECISIONS.md` (e.g. the Fraunces/sage
+identity, D-11 evidence-first assets), the decision wins until a sprint
+re-opens it with evidence.
+
+## 6. Visual / asset / motion audit and rating (2026-10-31)
+
+Method: screenshots at 1440×900 (10 homepage chapters, `/projects/…` detail)
+and 375×812 (hero) from the MOTION-08 build (`.opencode/shots-audit.mjs`), read
+against taste `references/tells.md`, impeccable `reference/audit.md` (0–4
+dimensions) and Emil's motion bar; counts from `rg` over `src/` (tests and
+`experiments/` excluded). Scores are a reviewer's judgement **grounded** in the
+evidence listed — label: DOCUMENTED (judgement), with every cited count VERIFIED.
+
+### 6.1 Ratings
+
+| Area | Score | Strongest evidence for | Strongest evidence against |
+| --- | ---: | --- | --- |
+| Visual design | **6.5 / 10** | Real identity: Fraunces display name, consistent sage/clay tokens, dark-first, clean 1200 px grid; hero uses a real personal photograph | Every chapter eyebrow is the literal word **"Section"** (`molecules/Section.astro:64`, 9×) — ornament with zero information; heavy "gallery fashion" tells: 138 `font-mono`, 38 `.section-label` tracked-caps labels, 2-digit ordinals ("01 EXPERIENCE", "01/10"), 249 `border-border` hairlines, 57 `backdrop-blur`, 78 `rounded-xl/2xl`; sage + clay + editorial serif is exactly the third-wave "warm editorial" look the taste registry flags; display face used in hero/Signal Loom but section h2 and detail h1 are bold Inter, so the type system reads as two systems |
+| Assets | **5 / 10** | MOTION-01.5 image hygiene is excellent (homepage images −82.7 % / −92.9 %); hero photo and portrait are owned; 27 lab thumbnails are small SVGs; logos for every issuer | **17 of 22 projects** have only `placeholder/project.svg` — detail pages are a wall of text in a box with no evidence image; hero art direction fails at 375 px (the subject is cropped out, only the gate and a sliver of the red shirt remain); the hexagon avatar duplicates the person already in the hero photo; one featured thumbnail is a logo, not the product |
+| Motion | **7.5 / 10** | Engineering is top-tier: CSS scroll-driven chapters inside `@supports`, true reduced-motion off switch, compositor-only progress, data-ordered beats (career, cards, contact sheet), one-shot instruments, now a single page-turn with instant restore; 0 D/F MotionScore findings | Expressively uniform: 9 chapters share one fade-and-rise head/body beat (taste motion tell "identical fade-up on every block"), no signature moment; ambient always-on layers remain (R3F `AmbientScene` on every page, `CustomCursor`, noise overlay, infinite loops in `LanguageNebula`/`CreativeLabPill`); global reduced-motion rule is still `0.01ms` (impeccable flags it); home MotionScore B 56–59 |
+| **Overall** | **6.5 / 10** | A rigorously engineered, honest portfolio (derived numbers, no dead controls, a11y-tested) | It reads as a well-built template more than an authored piece: generic labels, uniform section rhythm, and missing project imagery hide the work |
+
+### 6.2 Findings routed to sprints
+
+| Finding | Evidence | Owner |
+| --- | --- | --- |
+| 17/22 projects placeholder-only; detail pages image-less | `data/projects.json` scan | MOTION-11 |
+| Mobile hero crops the subject out | `m-hero.png` @375 | MOTION-11 (art direction / `object-position` per source) |
+| Literal "Section" eyebrow ×9 | `molecules/Section.astro:64` | MOTION-12 (quick win) |
+| Mono micro-labels, ordinals, hairlines, blur, uniform radius | counts above | MOTION-12 (classify keep/remove) |
+| Two type systems (Fraunces hero vs bold Inter h2/h1) | screenshots | MOTION-12 (decision, not rebrand) |
+| Filter chips shown with count 0 (IoT 0, CLI 0, DevOps 0) on the homepage | `a-projects.png` | MOTION-12 (hide or disable empty categories) |
+| Two burger-style icons in the mobile header (nav sheet + game menu) | `m-hero.png` | MOTION-12 |
+| "Scroll" cue overlaps the hero metric row at 1440×900 | `a-hero.png` | MOTION-12 |
+| Uniform chapter beat, no signature move | `scroll-animations.css` | MOTION-12 |
+| Ambient layers + infinite loops + global `0.01ms` rule | `BaseLayout.astro`, islands, `global.css` | MOTION-13 |
+

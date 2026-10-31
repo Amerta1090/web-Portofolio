@@ -699,7 +699,7 @@ payload, diff review.
 
 ## MOTION-08 — Cross-page continuity
 
-**Status:** `READY`
+**Status:** `DONE` (2026-10-31) — see completion notes
 **Priority:** P3
 **Objective:** Make navigation between the homepage and detail pages feel like
 turning a page rather than a hard cut.
@@ -713,10 +713,28 @@ language; reduced motion falls back to instant.
 blocking of navigation on animation.
 
 **Tasks**
-- [ ] M8.1 Audit every `transition:animate` and `transition:persist`.
-- [ ] M8.2 Define one page-turn transition and one reduced-motion fallback.
-- [ ] M8.3 Verify focus and scroll restoration after navigation.
-- [ ] M8.4 Verify no flash of invisible content.
+- [x] M8.1 Audit every `transition:animate` and `transition:persist`. Three
+      declarations, all in `BaseLayout.astro`: `transition:persist="header"`,
+      `transition:persist="footer"`, `transition:animate="fade"` on `<main>`;
+      plus global `::view-transition-old/new(root)` fades (150 ms / **500 ms**).
+      Measured: the chrome cross-faded for 500 ms on top of the 180 ms main
+      fade; the persisted header kept the old page's `aria-current`
+      (on /observatory it still marked Home); server `aria-current` never
+      matched /observatory because `Astro.url.pathname` carries a trailing
+      slash.
+- [x] M8.2 Define one page-turn transition and one reduced-motion fallback.
+      `pageTurn` (directional): out 140 ms fade + 6 px lift, in 240 ms fade +
+      10 px rise (chapter language), mirrored on back; root snapshot
+      `animation: none`. Reduced motion: Astro's own
+      `@media (prefers-reduced-motion)` rule sets every view-transition
+      animation to `none` — measured **0** view-transition animations.
+- [x] M8.3 Verify focus and scroll restoration after navigation. Before: back
+      requested `scrollTo(0, 12000)` but `html { scroll-behavior: smooth }`
+      turned it into a fly-through (10,338 px after 2 s; 0 in another run) and
+      focus fell to `<body>`. After: restore is instant (12,140 → 12,140) and
+      focus returns to the activated link (`src/lib/page-continuity.ts`).
+- [x] M8.4 Verify no flash of invisible content. New page `h1` computes
+      opacity 1 once the 240 ms turn settles; no chapter reveal holds it.
 
 **Acceptance criteria**
 - Navigation never waits on an animation to show content.
@@ -728,16 +746,50 @@ specs; build; payload; diff review.
 
 ---
 
+**Completion notes (2026-10-31):**
+- New module `src/lib/page-continuity.ts` (bundled once, router events only:
+  `astro:before-preparation`, `astro:before-swap`, `astro:after-swap`; **no
+  scroll listener, rAF, or timer**): instant scroll restore by wrapping
+  `event.swap` and pinning `scroll-behavior: auto` only between the swap and
+  `astro:after-swap`; header `aria-current` re-sync with trailing-slash
+  normalisation (also used server-side by `Header.astro`, links tagged
+  `data-nav-link`); focus memory per history entry, applied only on
+  traversals.
+- **Lenis removed (Rule 3, D-12).** The inline CDN bootstrap had never run:
+  the UMD build has no default export, so every tier-2/3 visit fetched the
+  script and threw `TypeError: Lenis is not a constructor` (VERIFIED, CDN 200).
+- Tests: unit `page-continuity.test.ts` 8; e2e `page-continuity.spec.ts` 6.
+  Mutations 4/4 red on the intended test, restored by `md5sum`: M1 drop nav
+  re-sync → aria-current test; M2 drop instant restore → back test; M3 drop
+  focus restore → back test; M4 restore a 500 ms root fade → "only <main>
+  turns". (M1 was re-run cleanly after a `git stash` overlapped its first
+  build.)
+- Gates: `validate-data` OK; `build:fast` 49 pages; `astro check` 98 errors
+  (= baseline; one transient error from importing the type via
+  `astro:transitions` fixed by importing from `astro`); Biome clean on 6 touched
+  files (global.css pre-existing format error fixed); unit **1205/1205**;
+  targeted e2e navigation + accessibility + signal-loom-deeplink + work +
+  hero-metrics + mobile-nav + motion-chapters + page-continuity **102 passed,
+  1 skipped, 1 failed under concurrent unit load** — the failing
+  `navigation.spec.ts` case passed **15/15 ×3** in isolation.
+- Payload `/` 202.7 / 556.1 / **77.2** KB (JS flat, HTML −0.1 for the deleted
+  inline Lenis script); all dist JS 671.3 KB / 100 files; runtime after scroll
+  16 scroll listeners, 79 rectReads (= baseline).
+- Deviation: full e2e suite not re-run in this session (targeted specs cover
+  every surface the sprint touched); MOTION-09 owns the full sweep.
+
+---
+
 ## MOTION-09 — Motion QA & budget sweep
 
-**Status:** `PLANNED`
+**Status:** `READY`
 **Priority:** P2 (before release)
 **Objective:** Prove the whole programme holds together on modest hardware,
 mobile, and assistive settings.
 **Outcome:** A single sweep with documented numbers and no unexplained
 regression.
 
-**Dependencies:** MOTION-02 … MOTION-08.
+**Dependencies:** MOTION-02 … MOTION-08 (all `DONE`).
 
 **Scope:** e2e specs, `measure:routes`, `measure:runtime`, MotionScore, docs.
 **Exclusions:** no new features; only fixes required by the sweep.
@@ -747,6 +799,12 @@ regression.
 - [ ] M9.2 Run reduced-motion, reduced-data, and no-JS paths.
 - [ ] M9.3 Record payload, listener, rect-read, and MotionScore ranges.
 - [ ] M9.4 Fix or document every finding.
+- [ ] M9.5 Run the installed review skills as inputs (`RESEARCH.md` §5):
+      Emil `review-animations` + GSAP `gsap-performance` over motion code,
+      `web-design-guidelines` over touched templates; record findings, route
+      visual ones to MOTION-12/13.
+- [ ] M9.6 Run the full e2e suite once (`--workers=1`, nothing else running —
+      MOTION-08 ran targeted specs only).
 
 **Acceptance criteria**
 - Zero overflow outside the documented `/resume` print exception.
@@ -760,6 +818,134 @@ regression.
 
 ---
 
+## MOTION-11 — Project evidence imagery
+
+**Status:** `PLANNED` (added 2026-10-31 from the visual/asset audit, `RESEARCH.md` §6)
+**Priority:** P1 (largest visual gap measured)
+**Objective:** Every project a reader can open shows real evidence of the work,
+not a generic placeholder.
+**Outcome:** The 17 of 22 projects whose only image is
+`/images/placeholder/project.svg` either ship an owned, captioned evidence image
+or render an intentional no-image layout. No generic placeholder reaches a page.
+
+**Dependencies:** MOTION-01.5 (variant pipeline, `ProjectThumbnail` `srcset`),
+D-11 (evidence first, owned assets only).
+
+**Scope:** `data/projects.json` `images[]`, `public/images/projects/`,
+`ProjectThumbnail.tsx`, `/projects/[slug]`, `/work/[slug]`, `ASSETS.md`.
+**Exclusions:** no stock photography, no AI illustration, no mock dashboards
+(taste tell "fake dashboard hero"), no new runtime dependency, no external asset
+without an `ASSETS.md` row.
+
+**Tasks**
+- [ ] M11.1 Inventory: per project, what owned evidence exists (repo README
+      screenshots, CLI output, architecture notes, deployed URL). Record in
+      `ASSETS.md`.
+- [ ] M11.2 Produce owned evidence per kind: UI screenshots for web/app
+      projects (capture from the live app or local build), real terminal
+      captures for CLI tools (text-rendered SVG/PNG from an actual run), and a
+      data-derived SVG diagram for ML/agent systems (built from the case-study
+      metadata, same pure-geometry approach as the Case Study Reactor).
+- [ ] M11.3 Run every new image through the MOTION-01.5 pipeline (WebP variants,
+      `srcset`/`sizes`, explicit dimensions, lazy below the fold) and record
+      bytes.
+- [ ] M11.4 Where no honest evidence exists, delete the placeholder and render
+      the card without an image slot (P6: no invented evidence).
+- [ ] M11.5 Fix hero art direction at narrow widths: the 375 px crop shows the
+      gate, not the person (`RESEARCH.md` §6.1); choose a per-breakpoint focal
+      point or a portrait crop variant, and drop the duplicate hexagon avatar
+      if the photo carries the face.
+- [ ] M11.6 Re-run the image-transfer probe at 1440 and 375 (`QA_CHECKLIST.md`
+      §4.5) and the taste/impeccable visual review on `/projects`.
+
+**Acceptance criteria**
+- `rg 'placeholder/project.svg' data dist` = 0.
+- Homepage image transfer stays within the §7 budget of `ASSETS.md`.
+- Every new image has an `ASSETS.md` row (source, owner, date, bytes).
+
+**Definition of Done / verification:** `validate-data` (+ a new gate rejecting
+placeholder paths), build, image probe 1440/375, `project-cards` +
+`projects-detail` e2e, docs.
+
+---
+
+## MOTION-12 — Taste pass: tells audit and one signature move
+
+**Status:** `PLANNED` (added 2026-10-31, `RESEARCH.md` §6)
+**Priority:** P2
+**Objective:** Measure the site against the dated "AI tells" registry and keep
+only the devices that carry information; give the homepage one recognisable
+motion signature instead of nine identical chapter fades.
+**Outcome:** A recorded tells score before/after, a short list of removed
+devices, and one documented signature move.
+
+**Dependencies:** MOTION-09 (QA numbers to compare against).
+
+**Scope:** `src/styles/*`, `scroll-animations.css`, section organisms,
+`DECISIONS.md`.
+**Exclusions:** no rebrand (Fraunces / Inter / JetBrains Mono and sage/clay stay
+unless a new decision is written with evidence), no new route or section.
+
+**Tasks**
+- [ ] M12.1 Run taste `scripts/inspect.mjs` + impeccable `audit` on `/`,
+      `/projects`, `/work/ai-quranic-tafsir`, `/observatory`; record findings
+      with counts (baseline from source: 138 `font-mono`, 38 `.section-label`,
+      249 `border-border`, 57 `backdrop-blur`, 78 `rounded-xl/2xl`, 6 two-digit
+      ordinal emitters).
+- [ ] M12.0 Quick wins already measured: replace the literal "Section" eyebrow
+      (`molecules/Section.astro:64`, 9 chapters) with real content or remove
+      it; hide/disable 0-count project filter chips; resolve the two burger
+      icons in the mobile header; move the hero "Scroll" cue off the metric row.
+- [ ] M12.2 Classify each tell: *carries information* (keep, with reason) vs
+      *ornament* (remove). Example: career ordinals are `aria-hidden` duplicates
+      of the date — candidate removal; mono on numeric data stays.
+- [ ] M12.3 Pick one signature move from existing chapter language (e.g. the
+      hero hand-off or the Signal Loom edge draw) and let other chapters stay
+      quieter; write it as a decision.
+- [ ] M12.4 Re-run the review; record the delta.
+
+**Acceptance criteria**
+- Tells report before/after with numbers; every kept tell has a written reason.
+- No contrast, reduced-motion, or no-JS regression (existing e2e).
+- Payload flat or lower.
+
+**Definition of Done / verification:** review outputs in `SESSION_LOG.md`,
+targeted e2e, build, payload.
+
+---
+
+## MOTION-13 — Ambient decoration audit
+
+**Status:** `PLANNED` (added 2026-10-31, `RESEARCH.md` §6)
+**Priority:** P2
+**Objective:** Every always-on decorative effect must justify its cost or go.
+**Outcome:** A measured keep/remove decision for each ambient effect.
+
+**Dependencies:** MOTION-09.
+
+**Scope:** `AmbientScene` (R3F, every page), `CustomCursor`, `.noise-overlay`,
+infinite loops in `LanguageNebula.tsx` and `CreativeLabPill.tsx`, the
+time-of-day warmth script, the global `0.01ms` reduced-motion rule.
+**Exclusions:** gallery experiments (they own the experimental budget).
+
+**Tasks**
+- [ ] M13.1 A/B each effect off (preseden §M-4.2): payload, runtime RAF,
+      GPU, MotionScore findings.
+- [ ] M13.2 Decide keep/remove per effect; remove dead or costly ones (Rule 3).
+- [ ] M13.3 Replace the global `animation-duration: 0.01ms` reduced-motion rule
+      with explicit `animation: none` blocks where it is still the only
+      mechanism (D-04; impeccable audit flags the global kill).
+- [ ] M13.4 Verify infinite loops pause off-screen and stop under reduced motion.
+
+**Acceptance criteria**
+- No infinite decorative loop runs off-screen or under reduced motion.
+- Each kept ambient effect has a measured cost and a written reason.
+
+**Definition of Done / verification:** `measure:runtime`, MotionScore range,
+reduced-motion e2e with `emulateMedia` + `matchMedia` readback, docs.
+
+---
+
 ## MOTION-10 — Programme release
 
 **Status:** `PLANNED`
@@ -768,7 +954,7 @@ regression.
 **Outcome:** The motion language is documented for future contributors, the
 backlog is empty or explicitly deferred, and the site is deployed.
 
-**Dependencies:** MOTION-09.
+**Dependencies:** MOTION-09, MOTION-11, MOTION-12, MOTION-13.
 
 **Scope:** docs, release checklist.
 **Exclusions:** new features.
@@ -800,11 +986,16 @@ MOTION-00 (DONE)
        ├─ MOTION-04 (DONE)
        ├─ MOTION-06 (DONE)
        ├─ MOTION-07 (DONE)
-       └─ MOTION-08 (READY)
-            └─ MOTION-09
-                 └─ MOTION-10
+       └─ MOTION-08 (DONE)
+            └─ MOTION-09 (READY)
+                 ├─ MOTION-11 (project evidence imagery)
+                 ├─ MOTION-12 (taste pass)
+                 ├─ MOTION-13 (ambient decoration audit)
+                 └─ MOTION-10 (release, after 11–13)
 ```
 
 Priority conflicts resolve in favour of the sprint that removes a measured
-defect or unblocks the most other sprints. MOTION-08 is now the next ready
-sprint; MOTION-07 is complete.
+defect or unblocks the most other sprints. MOTION-08 is complete; MOTION-09 is
+the next ready sprint. MOTION-11–13 were added on 2026-10-31 from the
+visual/asset/motion audit (`RESEARCH.md` §6) and run after the QA sweep so their
+deltas are measured against its numbers.

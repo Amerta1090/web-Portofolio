@@ -284,3 +284,30 @@ the block reveal structurally (`:has()`), not by unclipping the section. The
 guard test pins both the `overflow-clip` declaration and the absence of the
 `clip` prop; the e2e test asserts `overflow: clip` computed and that scrolling
 the section leaves `scrollTop` at 0.
+
+---
+
+## D-12 — Remove Lenis; page turns animate <main> only
+
+**Date:** 2026-10-31 · **Status:** Accepted (supersedes D-10)
+
+**Context.** MOTION-08 measured the inline Lenis bootstrap in
+`BaseLayout.astro`: the CDN file loads (HTTP 200) but its UMD build has no
+default export, so `new mod.default(...)` throws `TypeError: Lenis is not a
+constructor` on every tier-2/3 visit. Smooth scrolling never ran; readers paid a
+third-party request and an uncaught error. Separately, the global
+`::view-transition-*(root)` fades cross-faded the header and footer for 500 ms on
+every navigation, and `html { scroll-behavior: smooth }` turned the router's
+scroll restore into a fly-through.
+
+**Decision.** Delete the Lenis bootstrap (Rule 3: dead code). Page transitions
+animate `<main>` only (`pageTurn`, 140 ms out / 240 ms in, directional); the root
+snapshot does not animate. Scroll restoration after a client navigation is
+always instant; in-page anchor jumps keep the stylesheet's smooth behaviour.
+Reduced motion relies on Astro's built-in `animation: none` for every
+view-transition pseudo-element, verified by `e2e/page-continuity.spec.ts`.
+
+**Consequences.** No smooth-scroll library in the stack. Re-adding one needs a
+measured need, a reduced-motion path, and compatibility with ClientRouter scroll
+restoration.
+

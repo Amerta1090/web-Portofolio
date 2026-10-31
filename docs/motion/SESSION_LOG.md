@@ -649,3 +649,71 @@ information, no new thumbnails.
 
 **Next:** MOTION-07 is closed. MOTION-08 (Cross-page continuity) is `READY`; do
 not begin it in this execution.
+
+---
+
+## 2026-10-31 — MOTION-08 Cross-page continuity + skill research + visual audit
+
+**Start:** HEAD `016608f`, tree clean. User asked for: (1) research and install
+agent skills that raise design/motion quality, (2) execute `prompt.txt`
+(MOTION-08), (3) rate visuals/assets/motion and add sprints for gaps.
+
+**Skill research (`RESEARCH.md` §5).** Stars read live via `gh api` for 12
+candidate repos. Installed user-level with `npx skills add … -a claude-code -g
+-y --copy`: taste-skill `design-taste-frontend`, `impeccable`, Emil
+(`emil-design-eng`, `review-animations`, `animation-performance`,
+`improve-animations`, `find-animation-opportunities`), GSAP official
+(`gsap-core`, `gsap-react`, `gsap-scrolltrigger`, `gsap-performance`,
+`gsap-plugins`), Vercel `web-design-guidelines` — 13 skills in
+`~/.claude/skills/`. Note: the CLI's comma-separated `-s a,b` silently installs
+nothing; repeat `-s` per skill.
+
+**MOTION-08 audit (before, `.opencode/probe-m08*.mjs`, tier-2, 1440×900)**
+
+- Declarations: `transition:persist` header + footer, `transition:animate="fade"`
+  on `<main>`, global root fades 150 ms out / 500 ms in.
+- After header nav to /observatory, `aria-current="page"` still on `/`; the
+  server render of /observatory had none (pathname `/observatory/`).
+- Back from a project page: Astro called `scrollTo(0, 12000)` (traced with a
+  wrapped `window.scrollTo`), but `html { scroll-behavior: smooth }` animated it:
+  10,338 px after 2 s in one run, 0 at 1.5 s in another. Focus after back:
+  `<body>`.
+- Lenis: CDN 200, `TypeError: Lenis is not a constructor`, `window.__LENIS`
+  never set — the smooth-scroll layer had never run.
+
+**Change.** `src/lib/page-continuity.ts` (+ 8 unit tests), `pageTurn` in
+`BaseLayout.astro`, root `animation: none` + 4 keyframes in `global.css`,
+`data-nav-link` + trailing-slash-safe `aria-current` in `Header.astro`, Lenis
+bootstrap deleted, `e2e/page-continuity.spec.ts` (6).
+
+**After.** Only `<main>` animates (140/240 ms; `-back` variants on traversal);
+reduced motion 0 view-transition animations (`matchMedia` true); back lands on
+12,140 = 12,140 instantly, focus on the activated link; header `aria-current`
+on `/observatory` client- and server-side; 0 Lenis requests/errors.
+
+**Verification**
+
+- `validate-data` OK · `build:fast` 49 pages · `astro check` 98 (one transient
+  ts(2305) from importing the type via `astro:transitions`; fixed by importing
+  from `astro`) · Biome clean on 6 touched files.
+- Unit **1205/1205** (full run, 352 s).
+- Mutations 4/4 red on the intended test, `md5sum` restored: nav re-sync,
+  instant restore, focus restore, root fade. **Defect in my own process:** a
+  `git stash`/`pop` ran while the first mutation's build was in progress, so M1
+  was re-run cleanly (1 red, the aria-current test).
+- Targeted e2e (8 specs, `--workers=1`, run concurrently with the unit suite):
+  102 passed, 1 skipped, 1 failed (`navigation.spec.ts` "readout tracks
+  scrolling…") → isolated `--repeat-each=3` **15/15**: load flake.
+- `measure:routes` `/` 202.7 / 556.1 / 77.2 KB; runtime after scroll 16 scroll
+  listeners, 79 rectReads (= baseline).
+- Full e2e suite **not** run this session → MOTION-09 M9.6.
+
+**Visual audit (`RESEARCH.md` §6).** Screenshots via `.opencode/shots-audit.mjs`.
+Rating: visual 6.5, assets 5, motion 7.5, overall 6.5 / 10. Main findings: 17/22
+projects placeholder-only; 375 px hero crops the subject out; every chapter
+eyebrow reads the literal word "Section"; heavy mono/ordinal/hairline tells;
+uniform chapter beat. New sprints MOTION-11/12/13 (PLANNED) placed after
+MOTION-09, before MOTION-10.
+
+**Next:** MOTION-09 is `READY`. Do not start it in this execution.
+

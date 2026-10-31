@@ -12,7 +12,8 @@
   font-weight: 700;
   font-style: normal;
   font-display: swap;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 /* Metric-compatible fallback — prevents layout shift during swap.
@@ -26,7 +27,8 @@
   line-gap-override: 0%;
   size-adjust: 97%;
   font-display: swap;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 :root {
@@ -118,8 +120,8 @@ body {
   line-height: var(--leading-normal);
   color: var(--text-primary);
   background-color: var(--bg-primary);
-  transition: background-color var(--dur-base) var(--ease-out),
-              color var(--dur-base) var(--ease-out);
+  transition: background-color var(--dur-base) var(--ease-out), color var(--dur-base)
+    var(--ease-out);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -251,17 +253,36 @@ pre {
 }
 
 /* ── View Transitions (Astro ClientRouter) ── */
-::view-transition-old(root) {
-  animation: fade-out var(--dur-fast) var(--ease-in) both;
-}
+/* MOTION-08: only <main> turns (see `pageTurn` in BaseLayout.astro). The root
+   snapshot is header, footer and background — identical across pages — so it
+   swaps without animating instead of cross-fading the chrome for 500 ms. */
+::view-transition-old(root),
 ::view-transition-new(root) {
-  animation: fade-in var(--dur-slow) var(--ease-out) both;
+  animation: none;
 }
-@keyframes fade-out {
-  to { opacity: 0; }
+@keyframes page-turn-out {
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
 }
-@keyframes fade-in {
-  from { opacity: 0; }
+@keyframes page-turn-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@keyframes page-turn-out-back {
+  to {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+@keyframes page-turn-in-back {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
 }
 
 /* Reduced Motion */
@@ -308,10 +329,18 @@ pre {
 }
 
 /* Gradual scale untuk heading di bawah display. */
-.text-h1 { font-size: var(--text-h1); }
-.text-h2 { font-size: var(--text-h2); }
-.text-h3 { font-size: var(--text-h3); }
-.text-h4 { font-size: var(--text-h4); }
+.text-h1 {
+  font-size: var(--text-h1);
+}
+.text-h2 {
+  font-size: var(--text-h2);
+}
+.text-h3 {
+  font-size: var(--text-h3);
+}
+.text-h4 {
+  font-size: var(--text-h4);
+}
 
 /* Eyebrow editorial: mono kecil bercermin pada headline raksasa. */
 .section-label {
@@ -331,15 +360,24 @@ pre {
 
 /* ── Skeleton shimmer ── */
 @keyframes skeleton-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .skeleton-shimmer::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.06) 50%, transparent 100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.06) 50%,
+    transparent 100%
+  );
   background-size: 200% 100%;
   animation: skeleton-shimmer var(--dur-loop) var(--ease-in-out) infinite;
 }

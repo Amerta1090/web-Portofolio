@@ -144,6 +144,12 @@ not a sprint**; it produces `ASSETS.md` and D-11, not a sprint status.
 
 ## 5. Accessibility and responsiveness
 
+Page transitions (since MOTION-08): run `e2e/page-continuity.spec.ts` whenever
+`BaseLayout.astro`, `Header.astro`, or `src/lib/page-continuity.ts` changes.
+Review inputs (since 2026-10-31): `web-design-guidelines` skill over touched
+templates; Emil `review-animations` over touched motion code (`RESEARCH.md` §5).
+
+
 - Keyboard: skip link, chapter headings, jump links, filters, dialog focus.
 - No-JS: every chapter readable in order; no dead controls; no hidden content.
 - Overflow: 320/375/768/1024/1440/1920/2560 on `/`, `/gallery`, `/observatory`,
@@ -174,6 +180,23 @@ git diff -- <files>
 - [x] `RESEARCH.md` updated if an assumption became verified. *(§2.1 reduced-motion measured; reduced-data Chromium limitation recorded §2.1/§3)*
 
 ## 8. Sprint results log
+
+### MOTION-08 — 2026-10-31
+
+| Gate | Result |
+| --- | --- |
+| `bun run validate-data` | OK |
+| `bun run build:fast` | 49 pages |
+| `bunx astro check` | 98 errors = baseline |
+| Biome, touched files | 6 files clean |
+| Unit suite | **1205/1205** (1197 + 8 `page-continuity.test.ts`) |
+| Targeted e2e | navigation, accessibility, signal-loom-deeplink, work, hero-metrics, mobile-nav, motion-chapters, page-continuity: 102 passed + 1 skipped + 1 load flake (`navigation.spec.ts` 15/15 ×3 isolated) |
+| New spec | `e2e/page-continuity.spec.ts` **6/6**; mutations 4/4 red on the intended test |
+| Transition behaviour | only `<main>` animates (`page-turn-out` 140 ms, `page-turn-in` 240 ms; `-back` variants on traversal); root 0 animations; reduced motion 0 view-transition animations with `matchMedia` read back `true` |
+| Restoration | back returns to the exact scrollY (12,140 → 12,140) instantly and focuses the activated link |
+| `measure:routes` `/` | 202.7 / 556.1 / **77.2** KB; all dist JS 671.3 KB / 100 files |
+| Runtime after scroll `/` | 16 scroll listeners, 79 rectReads (= baseline) |
+| Third-party | 0 Lenis requests, 0 `Lenis` page errors |
 
 ### MOTION-07 — 2026-10-30
 

@@ -3,6 +3,7 @@ import "../styles/global.css";
 import "../styles/theme.css";
 import "../lib/scroll-animations.css";
 import "../lib/layout-queries.css";
+import type { TransitionDirectionalAnimations } from "astro";
 import ClientRouter from "astro/components/ClientRouter.astro";
 import Footer from "../components/templates/Footer.astro";
 import Header from "../components/templates/Header.astro";
@@ -49,6 +50,42 @@ const currentPath = Astro.url.pathname;
 const faqLd = buildFaqLd();
 
 const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
+
+// MOTION-08 page turn: the old page settles out (fade + 6 px lift), the new one
+// settles in the way a chapter does (fade + 10 px rise); going back mirrors the
+// direction. Only <main> animates — header, footer and background stay put.
+// Under prefers-reduced-motion Astro's own stylesheet sets every view-transition
+// animation to `none`, so navigation is an instant swap.
+const pageTurn: TransitionDirectionalAnimations = {
+  forwards: {
+    old: {
+      name: "page-turn-out",
+      duration: "140ms",
+      easing: "cubic-bezier(0.4, 0, 1, 1)",
+      fillMode: "both",
+    },
+    new: {
+      name: "page-turn-in",
+      duration: "240ms",
+      easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+      fillMode: "both",
+    },
+  },
+  backwards: {
+    old: {
+      name: "page-turn-out-back",
+      duration: "140ms",
+      easing: "cubic-bezier(0.4, 0, 1, 1)",
+      fillMode: "both",
+    },
+    new: {
+      name: "page-turn-in-back",
+      duration: "240ms",
+      easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+      fillMode: "both",
+    },
+  },
+};
 ---
 
 <!DOCTYPE html>
@@ -229,7 +266,7 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
       <div transition:persist="header">
         <Header currentPath={currentPath} />
       </div>
-      <main id="main-content" class="pt-16" role="main" transition:animate="fade">
+      <main id="main-content" class="pt-16" role="main" transition:animate={pageTurn}>
         <slot />
       </main>
       <div transition:persist="footer">
@@ -238,55 +275,9 @@ const cfAnalyticsToken = import.meta.env.CF_ANALYTICS_TOKEN;
     </div>
     <GlobalChrome client:load />
 
-    <script is:inline>
-      (function () {
-        if (document.documentElement.dataset.experienceTier === "tier-1") return;
-
-        import("https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js").then(function (mod) {
-          var Lenis = mod.default;
-          var lenis = new Lenis({
-            duration: 1.2,
-            easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
-            orientation: "vertical",
-            smoothWheel: true
-          });
-          window.__LENIS = lenis;
-
-          var hidden = false;
-          function onVisibility() {
-            hidden = document.hidden;
-          }
-          document.addEventListener("visibilitychange", onVisibility);
-
-          function raf(time) {
-            // Don't drive Lenis while the tab is hidden (Rule 8: no 60fps
-            // work when it can't be seen). Lenis' own Animate.advance is
-            // already idle when not scrolling; this removes the per-frame
-            // call entirely while hidden.
-            if (!hidden) lenis.raf(time);
-            requestAnimationFrame(raf);
-          }
-          requestAnimationFrame(raf);
-
-          document.addEventListener("click", function (e) {
-            var link = e.target.closest("a");
-            if (!link) return;
-            var href = link.getAttribute("href");
-            if (!href || !href.startsWith("/#")) return;
-            var id = href.replace("/#", "");
-            var el = document.getElementById(id);
-            if (!el) return;
-            e.preventDefault();
-            lenis.scrollTo(el, { offset: -64 });
-          }, { passive: false });
-
-          if (window.location.hash) {
-            var id = window.location.hash.replace("#", "");
-            var el = document.getElementById(id);
-            if (el) setTimeout(function () { lenis.scrollTo(el, { offset: -64 }); }, 100);
-          }
-        });
-      })();
+    <script>
+      import { installPageContinuity } from "../lib/page-continuity";
+      installPageContinuity();
     </script>
   </body>
 </html>

@@ -5,6 +5,7 @@ export interface Props {
 
 const { currentPath = "/" } = Astro.props;
 import HeaderTools from "../../islands/HeaderTools";
+import { isCurrentPage } from "../../lib/page-continuity";
 import Container from "../atoms/Container.astro";
 import ThemeToggle from "../atoms/ThemeToggle.astro";
 
@@ -31,7 +32,8 @@ const navLinks = [
               <a
                 href={link.href}
                 class="text-sm text-text-secondary hover:text-brand transition-colors"
-                aria-current={currentPath === link.href ? "page" : undefined}
+                data-nav-link
+                aria-current={isCurrentPage(link.href, currentPath) ? "page" : undefined}
               >
                 {link.label}
               </a>
@@ -121,7 +123,8 @@ const navLinks = [
                 href={link.href}
                 data-mobile-nav-link
                 class="flex items-center rounded-lg px-3 py-2.5 text-sm text-text-secondary hover:text-brand hover:bg-bg-secondary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-                aria-current={currentPath === link.href ? "page" : undefined}
+                data-nav-link
+                aria-current={isCurrentPage(link.href, currentPath) ? "page" : undefined}
               >
                 {link.label}
               </a>

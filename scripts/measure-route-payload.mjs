@@ -170,9 +170,9 @@ function measureRoute(dist, graph, route) {
 
   // Astro inlines its island runtime as a `<script type="module">`; count it as
   // initial bytes even though it is not a separate file. Inline scripts are also
-  // where third-party CDN code is pulled from at runtime (the repo loads Lenis
-  // through a dynamic `import()` inside one), so surface those URLs instead of
-  // letting them vanish from the numbers.
+  // where third-party CDN code can be pulled from at runtime through a dynamic
+  // `import()`, so surface those URLs instead of letting them vanish from the
+  // numbers.
   let inlineModule = 0;
   for (const match of html.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g)) {
     if (/type="module"/.test(match[1]) && !/src=/.test(match[1])) {
