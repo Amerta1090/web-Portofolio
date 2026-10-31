@@ -746,3 +746,13 @@ overall re-weighted 3.85/10). Added MOTION-17 (brief, READY), 18 (IA & redirects
 after the history rewrite; Claude co-author trailers are banned by memory.
 No product code changed.
 
+### 2026-10-31 (follow-up 3) — asset pilot had no owner
+
+Owner asked whether the earlier asset research made it into the sprint plan.
+Finding: `ASSETS.md` §1 steps 1–2 shipped (MOTION-01.5, M5.0, M6.0) but step 5
+(the single OBI 1883 telephone-exchange plate pilot) never had an owning sprint.
+Added MOTION-24 "Asset audit & cherry-on-top pilot" (audit every owned asset,
+re-run the candidate register against the MOTION-20 concept, pilot ≤ 2 external
+images with caption test and kill criteria, or record A0), placed after
+MOTION-14 and before MOTION-12. `ASSETS.md` §12 updated.
+

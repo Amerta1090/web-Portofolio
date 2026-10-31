@@ -879,7 +879,7 @@ motion signature instead of nine identical chapter fades.
 **Outcome:** A recorded tells score before/after, a short list of removed
 devices, and one documented signature move.
 
-**Dependencies:** MOTION-14 (final palette), MOTION-20 (concept).
+**Dependencies:** MOTION-14 (final palette), MOTION-20 (concept), MOTION-24 (final asset set).
 
 **Scope:** `src/styles/*`, `scroll-animations.css`, section organisms,
 `DECISIONS.md`.
@@ -1073,6 +1073,64 @@ follow-up sprint is created.
 - Verdict follows M16.3 exactly; no score rounded up into a band.
 
 **Definition of Done:** rubric table, verdict, next sprint set `READY`.
+
+---
+
+## MOTION-24 — Asset audit & "cherry on top" pilot
+
+**Status:** `PLANNED` (added 2026-10-31)
+**Priority:** P2
+**Objective:** Re-audit every asset against the MOTION-20 concept and decide,
+with evidence, whether one or two external "cherry on top" images earn a place.
+**Outcome:** An updated asset register (`ASSETS.md`) with a keep/cut/add verdict
+per item, and at most two piloted external images — each with a caption job,
+a verified license, and kill criteria — or a written "A0: no new assets".
+
+**Why this sprint exists.** The 2026-10-21 asset strategy (`ASSETS.md` §1)
+ordered: (1) image hygiene → done in MOTION-01.5; (2) structural fixes → done in
+MOTION-05 (M5.0) and MOTION-06 (M6.0); (3) owned assets in place; (5) one
+archival plate as a pilot *after* 1–2. Steps 1–2 shipped, but **no sprint ever
+owned step 5**, so the pilot fell through the cracks. The re-plan also changes
+the ground: chapters move (MOTION-18/19) and a concept now exists (MOTION-20).
+
+**Dependencies:** MOTION-20 (concept + asset families), MOTION-11 (owned
+evidence first), MOTION-14 (palette — duotone treatment depends on it).
+
+**Scope:** `docs/motion/ASSETS.md`, `public/images/<purpose>/`, the chapter
+that hosts a pilot, `QA_CHECKLIST.md` §4.5 image probe.
+**Exclusions:** the rejected groups in `ASSETS.md` §6 (stock photography,
+generic illustration, generative backgrounds, icon/texture/3D packs, Lottie/
+Rive/Spline) stay rejected unless this sprint records new evidence; no bulk
+download; no hotlinking.
+
+**Tasks**
+- [ ] M24.1 Audit owned assets: served vs unserved (`sudoku-premium.png`,
+      `ijo-plis-usdidr.png`, `nyatet-duwit-ui.jpg` — decide what the
+      Observatory asset metric should count before deleting), issuer logos
+      (career only, or also the certifications bento?), hero + duplicate
+      hexagon avatar, lab thumbnails, gallery sequence/audio. Verdict per item.
+- [ ] M24.2 Re-run the candidate register against the concept: OBI
+      "Central Telephone Office and Exchange" (1883, license verified, the only
+      candidate that passed the narrative test) for the capability-map chapter;
+      OBI "Great Comet of 1881" (1882, deferred) for `/data`; plus any new
+      candidate the concept suggests, each license-verified from a live page.
+- [ ] M24.3 Pilot at most two, following `ASSETS.md` §5.1 (≤ 80 KB WebP at
+      1200 px, `<figure>` + real caption, duotone from the MOTION-14 palette in
+      both themes, one-shot reveal, static under reduced motion).
+- [ ] M24.4 Caption test: show the chapter with and without the image to 3
+      people; keep it only if it improves "what is this section about?" answers.
+      Apply the kill criteria in `ASSETS.md` §5.1; record the verdict either way.
+- [ ] M24.5 Image probe at 1440 and 375; `ASSETS.md` license register row per
+      shipped item; taste `inspect` on the chapter.
+
+**Acceptance criteria**
+- Every asset in the site has a verdict row; every external one has a verified
+  license row.
+- ≤ 2 external images shipped, each with caption-test evidence — or A0 recorded.
+- Image budget held (`ASSETS.md` §7).
+
+**Definition of Done / verification:** image probe, CLS check, contrast both
+themes, e2e for the host chapter, docs.
 
 ---
 
@@ -1312,6 +1370,7 @@ MOTION-00 (DONE)
                            └─ MOTION-20  concept & art direction
                                 └─ MOTION-11  project evidence imagery
                                      └─ MOTION-14  colour system (triadic, OKLCH)
+                                          ├─ MOTION-24  asset audit & cherry-on-top pilot (runs before 12)
                                           └─ MOTION-12  taste pass
                                                └─ MOTION-21  signature moment
                                                     └─ MOTION-13  ambient decoration audit

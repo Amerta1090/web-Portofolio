@@ -146,7 +146,7 @@ completed — do not start MOTION-09 in the same execution.**
 
 **Next: MOTION-17 is READY** (re-plan approved by the owner on 2026-10-31).
 Order: 17 brief → 18 IA & redirects → 19 home edit → 20 concept → 11 imagery →
-14 colour → 12 taste → 21 signature moment → 13 ambient → 15 detail pages →
+14 colour → 24 asset audit → 12 taste → 21 signature moment → 13 ambient → 15 detail pages →
 22 design notes → 09 QA sweep → 16 rubric gate → 23 real-people gate → 10
 release. Misses at 16 or 23 create loop sprints `MOTION-L1…` without limit;
 each names the measurement it fixes.

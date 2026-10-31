@@ -384,17 +384,12 @@ commercial release. This is honest caution, not a blocker for a portfolio.
 
 ## 12. Next action
 
-1. **Do not add an external asset.** The next asset action is image hygiene, not
-   a new plate.
-2. Scope a small implementation task: responsive variants for the four homepage
-   project images + a hero compression test; measure with resource timing. This
-   is not a motion sprint and is not started here.
-3. In MOTION-05, fix the Signal Loom column alignment (M5.0) before the narrative
-   choreography.
-4. In MOTION-06, fix the BootSequence entry state (M6.0) before the instrument
-   choreography.
-5. Only after 2–4: pilot the OBI telephone plate with the §5.1 kill criteria. If
-   it fails, ship A0 (no new assets).
+Status 2026-10-31: steps 1–2 of §1 are done (MOTION-01.5 image hygiene, MOTION-05
+M5.0 Signal Loom alignment, MOTION-06 M6.0 BootSequence entry). Step 5 — the
+single archival plate pilot — **had no owning sprint** and was never run. It now
+belongs to **MOTION-24 (Asset audit & "cherry on top" pilot)**, which runs after
+the concept (MOTION-20), owned project evidence (MOTION-11), and the colour
+system (MOTION-14). Until then: **do not add an external asset.**
 
 ## 13. Shipped: image hygiene (MOTION-01.5, 2026-10-22)
 
