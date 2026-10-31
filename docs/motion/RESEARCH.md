@@ -419,3 +419,63 @@ Computed in OKLCH (`color.py` method recorded in `SESSION_LOG.md`, 2026-10-31):
   themes at the stated lightness. The final pick is a screenshot A/B at 1440
   and 375 in both themes, scored by V3.
 
+## 8. Impression goals, the "guarantee", and the narrative area (2026-10-31)
+
+**Goal (owner's words, translated):** recruiters and fellow developers leave
+thinking *"this is a professional site, full of applied design theory; the
+visuals and interactivity are impressive without being excessive; the assets
+vary without being too much."*
+
+**What can and cannot be guaranteed.** Nobody can promise how strangers will
+feel. What the programme guarantees instead is a **release rule**: the site does
+not ship as "done" until real people from both audiences have been tested and
+the thresholds below are met. If they are not met, the programme loops — new
+sprints aimed at the measured gap — however many loops it takes, and every new
+sprint must name the failed measurement it exists to fix.
+
+### 8.1 Perception thresholds (MOTION-23)
+
+Participants: **≥ 5 recruiters / hiring people and ≥ 5 developers**, none of
+whom built the site (5 per group finds most issues — Nielsen). Desktop and
+phone both represented. Free tooling (Google Forms + screen-share, or any
+5-second-test tool's free tier).
+
+| Test | Pass |
+| --- | --- |
+| 5-second test: "What does this person do?" | ≥ 80 % name the role correctly (AI/ML engineer / systems builder) |
+| 5-second test: "Name one project you remember" | ≥ 60 % recall one |
+| First-click: "Show me this person's best work" | ≥ 80 % first click correct, median < 10 s |
+| Word choice (reaction-card style list, pick 5) | "professional" picked by ≥ 70 %; "impressive" or "memorable" by ≥ 60 %; "overwhelming", "cluttered", "generic" each by ≤ 20 % |
+| Recruiters: "Would you shortlist / forward this candidate?" | ≥ 4 of 5 yes |
+| Developers: "Would you bookmark or share it?" | ≥ 3 of 5 yes; "which detail impressed you?" yields ≥ 3 distinct concrete answers |
+| Motion check: "Did anything feel slow, distracting, or nauseating?" | ≤ 1 participant per group says yes |
+
+### 8.2 Narrative & structure area (added to the §7 rubric)
+
+| # | Criterion | 0 | 1 | 2 |
+| --- | --- | --- | --- | --- |
+| N1 | First-screen clarity | role/value unclear at 1440 or 375 | clear on desktop only | role, proof, and next action visible at both widths |
+| N2 | Information architecture | duplicate routes for the same content | duplicates redirected, nav > 5 | one canonical route per kind of content, nav ≤ 5, redirects for every retired URL |
+| N3 | Home length & pacing | > 15 screens @1440×900 | 10–15 | ≤ 10 screens, ≤ 7 chapters |
+| N4 | Signature moment | none | one, but decorative or costly | one interaction people describe unprompted, inside the payload budget, with a reduced-motion equivalent |
+| N5 | Applied-theory visibility | none | consistent but undocumented | a living design-notes page generated from the real tokens |
+
+**Calibration today:** N1 1 (hero is clear on desktop, crops on mobile) · N2 0
+(6 duplicate pairs: `#projects`/`/projects`/`/work`, `#career`/`/timeline`,
+`#skills`/`/skills`, `#certifications`/`/certifications`, `#github`/`/github`,
+`#contact`/`/contact`) · N3 0 (25,542 px ≈ 28 screens, 10 chapters) · N4 0 ·
+N5 0 → **N = 1 / 10**.
+
+**Re-weighted overall (supersedes §7 weights from 2026-10-31 onward):**
+0.25 × visual + 0.20 × assets + 0.25 × motion + 0.30 × narrative.
+Today: 0.25·5 + 0.20·4 + 0.25·6 + 0.30·1 = **3.85 / 10**. The MOTION-16 gate
+(≥ 8.5 pass, 8.0–8.49 accepted with written blockers) now uses this formula,
+and **MOTION-23 perception thresholds must pass as well** — a high rubric score
+with failing human tests is a loop, not a release.
+
+### 8.3 Why the order changed
+
+Polishing ten sections and then cutting four of them throws work away. The
+structure (audience → IA → home edit → concept) is decided first; imagery,
+colour, taste, and motion polish then work on the final shape.
+

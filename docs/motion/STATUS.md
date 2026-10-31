@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-10-31 (MOTION-08 `DONE`)
 **Branch:** `main` · **HEAD at session start:** `016608f`
-**Active sprint:** none — MOTION-08 (Cross-page continuity) is closed; MOTION-09 READY
+**Active sprint:** none — MOTION-08 closed; **MOTION-17 (audience & narrative brief) READY** after the 2026-10-31 re-plan
 
 ## One-paragraph state
 
@@ -144,15 +144,17 @@ completed — do not start MOTION-09 in the same execution.**
 (taste, impeccable, Emil ×5, GSAP ×5, web-design-guidelines); usage rules in
 `RESEARCH.md` §5.
 
-**Next: MOTION-09 is READY** — Motion QA & budget sweep (now includes the full
-e2e run MOTION-08 skipped and the skill-based review inputs). Execution order
-after it: MOTION-11 → 14 → 12 → 13 → 15 → **16 rating gate (KKM 8.5)** → 10.
+**Next: MOTION-17 is READY** (re-plan approved by the owner on 2026-10-31).
+Order: 17 brief → 18 IA & redirects → 19 home edit → 20 concept → 11 imagery →
+14 colour → 12 taste → 21 signature moment → 13 ambient → 15 detail pages →
+22 design notes → 09 QA sweep → 16 rubric gate → 23 real-people gate → 10
+release. Misses at 16 or 23 create loop sprints `MOTION-L1…` without limit;
+each names the measurement it fixes.
 
-**Quality target (2026-10-31):** rubric in `RESEARCH.md` §7. Today **5.05 / 10**
-(visual 5, assets 4, motion 6 — stricter than the holistic 6.5). Projection:
-8.40 after 11–13 (pessimistic 7.75), **9.35 after 14–15 (pessimistic 8.70)**.
-MOTION-16 passes at ≥ 8.5, accepts 8.0–8.49 only with written blockers, and
-otherwise loops with MOTION-17+.
+**Quality target:** four-area rubric (`RESEARCH.md` §7 + §8.2) — today
+**3.85 / 10** (visual 5, assets 4, motion 6, narrative 1). Release needs
+rubric ≥ 8.5 (8.0–8.49 only with written blockers) **and** the §8.1
+perception thresholds with ≥ 5 recruiters and ≥ 5 developers.
 
 ## Open blockers / risks
 
@@ -199,8 +201,8 @@ otherwise loops with MOTION-17+.
 
 ## Next action
 
-**Stop here.** MOTION-08 is closed; MOTION-09 is `READY`. When the programme
-resumes, read MOTION-09 in `SPRINT_PLAN.md`. Carry-over facts: page transitions
+**Stop here.** MOTION-08 is closed; MOTION-17 is `READY`. When the programme
+resumes, read MOTION-17 in `SPRINT_PLAN.md` and `RESEARCH.md` §8. Carry-over facts: page transitions
 animate `<main>` only and restore scroll instantly (`src/lib/page-continuity.ts`),
 there is no smooth-scroll library, every reveal rule stays inside
 `@supports (animation-timeline: view())`, ordered choreography uses

@@ -782,14 +782,14 @@ specs; build; payload; diff review.
 
 ## MOTION-09 — Motion QA & budget sweep
 
-**Status:** `READY`
+**Status:** `PLANNED` (moved after the restructure on 2026-10-31; runs once on the final shape)
 **Priority:** P2 (before release)
 **Objective:** Prove the whole programme holds together on modest hardware,
 mobile, and assistive settings.
 **Outcome:** A single sweep with documented numbers and no unexplained
 regression.
 
-**Dependencies:** MOTION-02 … MOTION-08 (all `DONE`).
+**Dependencies:** MOTION-22 (all restructure, visual, and motion sprints).
 
 **Scope:** e2e specs, `measure:routes`, `measure:runtime`, MotionScore, docs.
 **Exclusions:** no new features; only fixes required by the sweep.
@@ -828,7 +828,7 @@ not a generic placeholder.
 `/images/placeholder/project.svg` either ship an owned, captioned evidence image
 or render an intentional no-image layout. No generic placeholder reaches a page.
 
-**Dependencies:** MOTION-09, MOTION-01.5 (variant pipeline, `ProjectThumbnail` `srcset`),
+**Dependencies:** MOTION-20 (asset families), MOTION-01.5 (variant pipeline, `ProjectThumbnail` `srcset`),
 D-11 (evidence first, owned assets only).
 
 **Scope:** `data/projects.json` `images[]`, `public/images/projects/`,
@@ -879,7 +879,7 @@ motion signature instead of nine identical chapter fades.
 **Outcome:** A recorded tells score before/after, a short list of removed
 devices, and one documented signature move.
 
-**Dependencies:** MOTION-14 (final palette), MOTION-09 (QA numbers to compare against).
+**Dependencies:** MOTION-14 (final palette), MOTION-20 (concept).
 
 **Scope:** `src/styles/*`, `scroll-animations.css`, section organisms,
 `DECISIONS.md`.
@@ -922,7 +922,7 @@ targeted e2e, build, payload.
 **Objective:** Every always-on decorative effect must justify its cost or go.
 **Outcome:** A measured keep/remove decision for each ambient effect.
 
-**Dependencies:** MOTION-12.
+**Dependencies:** MOTION-21 (the signature moment decides which ambient layers stay).
 
 **Scope:** `AmbientScene` (R3F, every page), `CustomCursor`, `.noise-overlay`,
 infinite loops in `LanguageNebula.tsx` and `CreativeLabPill.tsx`, the
@@ -1003,7 +1003,7 @@ in a box.
 
 **Dependencies:** MOTION-11 (the evidence), MOTION-14 (palette).
 
-**Scope:** `src/pages/projects/[slug].astro`, project data fields that already
+**Scope:** `src/pages/work/[slug].astro` (merged in MOTION-18), project data fields that already
 exist (`highlights`, `skills`, `links`, `period`, `association`), the type
 hierarchy from MOTION-12.
 **Exclusions:** no new route, no invented metric (Rule 7), no CMS.
@@ -1038,7 +1038,8 @@ programme may release.
 **Outcome:** A scored rubric with evidence per criterion and one of three
 verdicts.
 
-**Dependencies:** MOTION-09, -11, -12, -13, -14, -15.
+**Dependencies:** MOTION-09 (final QA numbers). Uses the four-area rubric of
+`RESEARCH.md` §8.2; a PASS here unlocks MOTION-23, not the release.
 
 **Scope:** `RESEARCH.md` §7, screenshots, probes; no product code unless a
 follow-up sprint is created.
@@ -1054,13 +1055,13 @@ follow-up sprint is created.
       evidence per score. The implementer may challenge a score only with new
       evidence, recorded in `SESSION_LOG.md`.
 - [ ] M16.3 Verdict:
-      - **≥ 8.5 — PASS.** Set MOTION-10 `READY`.
+      - **≥ 8.5 — PASS.** Set MOTION-23 `READY`.
       - **8.0 – 8.49 — ACCEPTED (mentok).** Allowed only if every criterion below
         2 has a written blocker showing the next point needs work outside the
         roadmap (e.g. no owned evidence exists for a project, GPU floor is
-        environmental). Then MOTION-10 `READY`.
+        environmental). Then MOTION-23 `READY`.
       - **< 8.0, or 8.0–8.49 without written blockers — LOOP.** Create
-        `MOTION-17`, `-18`, … one per lowest-scoring criterion (objective = that
+        loop sprints `MOTION-L1`, `-L2`, … one per lowest-scoring criterion (objective = that
         criterion's "2" anchor), set the first `READY`, and add a fresh
         MOTION-16 re-run after them. After two loops below 8.0, stop and ask the
         user before adding more.
@@ -1075,6 +1076,195 @@ follow-up sprint is created.
 
 ---
 
+## MOTION-17 — Audience & narrative brief
+
+**Status:** `READY` (added 2026-10-31, `RESEARCH.md` §8)
+**Priority:** P0 (first — everything after depends on it)
+**Objective:** Write down who the site is for, what each audience must conclude, and in what order the site proves it.
+**Outcome:** A one-page brief that every later sprint cites: audiences, key messages, proof per message, impression goals (`RESEARCH.md` §8.1), and a benchmark study.
+
+**Dependencies:** none.
+
+**Scope:** `docs/motion/STORYBOARD.md` (rewritten as the brief), `RESEARCH.md`.
+**Exclusions:** no product code.
+
+**Tasks**
+- [ ] M17.1 Audiences: recruiters (scan in < 30 s, want role, level, proof, contact) and developers (explore, want craft, depth, source). Record what each must believe after 5 s, 30 s, 3 min.
+- [ ] M17.2 Messages → proof map: each message points to concrete evidence already in the data layer (projects, metrics, case studies, certifications). A message without proof is cut.
+- [ ] M17.3 Benchmark study of 8–10 reference sites (strong developer portfolios + large product landing pages): for each, record structure, screen count, signature moment, asset families, motion density. Learn principles, never copy a layout.
+- [ ] M17.4 Pick the flagship projects (3) by evidence strength, not by date.
+- [ ] M17.5 Define the home storyboard: ≤ 7 chapters, each with one sentence of purpose and the proof it shows.
+
+**Acceptance criteria**
+- Brief fits one page; every chapter maps to a message and a proof.
+- Benchmark table recorded with principles extracted.
+- Owner approves the brief before MOTION-18 starts.
+
+**Definition of Done / verification:** brief in `STORYBOARD.md`, owner sign-off line in `SESSION_LOG.md`.
+
+---
+
+## MOTION-18 — Information architecture & route consolidation
+
+**Status:** `PLANNED` (added 2026-10-31, `RESEARCH.md` §8)
+**Priority:** P0
+**Objective:** One canonical place for each kind of content.
+**Outcome:** Routes: `/` (story), `/work` (index + case studies, merges `/projects` and `/work`), `/about` (career spine, skills, certifications, resume — merges `/timeline`, `/skills`, `/certifications`), `/lab` (gallery), `/data` (Observatory + GitHub statistics, merges `/observatory`, `/github`), contact as a home chapter + footer. Nav ≤ 5 items.
+
+**Dependencies:** MOTION-17.
+
+**Scope:** `src/pages/**`, `Header.astro`, `Footer.astro`, search index, sitemap, OG map, redirects config, e2e route specs.
+**Exclusions:** no content rewrite beyond moving; no visual redesign yet.
+
+**Tasks**
+- [ ] M18.1 Route inventory with traffic intent and duplicate pairs (6 today, `RESEARCH.md` §8.2).
+- [ ] M18.2 Redirect map for every retired URL (301 via host config or static redirect pages); verify deep links (`/projects/<slug>` → `/work/<slug>`, `/#career`, `/gallery#<id>` → `/lab#<id>`).
+- [ ] M18.3 Merge the two project detail templates into one (`/work/[slug]`), keeping case-study stages where they exist.
+- [ ] M18.4 Nav ≤ 5 + command palette + footer updated; search index regenerated from the new routes.
+- [ ] M18.5 Update every e2e spec that navigates by URL; add a redirect spec.
+
+**Acceptance criteria**
+- 0 duplicate routes for the same content; every old URL resolves (redirect spec green).
+- Rubric N2 = 2.
+- No dead link in build output (link checker).
+
+**Definition of Done / verification:** full e2e `--workers=1`, link check over `dist`, build, docs.
+
+---
+
+## MOTION-19 — Home edit (≤ 7 chapters, ≤ 10 screens)
+
+**Status:** `PLANNED` (added 2026-10-31, `RESEARCH.md` §8)
+**Priority:** P0
+**Objective:** Turn the 28-screen home into a story a recruiter finishes.
+**Outcome:** Home follows the MOTION-17 storyboard: hero → flagship proof (3) → how I work (condensed capability map) → journey highlights (5–6, link to `/about`) → lab teaser (6 picks, link to `/lab`) → contact. GitHub statistics leave the home for `/data`.
+
+**Dependencies:** MOTION-18.
+
+**Scope:** `src/pages/index.astro`, section organisms, `sectionIds`, chapter tokens.
+**Exclusions:** no new section types; reuse existing organisms, condensed.
+
+**Tasks**
+- [ ] M19.1 Measure: height per chapter @1440 and 375 (today 25,542 px; career 6,015 + GitHub 6,133 = 47.6 %).
+- [ ] M19.2 Condense career to highlights derived from data (rule written, not hand-picked), with a link to the full spine.
+- [ ] M19.3 Condense the Signal Loom to the default narrative + map; full map stays interactive.
+- [ ] M19.4 Lab teaser: 6 experiments chosen by a written rule (one per category + flagship).
+- [ ] M19.5 Re-run motion chapter specs, payload, runtime.
+
+**Acceptance criteria**
+- Home ≤ 10 screens @1440×900 and ≤ 7 chapters (rubric N3 = 2).
+- Payload `/` lower than 202.7 / 556.1 KB.
+- Every removed block still reachable on its canonical route.
+
+**Definition of Done / verification:** height probe, e2e, payload, runtime, docs.
+
+---
+
+## MOTION-20 — Concept & art direction
+
+**Status:** `PLANNED` (added 2026-10-31, `RESEARCH.md` §8)
+**Priority:** P1
+**Objective:** One visual idea that ties the site together, so "wow" comes from coherence, not from effects.
+**Outcome:** A written concept (one sentence + 3 rules), a storyboard frame per home chapter, the four asset families with "one family per chapter", and the signature-moment brief for MOTION-21.
+
+**Dependencies:** MOTION-19.
+
+**Scope:** `STORYBOARD.md`, `DECISIONS.md`, static frames (screenshots or HTML mock), `ASSETS.md`.
+**Exclusions:** no production code beyond throwaway mock pages; no stock or AI imagery.
+
+**Tasks**
+- [ ] M20.1 Derive the concept from the subject (systems that turn sensor/data into decisions) — not from a trend; check it against the taste tells registry.
+- [ ] M20.2 Asset families: owned photography · product evidence in one frame style · data-derived diagrams in one SVG style · generative visuals (lab only). Map one family per chapter.
+- [ ] M20.3 Motion language: chapter entrances quiet; one signature moment loud; page turn (MOTION-08) as connective tissue.
+- [ ] M20.4 Frame each chapter at 1440 and 375; review with impeccable `critique` + taste `inspect`.
+
+**Acceptance criteria**
+- Concept, rules, and frames approved by the owner.
+- Every chapter has one asset family and one purpose.
+
+**Definition of Done / verification:** frames in `SESSION_LOG.md`, decision D-13.
+
+---
+
+## MOTION-21 — Signature moment
+
+**Status:** `PLANNED` (added 2026-10-31, `RESEARCH.md` §8)
+**Priority:** P1
+**Objective:** Build the one interaction people remember and describe unprompted.
+**Outcome:** One signature moment (candidate: the hero → proof hand-off driven by real project data), progressive: static meaning without JS, full on capable devices, equivalent still under reduced motion.
+
+**Dependencies:** MOTION-20, MOTION-14 (palette).
+
+**Scope:** the chapter chosen in MOTION-20; GSAP/CSS/Canvas as the brief requires (D-02 still applies).
+**Exclusions:** no new full-viewport WebGL in editorial chapters unless MOTION-20 proves the need and the budget; no scroll hijacking.
+
+**Tasks**
+- [ ] M21.1 Prototype two variants behind a flag; A/B with 3 people for "would you mention this?".
+- [ ] M21.2 Budget: ≤ +40 KB gzip reachable on `/`, 0 new scroll listeners, 60 fps on the 4-core / 3 GB box, off-screen pause.
+- [ ] M21.3 Reduced motion + no-JS equivalents that keep the meaning.
+- [ ] M21.4 Emil `review-animations` + `gsap-performance` review; MotionScore no D/F.
+
+**Acceptance criteria**
+- Rubric N4 = 2.
+- Budget gates green.
+- Reduced-motion and no-JS paths verified with controls.
+
+**Definition of Done / verification:** e2e, runtime probe, MotionScore, review outputs, docs.
+
+---
+
+## MOTION-22 — Design notes (colophon)
+
+**Status:** `PLANNED` (added 2026-10-31, `RESEARCH.md` §8)
+**Priority:** P2
+**Objective:** Make the applied design theory visible to developers.
+**Outcome:** A `/design` (or `/colophon`) page generated from the real tokens: grid, type scale with ratios, OKLCH palette with live contrast numbers, motion tokens and rules, asset families, performance budget — a living spec, not a blog post.
+
+**Dependencies:** MOTION-14, MOTION-12, MOTION-21.
+
+**Scope:** new page under `/about` or footer; token readers; no new data source.
+**Exclusions:** no hand-typed numbers (Rule 7): every value read from tokens/config at build time.
+
+**Tasks**
+- [ ] M22.1 Specimens: type scale, colour swatches with contrast computed at build time, spacing grid, motion curves demo (reduced-motion aware).
+- [ ] M22.2 One paragraph per principle naming where it is applied on the site (chunking, hierarchy, 60/30/10, Von Restorff, Doherty).
+- [ ] M22.3 Guard: a test fails if a documented token differs from the stylesheet.
+
+**Acceptance criteria**
+- Rubric N5 = 2.
+- Every number on the page derived (guard green).
+
+**Definition of Done / verification:** unit guard, e2e, build, docs.
+
+---
+
+## MOTION-23 — Perception validation (real people)
+
+**Status:** `PLANNED` (added 2026-10-31, `RESEARCH.md` §8)
+**Priority:** P0 (release gate)
+**Objective:** Prove the impression lands with recruiters and developers.
+**Outcome:** Results of the §8.1 tests with ≥ 5 recruiters and ≥ 5 developers, and a PASS / LOOP verdict.
+
+**Dependencies:** MOTION-16 rubric verdict PASS or ACCEPTED.
+
+**Scope:** test script, consent-free anonymous answers, `RESEARCH.md` §8 results table.
+**Exclusions:** no product change inside this sprint; findings become loop sprints.
+
+**Tasks**
+- [ ] M23.1 Prepare the script (5-second test, first-click, word choice, shortlist/bookmark questions, motion comfort) and a neutral invitation text.
+- [ ] M23.2 Owner recruits participants (≥ 5 per group, desktop + phone); run sessions or async forms.
+- [ ] M23.3 Score against §8.1; quote the concrete details people remembered.
+- [ ] M23.4 Verdict: all thresholds met → MOTION-10 READY. Any miss → create loop sprints (MOTION-L1, L2, …) each naming the failed measurement, then re-run MOTION-16 and MOTION-23.
+
+**Acceptance criteria**
+- ≥ 10 participants recorded, both groups.
+- Every threshold reported with its number.
+- Verdict follows the rule; no threshold relaxed after seeing results.
+
+**Definition of Done / verification:** results table, verdict, next sprint READY.
+
+---
+
 ## MOTION-10 — Programme release
 
 **Status:** `PLANNED`
@@ -1083,7 +1273,7 @@ follow-up sprint is created.
 **Outcome:** The motion language is documented for future contributors, the
 backlog is empty or explicitly deferred, and the site is deployed.
 
-**Dependencies:** MOTION-16 verdict PASS or ACCEPTED (which implies MOTION-09, -11 … -15).
+**Dependencies:** MOTION-23 verdict PASS (rubric gate and real-people gate both met).
 
 **Scope:** docs, release checklist.
 **Exclusions:** new features.
@@ -1116,15 +1306,22 @@ MOTION-00 (DONE)
        ├─ MOTION-06 (DONE)
        ├─ MOTION-07 (DONE)
        └─ MOTION-08 (DONE)
-            └─ MOTION-09 (READY)  QA sweep
-                 └─ MOTION-11  project evidence imagery
-                      └─ MOTION-14  colour system (triadic, OKLCH)
-                           └─ MOTION-12  taste pass
-                                └─ MOTION-13  ambient decoration audit
-                                     └─ MOTION-15  evidence-first detail pages
-                                          └─ MOTION-16  rating gate (KKM 8.5)
-                                               ├─ PASS / ACCEPTED → MOTION-10 release
-                                               └─ LOOP → MOTION-17+ → MOTION-16 again
+            └─ MOTION-17 (READY)  audience & narrative brief
+                 └─ MOTION-18  information architecture & redirects
+                      └─ MOTION-19  home edit (≤ 7 chapters, ≤ 10 screens)
+                           └─ MOTION-20  concept & art direction
+                                └─ MOTION-11  project evidence imagery
+                                     └─ MOTION-14  colour system (triadic, OKLCH)
+                                          └─ MOTION-12  taste pass
+                                               └─ MOTION-21  signature moment
+                                                    └─ MOTION-13  ambient decoration audit
+                                                         └─ MOTION-15  evidence-first detail pages
+                                                              └─ MOTION-22  design notes (colophon)
+                                                                   └─ MOTION-09  QA & budget sweep
+                                                                        └─ MOTION-16  rubric gate (≥ 8.5)
+                                                                             └─ MOTION-23  real-people perception gate
+                                                                                  ├─ PASS → MOTION-10 release
+                                                                                  └─ miss → MOTION-L1, L2 … → 16 → 23
 ```
 
 Priority conflicts resolve in favour of the sprint that removes a measured
@@ -1135,3 +1332,9 @@ deltas are measured against its numbers. MOTION-14/15/16 were added the same day
 after the rubric projection (`RESEARCH.md` §7.3) showed 11–13 alone land near
 8.4 (pessimistic 7.75), under the 8.5 bar. Sprint numbers are not the execution
 order — the tree above is.
+
+**2026-10-31 re-plan.** The owner approved restructuring first: MOTION-17–23
+were added, MOTION-09 moved to the end (one QA sweep on the final shape), and
+the release now needs both the rubric gate (MOTION-16) and real recruiters and
+developers (MOTION-23). The number of loop sprints is unbounded by design; each
+must name the failed measurement it fixes (`RESEARCH.md` §8).

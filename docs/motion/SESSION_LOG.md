@@ -731,3 +731,18 @@ colour system), MOTION-15 (evidence-first detail pages), MOTION-16 (rating
 gate with PASS / ACCEPTED / LOOP verdicts, scored by a fresh sub-agent). No
 product code changed.
 
+### 2026-10-31 (follow-up 2) — re-plan: structure first, real-people gate
+
+Owner approved the senior-review direction: audiences are recruiters and
+developers; impression goal is "professional, applied design theory, impressive
+visuals/interactivity without excess, varied but restrained assets". Owner asked
+for a guarantee; recorded the honest version in `RESEARCH.md` §8 — a release
+rule (rubric ≥ 8.5 **and** perception thresholds with ≥ 5 + 5 real people),
+with unbounded loop sprints. Added a narrative rubric area (today N = 1/10,
+overall re-weighted 3.85/10). Added MOTION-17 (brief, READY), 18 (IA & redirects),
+19 (home edit), 20 (concept), 21 (signature moment), 22 (design notes), 23
+(perception gate); moved MOTION-09 to the end; MOTION-16 loops now create
+`MOTION-L*`. Also: GitHub sidebar contributors confirmed clean by the owner
+after the history rewrite; Claude co-author trailers are banned by memory.
+No product code changed.
+
