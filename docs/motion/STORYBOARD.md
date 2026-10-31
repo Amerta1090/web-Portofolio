@@ -1,18 +1,84 @@
-# Motion Programme — Storyboard
+# Motion Programme — Storyboard & Narrative Brief
 
-The homepage is read as a single argument: *who I am → what I can connect →
-what I have done → what I have proven → how I think → how to reach me.*
+> **MOTION-17 brief (2026-10-31).** This page is the authority every later
+> sprint cites (MOTION-18 IA, MOTION-19 home edit, MOTION-20 concept,
+> MOTION-21 signature moment). Benchmark evidence: `RESEARCH.md` §9. Impression
+> goal and release rule: `RESEARCH.md` §8. Status: **awaiting owner sign-off**
+> (`SESSION_LOG.md`). Appendix A keeps the motion notes for today's 10 chapters;
+> where it disagrees with the brief, the brief wins.
 
-Motion carries the argument in three registers:
+## The brief (one page)
 
-1. **Pacing** — chapter heads settle, bodies follow. The reader always knows
-   where a new idea starts.
-2. **Causality** — a capability connects to evidence; a metric counts something
-   that exists; a timeline draws in order.
-3. **Instrument** — numbers and diagrams behave like measuring devices, then
-   stop. Nothing loops for decoration.
+**Who it is for.** Two audiences, in this order of urgency.
+
+| Moment | Recruiter / hiring person (scans, < 30 s, wants role · level · proof · contact) | Developer (explores, wants craft · depth · source) |
+| --- | --- | --- |
+| **5 s** | "AI/ML engineer and systems builder, based in Indonesia (UTC+7), currently employed, easy to contact." | Same role, plus: "this site was built with care" — first screen is calm, legible, fast. |
+| **30 s** | "Three shipped ML systems with measured results; a real current role; a CV one click away." | "The work has stack, source and numbers; there is a way to see how they connect." |
+| **3 min** | "Consistent growth since 2023: roles, Bangkit / Samsung / IDCamp programmes, 62 certifications." | "Case-study stages, 27 lab experiments, open repositories, and a page that explains the site's own design system." |
+
+**Messages → proof.** A message without proof in the data layer is cut.
+
+| # | Message | Proof already in the data layer | Strength |
+| --- | --- | --- | --- |
+| M1 | AI/ML engineer who ships end-to-end systems | `profile.headline`; current role *Full-Stack Systems Engineer (AI & Automation)*, Ferswit Indonesia, since 2026-05 (`experience.json`); 9 of 22 projects are category `ml` (`projects.json`, via `SiteFacts`) | strong |
+| M2 | Results are measured, not demos | Tafsir: context relevance 0.972, 5.93 s end-to-end on i3 / 4 GB (case study); Red Devil: live deployment + 10-min survival window (case study); IJO PLIS: live demo, ~10 years of data, 7/30/90-day horizons | strong for Tafsir; **gap:** Red Devil and IJO PLIS publish no accuracy metric → MOTION-15 |
+| M3 | Thinks in systems, data → model → deployment | 5-stage process in 2 case studies; 2 MLOps projects; capability map 8 capabilities × 22 projects, 31 weighted edges | strong; **"from sensor" half is weak** — both IoT projects have no link and no image |
+| M4 | Keeps learning, with credentials | 7 roles 2023-11 → now; Bangkit (Google, Tokopedia, Gojek, Traveloka), Samsung Innovation Campus, IDCamp; 62 certifications from 7 issuers (`SiteFacts.certifications`) | strong |
+| M5 | Cares about craft (developers) | this site: derived numbers, no dead controls, a11y and reduced-motion tested; 27 lab experiments; public GitHub | strong but **invisible today** → MOTION-22 design notes |
+| M6 | Easy to reach | email first, phone, LinkedIn, GitHub, `/resume` | strong |
+
+**Cut from the home argument (no proof, or proof of the wrong thing):**
+GitHub activity statistics (activity ≠ skill → `/data`), the Tracery capability
+generator (a toy, proves nothing about the person), skills depth bars (→ `/about`),
+the full 22-card grid with filter (→ `/work`), the full 26-record spine and the
+certification bento (→ `/about`). The tagline "from sensor to deployment" stays
+only if MOTION-11/15 can show the IoT evidence; otherwise it is rewritten to
+"from data to deployment".
+
+**Flagship projects (3), picked by evidence strength, not date.**
+
+| Rank | Project | Why it qualifies | Missing evidence (owner) |
+| --- | --- | --- | --- |
+| 1 | AI Quranic Tafsir Assistant (Sep 2025 – Jan 2026) | full case study, 5 stages, 4 metrics incl. 0.972 / 5.93 s on constrained hardware, repo | no owned image → MOTION-11 |
+| 2 | Red Devil Dynamics (Mar 2026) | case study, live deployment, repo, owned image | no accuracy/calibration metric → MOTION-15 |
+| 3 | IJO PLIS — IHSG & USD/IDR forecasting (May – Jun 2026) | live demo + repo + 2 owned images, end-to-end (Django, PostgreSQL, Docker, Railway, retraining pipeline) | no case study, no error metric → MOTION-15 |
+
+Reserve: NyatetDuwit (live PWA, repo, 2 images) — strong evidence but web, not
+ML, so it supports M5 rather than M1. The Retro portfolio is excluded: it is a
+previous version of this site, not separate proof.
+
+**Home storyboard — 6 chapters, ≤ 10 screens at 1440×900** (today: 10 chapters,
+25,542 px ≈ 28 screens, `RESEARCH.md` §8.2).
+
+| # | Chapter | One-sentence purpose | Proof shown | Message | Screens |
+| ---: | --- | --- | --- | --- | ---: |
+| 1 | Hero | Say who, what, where, and what to do next in one screen at 1440 **and** 375. | name, role, location/UTC+7, current role, proof row of derived counts from `SiteFacts` (projects · certifications · years) replacing the GitHub activity row; CTAs "See the work" + email | M1, M6 | 1 |
+| 2 | Flagship proof | Show three shipped systems, each with one measured line and a path to its case study. | the 3 flagships above; link "All 22 projects → /work" | M1, M2 | 2.5 |
+| 3 | How I work | Show how capabilities connect to evidence, as the one place the site invites play. | condensed capability map (8 × 22, 31 edges); process stages problem → data → model → system → impact | M3, M5 | 2 |
+| 4 | Journey | Prove sustained growth in five to six records, not twenty-six. | current role, AI Engineer (AMIKOM), lab assistant, Bangkit, Samsung IC, IDCamp; one line "62 certifications from 7 issuers → /about" | M4 | 1.5 |
+| 5 | Lab | Give developers a reason to stay, without turning the home into a gallery. | 6 of 27 experiments (rule: lab `featured` first, at most one per category), link → `/lab` | M5 | 1.5 |
+| 6 | Contact | Close quietly with the shortest path to a conversation. | email first, phone, LinkedIn, GitHub, CV | M6 | 1 |
+
+Total 9.5 screens. Chapters 2 and 3 carry the weight; chapter 3 is the only
+candidate for the MOTION-21 signature moment. Everything else is reading.
+
+**Rules every later sprint inherits**
+1. Each home chapter has one message and one kind of proof; a chapter that
+   cannot name its row in the table above is cut.
+2. Proof is shown before adjectives: a number, an image, or a link to source —
+   never a claim alone (PRD P6, Rule 7).
+3. Recruiter path first: role, three flagships and contact must be reachable
+   without scrolling past anything developer-only.
+4. Developer depth lives one click away (`/work`, `/lab`, `/data`, design
+   notes), never stacked on the home.
+5. Principles from the benchmark (`RESEARCH.md` §9.2) are binding; no layout is
+   copied from a reference site.
 
 ## Creative directions considered
+
+> Pre-MOTION-20 record. MOTION-20 (concept & art direction) re-decides the
+> direction against this brief; until then "Editorial Instrument" stands.
 
 | Direction | Promise | Why it was/wasn't chosen |
 | --- | --- | --- |
@@ -44,7 +110,7 @@ Rules for this storyboard:
   only image transform; a plate gets at most a one-shot reveal.
 - Full register and pilot spec: `ASSETS.md`.
 
-## Section-by-section
+## Appendix A — section notes for the current 10-chapter home (pre-MOTION-19)
 
 ### 1. Hero — "the instrument boots"
 

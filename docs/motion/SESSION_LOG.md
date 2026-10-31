@@ -756,3 +756,27 @@ re-run the candidate register against the MOTION-20 concept, pilot ≤ 2 externa
 images with caption test and kill criteria, or record A0), placed after
 MOTION-14 and before MOTION-12. `ASSETS.md` §12 updated.
 
+
+### 2026-10-31 (MOTION-17) — audience & narrative brief
+
+Docs only; no product code, so the code gates do not apply (prompt.txt §4).
+
+1. Read the data layer for proof: 22 projects (`ml` 9, `cli` 5, `web` 4,
+   `devops` 2, `iot` 2); owned images on 5; two case studies with metrics
+   (Tafsir 0.972 / 5.93 s; Red Devil "Live", 10-min window — no accuracy);
+   7 roles 2023-11 → now; 62 certifications.
+2. Benchmark (M17.3): `bench.mjs` in the session scratchpad, run with
+   `executablePath` = `~/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome`
+   because the repo's Playwright now expects `chromium_headless_shell-1248`,
+   which is **not installed** on this box (`launch: Executable doesn't exist`).
+   Defect noted for MOTION-09: e2e runs may need `bunx playwright install
+   chromium` or the same path override. 10 sites × 2 widths, all loaded.
+   Results and principles: `RESEARCH.md` §9.
+3. Wrote the brief at the top of `STORYBOARD.md`; the old per-section notes are
+   kept as Appendix A (superseded where they disagree).
+4. Flagships by evidence: Tafsir, Red Devil, IJO PLIS (reserve NyatetDuwit).
+   Evidence gaps routed to MOTION-11/15/22.
+5. Deviation: 6 home chapters, not 7 (no seventh message had proof).
+
+**Owner sign-off:** _pending_ — MOTION-17 stays `BLOCKED` until this line reads
+"approved by the owner on <date>".

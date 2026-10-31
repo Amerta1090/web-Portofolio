@@ -479,3 +479,66 @@ Polishing ten sections and then cutting four of them throws work away. The
 structure (audience → IA → home edit → concept) is decided first; imagery,
 colour, taste, and motion polish then work on the final shape.
 
+
+## 9. Benchmark study (MOTION-17, 2026-10-31)
+
+**Method.** Headless Chromium 1228 (`chromium-1228`, the repo's installed
+Playwright browser), each home page at 1440×900 and 375×812, 2.5 s settle, 30
+wheel steps of 1,500 px to wake lazy content, then counted: document height ÷
+viewport (screens), visible `h2`, visible `<img>` wider than 64 px, `<svg>`,
+`<canvas>`, `<video>`, and `document.getAnimations().length` (a proxy for motion
+density at the moment of measurement, not a total). Script and raw JSON:
+session scratchpad `bench.mjs` / `bench.json` (not committed — re-runnable from
+the command recorded in `SESSION_LOG.md`). Counts are **VERIFIED** for
+2026-10-31 (live sites change). The *signature moment* and *asset family*
+columns are reviewer observation of the same visits plus prior knowledge of
+these sites — **ASSUMPTION** until screenshot-checked in MOTION-20.
+
+### 9.1 Table
+
+| Site | Kind | Screens 1440 / 375 | h2 | img / svg / canvas | anims | Signature moment (ASSUMPTION) | Asset families (ASSUMPTION) |
+| --- | --- | ---: | ---: | --- | ---: | --- | --- |
+| brittanychiang.com | dev portfolio | 4.3 / 6.6 | 5 | 9 / 29 / 0 | 0 | sticky identity column + cursor spotlight | project thumbnails, logos-as-links |
+| joshwcomeau.com | dev / education | 4.6 / 7.9 | 6 | 6 / 51 / 1 | 8 | playful interactive header, physics/sound details | illustrated SVG, custom icons |
+| rauno.me | dev / design engineer | 6.8 / 4.1 | 0 | 0 / 3 / 0 | 7 | the interaction craft itself, text-only shell | none — type only |
+| leerob.com | dev | 1.4 / 2.1 | 2 | 0 / 4 / 0 | 107* | none; one-screen writing index | none |
+| paco.me | dev / design | 1.6 / 1.9 | 5 | 0 / 0 / 0 | 7 | none; five labelled lists | none |
+| emilkowal.ski | design engineer | 2.1 / 2.1 | 0 | 0 / 1 / 0 | 0 | quiet page; craft lives in linked work | none |
+| bruno-simon.com | creative dev | 1.0 / 1.0 | 6 | 0 / 7 / 1 | 0 | the whole site is one drivable 3D scene | 3D world, sound |
+| linear.app | product landing | 11.1 / 7.2 | 7 | 11 / 231 / 0 | 522 | rendered product UI moving as proof | product UI renders, icons |
+| stripe.com | product landing | 17.2 / 25.6 | 6 | 20 / 279 / 13 | 27 | animated gradient canvas behind the hero | gradients, product UI, logos |
+| vercel.com | product landing | 6.6 / 8.5 | 15 | 5 / 48 / 2 | 1 | globe / grid visual in the hero | product UI, diagrams, logos |
+| **this site (today)** | dev portfolio | **≈ 28** / — | 10 chapters | — | — | none (uniform chapter fade) | owned photo, 5/22 project images, 27 lab SVGs |
+
+\* leerob.com reports 107 animations at 1440 and 0 at 375 — likely a
+hover/staggered list effect running at measurement time; one sample, not a
+density claim.
+
+### 9.2 Principles extracted (binding for MOTION-18 → 21)
+
+1. **Developer portfolios are short.** All seven measure 1.0–6.8 screens at
+   1440; the longest still sits under 7. Our ≈ 28 is four times the longest
+   reference. The ≤ 10 screen target in MOTION-19 is generous, not aggressive.
+2. **Length is earned by product, not by person.** Only the product landings
+   (Linear 11.1, Stripe 17.2) exceed 10 screens, and they sell many features to
+   many buyers. A personal site has one buyer question: *should I talk to this
+   person?*
+3. **One signature, everything else quiet.** Each reference with a memorable
+   moment has exactly one (spotlight column, 3D world, moving product UI,
+   gradient canvas); the rest of the page is still. Matches MOTION-21: one
+   moment, in the "How I work" chapter.
+4. **Craft can be the signature.** rauno.me and emilkowal.ski show 0 images and
+   almost no SVG; the impression comes from type, spacing and interaction
+   quality. Variety of assets is not a requirement for "impressive".
+5. **Product proof beats decoration.** The product landings use their own UI as
+   the main asset family. For us that means project screenshots, diagrams and
+   measured numbers (MOTION-11, MOTION-15), never stock or abstract art.
+6. **Navigation stays tiny.** Portfolios expose 0–4 nav items (Brittany Chiang:
+   About / Experience / Projects + socials). Supports N2: nav ≤ 5.
+7. **Mobile is not the desktop shortened.** Screen ratios flip between widths
+   (rauno.me 6.8 → 4.1, Stripe 17.2 → 25.6). Budget the home at 375 as well;
+   MOTION-19 records both numbers.
+
+What we will **not** take: the full-site 3D world (Bruno Simon) — it conflicts
+with rule 6 (no new full-viewport canvas in editorial sections) and with the
+recruiter 30-second path; and the product-landing length.

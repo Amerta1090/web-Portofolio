@@ -1136,7 +1136,7 @@ themes, e2e for the host chapter, docs.
 
 ## MOTION-17 — Audience & narrative brief
 
-**Status:** `READY` (added 2026-10-31, `RESEARCH.md` §8)
+**Status:** `BLOCKED` — all tasks done 2026-10-31; waiting for the owner's sign-off on the brief (acceptance line 3, DoD). Added 2026-10-31, `RESEARCH.md` §8.
 **Priority:** P0 (first — everything after depends on it)
 **Objective:** Write down who the site is for, what each audience must conclude, and in what order the site proves it.
 **Outcome:** A one-page brief that every later sprint cites: audiences, key messages, proof per message, impression goals (`RESEARCH.md` §8.1), and a benchmark study.
@@ -1147,11 +1147,11 @@ themes, e2e for the host chapter, docs.
 **Exclusions:** no product code.
 
 **Tasks**
-- [ ] M17.1 Audiences: recruiters (scan in < 30 s, want role, level, proof, contact) and developers (explore, want craft, depth, source). Record what each must believe after 5 s, 30 s, 3 min.
-- [ ] M17.2 Messages → proof map: each message points to concrete evidence already in the data layer (projects, metrics, case studies, certifications). A message without proof is cut.
-- [ ] M17.3 Benchmark study of 8–10 reference sites (strong developer portfolios + large product landing pages): for each, record structure, screen count, signature moment, asset families, motion density. Learn principles, never copy a layout.
-- [ ] M17.4 Pick the flagship projects (3) by evidence strength, not by date.
-- [ ] M17.5 Define the home storyboard: ≤ 7 chapters, each with one sentence of purpose and the proof it shows.
+- [x] M17.1 Audiences: recruiters (scan in < 30 s, want role, level, proof, contact) and developers (explore, want craft, depth, source). Record what each must believe after 5 s, 30 s, 3 min.
+- [x] M17.2 Messages → proof map: each message points to concrete evidence already in the data layer (projects, metrics, case studies, certifications). A message without proof is cut.
+- [x] M17.3 Benchmark study of 8–10 reference sites (strong developer portfolios + large product landing pages): for each, record structure, screen count, signature moment, asset families, motion density. Learn principles, never copy a layout.
+- [x] M17.4 Pick the flagship projects (3) by evidence strength, not by date.
+- [x] M17.5 Define the home storyboard: ≤ 7 chapters, each with one sentence of purpose and the proof it shows.
 
 **Acceptance criteria**
 - Brief fits one page; every chapter maps to a message and a proof.
@@ -1159,6 +1159,20 @@ themes, e2e for the host chapter, docs.
 - Owner approves the brief before MOTION-18 starts.
 
 **Definition of Done / verification:** brief in `STORYBOARD.md`, owner sign-off line in `SESSION_LOG.md`.
+
+**Completion notes (2026-10-31)**
+- M17.1–M17.5 written to `STORYBOARD.md` "The brief (one page)": audience table
+  at 5 s / 30 s / 3 min, six messages each mapped to data-layer proof (three
+  evidence gaps routed: Red Devil + IJO PLIS accuracy → MOTION-15, IoT
+  "from sensor" evidence → MOTION-11/15, craft invisible → MOTION-22), cut
+  list, flagships (Tafsir, Red Devil, IJO PLIS; reserve NyatetDuwit), and a
+  6-chapter / 9.5-screen home storyboard.
+- M17.3 benchmark: 10 sites measured at 1440 and 375 (`RESEARCH.md` §9,
+  counts VERIFIED, qualitative columns ASSUMPTION). Seven principles extracted.
+- **Deviation:** 6 chapters, not 7 — certifications fold into the Journey
+  chapter as one linked line; no message needed a seventh.
+- Acceptance: brief fits one page ✓ · every chapter maps to a message and proof
+  ✓ · benchmark + principles ✓ · **owner approval — pending**.
 
 ---
 
@@ -1364,7 +1378,7 @@ MOTION-00 (DONE)
        ├─ MOTION-06 (DONE)
        ├─ MOTION-07 (DONE)
        └─ MOTION-08 (DONE)
-            └─ MOTION-17 (READY)  audience & narrative brief
+            └─ MOTION-17 (BLOCKED: owner sign-off)  audience & narrative brief
                  └─ MOTION-18  information architecture & redirects
                       └─ MOTION-19  home edit (≤ 7 chapters, ≤ 10 screens)
                            └─ MOTION-20  concept & art direction

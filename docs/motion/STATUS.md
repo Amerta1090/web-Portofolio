@@ -1,8 +1,8 @@
 # Motion Programme — Status
 
-**Last updated:** 2026-10-31 (MOTION-08 `DONE`)
+**Last updated:** 2026-10-31 (MOTION-17 tasks done, awaiting owner sign-off)
 **Branch:** `main` · **HEAD at session start:** `016608f`
-**Active sprint:** none — MOTION-08 closed; **MOTION-17 (audience & narrative brief) READY** after the 2026-10-31 re-plan
+**Active sprint:** **MOTION-17 (audience & narrative brief) — `BLOCKED` on owner sign-off.** All five tasks done (brief in `STORYBOARD.md`, benchmark in `RESEARCH.md` §9); MOTION-18 stays `PLANNED` until the owner approves.
 
 ## One-paragraph state
 
@@ -59,6 +59,7 @@ MOTION-11 (project evidence imagery), MOTION-12 (taste pass) and MOTION-13
 
 | Fact | Evidence | Label |
 | --- | --- | --- |
+| Reference developer portfolios measure 1.0–6.8 screens @1440 (7 sites), product landings 6.6–17.2 (3 sites); this home ≈ 28 | `RESEARCH.md` §9.1, headless Chromium 1228 | VERIFIED (2026-10-31) |
 | MOTION-01 shipped: 9 chapters (`data-chapter`), 8 heads, head/body ranges `entry→entry 45%` vs `entry 12%→entry 78%` | `e2e/motion-chapters.spec.ts` computed + markup assertions | VERIFIED |
 | Reduced motion is a real off switch: `animation-name: none`, `opacity: 1`, `transform: none` pre-scroll (positive + negative controls) | `e2e/motion-chapters.spec.ts` via `emulateMedia` + readback | VERIFIED |
 | `prefers-reduced-data` cannot be emulated in Chromium (CDP accepted, `matchMedia` stays `false`); its CSS rule is source-guard enforced | guard test + skipped e2e case with reason | VERIFIED (limitation) |
@@ -144,7 +145,7 @@ completed — do not start MOTION-09 in the same execution.**
 (taste, impeccable, Emil ×5, GSAP ×5, web-design-guidelines); usage rules in
 `RESEARCH.md` §5.
 
-**Next: MOTION-17 is READY** (re-plan approved by the owner on 2026-10-31).
+**MOTION-17 brief written, waiting for owner sign-off** (2026-10-31): audiences, messages → proof, flagships Tafsir / Red Devil / IJO PLIS, 6-chapter 9.5-screen home; benchmark of 10 sites shows developer portfolios at 1.0–6.8 screens @1440 vs our ≈ 28.
 Order: 17 brief → 18 IA & redirects → 19 home edit → 20 concept → 11 imagery →
 14 colour → 24 asset audit → 12 taste → 21 signature moment → 13 ambient → 15 detail pages →
 22 design notes → 09 QA sweep → 16 rubric gate → 23 real-people gate → 10
@@ -201,8 +202,10 @@ perception thresholds with ≥ 5 recruiters and ≥ 5 developers.
 
 ## Next action
 
-**Stop here.** MOTION-08 is closed; MOTION-17 is `READY`. When the programme
-resumes, read MOTION-17 in `SPRINT_PLAN.md` and `RESEARCH.md` §8. Carry-over facts: page transitions
+**Owner reviews `STORYBOARD.md` "The brief (one page)".** On approval: record
+the sign-off line in `SESSION_LOG.md`, set MOTION-17 `DONE` and MOTION-18
+`READY`. On changes: edit the brief, re-request sign-off. Do not start
+MOTION-18 before that. Carry-over facts: page transitions
 animate `<main>` only and restore scroll instantly (`src/lib/page-continuity.ts`),
 there is no smooth-scroll library, every reveal rule stays inside
 `@supports (animation-timeline: view())`, ordered choreography uses
