@@ -3,7 +3,7 @@
 > **MOTION-17 brief (2026-10-31).** This page is the authority every later
 > sprint cites (MOTION-18 IA, MOTION-19 home edit, MOTION-20 concept,
 > MOTION-21 signature moment). Benchmark evidence: `RESEARCH.md` §9. Impression
-> goal and release rule: `RESEARCH.md` §8. Status: **awaiting owner sign-off**
+> goal and release rule: `RESEARCH.md` §8. Status: **approved by the owner 2026-10-31**
 > (`SESSION_LOG.md`). Appendix A keeps the motion notes for today's 10 chapters;
 > where it disagrees with the brief, the brief wins.
 

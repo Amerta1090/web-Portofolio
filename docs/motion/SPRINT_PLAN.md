@@ -1136,7 +1136,7 @@ themes, e2e for the host chapter, docs.
 
 ## MOTION-17 — Audience & narrative brief
 
-**Status:** `BLOCKED` — all tasks done 2026-10-31; waiting for the owner's sign-off on the brief (acceptance line 3, DoD). Added 2026-10-31, `RESEARCH.md` §8.
+**Status:** `DONE` (2026-10-31, owner sign-off recorded in `SESSION_LOG.md`). Added 2026-10-31, `RESEARCH.md` §8.
 **Priority:** P0 (first — everything after depends on it)
 **Objective:** Write down who the site is for, what each audience must conclude, and in what order the site proves it.
 **Outcome:** A one-page brief that every later sprint cites: audiences, key messages, proof per message, impression goals (`RESEARCH.md` §8.1), and a benchmark study.
@@ -1172,13 +1172,13 @@ themes, e2e for the host chapter, docs.
 - **Deviation:** 6 chapters, not 7 — certifications fold into the Journey
   chapter as one linked line; no message needed a seventh.
 - Acceptance: brief fits one page ✓ · every chapter maps to a message and proof
-  ✓ · benchmark + principles ✓ · **owner approval — pending**.
+  ✓ · benchmark + principles ✓ · owner approval ✓ (2026-10-31).
 
 ---
 
 ## MOTION-18 — Information architecture & route consolidation
 
-**Status:** `PLANNED` (added 2026-10-31, `RESEARCH.md` §8)
+**Status:** `READY` (MOTION-17 `DONE` 2026-10-31; added 2026-10-31, `RESEARCH.md` §8)
 **Priority:** P0
 **Objective:** One canonical place for each kind of content.
 **Outcome:** Routes: `/` (story), `/work` (index + case studies, merges `/projects` and `/work`), `/about` (career spine, skills, certifications, resume — merges `/timeline`, `/skills`, `/certifications`), `/lab` (gallery), `/data` (Observatory + GitHub statistics, merges `/observatory`, `/github`), contact as a home chapter + footer. Nav ≤ 5 items.
@@ -1378,8 +1378,8 @@ MOTION-00 (DONE)
        ├─ MOTION-06 (DONE)
        ├─ MOTION-07 (DONE)
        └─ MOTION-08 (DONE)
-            └─ MOTION-17 (BLOCKED: owner sign-off)  audience & narrative brief
-                 └─ MOTION-18  information architecture & redirects
+            └─ MOTION-17 (DONE)  audience & narrative brief
+                 └─ MOTION-18 (READY)  information architecture & redirects
                       └─ MOTION-19  home edit (≤ 7 chapters, ≤ 10 screens)
                            └─ MOTION-20  concept & art direction
                                 └─ MOTION-11  project evidence imagery

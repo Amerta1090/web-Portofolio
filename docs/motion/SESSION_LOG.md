@@ -778,5 +778,5 @@ Docs only; no product code, so the code gates do not apply (prompt.txt §4).
    Evidence gaps routed to MOTION-11/15/22.
 5. Deviation: 6 home chapters, not 7 (no seventh message had proof).
 
-**Owner sign-off:** _pending_ — MOTION-17 stays `BLOCKED` until this line reads
-"approved by the owner on <date>".
+**Owner sign-off:** approved by the owner on 2026-10-31 ("Approve the brief").
+MOTION-17 `DONE`; MOTION-18 `READY`.

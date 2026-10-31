@@ -1,8 +1,8 @@
 # Motion Programme — Status
 
-**Last updated:** 2026-10-31 (MOTION-17 tasks done, awaiting owner sign-off)
+**Last updated:** 2026-10-31 (MOTION-17 `DONE`, owner approved)
 **Branch:** `main` · **HEAD at session start:** `016608f`
-**Active sprint:** **MOTION-17 (audience & narrative brief) — `BLOCKED` on owner sign-off.** All five tasks done (brief in `STORYBOARD.md`, benchmark in `RESEARCH.md` §9); MOTION-18 stays `PLANNED` until the owner approves.
+**Active sprint:** none — MOTION-17 `DONE` (brief approved 2026-10-31); **MOTION-18 (information architecture & route consolidation) READY**
 
 ## One-paragraph state
 
@@ -145,7 +145,7 @@ completed — do not start MOTION-09 in the same execution.**
 (taste, impeccable, Emil ×5, GSAP ×5, web-design-guidelines); usage rules in
 `RESEARCH.md` §5.
 
-**MOTION-17 brief written, waiting for owner sign-off** (2026-10-31): audiences, messages → proof, flagships Tafsir / Red Devil / IJO PLIS, 6-chapter 9.5-screen home; benchmark of 10 sites shows developer portfolios at 1.0–6.8 screens @1440 vs our ≈ 28.
+**MOTION-17 DONE — brief approved by the owner** (2026-10-31): audiences, messages → proof, flagships Tafsir / Red Devil / IJO PLIS, 6-chapter 9.5-screen home; benchmark of 10 sites shows developer portfolios at 1.0–6.8 screens @1440 vs our ≈ 28.
 Order: 17 brief → 18 IA & redirects → 19 home edit → 20 concept → 11 imagery →
 14 colour → 24 asset audit → 12 taste → 21 signature moment → 13 ambient → 15 detail pages →
 22 design notes → 09 QA sweep → 16 rubric gate → 23 real-people gate → 10
@@ -202,12 +202,12 @@ perception thresholds with ≥ 5 recruiters and ≥ 5 developers.
 
 ## Next action
 
-**Owner reviews `STORYBOARD.md` "The brief (one page)".** On approval: record
-the sign-off line in `SESSION_LOG.md`, set MOTION-17 `DONE` and MOTION-18
-`READY`. On changes: edit the brief, re-request sign-off. Do not start
-MOTION-18 before that. Carry-over facts: page transitions
-animate `<main>` only and restore scroll instantly (`src/lib/page-continuity.ts`),
-there is no smooth-scroll library, every reveal rule stays inside
-`@supports (animation-timeline: view())`, ordered choreography uses
-server-emitted tokens, reduced motion is `animation: none` verified with
-`page.emulateMedia`, and `Section` uses `overflow: clip`.
+**Stop here.** MOTION-17 is closed; MOTION-18 is `READY`. When the programme
+resumes, read MOTION-18 in `SPRINT_PLAN.md`, the approved brief at the top of
+`STORYBOARD.md`, and `RESEARCH.md` §8.2 (N2) / §9.2 (nav ≤ 5). Carry-over
+facts: page transitions animate `<main>` only (`src/lib/page-continuity.ts`),
+every reveal rule stays inside `@supports (animation-timeline: view())`,
+reduced motion is `animation: none` verified with `page.emulateMedia`,
+`Section` uses `overflow: clip`, and the repo's Playwright expects
+`chromium_headless_shell-1248`, which is not installed (run
+`bunx playwright install chromium` before e2e).
