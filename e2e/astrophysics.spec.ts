@@ -4,7 +4,7 @@ import { waitForExperimentReady } from "./hydration";
 test.describe("Astrophysics experiments", () => {
   test.describe("3-Body Problem", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto("/gallery#three-body-problem");
+      await page.goto("/lab#three-body-problem");
       await waitForExperimentReady(page);
     });
 
@@ -45,7 +45,7 @@ test.describe("Astrophysics experiments", () => {
     });
 
     test("card is present in gallery", async ({ page }) => {
-      await page.goto("/gallery");
+      await page.goto("/lab");
       await page.waitForSelector('[role="listitem"]', { timeout: 5000 });
       const card = page.locator('[role="listitem"]').filter({ hasText: "3-Body" });
       await expect(card.first()).toBeVisible();
@@ -54,7 +54,7 @@ test.describe("Astrophysics experiments", () => {
 
   test.describe("Relativistic Orbits", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto("/gallery#relativistic-orbits");
+      await page.goto("/lab#relativistic-orbits");
       await waitForExperimentReady(page);
     });
 
@@ -91,7 +91,7 @@ test.describe("Astrophysics experiments", () => {
 
     test("card is present in gallery", async ({ page }) => {
       await page.keyboard.press("Escape");
-      await page.goto("/gallery");
+      await page.goto("/lab");
       const card = page.locator('[role="listitem"]').filter({ hasText: /Relativistic Orbits/ });
       await expect(card).toBeVisible();
     });
@@ -99,7 +99,7 @@ test.describe("Astrophysics experiments", () => {
 
   test.describe("Galaxy Formation", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto("/gallery#galaxy-formation");
+      await page.goto("/lab#galaxy-formation");
       await waitForExperimentReady(page);
     });
 
@@ -142,7 +142,7 @@ test.describe("Astrophysics experiments", () => {
     });
 
     test("card is present in gallery", async ({ page }) => {
-      await page.goto("/gallery");
+      await page.goto("/lab");
       await page.waitForSelector('[role="listitem"]', { timeout: 5000 });
       const card = page.locator('[role="listitem"]').filter({ hasText: /Galaxy Formation/ });
       await expect(card.first()).toBeVisible();

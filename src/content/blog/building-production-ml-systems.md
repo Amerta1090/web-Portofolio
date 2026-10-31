@@ -100,6 +100,6 @@ Production ML is as much about systems engineering as it is about data science. 
 <div class="bg-bg-secondary border border-border rounded-xl p-6 my-8">
   <p class="text-text-secondary text-sm">
     <strong>Series:</strong> This is part 1 of the "Production ML" series.
-    <a href="/blog/tag/Production%20ML" class="text-accent hover:underline">View all posts in this series →</a>
+    <a href="/blog/tag/MLOps" class="text-accent hover:underline">View all posts in this series →</a>
   </p>
 </div>

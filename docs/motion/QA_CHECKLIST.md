@@ -18,7 +18,8 @@ Commands assume the repository root and a 4-core / 3 GB Linux box.
 
 ```bash
 bun run validate-data
-bun run build:fast                 # expect 49 pages
+bun run build:fast                 # expect 72 pages (42 canonical + 30 redirect fallbacks, MOTION-18)
+bun run check:links                # 0 broken same-site links, 0 links to retired routes (MOTION-18)
 bunx astro check 2>&1 | tee /tmp/opencode/astro-check.log
 bunx biome check <touched files>   # per-file, not repo-wide noise
 ```
@@ -26,8 +27,9 @@ bunx biome check <touched files>   # per-file, not repo-wide noise
 | Gate | Baseline | Rule |
 | --- | --- | --- |
 | `validate-data` | OK, GitHub cache non-degenerate | must stay OK |
-| Build pages | 49 | must stay 49 |
-| `astro check` | 98 errors, 0 warnings | sorted diff must be empty |
+| Build pages | 72 (42 canonical incl. 404 + 30 retired-route fallbacks; was 49 before MOTION-18) | change only with a route change, and say which |
+| Link check | 0 broken, 0 retired-route links (`bun run check:links`) | must stay 0 |
+| `astro check` | 89 errors, 0 warnings (was 98 before MOTION-18: −9 from deleted pages, 0 new) | sorted diff must be empty |
 | Biome on touched files | clean | 0 new diagnostics |
 
 ## 2. Unit tests
@@ -152,7 +154,7 @@ templates; Emil `review-animations` over touched motion code (`RESEARCH.md` §5)
 
 - Keyboard: skip link, chapter headings, jump links, filters, dialog focus.
 - No-JS: every chapter readable in order; no dead controls; no hidden content.
-- Overflow: 320/375/768/1024/1440/1920/2560 on `/`, `/gallery`, `/observatory`,
+- Overflow: 320/375/768/1024/1440/1920/2560 on `/`, `/lab`, `/data`,
   `/work/ai-quranic-tafsir`. `/resume` @320 is a documented print exception.
 - Contrast: new labels meet AA (4.5:1 for small text).
 
@@ -180,6 +182,22 @@ git diff -- <files>
 - [x] `RESEARCH.md` updated if an assumption became verified. *(§2.1 reduced-motion measured; reduced-data Chromium limitation recorded §2.1/§3)*
 
 ## 8. Sprint results log
+
+### MOTION-18 — 2026-10-31
+
+| Gate | Result |
+| --- | --- |
+| `bun run validate-data` | OK; new `case_study` check proven: missing file → ERROR, double claim → ERROR, `md5sum` restored |
+| `bun run build:fast` | **72 pages** (42 canonical incl. 404 + 30 retired-route fallbacks) |
+| `bun run check:links` | **0 broken / 1,547 same-site links / 73 HTML files**; first run found 4 pre-existing dead links (3× `#links` on link-less project pages, 1 blog tag) — fixed; mutation (dead path, retired route, missing id) → 3/3 reported, exit 1 |
+| `bunx astro check` | **89** errors (98 → 89); sorted diff vs HEAD worktree = moves only (`observatory` → `data`, `work/[slug]` → `CaseStudyArticle`), 0 new |
+| Biome, touched files | per-file categories equal HEAD worktree (0 new); safe fixes applied to files clean at HEAD |
+| Unit suite | **1214/1214** (106 files; +9 `routes.test.ts`) |
+| Full e2e `--workers=1`, run 1 | 431 passed, 6 failed, 1 skipped (437) — all six fixed: nav/footer expectations of the new IA (4) + 2 races where the URL flips before ClientRouter swaps the DOM |
+| Full e2e `--workers=1`, run 2 | **433 passed, 3 failed, 1 skipped** — `scroll-lock` ×2 = load flakes (isolated 3/3, green in run 1); `observatory` nav = 5 s URL budget vs 4.3–6.2 s swap → 15 s, then 15/15 |
+| New spec | `e2e/redirects.spec.ts` **37/37** (30 routes + fragment, reader fragment, query, noindex/canonical, no-JS meta refresh, sitemap, positive control) |
+| `measure:routes` | `/` 202.7 / 556.2 / 77.2 KB (+0.1 reachable); `/work/ai-quranic-tafsir` 150.8 / 393.2 / 18.6; `/lab` 179.3 / 504.6 / 20.0 (= old `/gallery`); new `/about` 150.8 / 436.1 / 26.5, `/data` 156.8 / 503.2 / 56.4, `/work` 152.2 / 390.8 / 36.5 |
+| A/B navigation (HEAD :4323 vs current :4321) | home → page swap 4.3–6.2 s on both builds (`/observatory` 5.5 s at HEAD) — pre-existing |
 
 ### MOTION-08 — 2026-10-31
 

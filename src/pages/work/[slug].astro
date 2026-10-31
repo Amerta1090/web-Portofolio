@@ -1,339 +1,57 @@
 ---
-import { type CollectionEntry, getCollection, render } from "astro:content";
-import CaseStudyReactor from "../../islands/CaseStudyReactor";
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import { buildStageViews, processStagesOf } from "../../lib/creative/case-study-reactor";
+/**
+ * One page per project (MOTION-18). Replaces `/projects/[slug]` (22 project
+ * pages) and the old `/work/[slug]` (2 case studies), which described two of the
+ * same projects twice. A project that names a `case_study` renders the case
+ * study body (stages, metrics, MDX) plus its links; every other project renders
+ * the project body. Prev/next walk all 22 in `projects.json` order.
+ */
+import { type CollectionEntry, getCollection } from "astro:content";
+import CaseStudyArticle from "../../components/templates/CaseStudyArticle.astro";
+import ProjectArticle from "../../components/templates/ProjectArticle.astro";
+import { getProjects } from "../../lib/data";
+import { workHref, workSlug } from "../../lib/routes";
 
 export async function getStaticPaths() {
+  const projects = getProjects();
   const entries = await getCollection("caseStudies");
-  return entries.map((entry) => ({
-    params: { slug: entry.id },
-    props: { entry },
-  }));
+  const byId = new Map<string, CollectionEntry<"caseStudies">>(
+    entries.map((entry: CollectionEntry<"caseStudies">) => [entry.id, entry]),
+  );
+  const claimed = new Set(projects.flatMap((project) => project.case_study ?? []));
+  const orphans = entries
+    .map((entry: CollectionEntry<"caseStudies">) => entry.id)
+    .filter((id: string) => !claimed.has(id));
+  if (orphans.length > 0) {
+    // A case study no project claims would have no URL at all.
+    throw new Error(`Case studies without a project: ${orphans.join(", ")}`);
+  }
+
+  const neighbour = (index: number) => {
+    const project = projects[index];
+    return project ? { title: project.title, href: workHref(project) } : null;
+  };
+
+  return projects.map((project, index) => {
+    const entry = project.case_study ? byId.get(project.case_study) : undefined;
+    if (project.case_study && !entry) {
+      throw new Error(`Missing case study "${project.case_study}" for "${project.title}"`);
+    }
+    return {
+      params: { slug: workSlug(project) },
+      props: { project, entry, prev: neighbour(index - 1), next: neighbour(index + 1) },
+    };
+  });
 }
 
-interface Props {
-  entry: CollectionEntry<"caseStudies">;
-}
-
-const { entry } = Astro.props;
-const { Content, headings } = await render(entry);
-const { title, summary, role, stack, period, category, metrics } = entry.data;
-
-// Optional Case Study Reactor content model: an ordered build narrative that
-// stays complete as plain content. Absent stages mean this page renders exactly
-// what it rendered before.
-const stageViews = buildStageViews(processStagesOf(entry.data) ?? []);
-
-const allEntries = await getCollection("caseStudies");
-allEntries.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
-const currentIndex = allEntries.findIndex((e) => e.id === entry.id);
-const prevEntry = currentIndex > 0 ? allEntries[currentIndex - 1] : null;
-const nextEntry = currentIndex < allEntries.length - 1 ? allEntries[currentIndex + 1] : null;
+const { project, entry, prev, next } = Astro.props;
+const slug = workSlug(project);
 ---
 
-<BaseLayout
-  title={`${title} — Abdul Majid Ridwan Tyastonoatmaja`}
-  description={summary.slice(0, 160)}
-  canonicalUrl={`https://portfolio.abdulmajidr708.workers.dev/work/${entry.id}`}
-  ogSlug={`work/${entry.id}`}
->
-  <div class="py-12 md:py-24">
-    <div class="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
-      <div class="mb-8">
-        <a href="/work" class="text-sm text-text-secondary hover:text-accent transition-colors">&larr; Back to Work</a>
-      </div>
-
-      {/* The reading column keeps its 65ch measure (`.work-measure`, centred on
-          the same axis). The page is only as wide as the widest block: the
-          Case Study Reactor needs room for a sticky stage beside the list. */}
-      <article class="mx-auto w-full max-w-[62rem]">
-        <header class="work-measure mb-12">
-          {category && (
-            <span class="inline-flex items-center px-3 py-1 mb-4 text-xs font-medium bg-accent-muted/20 text-accent rounded-full">{category.toUpperCase()}</span>
-          )}
-
-          <h1 class="font-display text-text-primary leading-tight mb-4" style="font-size: var(--text-display); line-height: 0.95; letter-spacing: var(--tracking-display);">
-            {title}
-          </h1>
-
-          <p class="text-lg text-text-secondary leading-relaxed mb-6">{summary}</p>
-
-          <div class="flex flex-wrap items-center gap-4 text-sm text-text-secondary">
-            <span class="inline-flex items-center gap-1.5">
-              <span class="w-1 h-1 bg-accent rounded-full"></span>
-              {role}
-            </span>
-            <span class="text-border">|</span>
-            <span>{period}</span>
-          </div>
-        </header>
-
-        {metrics && metrics.length > 0 && (
-          <div class="work-measure grid grid-cols-2 md:grid-cols-4 gap-6 mb-12 p-6 bg-bg-secondary border border-border rounded-xl">
-            {metrics.map((m) => (
-              <div class="text-center">
-                <div class="text-2xl md:text-3xl font-bold text-brand mb-1">{m.value}</div>
-                <div class="text-xs text-text-secondary uppercase tracking-wide">{m.label}</div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {stack && stack.length > 0 && (
-          <div class="work-measure mb-12">
-            <h3 class="text-xs font-semibold text-text-secondary uppercase tracking-widest mb-3">Tech Stack</h3>
-            <div class="flex flex-wrap gap-2">
-              {stack.map((s) => (
-                <span class="inline-flex items-center rounded-full border border-border px-3 py-1 text-xs font-medium text-text-secondary bg-bg-tertiary">
-                  {s}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div class="work-measure border-t border-border pt-10">
-          <div class="case-study-content">
-            <Content />
-          </div>
-        </div>
-
-        {stageViews.length > 0 && (
-          <section id="process" class="mt-12 pt-10 border-t border-border">
-            <div class="work-measure">
-              <p class="section-label mb-2">Process</p>
-              <h2 class="text-xl font-semibold text-text-primary mb-3">
-                The build, stage by stage
-              </h2>
-              <p class="text-sm text-text-secondary leading-relaxed">
-                The same case study, decomposed into the stages it actually went through. Each
-                stage keeps the evidence behind it — this reads as an ordered sequence, with or
-                without JavaScript.
-              </p>
-            </div>
-
-            {/* Desktop (`lg` and up): the stage visual becomes a sticky column
-                beside the ordered list, so the diagram stays on screen while the
-                reader walks the stages. Below `lg` the very same two blocks stay
-                in normal document flow — stepper, then panel, then the list: no
-                sticky, no horizontal drag, no hover-only affordance. */}
-            <div class="mt-8 grid gap-8 mx-auto w-full max-w-[65ch] lg:max-w-none lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)] lg:items-start">
-              <div class="min-w-0 lg:sticky lg:top-24">
-                <CaseStudyReactor client:visible stages={stageViews} />
-              </div>
-
-              <ol class="space-y-8">
-                {stageViews.map((stage) => (
-                  <li id={stage.anchorId} data-reactor-stage={stage.id} class="scroll-mt-24">
-                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-                      <span class="font-mono text-xs text-brand tabular-nums">{stage.ordinal}</span>
-                      <h3 class="text-lg font-semibold text-text-primary">{stage.label}</h3>
-                      <a
-                        href={`#${stage.anchorId}`}
-                        aria-label={`Link to ${stage.positionLabel}: ${stage.label}`}
-                        class="text-xs text-text-secondary hover:text-accent transition-colors focus:outline-none focus:ring-2 focus:ring-accent rounded"
-                      >#{stage.id}</a>
-                    </div>
-                    <p class="mt-2 text-text-primary leading-relaxed">{stage.summary}</p>
-                    <p class="mt-3 border-l-2 border-border pl-4 text-sm italic text-text-secondary leading-relaxed">
-                      {stage.evidence}
-                    </p>
-                    {stage.metric && (
-                      <dl class="mt-3 flex items-baseline gap-2">
-                        <dt class="text-xs uppercase tracking-wide text-text-secondary">
-                          {stage.metric.label}
-                        </dt>
-                        <dd class="font-mono text-sm text-brand tabular-nums">
-                          {stage.metric.value}
-                        </dd>
-                      </dl>
-                    )}
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </section>
-        )}
-
-        {(prevEntry || nextEntry) && (
-          <div class="work-measure mt-16 pt-8 border-t border-border flex flex-wrap justify-between gap-4">
-            <div>
-              {prevEntry && (
-                <a href={`/work/${prevEntry.id}`} class="text-sm text-text-secondary hover:text-accent transition-colors">&larr; {prevEntry.data.title}</a>
-              )}
-            </div>
-            <div>
-              {nextEntry && (
-                <a href={`/work/${nextEntry.id}`} class="text-sm text-text-secondary hover:text-accent transition-colors">{nextEntry.data.title} &rarr;</a>
-              )}
-            </div>
-          </div>
-        )}
-      </article>
-    </div>
-  </div>
-</BaseLayout>
-
-<style is:global>
-  /* The reading measure. Prose blocks keep 65ch and stay centred on the same
-     axis at every viewport, so widening the page for the reactor below never
-     moves the narrative. */
-  .work-measure {
-    max-width: 65ch;
-    margin-inline: auto;
-  }
-
-  .case-study-content {
-    max-width: 65ch;
-  }
-
-  .case-study-content h2 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    line-height: 1.3;
-    margin-top: 2.5rem;
-    margin-bottom: 0.75rem;
-    color: var(--text-primary);
-  }
-
-  .case-study-content h3 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    line-height: 1.4;
-    margin-top: 2rem;
-    margin-bottom: 0.5rem;
-    color: var(--text-primary);
-  }
-
-  .case-study-content p {
-    margin-bottom: 1.25rem;
-    line-height: 1.8;
-    color: var(--text-secondary);
-  }
-
-  .case-study-content strong {
-    color: var(--text-primary);
-    font-weight: 600;
-  }
-
-  .case-study-content ul,
-  .case-study-content ol {
-    margin-bottom: 1.25rem;
-    padding-left: 1.5rem;
-    color: var(--text-secondary);
-    line-height: 1.8;
-  }
-
-  .case-study-content li {
-    margin-bottom: 0.25rem;
-  }
-
-  .case-study-content ul li {
-    list-style-type: disc;
-  }
-
-  .case-study-content ol li {
-    list-style-type: decimal;
-  }
-
-  .case-study-content code {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 0.875rem;
-    background: var(--bg-tertiary);
-    padding: 0.15em 0.4em;
-    border-radius: 4px;
-    color: var(--accent);
-  }
-
-  .case-study-content pre {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 1rem;
-    margin: 1.5rem 0;
-    overflow-x: auto;
-  }
-
-  .case-study-content pre code {
-    background: none;
-    padding: 0;
-    color: var(--text-primary);
-    font-size: 0.8125rem;
-    line-height: 1.6;
-  }
-
-  .case-study-content blockquote {
-    border-left: 3px solid var(--accent);
-    padding-left: 1rem;
-    margin: 1.5rem 0;
-    color: var(--text-secondary);
-    font-style: italic;
-  }
-
-  .case-study-content hr {
-    border: none;
-    height: 1px;
-    background: var(--border);
-    margin: 2rem 0;
-  }
-
-  /* ── Case Study Reactor ──────────────────────────────────────────────
-     The ordered list above is the canonical content; the island below it is
-     the enhancement. Styling lives here (not in the island) so the page owns
-     both halves of the section, and everything stays token-based. */
-
-  /* The island marks the list item that the active stage describes. Emphasis
-     only: no hiding, no layout shift, same information either way. */
-  #process [data-reactor-stage][data-reactor-active="true"] h3 {
-    color: var(--accent);
-  }
-
-  #process [data-reactor-diagram] text {
-    font-family: inherit;
-  }
-
-  /* Bounded entry motion: boxes and edges resolve layer by layer so the flow
-     reads as a causal chain. `data-reactor-animate` is absent before hydration
-     and under prefers-reduced-motion, and the rule below is scoped to it, so
-     the resting state is plain static markup. */
-  #process [data-reactor-animate="true"] [data-reactor-node] {
-    animation: reactor-node-in 320ms cubic-bezier(0.22, 0.61, 0.36, 1) backwards;
-    animation-delay: calc(var(--reactor-order, 0) * 60ms);
-  }
-
-  #process [data-reactor-animate="true"] [data-reactor-edge] {
-    animation: reactor-edge-in 320ms ease-out backwards;
-    animation-delay: calc(var(--reactor-order, 0) * 60ms);
-  }
-
-  @keyframes reactor-node-in {
-    from {
-      opacity: 0;
-      transform: translateY(3px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes reactor-edge-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  /* Belt and braces: the island already omits the animate hook when the
-     visitor prefers reduced motion, so a preference that changes after
-     hydration cannot start the sequence either. */
-  @media (prefers-reduced-motion: reduce) {
-    #process [data-reactor-animate="true"] [data-reactor-node],
-    #process [data-reactor-animate="true"] [data-reactor-edge] {
-      animation: none;
-    }
-  }
-</style>
+{
+  entry ? (
+    <CaseStudyArticle entry={entry} project={project} slug={slug} prev={prev} next={next} />
+  ) : (
+    <ProjectArticle project={project} slug={slug} prev={prev} next={next} />
+  )
+}

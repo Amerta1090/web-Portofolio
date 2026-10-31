@@ -780,3 +780,36 @@ Docs only; no product code, so the code gates do not apply (prompt.txt §4).
 
 **Owner sign-off:** approved by the owner on 2026-10-31 ("Approve the brief").
 MOTION-17 `DONE`; MOTION-18 `READY`.
+
+### 2026-10-31 (MOTION-18) — information architecture & route consolidation
+
+1. **Inventory (M18.1).** 17 routes; duplicate pairs: `/projects`+`/work`
+   index, `/projects/<slug>`+`/work/<slug>` (Tafsir and Red Devil described
+   twice), `/timeline`/`/skills`/`/certifications` (career record ×3),
+   `/observatory`+`/github`, `/contact` = home `#contact` (same form).
+2. **Route module** `src/lib/routes.ts` (0 imports): `ROUTES`, `workHref`,
+   `labHref`, `retiredRoutes`, `redirectsFile`. `projects.json` gained
+   `case_study` (2 projects); `validate-data` checks it.
+3. **Pages.** `/work` (merged index), `/work/[slug]` (22 pages, two bodies moved
+   into `components/templates/`), `/about` (spine + skills + certifications),
+   `/lab` (`git mv` gallery), `/data` (`git mv` observatory + GitHub Universe at
+   `#github`), `src/pages/[...retired].astro` (30 fallbacks). Deleted:
+   `projects/index`, `timeline`, `skills`, `certifications`, `github`,
+   `contact`, and `organisms/Projects.astro` (0 consumers).
+4. **Links.** 14 producers repointed (signal-loom, buildIndex, architecture
+   crossings, CapabilityArchitecture, Certifications, CreativeLabTeaser, index,
+   404, TopRepos, CreativeLabPill, GameMenu, Header/Footer/constants, OG map).
+   Sitemap filters retired paths; `public/_redirects` generated + test-locked.
+5. **New gate `check:links`** found 4 pre-existing dead links → fixed.
+6. **Defects found by e2e (not by unit):** (a) legacy `[data-reveal] > *` kept
+   `/data`'s h1 at opacity 0 after a client swap → gate removed from that header;
+   (b) the URL flips before ClientRouter swaps the DOM, so specs that waited on
+   the URL could read the old page → they wait for the new document now.
+7. **A/B.** Built HEAD in a worktree with its own `bun install` (a symlinked
+   `node_modules` breaks Astro; `git stash push -- ':!dist'` half-ran because
+   `dist` is ignored — the stash was verified byte-identical and kept until
+   commit). Swap away from home: 4.3–6.2 s on both builds.
+8. **Process defect (mine):** `pkill -f <pattern>` matched my own shell twice and
+   killed it; use the port's PID instead.
+
+Gates: see `QA_CHECKLIST.md` §8 MOTION-18. **Next:** MOTION-19 `READY`.

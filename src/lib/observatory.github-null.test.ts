@@ -22,7 +22,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const pagePath = resolve(__dirname, "../pages/observatory.astro");
+const pagePath = resolve(__dirname, "../pages/data.astro"); // was observatory.astro (MOTION-18)
 const page = readFileSync(pagePath, "utf-8");
 
 describe("observatory.astro GitHub metrics", () => {

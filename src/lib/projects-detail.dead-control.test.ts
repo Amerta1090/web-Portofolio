@@ -55,7 +55,13 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
-const projectPage = readFileSync(resolve(root, "src/pages/projects/[slug].astro"), "utf-8");
+const projectPage = readFileSync(
+  resolve(
+    root,
+    "src/components/templates/ProjectArticle.astro",
+  ) /* was src/pages/projects/[slug].astro (MOTION-18) */,
+  "utf-8",
+);
 
 /** Every `.astro` / `.tsx` / `.ts` file under `src/`, so the target check is repo-wide. */
 function readSourceTree(dir: string): string {

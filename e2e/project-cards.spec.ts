@@ -10,14 +10,15 @@ import { waitForIslandHydration } from "./hydration";
  *
  * The four slugs below are the deterministic output of the shared slug rule
  * (`title.toLowerCase().replace(/[^a-z0-9]+/g, "-")`), the same one used by
- * `/projects/[slug]` and the observatory index. If the rule changes, both this
+ * `/work/[slug]` (`src/lib/routes.ts`) and the observatory index. If the rule changes, both this
  * spec and the unit suite have to move together.
  */
 const SLUGS = [
   "retro-game-inspired-portfolio-website",
   "nyatetduwit-offline-first-personal-finance-pwa",
   "ijo-plis-ihsg-usd-idr-forecasting-platform",
-  "red-devil-dynamics-ai-goal-timing-predictor-for-manchester-united",
+  // MOTION-18: a project with a case study lives at its case-study id.
+  "red-devil-dynamics",
 ];
 
 const CARDS = "#projects [data-project-card]";
@@ -27,11 +28,11 @@ test("home renders exactly the four featured project cards", async ({ page }) =>
   await expect(page.locator(CARDS)).toHaveCount(4);
 });
 
-test("each title is a real link to its /projects/<slug> page", async ({ page }) => {
+test("each title is a real link to its /work/<slug> page", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(CARDS)).toHaveCount(4);
   for (const slug of SLUGS) {
-    await expect(page.locator(`#projects a[href="/projects/${slug}"]`)).toHaveCount(1);
+    await expect(page.locator(`#projects a[href="/work/${slug}"]`)).toHaveCount(1);
   }
 });
 
@@ -99,12 +100,12 @@ test("after hydration every card-area button is a live filter chip", async ({ pa
 test("clicking a card's title navigates to the real project page", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(CARDS)).toHaveCount(4);
-  const title = page.locator(`#projects a[href="/projects/retro-game-inspired-portfolio-website"]`);
+  const title = page.locator(`#projects a[href="/work/retro-game-inspired-portfolio-website"]`);
   await Promise.all([
-    page.waitForURL("**/projects/retro-game-inspired-portfolio-website"),
+    page.waitForURL("**/work/retro-game-inspired-portfolio-website"),
     title.click(),
   ]);
-  await expect(page).toHaveURL(/\/projects\/retro-game-inspired-portfolio-website$/);
+  await expect(page).toHaveURL(/\/work\/retro-game-inspired-portfolio-website$/);
 });
 
 test("cursor spotlight is on when the grid is visible after hydration", async ({ page }) => {

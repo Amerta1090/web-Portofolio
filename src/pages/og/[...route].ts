@@ -1,7 +1,8 @@
 import type { APIRoute } from "astro";
 import { OGImageRoute } from "astro-og-canvas";
-import { getCollection } from "astro:content";
+import { type CollectionEntry, getCollection } from "astro:content";
 import { getProjects } from "../../lib/data";
+import { workSlug } from "../../lib/routes";
 
 const caseStudies = await getCollection("caseStudies");
 const blogEntries = await getCollection("blog");
@@ -16,50 +17,32 @@ const pages: Record<string, { title: string; description: string }> = {
     title: AUTHOR,
     description: "AI/ML Engineer & Systems Builder",
   },
-  projects: {
-    title: "Projects",
-    description: `${AUTHOR} — Selected work and open source`,
+  // MOTION-18: one key per canonical route. Retired routes have no page of
+  // their own (they redirect), so they have no image either.
+  about: {
+    title: "About",
+    description: `${AUTHOR} — Career, skills & certifications`,
   },
-  gallery: {
-    title: "Engineering Showcase",
+  lab: {
+    title: "Creative Lab",
     description: `${AUTHOR} — Interactive experiments & visualizations`,
   },
-  github: {
-    title: "GitHub Universe",
-    description: `${AUTHOR} — Contributions, languages & repositories`,
-  },
-  observatory: {
-    title: "Observatory",
-    description: `${AUTHOR} — Portfolio viewed as a dataset`,
-  },
-  contact: {
-    title: "Contact",
-    description: `Get in touch with ${AUTHOR}`,
-  },
-  skills: {
-    title: "Skills",
-    description: `${AUTHOR} — Technical skills & expertise`,
-  },
-  certifications: {
-    title: "Certifications",
-    description: `${AUTHOR} — Verified credentials`,
+  data: {
+    title: "Data",
+    description: `${AUTHOR} — Portfolio as a dataset, plus GitHub telemetry`,
   },
   // Key = output slug, NOT the page route. `astro-og-canvas` rewrites a trailing
   // `/index` (`path.replace(/\/index\.(png|jpeg|webp)$/, extension)`), so a key of
   // "work/index" is emitted as "work.png" and anything asking for
-  // `/og/work/index.png` 404s. Routes are flat (/work, /resume, /timeline, /blog)
+  // `/og/work/index.png` 404s. Routes are flat (/work, /resume, /about, /blog)
   // so the keys must be flat too.
   work: {
-    title: "Work — Case Studies",
-    description: `${AUTHOR} — Deep dives into AI/ML engineering projects`,
+    title: "Work",
+    description: `${AUTHOR} — Every project, with case studies`,
   },
   resume: {
     title: "Resume",
     description: `${AUTHOR} — Professional resume`,
-  },
-  timeline: {
-    title: "Timeline",
-    description: `${AUTHOR} — Career timeline`,
   },
   blog: {
     title: "Blog",
@@ -67,19 +50,16 @@ const pages: Record<string, { title: string; description: string }> = {
   },
 };
 
-for (const entry of caseStudies) {
-  pages[`work/${entry.id}`] = {
-    title: entry.data.title,
-    description: `${entry.data.summary.slice(0, 120)}`,
-  };
-}
-
+// One image per `/work/<slug>` page; a case study supplies the copy for the
+// project that claims it.
+const caseStudyById = new Map<string, CollectionEntry<"caseStudies">>(
+  caseStudies.map((entry: CollectionEntry<"caseStudies">) => [entry.id, entry]),
+);
 for (const project of projects) {
-  const slug = project.title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-  pages[`projects/${slug}`] = {
-    title: project.title,
-    description: (project.description || "").slice(0, 120),
-  };
+  const entry = project.case_study ? caseStudyById.get(project.case_study) : undefined;
+  pages[`work/${workSlug(project)}`] = entry
+    ? { title: entry.data.title, description: entry.data.summary.slice(0, 120) }
+    : { title: project.title, description: (project.description || "").slice(0, 120) };
 }
 
 for (const entry of blogEntries) {

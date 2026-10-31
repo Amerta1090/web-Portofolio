@@ -25,17 +25,17 @@ describe("CreativeLabPill", () => {
     vi.restoreAllMocks();
   });
 
-  it("renders the Lab pill link on non-gallery pages", () => {
+  it("renders the Lab pill link on non-lab pages", () => {
     const { container } = render(<CreativeLabPill />);
-    const link = container.querySelector('a[href="/gallery"]');
+    const link = container.querySelector('a[href="/lab"]');
     expect(link).toBeTruthy();
     expect(link?.textContent).toContain("Lab");
   });
 
-  it("renders nothing on /gallery", () => {
-    window.history.replaceState({}, "", "/gallery");
+  it("renders nothing on /lab", () => {
+    window.history.replaceState({}, "", "/lab");
     const { container } = render(<CreativeLabPill />);
-    expect(container.querySelector('a[href="/gallery"]')).toBeNull();
+    expect(container.querySelector('a[href="/lab"]')).toBeNull();
   });
 
   it("shows breathing glow ring by default", () => {
@@ -47,6 +47,6 @@ describe("CreativeLabPill", () => {
     reducedMotion = true;
     const { container } = render(<CreativeLabPill />);
     expect(container.querySelector(".pointer-events-none.inset-0")).toBeNull();
-    expect(container.querySelector('a[href="/gallery"]')).toBeTruthy();
+    expect(container.querySelector('a[href="/lab"]')).toBeTruthy();
   });
 });

@@ -16,7 +16,7 @@
  * Usage:
  *   node scripts/measure-route-payload.mjs
  *   node scripts/measure-route-payload.mjs --dist ../base/dist --json /
- *   node scripts/measure-route-payload.mjs / /work/ai-quranic-tafsir /gallery
+ *   node scripts/measure-route-payload.mjs / /work/ai-quranic-tafsir /lab
  */
 
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
@@ -27,7 +27,7 @@ import { gzipSync } from "node:zlib";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DEFAULT_DIST = join(__dirname, "..", "dist");
 
-const DEFAULT_ROUTES = ["/", "/work/ai-quranic-tafsir", "/gallery"];
+const DEFAULT_ROUTES = ["/", "/work/ai-quranic-tafsir", "/lab"]; // /gallery retired (MOTION-18)
 
 const formatBytes = (bytes) => `${(bytes / 1024).toFixed(1)} KB`;
 

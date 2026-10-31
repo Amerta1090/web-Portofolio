@@ -32,14 +32,14 @@ async function openExperiment(page: Page, name: string) {
 
 test.describe("Gallery page", () => {
   test("loads with experiment cards", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await expect(page.getByRole("heading", { name: "Creative Lab" })).toBeVisible();
     const cards = page.locator('[role="list"] > [role="listitem"]');
     await expect(cards).toHaveCount(27);
   });
 
   test("Fractal Explorer card is present", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await expect(page.getByText("Fractal Explorer").first()).toBeVisible();
     const card = page.locator('[role="listitem"]').filter({ hasText: "Fractal Explorer" }).first();
     await expect(card).toBeVisible();
@@ -48,7 +48,7 @@ test.describe("Gallery page", () => {
   });
 
   test("clicking Fractal Explorer opens modal with controls", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Fractal Explorer");
     await expect(page.getByRole("button", { name: "Mandelbrot" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Julia" })).toBeVisible();
@@ -59,7 +59,7 @@ test.describe("Gallery page", () => {
   test("modal focus trap: fokus awal tombol tutup dan Tab berputar di dalam dialog", async ({
     page,
   }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Fractal Explorer");
     const dialog = page.getByRole("dialog", { name: "Fractal Explorer" });
     await expect(dialog).toBeVisible();
@@ -82,7 +82,7 @@ test.describe("Gallery page", () => {
   });
 
   test("Julia toggle shows Cx/Cy controls in modal", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Fractal Explorer");
     await page.getByRole("button", { name: "Julia" }).click();
     const modal = page.locator("[data-modal-content]");
@@ -92,7 +92,7 @@ test.describe("Gallery page", () => {
   });
 
   test("morph toggle works in Julia mode", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Fractal Explorer");
     await page.getByRole("button", { name: "Julia" }).click();
     await page.getByRole("button", { name: "Morph" }).click();
@@ -101,7 +101,7 @@ test.describe("Gallery page", () => {
   });
 
   test("palette buttons switch active state", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Fractal Explorer");
     await expect(page.getByRole("button", { name: "Amber" })).toBeVisible();
     await page.getByRole("button", { name: "Fire" }).click();
@@ -109,20 +109,20 @@ test.describe("Gallery page", () => {
   });
 
   test("Pan and Zoom mode toggle exist", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Fractal Explorer");
     await expect(page.getByRole("button", { name: "Pan" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Zoom" })).toBeVisible();
   });
 
   test("Bookmark button is present in modal", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Fractal Explorer");
     await expect(page.getByRole("button", { name: "Bookmark" })).toBeVisible();
   });
 
   test("closes modal with Escape", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Fractal Explorer");
     await expect(page.getByRole("button", { name: "Mandelbrot" })).toBeVisible();
     await page.keyboard.press("Escape");
@@ -133,12 +133,12 @@ test.describe("Gallery page", () => {
   // load + a React.lazy experiment chunk + experiment init, measured at
   // 4.5–5.7s on this 4-core box — right at the old edge, so it flaked by load.
   test("deep link via URL hash opens experiment", async ({ page }) => {
-    await page.goto("/gallery#fractal-explorer");
+    await page.goto("/lab#fractal-explorer");
     await expect(page.getByRole("button", { name: "Mandelbrot" })).toBeVisible({ timeout: 15000 });
   });
 
   test("Iter slider is adjustable", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Fractal Explorer");
     const slider = page.locator('label:has-text("Iter") input[type="range"]');
     await expect(slider).toBeVisible();
@@ -146,7 +146,7 @@ test.describe("Gallery page", () => {
   });
 
   test("Shift slider is adjustable", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Fractal Explorer");
     const slider = page.locator('label:has-text("Shift") input[type="range"]');
     await expect(slider).toBeVisible();
@@ -155,7 +155,7 @@ test.describe("Gallery page", () => {
   });
 
   test("Interactive Canvas card is present", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await expect(page.getByText("Interactive Canvas").first()).toBeVisible();
     const card = page
       .locator('[role="listitem"]')
@@ -167,7 +167,7 @@ test.describe("Gallery page", () => {
   });
 
   test("Interactive Canvas modal shows toolbar with drawing tools", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Interactive Canvas");
     await expect(page.getByTitle("Pen (P)")).toBeVisible();
     await expect(page.getByTitle("Eraser (E)")).toBeVisible();
@@ -176,7 +176,7 @@ test.describe("Gallery page", () => {
   });
 
   test("Interactive Canvas shows export and undo/redo buttons", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Interactive Canvas");
     await expect(page.getByRole("button", { name: "PNG" })).toBeVisible();
     await expect(page.getByRole("button", { name: "SVG" })).toBeVisible();
@@ -186,7 +186,7 @@ test.describe("Gallery page", () => {
   });
 
   test("Interactive Canvas switches tool by clicking toolbar buttons", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Interactive Canvas");
     await page.getByTitle("Eraser (E)").click();
     const eraserBtn = page.getByTitle("Eraser (E)");
@@ -200,19 +200,19 @@ test.describe("Gallery page", () => {
   // 5s sat exactly on the edge (Sprint 1 DoD raised 3 of these; this finishes
   // the class-level fix). 15s is the floor for a cold browser, not a retry.
   test("Interactive Canvas deep link opens via URL hash", async ({ page }) => {
-    await page.goto("/gallery#interactive-canvas");
+    await page.goto("/lab#interactive-canvas");
     await expect(page.getByTitle("Pen (P)")).toBeVisible({ timeout: 15000 });
   });
 
   test("Strange Attractor Zoo card is present", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     const card = page.locator('[role="listitem"]').filter({ hasText: "Strange Attractor Zoo" });
     await expect(card).toBeVisible();
     await expect(card.getByText("Chaos", { exact: true })).toBeVisible();
   });
 
   test("Strange Attractor Zoo modal shows attractor toggles", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Strange Attractor Zoo");
     await expect(page.getByRole("button", { name: "Lorenz" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Rössler" })).toBeVisible();
@@ -221,35 +221,35 @@ test.describe("Gallery page", () => {
   });
 
   test("Strange Attractor switches attractor on click", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Strange Attractor Zoo");
     await page.getByRole("button", { name: "Rössler" }).click();
     await expect(page.getByRole("button", { name: "Rössler" })).toBeVisible();
   });
 
   test("Logistic Map card is present", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await expect(page.getByText("Logistic Map")).toBeVisible();
     const card = page.locator('[role="listitem"]').filter({ hasText: "Logistic Map" });
     await expect(card).toBeVisible();
   });
 
   test("Logistic Map modal shows controls", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Logistic Map");
     await expect(page.getByRole("button", { name: "Cobweb" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Auto Sweep" })).toBeVisible();
   });
 
   test("Logistic Map cobweb toggle works", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Logistic Map");
     await page.getByRole("button", { name: "Cobweb" }).click();
     await expect(page.getByRole("button", { name: "Cobweb" })).toBeVisible();
   });
 
   test("Logistic Map r slider is adjustable", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Logistic Map");
     const slider = page.locator('label:has-text("r") input[type="range"]');
     await expect(slider).toBeVisible();
@@ -258,17 +258,17 @@ test.describe("Gallery page", () => {
   });
 
   test("deep link for strange-attractor opens via URL hash", async ({ page }) => {
-    await page.goto("/gallery#strange-attractor");
+    await page.goto("/lab#strange-attractor");
     await expect(page.getByRole("button", { name: "Lorenz" })).toBeVisible({ timeout: 15000 });
   });
 
   test("deep link for logistic-map opens via URL hash", async ({ page }) => {
-    await page.goto("/gallery#logistic-map");
+    await page.goto("/lab#logistic-map");
     await expect(page.getByRole("button", { name: "Cobweb" })).toBeVisible({ timeout: 15000 });
   });
 
   test("Noise Topography card is present", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await expect(page.getByText("Noise Topography")).toBeVisible();
     const card = page.locator('[role="listitem"]').filter({ hasText: "Noise Topography" });
     await expect(card).toBeVisible();
@@ -277,7 +277,7 @@ test.describe("Gallery page", () => {
   });
 
   test("Noise Topography modal shows terrain controls", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Noise Topography");
     await expect(page.getByRole("button", { name: "Export STL" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Auto" })).toBeVisible();
@@ -287,7 +287,7 @@ test.describe("Gallery page", () => {
   });
 
   test("Noise Topography Auto toggle works", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Noise Topography");
     await expect(page.getByText("✦ Auto")).toBeVisible();
     await page.getByText("✦ Auto").click();
@@ -295,7 +295,7 @@ test.describe("Gallery page", () => {
   });
 
   test("Noise Topography Seed slider is adjustable", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Noise Topography");
     const slider = page.locator('label:has-text("Seed") input[type="range"]');
     await expect(slider).toBeVisible();
@@ -304,12 +304,12 @@ test.describe("Gallery page", () => {
   });
 
   test("Noise Topography deep link opens via URL hash", async ({ page }) => {
-    await page.goto("/gallery#noise-topography");
+    await page.goto("/lab#noise-topography");
     await expect(page.getByRole("button", { name: "Export STL" })).toBeVisible({ timeout: 15000 });
   });
 
   test("Fourier Epicycles card is present", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await expect(page.getByText("Fourier Epicycles")).toBeVisible();
     const card = page.locator('[role="listitem"]').filter({ hasText: "Fourier Epicycles" });
     await expect(card).toBeVisible();
@@ -318,14 +318,14 @@ test.describe("Gallery page", () => {
   });
 
   test("Fourier Epicycles modal shows mode toggle and draw hint", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Fourier Epicycles");
     await expect(page.getByText("Epicycles →")).toBeVisible();
     await expect(page.getByText("Draw a closed shape")).toBeVisible();
   });
 
   test("Fourier Epicycles toggles between draw and epicycles mode", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Fourier Epicycles");
     await expect(page.getByText("Epicycles →")).toBeVisible();
     await page.getByText("Epicycles →").click();
@@ -333,7 +333,7 @@ test.describe("Gallery page", () => {
   });
 
   test("Fourier Epicycles deep link opens via URL hash", async ({ page }) => {
-    await page.goto("/gallery#fourier-epicycles");
+    await page.goto("/lab#fourier-epicycles");
     await expect(page.getByText("Epicycles →")).toBeVisible({ timeout: 15000 });
   });
 
@@ -342,7 +342,7 @@ test.describe("Gallery page", () => {
   // ═══════════════════════════════════════════
 
   test("SVD Image Compression card is present", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await expect(page.getByText("SVD Image Compression")).toBeVisible();
     const card = page.locator('[role="listitem"]').filter({ hasText: "SVD Image Compression" });
     await expect(card).toBeVisible();
@@ -351,14 +351,14 @@ test.describe("Gallery page", () => {
   });
 
   test("SVD Image Compression modal shows rank slider and file upload", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "SVD Image Compression");
     await expect(page.getByText("Upload Image")).toBeVisible();
     await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
   });
 
   test("Tesseract Projection card is present", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await expect(page.getByText("Tesseract Hypercube Projection")).toBeVisible();
     const card = page
       .locator('[role="listitem"]')
@@ -369,7 +369,7 @@ test.describe("Gallery page", () => {
   });
 
   test("Tesseract Projection modal shows rotation plane controls", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Tesseract Hypercube Projection");
     await expect(page.getByText("Auto", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Wireframe" })).toBeVisible();
@@ -377,7 +377,7 @@ test.describe("Gallery page", () => {
   });
 
   test("PCA / t-SNE card is present", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await expect(page.getByText("PCA / t-SNE Visualization")).toBeVisible();
     const card = page.locator('[role="listitem"]').filter({ hasText: "PCA / t-SNE Visualization" });
     await expect(card).toBeVisible();
@@ -386,24 +386,24 @@ test.describe("Gallery page", () => {
   });
 
   test("PCA / t-SNE modal shows projection controls", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "PCA / t-SNE Visualization");
     await expect(page.getByText("Generate New Data")).toBeVisible();
     await expect(page.getByText("Perplexity:")).toBeVisible();
   });
 
   test("deep link for svd-compression opens via URL hash", async ({ page }) => {
-    await page.goto("/gallery#svd-compression");
+    await page.goto("/lab#svd-compression");
     await expect(page.getByText("Upload Image")).toBeVisible({ timeout: 15000 });
   });
 
   test("deep link for tesseract-projection opens via URL hash", async ({ page }) => {
-    await page.goto("/gallery#tesseract-projection");
+    await page.goto("/lab#tesseract-projection");
     await expect(page.getByText("Auto", { exact: true })).toBeVisible({ timeout: 15000 });
   });
 
   test("deep link for pca-tsne-viz opens via URL hash", async ({ page }) => {
-    await page.goto("/gallery#pca-tsne-viz");
+    await page.goto("/lab#pca-tsne-viz");
     await expect(page.getByText("Generate New Data")).toBeVisible({ timeout: 15000 });
   });
 
@@ -412,7 +412,7 @@ test.describe("Gallery page", () => {
   // ═══════════════════════════════════════════
 
   test("Spring Physics Sandbox card is present", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await expect(page.getByText("Spring Physics Sandbox")).toBeVisible();
     const card = page.locator('[role="listitem"]').filter({ hasText: "Spring Physics Sandbox" });
     await expect(card).toBeVisible();
@@ -420,7 +420,7 @@ test.describe("Gallery page", () => {
   });
 
   test("Spring Physics Sandbox modal shows preset buttons", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Spring Physics Sandbox");
     await expect(page.getByRole("button", { name: "Cloth" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Chain" })).toBeVisible();
@@ -429,7 +429,7 @@ test.describe("Gallery page", () => {
   });
 
   test("Spring Physics Sandbox deep link opens via URL hash", async ({ page }) => {
-    await page.goto("/gallery#spring-physics");
+    await page.goto("/lab#spring-physics");
     await expect(page.getByRole("button", { name: "Cloth" })).toBeVisible({ timeout: 15000 });
   });
 
@@ -439,7 +439,7 @@ test.describe("Gallery page", () => {
 
   test.describe("Ulam Spiral", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto("/gallery#ulam-spiral");
+      await page.goto("/lab#ulam-spiral");
       await waitForExperimentReady(page);
     });
 
@@ -463,7 +463,7 @@ test.describe("Gallery page", () => {
 
   test.describe("Hyperbolic Game of Life", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto("/gallery#hyperbolic-gol");
+      await page.goto("/lab#hyperbolic-gol");
       await waitForExperimentReady(page);
     });
 
@@ -493,7 +493,7 @@ test.describe("Gallery page", () => {
 
   test.describe("Conformal Mapping", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto("/gallery#conformal-mapping");
+      await page.goto("/lab#conformal-mapping");
       await waitForExperimentReady(page);
     });
 
@@ -524,7 +524,7 @@ test.describe("Gallery page", () => {
 
   test.describe("Bézier Playground", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto("/gallery#bezier-playground");
+      await page.goto("/lab#bezier-playground");
       await waitForExperimentReady(page);
     });
 
@@ -563,7 +563,7 @@ test.describe("Gallery page", () => {
 
   test.describe("Neural Network Art", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto("/gallery#nn-art");
+      await page.goto("/lab#nn-art");
       await waitForExperimentReady(page);
     });
 
@@ -598,7 +598,7 @@ test.describe("Gallery page", () => {
 
   test.describe("Fractal Flame Sync", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto("/gallery#fractal-flame-sync");
+      await page.goto("/lab#fractal-flame-sync");
       await waitForExperimentReady(page);
     });
 

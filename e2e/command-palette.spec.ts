@@ -38,7 +38,7 @@ test.describe("CommandPalette (detAIministic)", () => {
     const input = page.getByRole("searchbox");
     await input.fill("galaxy");
     await page.keyboard.press("Enter");
-    await expect(page).toHaveURL(/\/gallery#galaxy-formation/);
+    await expect(page).toHaveURL(/\/lab#galaxy-formation/);
   });
 
   test("closes on Escape", async ({ page }) => {

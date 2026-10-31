@@ -104,7 +104,7 @@ describe("CommandPalette", () => {
     const option = getOptions()[0];
     expect(option).toBeTruthy();
     fireEvent.keyDown(window, { key: "Enter" });
-    expect(assignSpy).toHaveBeenCalledWith("/gallery#galaxy-formation");
+    expect(assignSpy).toHaveBeenCalledWith("/lab#galaxy-formation");
   });
 
   it("scrolls to an anchor section for skill items", () => {
@@ -132,7 +132,7 @@ describe("CommandPalette", () => {
     fireEvent.change(input, { target: { value: "galaxy" } });
     const option = getOptions()[0];
     fireEvent.click(option);
-    expect(assignSpy).toHaveBeenCalledWith("/gallery#galaxy-formation");
+    expect(assignSpy).toHaveBeenCalledWith("/lab#galaxy-formation");
   });
 
   it("clears the query with the clear button", () => {

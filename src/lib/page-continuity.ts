@@ -13,7 +13,7 @@
 // Everything here runs once per document (bundled module script) and only on
 // router events: no scroll listener, no rAF, no timer.
 
-/** `/observatory/` and `/observatory` name the same page. */
+/** `/data/` and `/data` name the same page. */
 export function normalizePath(path: string): string {
   const bare = path.split(/[?#]/)[0] || "/";
   return bare.length > 1 ? bare.replace(/\/+$/, "") : bare;

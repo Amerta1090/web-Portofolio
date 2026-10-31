@@ -3,7 +3,7 @@ import { waitForExperimentReady } from "./hydration";
 
 test.describe("Markov Text Generator", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/gallery#markov-generator");
+    await page.goto("/lab#markov-generator");
     await waitForExperimentReady(page);
   });
 
@@ -51,7 +51,7 @@ test.describe("Markov Text Generator", () => {
   });
 
   test("card is present in the gallery grid", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     const card = page.locator('[role="listitem"]').filter({ hasText: "Markov Text Generator" });
     await expect(card.first()).toBeVisible();
   });

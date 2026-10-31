@@ -1,7 +1,10 @@
 ---
 import Container from "../components/atoms/Container.astro";
+import GitHubUniverse from "../components/organisms/GitHubUniverse.astro";
 import ObservatoryOverview from "../islands/ObservatoryOverview";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { getProfile } from "../lib/data";
+import { fetchAllGitHubData } from "../lib/github";
 import { buildObservatoryDataset } from "../lib/observatory/index";
 import { generateInsights } from "../lib/observatory/insights";
 import { categoryCounts, skillPairs } from "../lib/observatory/metrics";
@@ -62,18 +65,25 @@ function barPct(value: number): number {
 function edgeOpacity(count: number): number {
   return Math.min(1, 0.18 + count * 0.18);
 }
+
+// `/data` (MOTION-18) = the old `/observatory` plus the old `/github` page, so
+// every derived statistic about the portfolio lives on one route.
+const profile = getProfile();
+const gitHubData = await fetchAllGitHubData();
 ---
 
 <BaseLayout
-  title="Observatory — Abdul Majid Ridwan Tyastonoatmaja"
+  title="Data — Abdul Majid Ridwan Tyastonoatmaja"
   description="A deterministic, data-driven view of the portfolio — the engineering record read as a dataset. Projects, technology, patterns, and derived insights."
-  canonicalUrl="https://portfolio.abdulmajidr708.workers.dev/observatory"
-  ogSlug="observatory"
+  canonicalUrl="https://portfolio.abdulmajidr708.workers.dev/data"
+  ogSlug="data"
 >
   <div class="pt-24 pb-16">
     <Container size="xl">
-      <!-- Header -->
-      <header class="mb-14" data-reveal>
+      <!-- Header. Not reveal-gated: the legacy `[data-reveal] > *` rule starts
+           at opacity 0 and waits for a view() timeline, which after a
+           ClientRouter swap left this page's h1 invisible (MOTION-18 e2e). -->
+      <header class="mb-14">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/10 border border-brand/20 text-brand text-xs font-medium mb-6">
           <span class="w-2 h-2 rounded-full bg-brand animate-pulse" />
           Analytical layer · deterministic insights
@@ -394,4 +404,8 @@ function edgeOpacity(count: number): number {
       </section>
     </Container>
   </div>
+
+  <section id="github" aria-label="GitHub telemetry" class="scroll-mt-16" data-data-github>
+    <GitHubUniverse gitHubData={gitHubData} profileName={profile.name} fullPage={true} />
+  </section>
 </BaseLayout>

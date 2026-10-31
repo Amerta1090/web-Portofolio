@@ -1178,7 +1178,7 @@ themes, e2e for the host chapter, docs.
 
 ## MOTION-18 — Information architecture & route consolidation
 
-**Status:** `READY` (MOTION-17 `DONE` 2026-10-31; added 2026-10-31, `RESEARCH.md` §8)
+**Status:** `DONE` (2026-10-31)
 **Priority:** P0
 **Objective:** One canonical place for each kind of content.
 **Outcome:** Routes: `/` (story), `/work` (index + case studies, merges `/projects` and `/work`), `/about` (career spine, skills, certifications, resume — merges `/timeline`, `/skills`, `/certifications`), `/lab` (gallery), `/data` (Observatory + GitHub statistics, merges `/observatory`, `/github`), contact as a home chapter + footer. Nav ≤ 5 items.
@@ -1189,11 +1189,11 @@ themes, e2e for the host chapter, docs.
 **Exclusions:** no content rewrite beyond moving; no visual redesign yet.
 
 **Tasks**
-- [ ] M18.1 Route inventory with traffic intent and duplicate pairs (6 today, `RESEARCH.md` §8.2).
-- [ ] M18.2 Redirect map for every retired URL (301 via host config or static redirect pages); verify deep links (`/projects/<slug>` → `/work/<slug>`, `/#career`, `/gallery#<id>` → `/lab#<id>`).
-- [ ] M18.3 Merge the two project detail templates into one (`/work/[slug]`), keeping case-study stages where they exist.
-- [ ] M18.4 Nav ≤ 5 + command palette + footer updated; search index regenerated from the new routes.
-- [ ] M18.5 Update every e2e spec that navigates by URL; add a redirect spec.
+- [x] M18.1 Route inventory with traffic intent and duplicate pairs (6 today, `RESEARCH.md` §8.2).
+- [x] M18.2 Redirect map for every retired URL (301 via host config or static redirect pages); verify deep links (`/projects/<slug>` → `/work/<slug>`, `/#career`, `/gallery#<id>` → `/lab#<id>`).
+- [x] M18.3 Merge the two project detail templates into one (`/work/[slug]`), keeping case-study stages where they exist.
+- [x] M18.4 Nav ≤ 5 + command palette + footer updated; search index regenerated from the new routes.
+- [x] M18.5 Update every e2e spec that navigates by URL; add a redirect spec.
 
 **Acceptance criteria**
 - 0 duplicate routes for the same content; every old URL resolves (redirect spec green).
@@ -1202,11 +1202,42 @@ themes, e2e for the host chapter, docs.
 
 **Definition of Done / verification:** full e2e `--workers=1`, link check over `dist`, build, docs.
 
+**Completion notes (2026-10-31)**
+- **Route table** (`src/lib/routes.ts`, no imports): `/`, `/work`, `/about`,
+  `/lab`, `/data`, contact = `/#contact`. 30 retired URLs: `/projects`,
+  `/gallery`, `/observatory`, `/github`, `/timeline`, `/skills`,
+  `/certifications`, `/contact`, and 22 `/projects/<slug>`. Duplicate pairs
+  closed: `/projects`+`/work` (index), `/projects/<slug>`+`/work/<slug>` (2 case
+  studies described twice), `/timeline`/`/skills`/`/certifications` → `/about`,
+  `/observatory`+`/github` → `/data`, `/contact` → home chapter.
+- **Redirects, two layers.** Host: `public/_redirects` (Cloudflare, 301; a unit
+  test keeps it byte-equal to `redirectsFile()`). Fallback: `src/pages/[...retired].astro`
+  — inline `location.replace` that keeps the reader's `?query` and `#fragment`
+  (a meta refresh drops `/gallery#ulam-spiral`'s experiment), then meta refresh
+  for no-JS, `noindex` + canonical. Sitemap filters every retired path.
+- **M18.3:** one route `src/pages/work/[slug].astro` over all 22 projects; a
+  project that names `case_study` (new `projects.json` field, validated: file
+  exists, claimed once) renders the case-study body + its links; others render
+  the project body. Prev/next walk all 22. **Deviation:** the two bodies stay two
+  templates (`CaseStudyArticle.astro`, `ProjectArticle.astro`) behind one
+  route — visual unification is MOTION-15 (evidence-first detail pages); this
+  sprint's exclusion forbids a redesign.
+- **M18.4:** `NAV_ITEMS` = Work · About · Lab · Data · Contact (5); Header now
+  renders `NAV_ITEMS` instead of its own copy (two lists had to agree by hand);
+  footer = nav + Home/Blog/Resume; palette page index regenerated from both.
+- **Found by the new link check (`bun run check:links`):** 3 project pages
+  linked a `#links` section they never render (no links) and a blog post linked
+  a tag page that does not exist — both fixed. `Projects.astro` had 0 consumers
+  → deleted (Rule 6).
+- **Rubric N2 = 2 for routes.** The home still repeats `/about` and `/data`
+  content as chapters (#career, #skills, #certifications, #github); removing
+  them is MOTION-19's cut list (`STORYBOARD.md`).
+
 ---
 
 ## MOTION-19 — Home edit (≤ 7 chapters, ≤ 10 screens)
 
-**Status:** `PLANNED` (added 2026-10-31, `RESEARCH.md` §8)
+**Status:** `READY` (MOTION-18 `DONE` 2026-10-31; added 2026-10-31, `RESEARCH.md` §8)
 **Priority:** P0
 **Objective:** Turn the 28-screen home into a story a recruiter finishes.
 **Outcome:** Home follows the MOTION-17 storyboard: hero → flagship proof (3) → how I work (condensed capability map) → journey highlights (5–6, link to `/about`) → lab teaser (6 picks, link to `/lab`) → contact. GitHub statistics leave the home for `/data`.
@@ -1379,8 +1410,8 @@ MOTION-00 (DONE)
        ├─ MOTION-07 (DONE)
        └─ MOTION-08 (DONE)
             └─ MOTION-17 (DONE)  audience & narrative brief
-                 └─ MOTION-18 (READY)  information architecture & redirects
-                      └─ MOTION-19  home edit (≤ 7 chapters, ≤ 10 screens)
+                 └─ MOTION-18 (DONE)  information architecture & redirects
+                      └─ MOTION-19 (READY)  home edit (≤ 7 chapters, ≤ 10 screens)
                            └─ MOTION-20  concept & art direction
                                 └─ MOTION-11  project evidence imagery
                                      └─ MOTION-14  colour system (triadic, OKLCH)

@@ -3,7 +3,7 @@ import { waitForExperimentReady } from "./hydration";
 
 test.describe("Sentiment Gauge", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/gallery#sentiment-gauge");
+    await page.goto("/lab#sentiment-gauge");
     await waitForExperimentReady(page);
   });
 
@@ -47,7 +47,7 @@ test.describe("Sentiment Gauge", () => {
   });
 
   test("card is present in the gallery grid", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     const card = page.locator('[role="listitem"]').filter({ hasText: "Sentiment Gauge" });
     await expect(card.first()).toBeVisible();
   });

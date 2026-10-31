@@ -1,0 +1,227 @@
+---
+/**
+ * `/about` (MOTION-18): the career record in one place. Merges the old
+ * `/timeline` (now the career spine — the same experience + certification
+ * records, plus honors and volunteering), `/skills` (capability architecture)
+ * and `/certifications` (searchable full list), and links the printable CV.
+ * Retired URLs land on the anchors below (`src/lib/routes.ts`).
+ */
+import { ArrowRight, ChevronDown } from "lucide-react";
+import { Badge } from "../components/atoms/Badge.tsx";
+import Container from "../components/atoms/Container.astro";
+import Section from "../components/molecules/Section.astro";
+import CapabilityArchitecture from "../components/organisms/CapabilityArchitecture.astro";
+import CareerSpine from "../components/organisms/CareerSpine.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { buildCareerEvents } from "../lib/creative/career-spine";
+import { getCertifications, getProfile, getProjects, getSkills } from "../lib/data";
+import { ABOUT_ANCHORS, ROUTES } from "../lib/routes";
+import { buildCapabilityArchitecture } from "../lib/skills/architecture";
+import type { Certification } from "../types/certifications";
+
+const profile = getProfile();
+const career = buildCareerEvents();
+const architecture = buildCapabilityArchitecture(getSkills(), getProjects());
+const areaCount = architecture.stages.reduce((sum, stage) => sum + stage.areas.length, 0);
+const certifications = getCertifications();
+
+/**
+ * Where to go next. Each claim is a question a visitor reaches this page with and
+ * cannot answer from it — the projects themselves and the page that reads the
+ * same data as a dataset.
+ */
+const nextSteps = [
+  {
+    href: ROUTES.work,
+    title: "See the projects",
+    body: `${architecture.totalProjects} of them, each with its own skill list — the evidence behind every count above.`,
+  },
+  {
+    href: ROUTES.data,
+    title: "Read it as a dataset",
+    body: "The same record under derived metrics: timeline, technology frequency, co-occurring pairs, rules.",
+  },
+  {
+    href: `#${ABOUT_ANCHORS.certifications}`,
+    title: "Check the certifications",
+    body: `${certifications.length} vendor certificates, with issuers and dates, for the areas above.`,
+  },
+];
+
+function formatDate(date: string | null): string {
+  if (!date) return "";
+  const [year, month] = date.split("-");
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return month ? `${months[Number.parseInt(month) - 1]} ${year}` : year;
+}
+
+const grouped = certifications.reduce((acc: Record<string, Certification[]>, cert) => {
+  const issuer = cert.issuer || "Other";
+  if (!acc[issuer]) acc[issuer] = [];
+  acc[issuer].push(cert);
+  return acc;
+}, {});
+---
+
+<BaseLayout
+  title="About — Abdul Majid Ridwan Tyastonoatmaja"
+  description={`Career record, ${architecture.totalSkills} capabilities and ${certifications.length} certifications of ${profile.name}.`}
+  canonicalUrl="https://portfolio.abdulmajidr708.workers.dev/about"
+  ogSlug="about"
+>
+  <div class="pt-24">
+    <Container size="xl">
+      <header class="max-w-3xl">
+        <p class="section-label text-text-secondary">About</p>
+        <h1 class="text-display font-display text-text-primary mt-4">{profile.headline}</h1>
+        <p class="text-lg text-text-secondary mt-5 leading-relaxed">{profile.tagline}</p>
+        <p class="text-base text-text-secondary/80 mt-4 leading-relaxed">{profile.summary}</p>
+        <nav class="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm" aria-label="On this page">
+          <a class="text-brand hover:underline" href={`#${ABOUT_ANCHORS.career}`}>Career</a>
+          <a class="text-brand hover:underline" href={`#${ABOUT_ANCHORS.skills}`}>Skills</a>
+          <a class="text-brand hover:underline" href={`#${ABOUT_ANCHORS.certifications}`}>Certifications</a>
+          <a class="text-brand hover:underline" href={profile.resume_url ?? ROUTES.resume}>Printable CV</a>
+        </nav>
+      </header>
+    </Container>
+  </div>
+
+  <Section id={ABOUT_ANCHORS.career} title="Career Spine" subtitle="Every dated record in one chronological line — work, certifications, honors, volunteering" ariaLabel="Career spine">
+    <CareerSpine events={career.events} dropped={career.dropped} />
+  </Section>
+
+  <Section id={ABOUT_ANCHORS.skills} title="Skills" variant="alt" ariaLabel="Skills">
+    <Container size="xl">
+      <dl class="grid grid-cols-2 gap-x-6 gap-y-8 border-y border-border py-8 sm:grid-cols-4">
+        <div>
+          <dd class="font-display text-h2 text-text-primary tabular-nums">{architecture.totalSkills}</dd>
+          <dt class="section-label text-text-secondary mt-2">Skills</dt>
+        </div>
+        <div>
+          <dd class="font-display text-h2 text-text-primary tabular-nums">{architecture.stages.length}</dd>
+          <dt class="section-label text-text-secondary mt-2">Stages</dt>
+        </div>
+        <div>
+          <dd class="font-display text-h2 text-text-primary tabular-nums">{areaCount}</dd>
+          <dt class="section-label text-text-secondary mt-2">Capability areas</dt>
+        </div>
+        <div>
+          <dd class="font-display text-h2 text-text-primary tabular-nums">
+            {architecture.coveredProjects}<span class="text-text-secondary/50 text-h4">/{architecture.totalProjects}</span>
+          </dd>
+          <dt class="section-label text-text-secondary mt-2">Projects covered</dt>
+        </div>
+      </dl>
+
+      <p class="mt-10 max-w-2xl text-text-secondary leading-relaxed">
+        A list of tools answers "what is installed", not "what does this person do". The
+        {architecture.totalSkills} capabilities below are grouped the way the work actually runs —
+        read top to bottom, each stage takes the previous one's output and makes it usable. Every
+        figure is counted from the same files that fill the rest of this site; the only judgement
+        call is the grouping itself.
+      </p>
+
+      <div class="mt-16">
+        <CapabilityArchitecture architecture={architecture} />
+      </div>
+
+      <nav class="mt-20 border-t border-border pt-10" aria-labelledby="skills-next">
+        <h3 class="section-label text-text-secondary" id="skills-next">Where the evidence is</h3>
+        <ul class="mt-6 grid gap-x-10 gap-y-8 md:grid-cols-3">
+          {
+            nextSteps.map((step) => (
+              <li>
+                <a class="group block" href={step.href}>
+                  <span class="flex items-center gap-1.5 text-text-primary group-hover:text-brand transition-colors duration-200">
+                    <span class="font-display text-h4">{step.title}</span>
+                    <ArrowRight
+                      size={15}
+                      aria-hidden="true"
+                      className="shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
+                    />
+                  </span>
+                  <span class="mt-2 block text-sm text-text-secondary leading-relaxed">{step.body}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </Container>
+  </Section>
+
+  <Section id={ABOUT_ANCHORS.certifications} title="Certifications" subtitle={`${certifications.length} professional certifications`} ariaLabel="Certifications">
+    <div class="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+      <div class="mb-6">
+        <input
+          type="text"
+          id="cert-search"
+          placeholder="Search certifications..."
+          aria-label="Search certifications"
+          class="w-full max-w-md px-4 py-2.5 bg-bg-secondary border border-border rounded-lg text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200"
+          oninput="filterCertifications(this.value)"
+        />
+      </div>
+      <div id="cert-list" class="space-y-4">
+        {Object.entries(grouped).map(([issuer, certs]) => (
+          <details class="group bg-bg-secondary border border-border rounded-xl overflow-hidden" data-issuer={issuer}>
+            <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-bg-tertiary transition-colors duration-200 list-none">
+              <div class="flex items-center gap-3">
+                <h3 class="font-medium text-text-primary">{issuer}</h3>
+                <Badge>{certs.length}</Badge>
+              </div>
+              <ChevronDown className="w-5 h-5 text-text-secondary group-open:rotate-180 transition-transform duration-200" aria-hidden="true" />
+            </summary>
+            <div class="border-t border-border">
+              {certs.map((cert) => (
+                <div class="p-4 border-b border-border last:border-b-0 hover:bg-bg-tertiary/50 transition-colors" data-search={`${cert.title} ${cert.issuer} ${cert.skills.join(" ")}`}>
+                  <div class="flex items-start justify-between gap-4">
+                    <div>
+                      <p class="text-text-primary text-sm font-medium">
+                        {cert.url
+                          ? <a href={cert.url} target="_blank" rel="noopener noreferrer" class="hover:text-accent transition-colors">{cert.title}</a>
+                          : cert.title
+                        }
+                      </p>
+                      {cert.date && (
+                        <p class="text-xs text-text-secondary mt-0.5">{formatDate(cert.date)}</p>
+                      )}
+                    </div>
+                    {cert.credential_id && (
+                      <span class="text-xs text-text-secondary flex-shrink-0">ID: {cert.credential_id}</span>
+                    )}
+                  </div>
+                  {cert.skills && cert.skills.length > 0 && (
+                    <div class="flex flex-wrap gap-1.5 mt-2">
+                      {cert.skills.map((skill) => (
+                        <span class="inline-flex items-center px-2 py-0.5 text-xs bg-bg-tertiary text-text-secondary rounded-full">{skill}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </Section>
+</BaseLayout>
+
+<script is:inline>
+  function filterCertifications(query) {
+    const term = query.toLowerCase().trim();
+    const items = document.querySelectorAll("#cert-list details");
+    for (const item of items) {
+      const certItems = item.querySelectorAll("[data-search]");
+      let groupHasMatch = false;
+      for (const cert of certItems) {
+        const text = (cert.getAttribute("data-search") || "").toLowerCase();
+        const match = !term || text.includes(term);
+        cert.style.display = match ? "" : "none";
+        if (match) groupHasMatch = true;
+      }
+      item.style.display = groupHasMatch ? "" : "none";
+    }
+  }
+</script>

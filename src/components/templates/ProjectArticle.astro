@@ -1,32 +1,28 @@
 ---
+/**
+ * Project page body for a project without a case study (MOTION-18: one route,
+ * `/work/[slug]`, for every project). Rendered by `src/pages/work/[slug].astro`.
+ */
 import { Tag } from "../../components/atoms/Tag.tsx";
 import TechExplorer from "../../islands/TechExplorer";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getProjects } from "../../lib/data";
 import { fetchReadme } from "../../lib/github";
+import { ROUTES } from "../../lib/routes";
+import type { Project } from "../../types/projects";
 
-export async function getStaticPaths() {
-  const projects = getProjects();
-  return projects.map((project) => ({
-    params: { slug: project.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") },
-    props: { project },
-  }));
+interface Neighbour {
+  title: string;
+  href: string;
 }
 
-const { project } = Astro.props;
-
-if (!project) {
-  return Astro.redirect("/404");
+interface Props {
+  project: Project;
+  slug: string;
+  prev: Neighbour | null;
+  next: Neighbour | null;
 }
 
-const allProjects = getProjects();
-const currentIndex = allProjects.findIndex((p) => p.title === project.title);
-const prevProject = currentIndex > 0 ? allProjects[currentIndex - 1] : null;
-const nextProject = currentIndex < allProjects.length - 1 ? allProjects[currentIndex + 1] : null;
-
-function slugify(title: string): string {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-}
+const { project, slug, prev: prevProject, next: nextProject } = Astro.props;
 
 const githubLink = project.links?.find((l) => l.label.includes("GitHub"));
 let readme: { content: string; fetched_at: string } | null = null;
@@ -50,11 +46,11 @@ function extractReadmeSection(content: string, heading: string): string | null {
 }
 ---
 
-<BaseLayout title={`${project.title} — Abdul Majid Ridwan Tyastonoatmaja`} description={project.description.slice(0, 160)} canonicalUrl={`https://portfolio.abdulmajidr708.workers.dev/projects/${slugify(project.title)}`} ogSlug={`projects/${slugify(project.title)}`}>
+<BaseLayout title={`${project.title} — Abdul Majid Ridwan Tyastonoatmaja`} description={project.description.slice(0, 160)} canonicalUrl={`https://portfolio.abdulmajidr708.workers.dev/work/${slug}`} ogSlug={`work/${slug}`}>
   <div class="py-12 md:py-24">
     <div class="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
       <div class="mb-8">
-        <a href="/projects" class="text-sm text-text-secondary hover:text-accent transition-colors">&larr; Back to Projects</a>
+        <a href={ROUTES.work} class="text-sm text-text-secondary hover:text-accent transition-colors">&larr; Back to Work</a>
       </div>
 
       <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
@@ -63,7 +59,10 @@ function extractReadmeSection(content: string, heading: string): string | null {
             <a href="#overview" class="block px-3 py-2 text-sm text-text-secondary hover:text-accent hover:bg-bg-tertiary rounded-lg transition-all">Overview</a>
             <a href="#highlights" class="block px-3 py-2 text-sm text-text-secondary hover:text-accent hover:bg-bg-tertiary rounded-lg transition-all">Highlights</a>
             <a href="#technologies" class="block px-3 py-2 text-sm text-text-secondary hover:text-accent hover:bg-bg-tertiary rounded-lg transition-all">Technologies</a>
-            <a href="#links" class="block px-3 py-2 text-sm text-text-secondary hover:text-accent hover:bg-bg-tertiary rounded-lg transition-all">Links</a>
+            {/* Only when the Links section renders — a jump to a missing id is a dead control (found by check:links). */}
+            {project.links && project.links.length > 0 && (
+              <a href="#links" class="block px-3 py-2 text-sm text-text-secondary hover:text-accent hover:bg-bg-tertiary rounded-lg transition-all">Links</a>
+            )}
           </div>
         </nav>
 
@@ -162,12 +161,12 @@ function extractReadmeSection(content: string, heading: string): string | null {
             <div class="mt-16 pt-8 border-t border-border flex flex-wrap justify-between gap-4">
               <div>
                 {prevProject && (
-                  <a href={`/projects/${slugify(prevProject.title)}`} class="text-sm text-text-secondary hover:text-accent transition-colors">&larr; {prevProject.title}</a>
+                  <a href={prevProject.href} class="text-sm text-text-secondary hover:text-accent transition-colors">&larr; {prevProject.title}</a>
                 )}
               </div>
               <div>
                 {nextProject && (
-                  <a href={`/projects/${slugify(nextProject.title)}`} class="text-sm text-text-secondary hover:text-accent transition-colors">{nextProject.title} &rarr;</a>
+                  <a href={nextProject.href} class="text-sm text-text-secondary hover:text-accent transition-colors">{nextProject.title} &rarr;</a>
                 )}
               </div>
             </div>

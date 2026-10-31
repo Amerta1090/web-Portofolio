@@ -7,6 +7,12 @@ export interface ProjectImageVariant {
 
 export interface Project {
   title: string;
+  /**
+   * Id of the `caseStudies` entry that documents this project. When set, the
+   * project's canonical page is `/work/<case_study>` (MOTION-18), so the case
+   * study and the project are one page, not two.
+   */
+  case_study?: string;
   period: string;
   description: string;
   links: ProjectLink[];

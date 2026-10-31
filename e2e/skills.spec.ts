@@ -15,39 +15,35 @@ interface ProjectsFile {
 }
 
 /**
- * `/skills` was the second orphaned page: the nav only pointed at the /#skills
- * anchor on home, never at this standalone page. These guard the entry points
- * and the label-collision trap documented in src/lib/constants.ts.
+ * MOTION-18: the standalone `/skills` page became the `#skills` section of
+ * `/about` (one canonical place for the career record). `/skills` redirects
+ * there. These guard the entry points.
  */
-test.describe("Skills page discoverability", () => {
-  test("home footer links to /skills", async ({ page }) => {
+const ABOUT = "/about";
+
+test.describe("Skills discoverability (/about#skills)", () => {
+  test("the primary nav links to /about", async ({ page }) => {
     await page.goto("/");
-    const link = page.locator('footer a[href="/skills"]');
-    await expect(link).toHaveCount(1);
-    await expect(link).toBeVisible();
+    await expect(page.locator('header nav a[href="/about"]').first()).toHaveCount(1);
   });
 
-  test("following the footer link lands on the skills page", async ({ page }) => {
+  test("following the nav link lands on /about with its own h1", async ({ page }) => {
     await page.goto("/");
-    await page.locator('footer a[href="/skills"]').click();
-    // Cold-load arrival budget is 15s, not 5s: a cross-page footer navigation
-    // pays full page load on this box, and under single-worker load the
-    // default 5s budget is marginal (isolated pass measured ~9s; full-suite
-    // runs at 2.5× the normal wall-clock time exceed 5s). Mirror the deep-link
-    // budgets raised to 15s in gallery.spec.ts (T1.6 DoD finding).
-    await expect(page).toHaveURL(/\/skills$/, { timeout: 15000 });
-    // The header is the h1 now: the page's own title, not a generic "Skills",
-    // and the stage names below it are deliberately not headings.
+    await page.locator('header nav a[href="/about"]').first().click();
+    // Cold-load arrival budget is 15s, not 5s (T1.6 DoD finding).
+    await expect(page).toHaveURL(/\/about$/, { timeout: 15000 });
     const h1 = page.getByRole("heading", { level: 1 });
     await expect(h1).toHaveCount(1);
     await expect(h1).toHaveText("AI/ML Engineer & Systems Builder");
+    await expect(page.locator("section#skills .cap-stage").first()).toBeVisible();
   });
 
-  // The command palette keys pages by `page-${slugify(label)}` and skips
-  // duplicates, and NAV_ITEMS already owns the label "Skills" (→ /#skills).
-  // A footer label of "Skills" would be silently dropped from the index, so
-  // this asserts the label actually survives into the palette.
-  test("findable via the command palette under a non-colliding label", async ({ page }) => {
+  test("the retired /skills URL lands on the skills section", async ({ page }) => {
+    await page.goto("/skills");
+    await expect(page).toHaveURL(/\/about#skills$/, { timeout: 15000 });
+  });
+
+  test("findable via the command palette", async ({ page }) => {
     await page.goto("/");
     await page.waitForFunction(
       () =>
@@ -55,14 +51,12 @@ test.describe("Skills page discoverability", () => {
         true,
     );
     await page.keyboard.press("Control+k");
-    await page.getByRole("searchbox").fill("all skills");
-    await expect(page.getByRole("button", { name: /All Skills/ })).toBeVisible();
-  });
-
-  test("the nav keeps its home anchor, unchanged", async ({ page }) => {
-    await page.goto("/");
-    const navLink = page.locator('header nav a[href="/#skills"]');
-    await expect(navLink).toHaveCount(1);
+    await page.getByRole("searchbox").fill("about");
+    await expect(
+      page
+        .getByRole("dialog", { name: "Command palette" })
+        .getByRole("button", { name: "Halaman About Page", exact: true }),
+    ).toBeVisible();
   });
 });
 
@@ -72,9 +66,9 @@ test.describe("Skills page discoverability", () => {
  * the properties that made the replacement worth doing, each to a number taken
  * from the data rather than a constant, so the page cannot rot silently.
  */
-test.describe("Skills page capability architecture", () => {
+test.describe("Skills section capability architecture (/about#skills)", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/skills", { waitUntil: "networkidle" });
+    await page.goto(ABOUT, { waitUntil: "networkidle" });
   });
 
   test("the four stages read in the arc's order", async ({ page }) => {
@@ -159,13 +153,12 @@ test.describe("Skills page capability architecture", () => {
     }
   });
 
-  test("the page ships no island for its own content", async ({ page }) => {
-    // The whole point of the redesign: this page is fully static. The three
-    // islands that remain are the site-wide chrome (header tools, global
-    // chrome, ambient scene), none of which are page content.
+  test("the skills section ships no island for its own content", async ({ page }) => {
+    // The whole point of the redesign: the architecture is fully static. On
+    // /about the career spine keeps its own scrub island; this section has none.
     const pageIslands = await page.evaluate(() => {
-      const root = document.querySelector("main") ?? document.body;
-      return root.querySelectorAll("astro-island").length;
+      const root = document.querySelector("section#skills");
+      return root ? root.querySelectorAll("astro-island").length : -1;
     });
     expect(pageIslands).toBe(0);
   });

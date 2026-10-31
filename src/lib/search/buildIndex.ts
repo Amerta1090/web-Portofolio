@@ -5,6 +5,7 @@ import { getProfile } from "../data";
 import { getProjects } from "../data";
 import { getSkills } from "../data";
 import { LAB_EXPERIMENTS } from "../lab-registry";
+import { ABOUT_ANCHORS, ROUTES, labHref, workHref } from "../routes";
 
 export type SearchItemType =
   | "person"
@@ -98,7 +99,7 @@ export function buildSearchIndex(): SearchItem[] {
       title: project.title,
       description: project.description,
       keywords: unique(withoutEmpty([project.category, ...(project.skills ?? [])])),
-      target: `/projects/${slugify(project.title)}`,
+      target: workHref(project),
     });
   }
 
@@ -120,7 +121,7 @@ export function buildSearchIndex(): SearchItem[] {
       title: cert.title,
       description: `Certification · ${cert.issuer}`,
       keywords: withoutEmpty([cert.issuer, ...(cert.skills ?? [])]),
-      target: "/certifications",
+      target: `${ROUTES.about}#${ABOUT_ANCHORS.certifications}`,
     });
   }
 
@@ -146,7 +147,7 @@ export function buildSearchIndex(): SearchItem[] {
       title: lab.title,
       description: `Lab · ${lab.category}`,
       keywords: unique([...lab.tags, lab.category]),
-      target: `/gallery#${lab.id}`,
+      target: labHref(lab.id),
     });
   }
 

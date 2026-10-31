@@ -1,0 +1,55 @@
+---
+/**
+ * Static fallback for every retired URL (MOTION-18).
+ *
+ * The host answers these with a real 301 from `public/_redirects`; this page is
+ * what `astro preview`, a host without redirect support, or a stale cache
+ * serves instead. It must still land the reader on the right content:
+ * - the inline script runs first and keeps the reader's own `?query` and
+ *   `#fragment` (a meta refresh drops both — `/gallery#ulam-spiral` would
+ *   lose the experiment it asked for);
+ * - the meta refresh covers readers without JavaScript;
+ * - the visible link covers everyone else.
+ * `noindex` + canonical keep search engines on the new URL.
+ */
+import { getProjects } from "../lib/data";
+import { type RetiredRoute, retiredRoutes } from "../lib/routes";
+
+export function getStaticPaths() {
+  return retiredRoutes(getProjects()).map((route) => ({
+    params: { retired: route.from.slice(1) },
+    props: { route },
+  }));
+}
+
+interface Props {
+  route: RetiredRoute;
+}
+
+const { route } = Astro.props;
+const site = "https://portfolio.abdulmajidr708.workers.dev";
+const canonical = new URL(route.to, site).toString();
+const target = JSON.stringify(route.to);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Moved to {route.to}</title>
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={canonical} />
+    <script is:inline define:vars={{ target }}>
+      {
+        const to = JSON.parse(target);
+        const [path, fragment = ""] = to.split("#");
+        const hash = location.hash || (fragment ? `#${fragment}` : "");
+        location.replace(path + location.search + hash);
+      }
+    </script>
+    <meta http-equiv="refresh" content={`0; url=${route.to}`} />
+  </head>
+  <body data-retired-route={route.from}>
+    <p>This page moved to <a href={route.to}>{route.to}</a>.</p>
+  </body>
+</html>

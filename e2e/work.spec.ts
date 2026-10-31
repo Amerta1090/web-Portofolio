@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
@@ -11,26 +12,32 @@ test.describe("Work discoverability", () => {
     await expect(link).toBeVisible();
   });
 
-  test("/projects links to /work with a data-derived count", async ({ page }) => {
-    await page.goto("/projects");
-    const link = page.locator('a[href="/work"]').first();
-    await expect(link).toBeVisible();
-    // Count comes from getCollection("caseStudies") — never hard-coded.
-    const cards = await page.evaluate(async () => {
-      const res = await fetch("/work");
-      return (await res.text()).match(/href="\/work\/[a-z-]+"/g)?.length ?? 0;
-    });
-    await expect(link).toContainText(String(cards));
+  // MOTION-18: `/work` is the merged index (all projects + case studies);
+  // the old `/projects` index redirects here.
+  test("/work lists every project and the case studies, counts from data", async ({ page }) => {
+    // Read the data file directly (Bun ESM rejects a JSON import without an
+    // attribute — see contact.spec.ts); counts are never typed into the spec.
+    const { projects } = JSON.parse(readFileSync("data/projects.json", "utf8")) as {
+      projects: { case_study?: string }[];
+    };
+    const withStudy = projects.filter((p) => p.case_study).length;
+    await page.goto("/work");
+    await expect(page.locator("main header p").first()).toContainText(
+      `${projects.length} projects`,
+    );
+    await expect(page.locator("[data-work-all-projects] a[href^='/work/']")).toHaveCount(
+      projects.length,
+    );
+    await expect(page.locator("[data-work-case-studies] a[href^='/work/']")).toHaveCount(withStudy);
   });
 
-  test("following the /projects link lands on the listing", async ({ page }) => {
+  test("the retired /projects index lands on /work", async ({ page }) => {
     await page.goto("/projects");
-    await page.locator('a[href="/work"]').first().click();
-    await expect(page).toHaveURL(/\/work$/);
+    await expect(page).toHaveURL(/\/work\/?$/);
     await expect(page.locator("h1")).toContainText("Work");
   });
 
-  test("findable via the command palette (indexed from FOOTER_LINKS)", async ({ page }) => {
+  test("findable via the command palette (indexed from NAV_ITEMS)", async ({ page }) => {
     await page.goto("/");
     await page.waitForFunction(
       () =>
@@ -39,10 +46,14 @@ test.describe("Work discoverability", () => {
     );
     await page.keyboard.press("Control+k");
     const input = page.getByRole("searchbox");
-    await input.fill("case");
-    // Scope to the result button: the footer link carries the same text, so a
-    // bare getByText() is a strict-mode violation (2 matches).
-    await expect(page.getByRole("button", { name: /Case Studies/ })).toBeVisible();
+    await input.fill("work");
+    // Scope to the result button: the nav and footer links carry the same text,
+    // so a bare getByText() is a strict-mode violation.
+    await expect(
+      page
+        .getByRole("dialog", { name: "Command palette" })
+        .getByRole("button", { name: "Halaman Work Page", exact: true }),
+    ).toBeVisible();
   });
 });
 
@@ -50,21 +61,21 @@ test.describe("Work listing page", () => {
   test("loads and displays case study cards", async ({ page }) => {
     await page.goto("/work");
     await expect(page.locator("h1")).toContainText("Work");
-    const cards = page.locator('a[href^="/work/"]');
+    const cards = page.locator('[data-work-case-studies] a[href^="/work/"]');
     await expect(cards).toHaveCount(2);
   });
 
   test("each card shows title, summary, role, and metrics", async ({ page }) => {
     await page.goto("/work");
-    const firstCard = page.locator('a[href^="/work/"]').first();
+    const firstCard = page.locator('[data-work-case-studies] a[href^="/work/"]').first();
     await expect(firstCard).toBeVisible();
-    await expect(firstCard.locator("h2")).not.toBeEmpty();
+    await expect(firstCard.locator("h3")).not.toBeEmpty();
     await expect(firstCard.locator("p").first()).not.toBeEmpty();
   });
 
   test("clicking a card navigates to detail page", async ({ page }) => {
     await page.goto("/work");
-    const firstCard = page.locator('a[href^="/work/"]').first();
+    const firstCard = page.locator('[data-work-case-studies] a[href^="/work/"]').first();
     const href = await firstCard.getAttribute("href");
     await firstCard.click();
     await expect(page).toHaveURL(new RegExp(`^.*${href}$`));

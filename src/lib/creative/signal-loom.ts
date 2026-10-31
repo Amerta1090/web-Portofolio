@@ -1,5 +1,6 @@
 import type { Project, ProjectLink } from "../../types/projects";
 import type { SkillCategory, SkillsData } from "../../types/skills";
+import { workHref } from "../routes";
 
 export type SignalLoomNodeKind = "capability" | "project";
 
@@ -105,7 +106,7 @@ function projectId(project: Project): string {
  * (Task 2.4 payload trim), exactly like `buildSkillHrefs` does for skills.
  */
 export function projectHref(project: Project): string {
-  return `/projects/${slugify(project.title)}`;
+  return workHref(project);
 }
 
 function projectSummary(project: Project): string {

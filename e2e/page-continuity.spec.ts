@@ -40,25 +40,27 @@ test.describe("Cross-page continuity (MOTION-08)", () => {
 
   test("the persisted header moves aria-current to the page it navigated to", async ({ page }) => {
     await page.goto("/", { waitUntil: "load" });
-    await expect(page.locator(`${primaryNav} a[aria-current="page"]`)).toHaveAttribute("href", "/");
+    // MOTION-18: Home is the logo, not a nav item, so nothing in the nav is
+    // current on "/" — the five items are all other pages.
+    await expect(page.locator(`${primaryNav} a[aria-current="page"]`)).toHaveCount(0);
 
-    await page.click(`${primaryNav} a[href="/observatory"]`);
-    await page.waitForURL("**/observatory**");
+    await page.click(`${primaryNav} a[href="/data"]`);
+    await page.waitForURL("**/data**");
 
     // Client navigation keeps the header node (transition:persist) …
     const current = page.locator(`${primaryNav} a[aria-current="page"]`);
     await expect(current).toHaveCount(1);
-    await expect(current).toHaveAttribute("href", "/observatory");
+    await expect(current).toHaveAttribute("href", "/data");
     // … and the server render agrees, trailing slash or not.
-    const html = await (await page.request.get("/observatory/")).text();
-    expect(html).toMatch(/href="\/observatory"[^>]*aria-current="page"/);
+    const html = await (await page.request.get("/data/")).text();
+    expect(html).toMatch(/href="\/data"[^>]*aria-current="page"/);
   });
 
   test("back restores the reading position instantly and refocuses the activated link", async ({
     page,
   }) => {
     await page.goto("/", { waitUntil: "load" });
-    const link = page.locator('#projects a[href^="/projects/"]').first();
+    const link = page.locator('#projects a[href^="/work/"]').first();
     await link.scrollIntoViewIfNeeded();
     await expect.poll(() => link.evaluate((a) => a.getBoundingClientRect().top)).toBeGreaterThan(0);
     const before = await page.evaluate(() => Math.round(scrollY));
@@ -89,10 +91,13 @@ test.describe("Cross-page continuity (MOTION-08)", () => {
     expect(await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches)).toBe(
       false,
     );
-    await page.click(`${primaryNav} a[href="/observatory"]`);
-    await page.waitForURL("**/observatory**");
+    await page.click(`${primaryNav} a[href="/data"]`);
+    await page.waitForURL("**/data**");
+    // Leaving the home page takes 4.3–6.2 s to swap on this 4-core box (A/B,
+    // identical at HEAD with /observatory, MOTION-18), so the 5 s default
+    // budget can end before the turn starts.
     await expect
-      .poll(async () => (await vt(page)).map((s) => s.name).sort())
+      .poll(async () => (await vt(page)).map((s) => s.name).sort(), { timeout: 15_000 })
       .toEqual(expect.arrayContaining(["page-turn-in", "page-turn-out"]));
     const samples = await vt(page);
     // The root snapshot (header, footer, background) swaps without animating.
@@ -119,8 +124,8 @@ test.describe("Cross-page continuity (MOTION-08)", () => {
     expect(await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches)).toBe(
       true,
     );
-    await page.click(`${primaryNav} a[href="/observatory"]`);
-    await page.waitForURL("**/observatory**");
+    await page.click(`${primaryNav} a[href="/data"]`);
+    await page.waitForURL("**/data**");
     await expect(page.locator("main h1")).toBeVisible();
     await page.waitForTimeout(400);
     expect(await vt(page)).toEqual([]);
@@ -130,8 +135,11 @@ test.describe("Cross-page continuity (MOTION-08)", () => {
     page,
   }) => {
     await page.goto("/", { waitUntil: "load" });
-    await page.click(`${primaryNav} a[href="/observatory"]`);
-    await page.waitForURL("**/observatory**");
+    await page.click(`${primaryNav} a[href="/data"]`);
+    await page.waitForURL("**/data**");
+    // The URL changes before ClientRouter swaps the DOM in, so wait for the new
+    // document itself — otherwise `main h1` can still be the home page's.
+    await expect(page).toHaveTitle(/^Data/, { timeout: 15_000 });
     const h1 = page.locator("main h1").first();
     await expect(h1).toBeVisible();
     await expect
@@ -149,8 +157,8 @@ test.describe("Cross-page continuity (MOTION-08)", () => {
     });
     page.on("pageerror", (e) => errors.push(String(e)));
     await page.goto("/", { waitUntil: "load" });
-    await page.click(`${primaryNav} a[href="/observatory"]`);
-    await page.waitForURL("**/observatory**");
+    await page.click(`${primaryNav} a[href="/data"]`);
+    await page.waitForURL("**/data**");
     await page.waitForTimeout(500);
     expect(lenis).toEqual([]);
     expect(errors.filter((e) => /Lenis/.test(e))).toEqual([]);

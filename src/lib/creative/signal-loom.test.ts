@@ -271,7 +271,7 @@ describe("Task 2.4 — skill → Capability Map bridge", () => {
   it("derives the project detail href from the title with a stable slug", () => {
     // M2.4.2: the id is derived from the content, not a list index, so the same
     // title always yields the same route and the value is reproducible.
-    expect(projectHref(sample)).toBe("/projects/forecasting-system");
+    expect(projectHref(sample)).toBe("/work/forecasting-system");
     expect(projectHref(sample)).toBe(projectHref({ ...sample }));
   });
 
@@ -649,7 +649,7 @@ describe("MOTION-05 — real portfolio narrative", () => {
     const nodeIds = new Set(graph.nodes.map((node) => node.id));
     for (const step of narrative?.steps ?? []) {
       expect(nodeIds.has(step.id)).toBe(true);
-      expect(step.href.startsWith("/projects/")).toBe(true);
+      expect(step.href.startsWith("/work/")).toBe(true);
     }
   });
 

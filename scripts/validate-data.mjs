@@ -130,6 +130,32 @@ for (const [file, schema] of Object.entries(schemas)) {
     }
   }
 
+  // MOTION-18: a project that names a case study is published at
+  // `/work/<case_study>`, so the entry must exist and be claimed only once —
+  // otherwise two projects would compete for one URL, or the link would 404.
+  if (schema.requiredPeriod) {
+    const items = data.projects || [];
+    const claimed = new Map();
+    for (let i = 0; i < items.length; i++) {
+      const id = items[i].case_study;
+      if (id === undefined) continue;
+      if (typeof id !== "string" || !/^[a-z0-9-]+$/.test(id)) {
+        console.error(`ERROR: projects.json[${i}] case_study must be a lowercase slug`);
+        errors++;
+        continue;
+      }
+      if (!existsSync(resolve(dataDir, "..", "src/content/case-studies", `${id}.mdx`))) {
+        console.error(`ERROR: projects.json[${i}] case_study "${id}" has no src/content/case-studies/${id}.mdx`);
+        errors++;
+      }
+      if (claimed.has(id)) {
+        console.error(`ERROR: projects.json[${i}] case_study "${id}" is already claimed by projects.json[${claimed.get(id)}]`);
+        errors++;
+      }
+      claimed.set(id, i);
+    }
+  }
+
   if (schema.grammarSymbols) {
     for (const symbol of schema.grammarSymbols) {
       const value = data[symbol];

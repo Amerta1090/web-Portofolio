@@ -3,7 +3,7 @@ import { openExperiment } from "./hydration";
 
 test.describe("RecommendedRow (content-based recommender)", () => {
   test("stays hidden on a fresh session with no interactions", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await expect(page.getByRole("heading", { name: "Creative Lab" })).toBeVisible();
     await expect(
       page.locator("section[aria-label='Rekomendasi berdasarkan aktivitas']"),
@@ -11,7 +11,7 @@ test.describe("RecommendedRow (content-based recommender)", () => {
   });
 
   test("appears after launching an experiment, recommending similar work", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Liquid Distortion");
     await page.keyboard.press("Escape");
     await expect(page.locator("[data-modal-content]")).toHaveCount(0);
@@ -26,7 +26,7 @@ test.describe("RecommendedRow (content-based recommender)", () => {
   });
 
   test("never recommends the item currently being explored", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Fractal Explorer");
     await page.keyboard.press("Escape");
     await expect(page.locator("[data-modal-content]")).toHaveCount(0);
@@ -40,7 +40,7 @@ test.describe("RecommendedRow (content-based recommender)", () => {
     page,
     context,
   }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await openExperiment(page, "Liquid Distortion");
     await page.keyboard.press("Escape");
     await expect(page.locator("[data-modal-content]")).toHaveCount(0);

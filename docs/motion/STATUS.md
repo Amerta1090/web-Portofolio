@@ -1,8 +1,8 @@
 # Motion Programme — Status
 
-**Last updated:** 2026-10-31 (MOTION-17 `DONE`, owner approved)
+**Last updated:** 2026-10-31 (MOTION-18 `DONE`)
 **Branch:** `main` · **HEAD at session start:** `016608f`
-**Active sprint:** none — MOTION-17 `DONE` (brief approved 2026-10-31); **MOTION-18 (information architecture & route consolidation) READY**
+**Active sprint:** none — MOTION-18 `DONE` (routes consolidated 2026-10-31); **MOTION-19 (home edit) READY**
 
 ## One-paragraph state
 
@@ -59,6 +59,9 @@ MOTION-11 (project evidence imagery), MOTION-12 (taste pass) and MOTION-13
 
 | Fact | Evidence | Label |
 | --- | --- | --- |
+| MOTION-18 routes: canonical `/`, `/work` (22 projects + 2 case studies), `/about`, `/lab`, `/data`, contact `/#contact`; nav = 5; 30 retired URLs redirect (host `public/_redirects` 301 + static fallback keeping `?query`/`#fragment`); sitemap 41 canonical, 0 retired | `e2e/redirects.spec.ts` (37), `src/lib/routes.test.ts` (9), `bun run check:links` 0 broken / 1,547 links | VERIFIED (2026-10-31) |
+| Build = 72 pages (42 canonical incl. 404 + 30 fallbacks); `astro check` 89 errors (98 → 89, sorted diff = moves only, 0 new) | `bun run build:fast`, `bunx astro check` diff vs HEAD worktree | VERIFIED (2026-10-31) |
+| Leaving `/` by client navigation takes 4.3–6.2 s to swap in the next page on this box — identical at HEAD (`/observatory` 5.5 s) | headless probe, HEAD worktree on :4323 vs current :4321 | VERIFIED (2026-10-31), pre-existing |
 | Reference developer portfolios measure 1.0–6.8 screens @1440 (7 sites), product landings 6.6–17.2 (3 sites); this home ≈ 28 | `RESEARCH.md` §9.1, headless Chromium 1228 | VERIFIED (2026-10-31) |
 | MOTION-01 shipped: 9 chapters (`data-chapter`), 8 heads, head/body ranges `entry→entry 45%` vs `entry 12%→entry 78%` | `e2e/motion-chapters.spec.ts` computed + markup assertions | VERIFIED |
 | Reduced motion is a real off switch: `animation-name: none`, `opacity: 1`, `transform: none` pre-scroll (positive + negative controls) | `e2e/motion-chapters.spec.ts` via `emulateMedia` + readback | VERIFIED |
@@ -159,6 +162,18 @@ perception thresholds with ≥ 5 recruiters and ≥ 5 developers.
 
 ## Open blockers / risks
 
+- **Legacy `[data-reveal] > *` can hide above-the-fold content (VERIFIED,
+  2026-10-31):** base `opacity: 0` + `view()` timeline; after a ClientRouter
+  swap the timeline is not yet active, so `/data`'s h1 read opacity 0 (2 of 3
+  runs). Fixed for `/data`'s header (gate removed); the rule itself still gates
+  blog/stagger wrappers → owner MOTION-13 (or MOTION-09).
+- **History-state writers that drop Astro's state (VERIFIED by `rg`, 2026-10-31):**
+  `CareerSpine` jump, `CaseStudyReactor` stage select, `GalleryGrid` close write
+  `replaceState(null, …)` and `ProjectFilter` writes `replaceState({}, …)` — the
+  M3.4.3 class (back() can leave the old DOM on screen). Not triggered by any
+  test this sprint → owner MOTION-09.
+- **Slow page swap away from home (VERIFIED, pre-existing):** 4.3–6.2 s headless
+  on this box, same at HEAD; MOTION-19's shorter home should be re-measured.
 - **`prefers-reduced-data` not emulatable in Chromium (VERIFIED):** the
   equivalent static path is enforced by the source guard only; runtime
   verification needs a Safari/Firefox-capable engine (owner MOTION-09).
@@ -202,12 +217,13 @@ perception thresholds with ≥ 5 recruiters and ≥ 5 developers.
 
 ## Next action
 
-**Stop here.** MOTION-17 is closed; MOTION-18 is `READY`. When the programme
-resumes, read MOTION-18 in `SPRINT_PLAN.md`, the approved brief at the top of
-`STORYBOARD.md`, and `RESEARCH.md` §8.2 (N2) / §9.2 (nav ≤ 5). Carry-over
-facts: page transitions animate `<main>` only (`src/lib/page-continuity.ts`),
-every reveal rule stays inside `@supports (animation-timeline: view())`,
-reduced motion is `animation: none` verified with `page.emulateMedia`,
-`Section` uses `overflow: clip`, and the repo's Playwright expects
-`chromium_headless_shell-1248`, which is not installed (run
-`bunx playwright install chromium` before e2e).
+**Stop here.** MOTION-18 is closed; MOTION-19 (home edit, ≤ 7 chapters, ≤ 10
+screens) is `READY`. Read MOTION-19 in `SPRINT_PLAN.md` and the approved brief
+at the top of `STORYBOARD.md`. Carry-over facts: every URL comes from
+`src/lib/routes.ts` (`workHref`, `labHref`, `ROUTES`); a retired route is added
+there and `public/_redirects` regenerated (a unit test fails otherwise); run
+`bun run check:links` after every build; the home still repeats `/about` and
+`/data` content (#career, #skills, #certifications, #github) — MOTION-19's cut
+list. Playwright runs on `chromium-1228`; `bunx playwright install chromium`
+did not add 1248 here, so ad-hoc scripts need
+`executablePath: ~/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome`.

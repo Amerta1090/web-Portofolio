@@ -26,6 +26,7 @@
  * `:nth-child`, and no JavaScript is added.
  */
 import type { LabCategoryCount } from "../../lib/facts";
+import { ROUTES, labHref } from "../../lib/routes";
 import { LAB_GALLERY_EXPERIMENTS } from "../../lib/lab-gallery";
 
 interface Props {
@@ -61,7 +62,7 @@ const groups = lab.byCategory.map((category) => ({
       experiment in the lab.
     </p>
     <a
-      href="/gallery"
+      href={ROUTES.lab}
       class="group inline-flex shrink-0 items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-5 py-2.5 text-sm font-medium text-accent transition-colors hover:border-accent/50 hover:bg-accent/20"
     >
       Explore the Creative Lab
@@ -123,7 +124,7 @@ const groups = lab.byCategory.map((category) => ({
               style={{ "--lab-card-order": String(cardIndex) }}
             >
               <a
-                href={`/gallery#${exp.id}`}
+                href={labHref(exp.id)}
                 data-lab-card
                 class="group/card block overflow-hidden rounded-xl border border-border/50 bg-bg-tertiary/60 transition-colors hover:border-accent/50"
               >

@@ -24,7 +24,8 @@
     "test:e2e": "playwright test",
     "test:e2e:changed": "playwright test --only-changed",
     "test:e2e:ui": "playwright test --ui",
-    "score:motion": "motionscore http://localhost:4321 --no-upload"
+    "score:motion": "motionscore http://localhost:4321 --no-upload",
+    "check:links": "node scripts/check-links.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^6.0.3",

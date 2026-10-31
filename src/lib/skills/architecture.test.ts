@@ -210,7 +210,7 @@ describe("project evidence", () => {
   it("records only projects that genuinely cross stages", () => {
     for (const crossing of architecture.crossings) {
       expect(crossing.stages.length).toBeGreaterThan(1);
-      expect(crossing.slug).toBe(slugify(crossing.title));
+      expect(crossing.href).toMatch(/^\/work\/[a-z0-9-]+$/);
     }
     expect(architecture.crossingProjects).toBe(architecture.crossings.length);
     expect(architecture.crossings.length).toBeLessThan(projects.length / 4);

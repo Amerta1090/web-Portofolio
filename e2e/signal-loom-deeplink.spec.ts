@@ -27,7 +27,8 @@ import { projectNodeId, requireLinkedProject } from "./project-data";
 //     (T1.2/T1.4 lessons).
 
 const HOME = "/";
-const SKILLS = "/skills";
+// MOTION-18: the Capability Stack moved from /skills to /about#skills.
+const SKILLS = "/about";
 
 /** Hydration marker of the Signal Loom island: exactly one card is in the tab order. */
 async function mapReady(page: Page) {
@@ -38,7 +39,7 @@ async function mapReady(page: Page) {
 const selectedNode = (page: Page) =>
   page.locator("[data-signal-node][aria-current='true']").getAttribute("data-signal-node");
 
-/** Capability anchor hrefs on /skills; each is `/#signal-capability-<id>`. */
+/** Capability anchor hrefs on /about (Capability Stack); each is `/#signal-capability-<id>`. */
 async function capabilityHrefs(page: Page) {
   await page.goto(SKILLS);
   const hrefs = await page
@@ -70,7 +71,11 @@ test.describe("Task 3.4 — deep links into the Capability Map (M6b)", () => {
 
     // And the round trip closes: back() returns to the Capability Stack.
     await page.goBack();
-    await page.waitForURL((url) => url.pathname === "/skills");
+    await page.waitForURL((url) => url.pathname === SKILLS);
+    // The URL flips before ClientRouter swaps /about back in; /about is a much
+    // larger document than /skills was (career spine + certifications), so the
+    // swap needs the repo's cold-navigation budget (15s, T1.6), not the 5s default.
+    await expect(page).toHaveTitle(/^About/, { timeout: 15_000 });
     await expect(
       page.locator(".cap-area-name a[href^='/#signal-capability-']").first(),
     ).toBeVisible();
@@ -205,7 +210,7 @@ test.describe("Task 3.4 — deep links into the Capability Map (M6b)", () => {
     const panelLink = page.locator("a[data-signal-detail-project]");
     await expect(panelLink).toBeVisible();
     const projectPath = (await panelLink.getAttribute("href")) as string;
-    expect(projectPath).toMatch(/^\/projects\/[a-z0-9-]+$/);
+    expect(projectPath).toMatch(/^\/work\/[a-z0-9-]+$/);
 
     await panelLink.click();
     await page.waitForURL((url) => url.pathname === projectPath);

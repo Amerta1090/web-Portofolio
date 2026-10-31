@@ -8,26 +8,22 @@ export const SITE = {
   linkedin: "https://linkedin.com/in/abdulmajidr708",
 } as const;
 
+// MOTION-18: one canonical route per kind of content, nav ≤ 5 (rubric N2).
+// Home is the logo; the header renders exactly these five.
 export const NAV_ITEMS = [
-  { label: "Home", href: "/" },
-  { label: "Experience", href: "/#career" },
-  { label: "Projects", href: "/#projects" },
-  { label: "Skills", href: "/#skills" },
-  { label: "Observatory", href: "/observatory" },
+  { label: "Work", href: "/work" },
+  { label: "About", href: "/about" },
+  { label: "Lab", href: "/lab" },
+  { label: "Data", href: "/data" },
   { label: "Contact", href: "/#contact" },
 ] as const;
 
 // NOTE for labels: the command palette indexes NAV + FOOTER keyed by
-// `page-${slugify(label)}` (buildIndex.ts) and skips duplicates. A footer label
-// that repeats a NAV label is therefore SILENTLY dropped from Ctrl+K — that is
-// why this is "All Skills" (-> /skills) while the nav keeps "Skills" (-> /#skills).
+// `page-${slugify(label)}` (buildIndex.ts) and skips duplicates, so a footer
+// label that repeats a NAV label is SILENTLY dropped from Ctrl+K. Footer-only
+// destinations go here; the footer renders NAV_ITEMS as well.
 export const FOOTER_LINKS = [
+  { label: "Home", href: "/" },
   { label: "Blog", href: "/blog" },
-  { label: "Case Studies", href: "/work" },
-  { label: "All Skills", href: "/skills" },
-  { label: "Certifications", href: "/certifications" },
-  { label: "GitHub", href: "/github" },
-  { label: "Timeline", href: "/timeline" },
   { label: "Resume", href: "/resume" },
-  { label: "Observatory", href: "/observatory" },
 ] as const;

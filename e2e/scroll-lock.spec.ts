@@ -20,7 +20,7 @@ const gutter = (page: import("@playwright/test").Page) =>
  */
 test.describe("Scroll lock wiring (M4.2.3)", () => {
   test("gallery modal locks scroll while open, restores on Escape", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     expect(await bodyOverflow(page)).toBe("");
     await openExperiment(page, "Fractal Explorer");
     expect(await bodyOverflow(page)).toBe("hidden");
@@ -115,7 +115,7 @@ test.describe("Scroll lock wiring — mobile nav (M4.3.4)", () => {
  */
 test.describe("Scrollbar-gutter probe (M4.2.4)", () => {
   test("gallery modal: 0px width delta across open + close", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     expect(await gutter(page)).toBe("stable");
     const before = await clientWidth(page);
     await openExperiment(page, "Fractal Explorer");

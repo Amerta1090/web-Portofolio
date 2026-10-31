@@ -8,7 +8,7 @@ export default function CreativeLabPill() {
   const prefersReducedMotion = useReducedMotion() ?? false;
 
   useEffect(() => {
-    setIsGallery(window.location.pathname === "/gallery");
+    setIsGallery(window.location.pathname === "/lab");
   }, []);
 
   if (isGallery) return null;
@@ -39,7 +39,7 @@ export default function CreativeLabPill() {
                 Interactive experiments & visual playgrounds
               </p>
               <a
-                href="/gallery"
+                href="/lab"
                 className="flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg bg-brand/10 border border-brand/20 text-brand text-[11px] font-medium hover:bg-brand/20 transition-all"
               >
                 <span>Enter Lab</span>
@@ -74,7 +74,7 @@ export default function CreativeLabPill() {
 
         {/* Badge */}
         <motion.a
-          href="/gallery"
+          href="/lab"
           className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg border border-brand/20 bg-bg-primary/90 backdrop-blur-xl shadow-lg shadow-brand/5 hover:border-brand/30 transition-colors"
           animate={prefersReducedMotion ? undefined : { scale: [1, 1.02, 1] }}
           transition={

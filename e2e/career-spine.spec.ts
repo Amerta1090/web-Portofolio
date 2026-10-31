@@ -754,7 +754,7 @@ test.describe("career spine — rail", () => {
     // Leave first: the hop makes the hash navigation below a real
     // cross-document load (gallery → home), so the browser scrolls to the
     // anchor on arrival and the island takes the silent mount path.
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await page.goto(`/#career-${eventId}`);
     await waitForRail(page);
 
@@ -890,7 +890,7 @@ test.describe("career spine — choreography (MOTION-03)", () => {
       .first()
       .getAttribute("data-career-id");
     // Cross-document load: a bare `goto` from `/` would only fire `hashchange`.
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await page.goto(`/#career-${eventId}`);
 
     const record = page.locator(`#career-${eventId}`);

@@ -25,9 +25,9 @@ const horizontalOverflow = (page: Page) =>
 
 const ROUTES = [
   { path: "/", name: "home" },
-  { path: "/gallery", name: "gallery" },
+  { path: "/lab", name: "lab" },
   { path: "/work/ai-quranic-tafsir", name: "case study" },
-  { path: "/observatory", name: "observatory" },
+  { path: "/data", name: "data" },
 ] as const;
 
 for (const route of ROUTES) {

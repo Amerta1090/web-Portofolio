@@ -10,9 +10,9 @@ import { expect, test } from "@playwright/test";
 const rowsOf = (page: import("@playwright/test").Page, id: string) =>
   page.locator(`table[data-chart-table="${id}"] tbody tr`);
 
-test.describe("Chart data tables — /observatory (M4.7)", () => {
+test.describe("Chart data tables — /data Observatory (M4.7)", () => {
   test("timeline table mirrors the SVG nodes (Project | Period | Category)", async ({ page }) => {
-    await page.goto("/observatory");
+    await page.goto("/data");
     const table = page.locator('table[data-chart-table="timeline"]');
     await expect(table).toBeAttached();
     await expect(table.locator("thead th")).toContainText(["Project", "Period", "Category"]);
@@ -27,7 +27,7 @@ test.describe("Chart data tables — /observatory (M4.7)", () => {
   });
 
   test("patterns table mirrors the SVG nodes (Skill | Projects)", async ({ page }) => {
-    await page.goto("/observatory");
+    await page.goto("/data");
     const table = page.locator('table[data-chart-table="patterns"]');
     await expect(table).toBeAttached();
     await expect(table.locator("thead th")).toContainText(["Skill", "Projects"]);
@@ -36,7 +36,7 @@ test.describe("Chart data tables — /observatory (M4.7)", () => {
   });
 });
 
-test.describe("Chart data tables — /github (M4.7)", () => {
+test.describe("Chart data tables — /data#github (M4.7)", () => {
   const tables = [
     "codedna-languages",
     "languages-radial",
@@ -47,7 +47,7 @@ test.describe("Chart data tables — /github (M4.7)", () => {
 
   for (const id of tables) {
     test(`${id}: table present with header + at least one data row`, async ({ page }) => {
-      await page.goto("/github");
+      await page.goto("/data");
       const table = page.locator(`table[data-chart-table="${id}"]`);
       await expect(table).toBeAttached();
       expect(await table.locator("thead th").count()).toBeGreaterThanOrEqual(2);
@@ -56,7 +56,7 @@ test.describe("Chart data tables — /github (M4.7)", () => {
   }
 
   test("radial table matches the visible legend (same source array)", async ({ page }) => {
-    await page.goto("/github");
+    await page.goto("/data");
     const firstCell = await rowsOf(page, "languages-radial").first().locator("td").first().textContent();
     expect(firstCell?.trim().length).toBeGreaterThan(0);
     // The legend next to the donut renders the same language names as text.
@@ -66,7 +66,7 @@ test.describe("Chart data tables — /github (M4.7)", () => {
   test("network tables present when the D3 tier renders (tier-1 grid / tier-3 canvas have no SVG graph)", async ({
     page,
   }) => {
-    await page.goto("/github");
+    await page.goto("/data");
     // SSR defaults to tier-3; the client settles the real tier on hydration.
     // Force-hydrate the galaxy phase before judging which tier rendered.
     const galaxy = page.locator('div[data-phase="galaxy"]');

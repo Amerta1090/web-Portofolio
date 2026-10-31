@@ -1,8 +1,9 @@
 import type { Project } from "../../types/projects";
 import type { SkillCategory, SkillsData } from "../../types/skills";
+import { workHref } from "../routes";
 
 /**
- * Capability architecture for `/skills`.
+ * Capability architecture for `/about#skills`.
  *
  * The previous page stacked a ring graph of 12 arbitrarily-chosen skills on top
  * of a flat list of all 51, so the two halves showed the same inventory twice
@@ -75,7 +76,8 @@ export interface CapabilityStage {
 /** A project that draws on more than one stage — the real cross-stage links. */
 export interface StageCrossing {
   title: string;
-  slug: string;
+  /** The project's canonical page (`workHref`, MOTION-18). */
+  href: string;
   /** Every stage the project touches, in reading order. */
   stages: StageId[];
 }
@@ -358,7 +360,7 @@ export function buildCapabilityArchitecture(
     .filter((entry) => entry.stageIds.length > 1)
     .map((entry) => ({
       title: entry.project.title,
-      slug: slugify(entry.project.title),
+      href: workHref(entry.project),
       stages: [...entry.stageIds].sort(
         (a, b) => (readingOrder.get(a) ?? 0) - (readingOrder.get(b) ?? 0),
       ),

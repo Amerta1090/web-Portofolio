@@ -46,12 +46,12 @@ test.describe("creative lab contact sheet", () => {
 
     // Every card deep-links into the lab, and each id appears exactly once.
     const hrefs = await cards.evaluateAll((nodes) => nodes.map((n) => n.getAttribute("href")));
-    expect(hrefs.every((h) => /^\/gallery#[a-z0-9-]+$/.test(h ?? ""))).toBe(true);
+    expect(hrefs.every((h) => /^\/lab#[a-z0-9-]+$/.test(h ?? ""))).toBe(true);
     expect(new Set(hrefs).size).toBe(hrefs.length);
 
     // The header CTA is the section's second escape hatch; a missing or wrong
     // href would be a dead control (Task 0.5).
-    await expect(page.locator(`${SECTION} a[href='/gallery']`)).toHaveCount(1);
+    await expect(page.locator(`${SECTION} a[href='/lab']`)).toHaveCount(1);
   });
 
   test("header, category rows and cards all count the same catalog", async ({ page }) => {
@@ -120,11 +120,11 @@ test.describe("creative lab contact sheet", () => {
     const card = page.locator(CARDS).first();
     const href = (await card.getAttribute("href")) ?? "";
     const title = ((await card.locator("span").textContent()) ?? "").trim();
-    expect(href).toMatch(/^\/gallery#[a-z0-9-]+$/);
+    expect(href).toMatch(/^\/lab#[a-z0-9-]+$/);
     expect(title).not.toBe("");
 
     await card.click();
-    await page.waitForURL((url) => url.pathname === "/gallery" && url.hash.length > 1);
+    await page.waitForURL((url) => url.pathname === "/lab" && url.hash.length > 1);
     await expect(page).toHaveURL(href);
     await waitForExperimentReady(page);
     // The title lives in the modal panel header, outside `[data-modal-content]`

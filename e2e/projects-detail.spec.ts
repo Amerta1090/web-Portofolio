@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { expect, test } from "@playwright/test";
 
 /**
- * `/projects/<slug>` is the only project route reachable from the listing, and
+ * `/work/<slug>` (was `/projects/<slug>` before MOTION-18) is the project route, and
  * until now **no e2e spec visited it at all** (`rg -n "goto\\('/projects/" e2e/`
  * → 0 hits). That is why a dead control lived there for so long: the unit suite
  * cannot import an Astro page, and the browser suite never went there. The
@@ -18,13 +18,14 @@ import { expect, test } from "@playwright/test";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const raw = JSON.parse(readFileSync(resolve(root, "data/projects.json"), "utf-8")) as {
-  projects?: Array<{ title: string; media?: string[] }>;
+  projects?: Array<{ title: string; media?: string[]; case_study?: string }>;
   [key: string]: unknown;
 };
-const projects = Array.isArray(raw) ? (raw as Array<{ title: string }>) : (raw.projects ?? []);
+const projects = raw.projects ?? [];
 
-/** Must mirror `slugify()` in `src/pages/projects/[slug].astro` exactly. */
+/** Must mirror `legacyProjectSlug()` / `workSlug()` in `src/lib/routes.ts` exactly. */
 const slugify = (title: string): string => title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+const workSlug = (p: { title: string; case_study?: string }) => p.case_study ?? slugify(p.title);
 
 // The 4 projects that used to render the dead "Gallery" tiles.
 const withMedia = projects.filter((p) => Array.isArray(p.media) && p.media.length > 0);
@@ -39,12 +40,14 @@ test.describe("project detail dead media control", () => {
   });
 
   for (const project of withMedia) {
-    test(`/${slugify(project.title)} has no dead lightbox control`, async ({ page }) => {
-      const response = await page.goto(`/projects/${slugify(project.title)}`);
+    test(`/work/${workSlug(project)} has no dead lightbox control`, async ({ page }) => {
+      // MOTION-18: project pages live at /work/<slug> (was /projects/<slug>).
+      const response = await page.goto(`/work/${workSlug(project)}`);
 
       // Proves we landed on this project's page and not a redirect or 404.
       expect(response?.status()).toBe(200);
-      await expect(page.locator("h1")).toContainText(project.title);
+      if (project.case_study) await expect(page.locator("h1")).not.toBeEmpty();
+      else await expect(page.locator("h1")).toContainText(project.title);
 
       // The dead control itself: a photo tile whose click resolved to nothing.
       await expect(page.locator("[data-lightbox]")).toHaveCount(0);

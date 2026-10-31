@@ -5,8 +5,10 @@ const MOBILE = { width: 375, height: 812 };
 test.describe("Mobile Site Navigation (21st Δ1)", () => {
   test.use({ viewport: MOBILE });
 
-  test("burger trigger tampil di /gallery dan membuka sheet dengan 6 link", async ({ page }) => {
-    await page.goto("/gallery");
+  test("burger trigger tampil di /lab dan membuka sheet dengan 5 link (MOTION-18)", async ({
+    page,
+  }) => {
+    await page.goto("/lab");
 
     const trigger = page.getByRole("button", { name: "Menu", exact: true });
     await expect(trigger).toBeVisible();
@@ -18,27 +20,18 @@ test.describe("Mobile Site Navigation (21st Δ1)", () => {
     const sheet = page.getByRole("dialog", { name: "Menu navigasi", exact: true });
     await expect(sheet).toBeVisible();
     const links = sheet.getByRole("link");
-    await expect(links).toHaveCount(6);
-    await expect(links).toContainText([
-      "Home",
-      "Experience",
-      "Projects",
-      "Skills",
-      "Observatory",
-      "Contact",
-    ]);
+    await expect(links).toHaveCount(5);
+    await expect(links).toContainText(["Work", "About", "Lab", "Data", "Contact"]);
   });
 
-  test("klik link menutup panel dan pindah halaman (non-index: /gallery → /observatory)", async ({
-    page,
-  }) => {
-    await page.goto("/gallery");
+  test("klik link menutup panel dan pindah halaman (non-index: /lab → /data)", async ({ page }) => {
+    await page.goto("/lab");
     await page.getByRole("button", { name: "Menu", exact: true }).click();
 
     const sheet = page.getByRole("dialog", { name: "Menu navigasi", exact: true });
-    await sheet.getByRole("link", { name: "Observatory", exact: true }).click();
+    await sheet.getByRole("link", { name: "Data", exact: true }).click();
 
-    await expect(page).toHaveURL(/\/observatory/);
+    await expect(page).toHaveURL(/\/data/);
     await expect(page.getByRole("button", { name: "Menu", exact: true })).toHaveAttribute(
       "aria-expanded",
       "false",
@@ -47,7 +40,7 @@ test.describe("Mobile Site Navigation (21st Δ1)", () => {
   });
 
   test("keyboard: Enter membuka, Esc menutup, fokus kembali ke trigger", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
 
     const trigger = page.getByRole("button", { name: "Menu", exact: true });
     await trigger.focus();
@@ -63,7 +56,7 @@ test.describe("Mobile Site Navigation (21st Δ1)", () => {
   });
 
   test("klik backdrop menutup panel", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await page.getByRole("button", { name: "Menu", exact: true }).click();
     await expect(page.getByRole("dialog", { name: "Menu navigasi", exact: true })).toBeVisible();
 
@@ -78,7 +71,7 @@ test.describe("Mobile Site Navigation (21st Δ1)", () => {
   });
 
   test("tombol tutup mengembalikan fokus ke trigger", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     const trigger = page.getByRole("button", { name: "Menu", exact: true });
     await trigger.click();
     const sheet = page.getByRole("dialog", { name: "Menu navigasi", exact: true });
@@ -89,7 +82,7 @@ test.describe("Mobile Site Navigation (21st Δ1)", () => {
   });
 
   test("klik backdrop mengembalikan fokus ke trigger", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     const trigger = page.getByRole("button", { name: "Menu", exact: true });
     await trigger.click();
     const sheet = page.getByRole("dialog", { name: "Menu navigasi", exact: true });
@@ -103,12 +96,12 @@ test.describe("Mobile Site Navigation (21st Δ1)", () => {
   test("Tab tak pernah keluar sheet; Shift+Tab dari pertama wrap ke terakhir (M4.3.6)", async ({
     page,
   }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await page.getByRole("button", { name: "Menu", exact: true }).click();
     const sheet = page.getByRole("dialog", { name: "Menu navigasi", exact: true });
     await expect(sheet).toBeVisible();
-    // Sheet punya 7 focusable (tutup + 6 link); 14 Tab = 2 putaran penuh.
-    for (let i = 0; i < 14; i++) {
+    // Sheet punya 6 focusable (tutup + 5 link, MOTION-18); 12 Tab = 2 putaran penuh.
+    for (let i = 0; i < 12; i++) {
       await page.keyboard.press("Tab");
       const inside = await sheet.evaluate((el) => el.contains(document.activeElement));
       expect(inside).toBe(true);
@@ -118,7 +111,7 @@ test.describe("Mobile Site Navigation (21st Δ1)", () => {
   });
 
   test("inert main+footer saat terbuka, dilepas saat tertutup (M4.3.6)", async ({ page }) => {
-    await page.goto("/gallery");
+    await page.goto("/lab");
     await page.getByRole("button", { name: "Menu", exact: true }).click();
     const sheet = page.getByRole("dialog", { name: "Menu navigasi", exact: true });
     await expect(sheet).toBeVisible();
@@ -141,15 +134,15 @@ test.describe("Mobile Site Navigation (21st Δ1)", () => {
     );
   });
 
-  test("setiap halaman memuat trigger + panel (cek /observatory)", async ({ page }) => {
-    await page.goto("/observatory");
+  test("setiap halaman memuat trigger + panel (cek /data)", async ({ page }) => {
+    await page.goto("/data");
     const trigger = page.getByRole("button", { name: "Menu", exact: true });
     await expect(trigger).toBeVisible();
     await trigger.click();
     await expect(page.getByRole("dialog", { name: "Menu navigasi", exact: true })).toBeVisible();
     await expect(
       page.getByRole("dialog", { name: "Menu navigasi", exact: true }).getByRole("link"),
-    ).toHaveCount(6);
+    ).toHaveCount(5);
   });
 });
 
@@ -162,7 +155,7 @@ test.describe("Mobile Site Navigation — reduced motion", () => {
 
   test("panel tetap buka/tutup tanpa animasi", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/gallery");
+    await page.goto("/lab");
     // Positive control: the preference actually landed before we assert on it.
     expect(await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches)).toBe(
       true,

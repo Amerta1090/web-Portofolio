@@ -4,7 +4,7 @@ import { waitForExperimentReady } from "./hydration";
 test.describe("Game Theory experiments", () => {
   test.describe("Gradient Descent Landscape", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto("/gallery#gradient-descent");
+      await page.goto("/lab#gradient-descent");
       await waitForExperimentReady(page);
     });
 
@@ -36,7 +36,7 @@ test.describe("Game Theory experiments", () => {
 
     test("card is present in gallery", async ({ page }) => {
       await page.keyboard.press("Escape");
-      await page.goto("/gallery");
+      await page.goto("/lab");
       const card = page.locator('[role="listitem"]').filter({ hasText: "Gradient Descent" });
       await expect(card).toBeVisible();
     });
@@ -44,7 +44,7 @@ test.describe("Game Theory experiments", () => {
 
   test.describe("Prisoner's Dilemma Tournament", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto("/gallery#prisoners-dilemma");
+      await page.goto("/lab#prisoners-dilemma");
       await waitForExperimentReady(page);
     });
 
@@ -80,7 +80,7 @@ test.describe("Game Theory experiments", () => {
 
     test("card is present in gallery", async ({ page }) => {
       await page.keyboard.press("Escape");
-      await page.goto("/gallery");
+      await page.goto("/lab");
       const card = page.locator('[role="listitem"]').filter({ hasText: /Prisoner/ });
       await expect(card).toBeVisible();
     });
@@ -88,7 +88,7 @@ test.describe("Game Theory experiments", () => {
 
   test.describe("Simulated Annealing TSP", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto("/gallery#simulated-annealing-tsp");
+      await page.goto("/lab#simulated-annealing-tsp");
       await waitForExperimentReady(page);
     });
 
@@ -122,7 +122,7 @@ test.describe("Game Theory experiments", () => {
 
     test("card is present in gallery", async ({ page }) => {
       await page.keyboard.press("Escape");
-      await page.goto("/gallery");
+      await page.goto("/lab");
       const card = page.locator('[role="listitem"]').filter({ hasText: /Simulated Annealing/ });
       await expect(card).toBeVisible();
     });

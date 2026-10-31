@@ -78,7 +78,7 @@ test.describe("Craft details: selection/scrollbar/focus/tabular-nums", () => {
   });
 
   test("stat numbers render with tabular numerals", async ({ page }) => {
-    await page.goto("/github");
+    await page.goto("/data");
     const stat = page.locator(".tabular-nums").first();
     await stat.scrollIntoViewIfNeeded().catch(() => {});
     await expect(stat).toBeVisible({ timeout: 15_000 });

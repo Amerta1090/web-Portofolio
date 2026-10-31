@@ -92,6 +92,7 @@
     },
     {
       "title": "Red Devil Dynamics — AI Goal Timing Predictor for Manchester United",
+      "case_study": "red-devil-dynamics",
       "featured": true,
       "category": "ml",
       "period": "Mar 2026 – Mar 2026",
@@ -131,6 +132,7 @@
     },
     {
       "title": "AI Quranic Tafsir Assistant: Hybrid Sparse-Dense Retrieval & RAG",
+      "case_study": "ai-quranic-tafsir",
       "featured": true,
       "category": "ml",
       "period": "Sep 2025 – Jan 2026",

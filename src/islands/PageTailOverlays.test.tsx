@@ -39,8 +39,8 @@ describe("PageTailOverlays (composite: EasterEgg + SectionCounter + CreativeLabP
     expect(counter?.querySelectorAll("[aria-label]")).toHaveLength(0);
   });
 
-  it("renders creative-lab pill linking to /gallery on non-gallery paths", () => {
+  it("renders creative-lab pill linking to /lab on non-lab paths", () => {
     const { container } = render(<PageTailOverlays sectionIds={sectionIds} />);
-    expect(container.querySelector("a[href='/gallery']")).not.toBeNull();
+    expect(container.querySelector("a[href='/lab']")).not.toBeNull();
   });
 });

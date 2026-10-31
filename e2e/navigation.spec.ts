@@ -173,22 +173,24 @@ test.describe("Navigation hierarchy — one primary nav, one position readout", 
     const start = await counter.textContent();
     expect(start?.trim()).toBe("01 / 10");
 
-    await page.locator("nav[aria-label='Primary'] a[href='/#projects']").click();
-    const top = await arriveTop(page, "#projects");
+    // MOTION-18: the nav's one in-page jump is Contact (Work/About/Lab/Data are
+    // pages now).
+    await page.locator("nav[aria-label='Primary'] a[href='/#contact']").click();
+    const top = await arriveTop(page, "#contact", { limit: 900, absolute: false });
 
-    // #projects sits under the 65px fixed header, so its top settles just above 0.
-    expect(Math.abs(top)).toBeLessThan(120);
+    // #contact sits under the 65px fixed header, so its top settles just above 0
+    // (or the page bottoms out first — the last chapter cannot scroll past it).
+    expect(top).toBeLessThan(900);
 
     const after = counter.textContent();
     expect((await after)?.trim()).not.toBe("01 / 10");
-    // projects is the 5th declared section (hero, about, systems-in-motion,
-    // career, projects) — it was 7th until Task 1.5 retired #experience and
-    // #journey ahead of it, so the ordinal moved with the count (6th before
-    // Task 1.2 inserted #career ahead of #journey).
+    // contact is the 10th and last declared section, but it is shorter than the
+    // viewport, so the page bottoms out with an earlier chapter still crossing
+    // the observer line: the readout settles on one of the last three (measured
+    // 08 and 10 on identical runs). It must have left 01 and kept the total.
     // The IntersectionObserver path can stall >5s under memory pressure on this
-    // 3 GB machine (Q4.2), so give the auto-retrying assertion a larger budget —
-    // the expected value is exact.
-    await expect(counter).toHaveText("05 / 10", { timeout: 15000 });
+    // 3 GB machine (Q4.2), hence the larger budget.
+    await expect(counter).toHaveText(/^(08|09|10) \/ 10$/, { timeout: 15000 });
   });
 });
 
@@ -217,9 +219,9 @@ test.describe("Navigation hierarchy — below lg", () => {
     await trigger.click();
     const sheet = page.getByRole("dialog", { name: "Menu navigasi", exact: true });
     await expect(sheet).toBeVisible();
-    await sheet.getByRole("link", { name: "Projects", exact: true }).click();
-    const mobileTop = await arriveTop(page, "#projects", { absolute: false });
+    await sheet.getByRole("link", { name: "Contact", exact: true }).click();
+    const mobileTop = await arriveTop(page, "#contact", { limit: 812, absolute: false });
     await expect(sheet).toBeHidden();
-    expect(mobileTop).toBeLessThan(120);
+    expect(mobileTop).toBeLessThan(812);
   });
 });

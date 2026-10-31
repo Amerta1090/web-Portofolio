@@ -1,7 +1,7 @@
 /**
  * Screen-reader data table for charts (Sprint 4, M4.7).
  *
- * Every SVG chart in `/observatory` and `/github` already exposes a generic
+ * Every SVG chart in `/data` (Observatory + GitHub) already exposes a generic
  * `aria-label` plus hover-only tooltips — nothing a screen reader or crawler
  * can read as *data*. This table carries the exact same rows the chart draws,
  * visually hidden but present in SSR HTML (islands server-render, so no-JS
@@ -14,7 +14,7 @@
  * M5.3.5: hidden with a `div.sr-only` *wrapper*, not `sr-only` on the `<table>`
  * itself. Tailwind's `sr-only` sets `width:1px; overflow:hidden`, but a table
  * box ignores both (`display:table` sizes to its content and does not clip), so
- * the table stayed 903px wide at 320px viewport and gave `/observatory` a real
+ * the table stayed 903px wide at 320px viewport and gave the Observatory (now `/data`) a real
  * 563px horizontal scroll (measured). The wrapper is a block box, so `width:1px`
  * + `overflow:hidden` clip it as written; the `data-chart-table` hook stays on
  * the table so existing selectors are unchanged.

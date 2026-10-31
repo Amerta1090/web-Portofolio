@@ -5,18 +5,12 @@ export interface Props {
 
 const { currentPath = "/" } = Astro.props;
 import HeaderTools from "../../islands/HeaderTools";
+import { NAV_ITEMS } from "../../lib/constants";
 import { isCurrentPage } from "../../lib/page-continuity";
 import Container from "../atoms/Container.astro";
 import ThemeToggle from "../atoms/ThemeToggle.astro";
 
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/#career", label: "Experience" },
-  { href: "/#projects", label: "Projects" },
-  { href: "/#skills", label: "Skills" },
-  { href: "/observatory", label: "Observatory" },
-  { href: "/#contact", label: "Contact" },
-];
+const navLinks = NAV_ITEMS;
 ---
 
 <header class="fixed top-0 left-0 right-0 z-50 bg-bg-primary/80 backdrop-blur-md border-b border-border" role="banner">

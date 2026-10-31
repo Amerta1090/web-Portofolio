@@ -11,14 +11,14 @@
  *
  *   bun run serve                                  # one build
  *   node scripts/q41-probe.mjs http://localhost:4321 current
- *   node scripts/q41-probe.mjs http://localhost:4322 baseline / /gallery
+ *   node scripts/q41-probe.mjs http://localhost:4322 baseline / /lab
  *
  * Frame counters are noisy on a shared machine (two runs of the same build can
  * differ by ±40%); listener counts and network bytes are the stable signals.
  */
 import { chromium } from "@playwright/test";
 
-const DEFAULT_ROUTES = ["/", "/work/ai-quranic-tafsir", "/gallery"];
+const DEFAULT_ROUTES = ["/", "/work/ai-quranic-tafsir", "/lab"]; // /gallery retired (MOTION-18)
 
 const base = process.argv[2] ?? "http://localhost:4321";
 const label = process.argv[3] ?? "current";

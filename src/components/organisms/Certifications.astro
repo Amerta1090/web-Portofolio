@@ -24,6 +24,7 @@
  * too — M1.2 mutation M5).
  */
 import { ChevronDown } from "lucide-react";
+import { ABOUT_ANCHORS, ROUTES } from "../../lib/routes";
 import { selectSpineCertifications } from "../../lib/creative/career-spine";
 import type { IssuerGroup } from "../../lib/facts";
 import type { Certification } from "../../types/certifications";
@@ -183,7 +184,7 @@ function year(date: string | null): string {
 
   <div class="text-center">
     <a
-      href="/certifications"
+      href={`${ROUTES.about}#${ABOUT_ANCHORS.certifications}`}
       class="group/text inline-flex items-center gap-2 text-sm text-brand transition-colors hover:text-brand-muted"
     >
       View all {total} certifications

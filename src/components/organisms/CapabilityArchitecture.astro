@@ -193,7 +193,7 @@ function path(stages: StageId[]): string {
         <ol class="cap-crossing-list">
           {architecture.crossings.map((crossing) => (
             <li class="cap-crossing">
-              <a class="cap-crossing-link" href={`/projects/${crossing.slug}`}>
+              <a class="cap-crossing-link" href={crossing.href}>
                 <span class="cap-crossing-title">{crossing.title}</span>
                 <span class="cap-crossing-path">{path(crossing.stages)}</span>
               </a>

@@ -25,7 +25,7 @@ test.describe("MOTION-06 data instruments", () => {
 
   test("reduced motion keeps Observatory metrics final and stable", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/observatory");
+    await page.goto("/data");
     const cards = page.locator('[data-observatory="metric"]');
     await expect(cards).toHaveCount(6);
     await expect(cards.first()).toContainText(/\d+/);
@@ -39,7 +39,7 @@ test.describe("MOTION-06 data instruments", () => {
   test("Observatory data remains visible with JavaScript disabled", async ({ browser }) => {
     const context = await browser.newContext({ javaScriptEnabled: false });
     const page = await context.newPage();
-    await page.goto("/observatory");
+    await page.goto("/data");
 
     await expect(page.locator('[data-observatory="metric"]')).toHaveCount(6);
     await expect(page.getByText("Projects catalogued")).toBeVisible();

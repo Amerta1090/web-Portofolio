@@ -16,6 +16,8 @@ interface Project {
   association?: string;
   featured?: boolean;
   category?: string;
+  /** Canonical page URL, resolved on the server (`workHref`, MOTION-18). */
+  href: string;
 }
 
 interface Props {
@@ -31,10 +33,6 @@ const CATEGORIES = [
   { value: "cli", label: "CLI" },
   { value: "devops", label: "DevOps" },
 ];
-
-function slugify(title: string): string {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-}
 
 export default function ProjectFilter({ projects, baseUrl }: Props) {
   const activeCategory = useFilterStore((s) => s.activeCategory);
@@ -125,7 +123,7 @@ export default function ProjectFilter({ projects, baseUrl }: Props) {
           {filtered.map((project) => (
             <a
               key={project.title}
-              href={`/projects/${slugify(project.title)}`}
+              href={project.href}
               className="block bg-bg-secondary border border-border rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 p-6 group"
             >
               <div className="flex items-start justify-between gap-2 mb-2">

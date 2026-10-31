@@ -160,7 +160,7 @@ export default function TopReposLeaderboard({ topRepos, repoActivity, builtAt }:
       >
         <MagneticButton>
           <a
-            href="/github"
+            href="/data#github"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand/10 border border-brand/20 text-brand text-sm font-medium hover:bg-brand/20 transition-all duration-300 group"
           >
             Explore Full Universe

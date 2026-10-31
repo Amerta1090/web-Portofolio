@@ -1,5 +1,6 @@
 ---
 import CapabilityGenerator from "../components/molecules/CapabilityGenerator";
+import { ROUTES } from "../lib/routes";
 import Section from "../components/molecules/Section.astro";
 import About from "../components/organisms/About.astro";
 import CareerSpine from "../components/organisms/CareerSpine.astro";
@@ -100,7 +101,7 @@ const sectionIds = [
     <ProjectCardGrid client:load projects={cardProjects} skillHrefs={skillHrefs} />
     <div class="mt-10 flex justify-center">
       <a
-        href="/projects"
+        href={ROUTES.work}
         class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand/10 border border-brand/20 text-brand text-sm font-medium hover:bg-brand/20 transition-all duration-300 group"
       >
         View all projects
