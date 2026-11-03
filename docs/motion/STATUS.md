@@ -233,8 +233,8 @@ perception thresholds with ≥ 5 recruiters and ≥ 5 developers.
 ## Next action
 
 **Owner decision needed on MOTION-20 rev. 2 ("The dark room", D-13).** It is a
-rebrand (Archivo, soot/lime) judged by an independent panel: mean 6.25 → 7.50
-over four rounds, taste inspector 0 FAIL (today 16). The panel's ceiling for
+rebrand (Archivo, soot/lime, lime-free data triad) judged by an independent
+panel: mean 6.25 → 7.58 over five rounds, taste inspector 0 FAIL (today 16). The panel's ceiling for
 layout-only work is ≈ 8.2; 9+ needs owner inputs: working live demos (both
 return 404 today — a defect on the shipped site too), a screen recording of a
 system working, a lit portrait, an owned Tafsir capture, outside proof. On

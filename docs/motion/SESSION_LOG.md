@@ -988,3 +988,33 @@ source (internet, skills, plugins), so the score is objective.
    was removed as superseded.
 
 **Owner sign-off:** pending on rev. 2 (direction, rebrand, and the asset asks).
+
+#### Round 5 — A/B: colour triad and wide numerals, judged with the scroll film (2026-11-03)
+
+Owner asked whether ~8 is a hard cap and whether found assets or a colour
+triad could reach 9. Experiment: B = A + an OKLCH triad from the lime hue
+(L .82 C .12: `#b4d178` / `#7dccff` / `#ffa3bb`, all ≥ 10:1 on the ground)
+for data only + Archivo `wdth` 125 numerals. Jurors also got `--film`
+contact sheets, so motion was judged for the first time. (Round interrupted
+once by an API session limit; resumed after reset.)
+
+| Juror | A | B |
+| --- | ---: | ---: |
+| Awwwards-weighted | 7.32 | 7.37 |
+| taste critique.md | 7.75 | 7.78 |
+| product-design | 7.4 | 7.6 |
+| **Mean** | **7.49** | **7.58** |
+
+Consensus fixes, applied as **B2** (taste inspector 0 FAIL, not yet re-scored by
+the panel): the data triad must not reuse lime (lime = action + "now" only) →
+lime-free triad `#56cebf` / `#e9a86a` / `#c7a6f1` (OKLCH L .78 C .11, hues
+184 / 64 / 304, ≥ 8.9:1); a key under the map and above the career bars;
+2 px family-coloured edges; counts stay ink with a coloured dot; the phone
+hero name keeps normal width. Jurors' own estimate for B2: ≈ 8.0.
+
+**Answer to the owner's question (all three jurors, independently):** colour
+and found assets raise craft, not the ceiling (≈ 8.0–8.2). 9+ needs: a
+signature the visitor can operate on the real work (e.g. move Red Devil's
+match inputs and watch the probability change), footage of a system running,
+lit photography of the person and the work, outside proof, and live demos that
+load (both return 404).

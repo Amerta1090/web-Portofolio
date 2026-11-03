@@ -135,9 +135,15 @@ for the sticky stage must become a `view()` timeline or IO in production
 (0 new scroll listeners, rule 2 of `prompt.txt`). Budget and invariants as in
 MOTION-21 tasks.
 
+**Data colours (round 5, proposed).** Lime is the action and "now", never a
+data category. Data uses a lime-free OKLCH triad at equal lightness (L .78,
+C .11): teal `#56cebf` (machine learning & data), amber `#e9a86a` (building
+software; earlier roles), violet `#c7a6f1` (infrastructure & devices;
+programmes), always with a key. Big numbers use Archivo `wdth` 125, weight 300.
+
 **Measured result of the mock (VERIFIED 2026-11-03).** Taste inspector: 0 FAIL
 (home today: 16 FAIL). Impeccable detector: 0 findings. Independent panel,
-average of three jurors per round: **6.25 → 7.0 → 7.27 → 7.5** (round 4:
+average of three jurors per round: **6.25 → 7.0 → 7.27 → 7.5 → 7.58** (round 5 = triad + wide numerals, judged with the scroll film) (round 4:
 taste-critique 7.8, Awwwards-weighted 7.3, product-design 7.4). All three
 jurors independently put the ceiling for layout-only work at ≈ 8.2.
 
