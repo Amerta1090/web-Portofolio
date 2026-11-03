@@ -8,27 +8,42 @@ import { waitForIslandHydration } from "./hydration";
  * `src/lib/hero-metrics.test.ts`; this spec covers the three things a unit test
  * structurally cannot:
  *
- * 1. **The target exists.** `#github-metrics` is a fact about the built page. A
- *    link to an anchor nobody renders is the same defect as a button with no
- *    handler, and asserting the `href` string would pass either way (Task 0.5).
- * 2. **Two render sites agree.** The row and the GitHub section read the same
- *    dataset through two different components, so comparing what each prints is
- *    the only way to prove the hero row is evidence rather than decoration. This
- *    is the actual product contract of M2.1.2, and it cannot be checked in jsdom.
+ * 1. **The target exists.** Each `href` is a fact about the built site: `/work`
+ *    exists, `/about#certifications` and `/about#career` point at ids someone
+ *    renders. A link to a route or anchor nobody renders is the same defect as
+ *    a button with no handler, and asserting the `href` string would pass either
+ *    way (Task 0.5).
+ * 2. **The figures agree with the pages they send you to.** The row and the
+ *    pages that list the same records read one dataset through different
+ *    components, so comparing what each prints is the only way to prove the
+ *    hero row is evidence rather than decoration. This is the actual product
+ *    contract of M2.1.2, and it cannot be checked in jsdom.
  * 3. **It survives without JavaScript.** The island hydrates on idle, and every
  *    figure is in the server HTML; a row that only appears after hydration would
  *    make the hero's first claim depend on a bundle arriving.
  *
- * Nothing here pins a cached figure. `bun run build` refreshes the GitHub cache,
- * so `571` and `27` are outputs, not contracts — the contracts are the shape of
- * the name, the target of the link, and the agreement between the two sites.
+ * Nothing here pins a cached figure. `22`, `62` and `2` are outputs, not
+ * contracts — the contracts are the shape of the name, the target of the link,
+ * and the agreement between the row and the page it points at.
  */
 
 const ROW = "[data-hero-metric-row]";
 const METRIC = "[data-hero-metric]";
 
-/** The section the row points at; its presence is part of what is being tested. */
-const EVIDENCE_SECTION = "#github-metrics";
+/**
+ * Where each figure can be checked, mirrored from `HERO_METRIC_HREFS` in
+ * `src/lib/hero-metrics.ts`.
+ *
+ * The module cannot be imported here: it reaches `./facts`, which reaches the
+ * JSON data layer, and Bun's ESM loader rejects those imports without an import
+ * attribute (the same wall T2.6 hit). So the map is copied with a comment that
+ * names its source — and the unit test pins the real one.
+ */
+const HERO_TARGETS = {
+  projects: "/work",
+  certifications: "/about#certifications",
+  experience: "/about#career",
+} as const;
 
 /**
  * `Longest streak: 27 days` → `["Longest streak", "27 days"]`.
@@ -48,21 +63,37 @@ test.describe("hero evidence row", () => {
     await page.goto("/");
   });
 
-  test("every figure is a link, and the section it names is on the page", async ({ page }) => {
+  test("every figure is a link to a canonical route whose target exists", async ({ page }) => {
     const row = page.locator(ROW);
     await expect(row).toHaveCount(1);
 
     const links = row.locator(METRIC);
     await expect(links.first()).toBeAttached();
 
-    const hrefs = await links.evaluateAll((nodes) =>
-      nodes.map((n) => (n as HTMLAnchorElement).getAttribute("href")),
+    const pairs = await links.evaluateAll((nodes) =>
+      nodes.map((node) => ({
+        id: node.getAttribute("data-hero-metric"),
+        href: (node as HTMLAnchorElement).getAttribute("href"),
+      })),
     );
-    expect(hrefs.length).toBeGreaterThan(0);
-    for (const href of hrefs) expect(href).toBe(EVIDENCE_SECTION);
+    // MOTION-19: the work first, then the credentials, then the time it took —
+    // and each destination is a page that lists what it counts, not a home
+    // anchor that happens to be nearby (the old `#github-metrics` did exactly
+    // that and landed ~2,000px above the counters it promised).
+    expect(pairs).toEqual(Object.entries(HERO_TARGETS).map(([id, href]) => ({ id, href })));
 
-    // The href is only worth anything if something answers to it.
-    await expect(page.locator(EVIDENCE_SECTION)).toHaveCount(1);
+    // The href is only worth anything if the page answers to it. Fetch the path
+    // and read the fragment off the real document; asserting the string alone
+    // would pass over a dead anchor (Task 0.5).
+    for (const { href } of pairs) {
+      if (!href) throw new Error("hero metric without an href");
+      const [path, fragment] = href.split("#");
+      const response = await page.request.get(path);
+      expect(response.status(), `${path} answers`).toBe(200);
+      if (!fragment) continue;
+      await page.goto(path);
+      await expect(page.locator(`#${fragment}`), `${href} names a real section`).toHaveCount(1);
+    }
   });
 
   test("the accessible name is `Kind: value` and carries the visible text", async ({ page }) => {
@@ -137,69 +168,36 @@ test.describe("hero evidence row", () => {
     await expect(page.locator(METRIC).first()).toBeVisible();
   });
 
-  test("the section it links to prints the same figures", async ({ page }) => {
-    const links = page.locator(METRIC);
-    await expect(links.first()).toBeAttached();
+  test("the figures agree with the pages that list them", async ({ page }) => {
+    const names = await page
+      .locator(METRIC)
+      .evaluateAll((nodes) => nodes.map((node) => node.getAttribute("aria-label") ?? ""));
+    // `Kind: value` → the first token of the value (no figure in this row has a
+    // thousands separator today; the builder would keep them if one did).
+    const figureFor = (label: string) => {
+      const name = names.find((candidate) => candidate.startsWith(`${label}: `));
+      return name?.slice(label.length + 2).split(" ")[0];
+    };
+    const projects = figureFor("Projects");
+    const certifications = figureFor("Certifications");
+    expect(projects).toBeTruthy();
+    expect(certifications).toBeTruthy();
 
-    const names = await links.evaluateAll((nodes) =>
-      nodes.map((n) => n.getAttribute("aria-label") ?? ""),
-    );
+    // Two render sites, two different components, one dataset: this is the
+    // actual product contract (M2.1.2), and jsdom cannot check it. `/work`
+    // prints `${projects.length} projects across …`; `/about` prints
+    // `${certifications.length} professional certifications` as the section
+    // subtitle. Experience has no printed counterpart anywhere, so inventing a
+    // comparison for it would be worse than leaving it to the link test above.
+    await page.goto("/work");
+    await expect(
+      page.getByText(`${projects} projects across ML, IoT, web, CLI, and DevOps.`, { exact: true }),
+    ).toBeVisible();
 
-    // Arriving the way a reader does: by following the link. `scrollIntoViewIfNeeded`
-    // on a section taller than the viewport aligns its *bottom*, which scrolls the
-    // counter row past the top of the screen — `useInView` then never fires and every
-    // `MetricCounter` sits at its initial `0`. Measured both ways: following the link
-    // puts the section top at 122px with the counters at 505px, and they read 47/9/0/571;
-    // `scrollIntoViewIfNeeded` put the counters at −152px, i.e. never in view at all.
-    await links.first().click();
-    await expect(page).toHaveURL(new RegExp(`${EVIDENCE_SECTION}$`));
-    // The Command Center island specifically, not `.text-center` (which only exists
-    // once it has hydrated) and not the first island in the section: `#github-metrics`
-    // also holds BootSequence, CodeDNAHelix and GitHubPhase3, and the dormant ones
-    // never hydrate because they are `client:visible` inside a hidden phase.
-    await waitForIslandHydration(
-      page,
-      '#github-metrics astro-island[component-url*="GitHubCommandCenter"]',
-    );
-
-    const compare = () =>
-      page.evaluate((metricNames) => {
-        const section = document.querySelector("#github-metrics");
-        if (!section) return { missingSection: true, unmatched: metricNames };
-        const leaves = Array.from(section.querySelectorAll<HTMLElement>("p, span")).filter(
-          (el) => el.children.length === 0,
-        );
-        /**
-         * Compare on lowercased alphanumerics, on *both* sides. The card
-         * concatenates the figure with its caption ("27daysLongest streak"), and
-         * the section capitalises inconsistently — `most_active_day` is stored
-         * lowercased and turned into "TUE" by a CSS `capitalize`, while
-         * `busiest_month` is a proper noun with an uppercase "S" in the DOM.
-         * Normalising only the metric name (the first version of this test) reads
-         * `September` as not containing `september`.
-         */
-        const norm = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, "");
-
-        return {
-          missingSection: false,
-          unmatched: metricNames.filter((name) => {
-            const at = name.indexOf(": ");
-            if (at < 1) return true;
-            const label = norm(name.slice(0, at));
-            const value = norm(name.slice(at + 2));
-            const labelEl = leaves.find((el) => norm(el.textContent ?? "") === label);
-            // The figure and its caption share a container in both card shapes:
-            // the Astro cards (`div` wrapping the number and the caption) and
-            // `MetricCounter` (`div.text-center`).
-            return !norm(labelEl?.parentElement?.textContent ?? "").includes(value);
-          }),
-        };
-      }, names);
-
-    await expect.poll(compare, { timeout: 15_000 }).toEqual({
-      missingSection: false,
-      unmatched: [],
-    });
+    await page.goto("/about");
+    await expect(
+      page.getByText(`${certifications} professional certifications`, { exact: true }),
+    ).toBeVisible();
   });
 
   test("does not overflow the viewport on small screens", async ({ page }) => {
@@ -270,7 +268,7 @@ test.describe("MOTION-02 hero handoff", () => {
     await expect
       .poll(async () => Number(await cue.evaluate((el) => getComputedStyle(el).opacity)))
       .toBeLessThan(0.1);
-    await expect(page.locator("#about [data-chapter-head]")).toBeVisible();
+    await expect(page.locator("#projects [data-chapter-head]")).toBeVisible();
   });
 
   test("server HTML keeps hero copy visible without JavaScript", async ({ browser }) => {

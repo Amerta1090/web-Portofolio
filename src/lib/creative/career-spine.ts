@@ -391,6 +391,33 @@ export function toCareerEvents(sources: CareerEventSources): CareerEventBuild {
   return { events, dropped };
 }
 
+/**
+ * The engagement type that is not a role or a programme: a short contract gig.
+ * The home's Journey chapter (MOTION-19) leaves it out; `/about` keeps it.
+ */
+export const CAREER_HIGHLIGHT_EXCLUDED_TYPE = "contract";
+
+/**
+ * Journey highlights for the home (MOTION-19 M19.2) — a rule, not a hand-picked
+ * list: every experience record (roles and programmes) except a contract gig
+ * (`type === "contract"`), in spine order. Certifications, honors and
+ * volunteering stay on the full spine at `/about`; the home prints one derived
+ * line about certifications instead of fifteen records.
+ */
+export function toCareerHighlights(experience: Experience[]): CareerEvent[] {
+  return toCareerEvents({
+    experience: experience.filter((exp) => exp.type !== CAREER_HIGHLIGHT_EXCLUDED_TYPE),
+    certifications: [],
+    honors: [],
+    volunteering: [],
+  }).events;
+}
+
+/** Journey highlights from the real data layer. */
+export function buildCareerHighlights(): CareerEvent[] {
+  return toCareerHighlights(getExperience());
+}
+
 /** The spine from the real data layer. */
 export function buildCareerEvents(): CareerEventBuild {
   return toCareerEvents({

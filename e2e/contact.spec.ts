@@ -91,15 +91,6 @@ test.describe("Contact form (21st Δ2 — form primitives retheme)", () => {
       "Message must be at least 10 characters",
     ]);
   });
-
-  test("SkillsExplorer search: input bernama + filter bekerja", async ({ page }) => {
-    await page.goto("/");
-    const search = page.getByLabel("Search skills");
-    await expect(search).toBeVisible();
-    await search.fill("Python");
-    // Hasil filter — setidaknya 1 kartu kategori dengan skill Python muncul
-    await expect(page.getByText("Python", { exact: true }).first()).toBeVisible();
-  });
 });
 
 test.describe("Contact channels (Task 2.7 — phone)", () => {

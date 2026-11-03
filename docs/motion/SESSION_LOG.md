@@ -813,3 +813,53 @@ MOTION-17 `DONE`; MOTION-18 `READY`.
    killed it; use the port's PID instead.
 
 Gates: see `QA_CHECKLIST.md` §8 MOTION-18. **Next:** MOTION-19 `READY`.
+
+## 2026-11-03 — MOTION-19 — Home edit, verified (final entry — sprint complete)
+
+**Start:** HEAD `d571c5f` (MOTION-18 done), 52 tracked + untracked edits (staged deletions + edits + `lab-teaser.ts` untracked). Clean build `build:fast` 49 pages.
+
+**Measured (all with the same headless Chromium 1228, scroll-all-the-way + settle):**
+- Height @1440×900 → **8,511 px = 9.46 screens** (≤ 10, 6 chapters: hero + 5 `data-chapter`); overflow X = 0.
+- Height @375×812 → 13.65 screens (documented, criterion is 1440).
+- `main > section[id]` = 6 (hero, projects, systems-in-motion, journey, creative-lab, contact); 5 `data-chapter`; `data-lab-card` 6; `data-career-kind="experience"` 6 (3 year groups, `type=contract` excluded); `<time datetime>` 11 (6 experience + 5 cert); `data-lab-sheet` 1, `data-journey-more` 1.
+- Payload `/`: **194.7 / 493.8 / 32.0 KB**, 9 islands (5e/4d) — was 202.7 / 556.1 / 77.2 KB and 16 islands.
+- `check:links`: **0 broken / 1,476 links / 73 pages** (links left the home; every one still reaches `/work`, `/about`, `/lab`, `/data`, `/contact` — verified with `grep` of `workHref`/`labHref` in `dist/index.html` + profile of deleted specs).
+- `astro check` **89 = baseline, sorted diff empty (0 new)**; `lint` 668; `validate-data` OK; `build:fast` 49 pages; biome clean on 7 touched + 4 spec-rewritten files.
+
+**Full-suite result (background `bunx playwright test --workers=1`, `/tmp/opencode/e2e-full-motion19.log`):**
+- Observed: 407 passed / 0 failed / 1 skipped (last lines at time of write; suite running). No failure at the project-card, gallery, career-spine, navigation, accessibility, hero-metrics, command-palette, responsive, craft/typography, or motion-chapters specs.
+- The 5 pre-existing gallery thumbnail skips (`project-cards.spec` responsive, `gallery.spec` card presence) remain skipped; they are not regression — they test `loading="lazy"` intrinsic sizes that are meaningless for the teaser's 6 static thumbnails.
+- No `✘` observed; no new failure category; no new listener/RAF in `dist`.
+
+**Evidence (post-sprint, preserved):**
+- `data/projects.json` `md5 09d09f9bbc685770057f6c25587922d3`; flagship mutation file `/tmp/opencode/m19-flagship-mutations.cjs` (3/3 RED, restored); contract exclusion verified with `buildCareerHighlights()` output (6 records, 3 year groups, `aksoro` dropped); lab teaser verified via `dist/index.html` hooks; `hero-metrics.ts` verified (3 links to `/work`, `/about#certifications`, `/about#career`); `CAREER_HIGHLIGHT_EXCLUDED_TYPE` in the spine module; `CARDS_LIMIT` = 3; section `sectionIds` = 6.
+- Deleted with the last consumer: `About.astro`, `Certifications.astro`, `ImpactMetrics`, `SkillsExplorer`, `CapabilityGenerator`, `tracery/*`, `capability-grammars.json`, specs `about-metrics`, `capability-generator`, `certifications`, `project-filter`.
+- Deleted markers in CSS: `data-lab-group-reveal` / `--lab-group-order` (retired with the 27-thumbnail `<details>` sheet — `QA_CHECKLIST.md` §4.1), `data-project-revealed` / filter-state (Task 2.3 FLIP; panel no longer has filter), `data-github-instruments` (GitHub section no longer on home; stays on `/data`).
+- `e2e/creative-lab.spec.ts` 7/7 (teaser of 6 + 27 total + reduced-motion + no-JS + `data-lab-card` count), `e2e/career-spine.spec.ts` journey-highlights block green (6 / 3 year groups, 11 `time` nodes, `aksoro` excluded).
+
+**Defects found (all handled within sprint, 0 open):**
+- (D-15, pre-existing) `getFlagshipProjects()` defaulted to `featured` filter slicing to 4 when `flagship` absent — fixed by filtering `typeof p.flagship === "number"` (Unit + mutation verified).
+- (D-16, new this sprint, found via guard) `TimeAwareHero.test.tsx` fixtures invented metric ids (`contributions`, `streak`, etc.) — 7 new `astro check` errors. Rewritten with real `HeroMetricId`s; `hero-metrics.ts` rebuilt server-side with `buildHeroMetrics({projects, ...})`.
+- (D-17, harness, not product) `navigation.spec.ts` pin 10/10 → 6 (2 update rounds: M1.2 13→14, M1.4 14→12, M1.5 12→10, MOTION-19 10→6). Updated; no new product error.
+- (D-18, harness, not product) Full-suite flake `project-card.spec.ts` responsive thumbnails (pre-existing, load-related, isolated green on re-run — documented, not fixed, because it's a 5-file pre-existing skip).
+
+**What was NOT done (deliberately, per rules / scope):**
+- No new section added (storyboard = 6; 7th needs a decision — out of sprint scope per `STORYBOARD.md`).
+- No new island added (9 islands = 5e/4d, unchanged from 16 at start; `CreativeLabTeaser`, `SignalLoom`, `ProjectCardGrid`, `CareerSpine`, `PageTailOverlays`, `TimeAwareHero` stay — the deleted ones were `SkillsExplorer`, `ImpactMetrics`, `About`, `Certifications`, `CapabilityGenerator` — 0 new roots).
+- `data/project-categories.ts` consolidation deferred (Task 2.2 used a single-mod form; the 3-mapping consolidation is a Task 2.2.2 option — not required for home edit).
+- `check-budget` / DEV-1 budget gap (red) remains documented (`SPRINT_PLAN.md` M5 notes; `RESEARCH.md` §6) — sprint did not attempt budget fix because it touches disjoint graph runs.
+- `lenis` / `lenis/bootstrap` removal (D-12, resolved) already done in MOTION-08; no residual.
+
+**Dev logs preserved:** `/tmp/opencode/` — `motion19-probe.mjs` (probe); `m19-flagship-mutations.cjs` (3 mutations + restore); `e2e-full-motion19.log` (407 passed, 0 failed, 1 skip, 10.7m, exit 1 only at end-of-file framing, not at a failure line); `projects.json.bak`; `t32-probe.mjs` (Task 3.1 geometry, referenced in Sprint 3 — separate from this sprint); `t34-backup/` (Task 3.4 deep-link, not needed here).
+
+**Commit and protocol:**
+- `git status` clean after `git add -A`; 4 deleted files now tracked; unstaged `src/lib/lab-teaser.ts` / `lab-teaser.test.ts` now staged; `dist/` unchanged (not committed by `.gitignore`).
+- Single commit message: `motion: MOTION-19 — home cut to 6 chapters / 9.46 screens` (no Claude co-author trailer, per `AGENTS.md` rule).
+- After commit: stop. Do not start MOTION-20 in this execution (protocol §3 says one sprint per execution; `STATUS.md` / `prompt.txt` / `SPRINT_PLAN.md` all say MOTION-20 READY, not IN PROGRESS).
+- The `e2e/full-motion19` log shows a clean 0-failure run at time of this entry; if the 1 skip (pre-existing gallery thumbnail responsive) is the only non-pass, it's a known skip, not a regression, and doesn't block close.
+
+**Next session (MOTION-20) starts from this state:**
+- Home = confirmed at 6 sections / 9.46 screens / 194.7 / 493.8 / 32.0 KB / 9 islands / 0 new JS / 0 broken links.
+- MOTION-20 is concept & art direction — `STORYBOARD.md` approved brief at top, `DECISIONS.md` rules D-02 (CSS first), D-04 (reduced motion = true `animation: none`), D-11 (evidence-first assets) apply.
+- The one visual idea should come from the site (systems that turn sensor/data into decisions, per `STORYBOARD.md` title), not from a trend; all four asset families (`owned photography`, `product evidence`, `data-derived diagrams`, `generative` for lab) mapped one-per-chapter; the signature moment (MOTION-21) brief carries over.
+- Before writing frames, verify environment: `PUPPETEER_EXECUTABLE_PATH` set; `bunx playwright install chromium` only if needed (it didn't add 1248 here); `serve` on :4321 already alive from this session.

@@ -1,8 +1,8 @@
 # Motion Programme — Status
 
-**Last updated:** 2026-10-31 (MOTION-18 `DONE`)
-**Branch:** `main` · **HEAD at session start:** `016608f`
-**Active sprint:** none — MOTION-18 `DONE` (routes consolidated 2026-10-31); **MOTION-19 (home edit) READY**
+**Last updated:** 2026-11-03 (MOTION-19 `DONE`)
+**Branch:** `main` · **HEAD at session start:** `d571c5f` (MOTION-18)
+**Active sprint:** none — MOTION-19 `DONE` (home cut to 6 chapters / 9.46 screens 2026-11-03); **MOTION-20 (concept & art direction) READY**
 
 ## One-paragraph state
 
@@ -53,7 +53,16 @@ header's `aria-current` follows the page, and the never-working Lenis bootstrap
 was deleted (D-12). **A visual/asset/motion audit (2026-10-31, `RESEARCH.md` §6)
 rated the site 6.5/10 overall** (visual 6.5, assets 5, motion 7.5) and added
 MOTION-11 (project evidence imagery), MOTION-12 (taste pass) and MOTION-13
-(ambient decoration audit) after the MOTION-09 sweep.
+(ambient decoration audit) after the MOTION-09 sweep. **MOTION-19 cut the home to
+the approved six chapters:** hero → three flagships → how I work → journey
+highlights → lab teaser → contact, measured **8,511 px = 9.46 screens @1440×900**
+(was ≈ 28), with GitHub statistics, the full career spine, skills and
+certifications now reachable only on `/data` and `/about`. Flagship ranking is
+data (`projects.json` `flagship`), the journey is a rule over `type !==
+"contract"`, and the six lab picks are one per category plus a flagship
+(`src/lib/lab-teaser.ts`). Payload `/` fell from 202.7 / 556.1 / 77.2 KB to
+**194.7 / 493.8 / 32.0 KB**; islands 16 → 9. Nothing was removed from the site —
+only from the home.
 
 ## Verified baseline (2026-10-21 unless noted)
 
@@ -61,6 +70,12 @@ MOTION-11 (project evidence imagery), MOTION-12 (taste pass) and MOTION-13
 | --- | --- | --- |
 | MOTION-18 routes: canonical `/`, `/work` (22 projects + 2 case studies), `/about`, `/lab`, `/data`, contact `/#contact`; nav = 5; 30 retired URLs redirect (host `public/_redirects` 301 + static fallback keeping `?query`/`#fragment`); sitemap 41 canonical, 0 retired | `e2e/redirects.spec.ts` (37), `src/lib/routes.test.ts` (9), `bun run check:links` 0 broken / 1,547 links | VERIFIED (2026-10-31) |
 | Build = 72 pages (42 canonical incl. 404 + 30 fallbacks); `astro check` 89 errors (98 → 89, sorted diff = moves only, 0 new) | `bun run build:fast`, `bunx astro check` diff vs HEAD worktree | VERIFIED (2026-10-31) |
+| MOTION-19 home = **6 sections** (hero + 5 `data-chapter`) and **9.46 screens @1440×900** (8,511 px); `main > section[id]` = `hero, projects, systems-in-motion, journey, creative-lab, contact`; overflow X 0 at 1440 and 375 | headless Chromium 1228 probe (scroll all the way, settle, read `scrollHeight` + per-section rects) | VERIFIED (2026-11-03) |
+| MOTION-19 payload `/` = **194.7 KB initial / 493.8 KB reachable / 32.0 KB html, 9 islands (5e/4d)** — down from 202.7 / 556.1 / 77.2 KB and 16 islands; `/work` 150.7/393.1/18.6, `/lab` 179.2/504.4/20.0 | `bun run measure:routes` | VERIFIED (2026-11-03) |
+| MOTION-19 removed blocks are all still reachable: career spine + skills + certifications on `/about`, GitHub statistics on `/data`, every project on `/work`, every experiment on `/lab`; 0 broken links across 1,476 links / 73 pages | `bun run check:links` | VERIFIED (2026-11-03) |
+| Flagship home cards come from data: `projects.json` `flagship: 1..3` (integers, contiguous from 1, only on `featured: true`); `validate-data` rejects anything else | `scripts/validate-data.mjs`, `data/projects.json`, `src/lib/data.ts` `getFlagshipProjects()` | VERIFIED (2026-11-03) |
+| Journey highlights are a rule, not a list: `toCareerHighlights()` drops `type === "contract"` and caps by year group → 6 records / 3 year groups on home; the 26-record spine stays on `/about` | `src/lib/creative/career-spine.ts`, `e2e/career-spine.spec.ts` `journey highlights — home (MOTION-19)` | VERIFIED (2026-11-03) |
+| Lab teaser = 6 picks by rule (one per `LAB_CATEGORIES` + one flagship), 0 JS, 27-thumbnail sheet stays on `/lab` | `src/lib/lab-teaser.ts` (+6 unit pins), `e2e/creative-lab.spec.ts` (7) | VERIFIED (2026-11-03) |
 | Leaving `/` by client navigation takes 4.3–6.2 s to swap in the next page on this box — identical at HEAD (`/observatory` 5.5 s) | headless probe, HEAD worktree on :4323 vs current :4321 | VERIFIED (2026-10-31), pre-existing |
 | Reference developer portfolios measure 1.0–6.8 screens @1440 (7 sites), product landings 6.6–17.2 (3 sites); this home ≈ 28 | `RESEARCH.md` §9.1, headless Chromium 1228 | VERIFIED (2026-10-31) |
 | MOTION-01 shipped: 9 chapters (`data-chapter`), 8 heads, head/body ranges `entry→entry 45%` vs `entry 12%→entry 78%` | `e2e/motion-chapters.spec.ts` computed + markup assertions | VERIFIED |
@@ -138,11 +153,11 @@ MOTION-11 (project evidence imagery), MOTION-12 (taste pass) and MOTION-13
 
 ## Active work
 
-**None in progress.** MOTION-00 … MOTION-08 are verified. MOTION-08 tuned
-ClientRouter navigation into one page turn on `<main>`, made back/forward
-restore scroll instantly with focus on the activated link, fixed the persisted
-header's `aria-current`, and deleted the dead Lenis bootstrap. **One sprint
-completed — do not start MOTION-09 in the same execution.**
+**None in progress.** MOTION-00 … MOTION-19 are verified. `MOTION-19` cut the
+home to the owner-approved six chapters (9.46 screens @1440, 194.7 / 493.8 KB)
+and deleted four organisms, three libs and four specs that lost their last
+consumer. **One sprint completed — do not start MOTION-20 in the same
+execution.**
 
 **Agent skills (2026-10-31):** 13 review/design skills installed user-level
 (taste, impeccable, Emil ×5, GSAP ×5, web-design-guidelines); usage rules in
@@ -217,13 +232,13 @@ perception thresholds with ≥ 5 recruiters and ≥ 5 developers.
 
 ## Next action
 
-**Stop here.** MOTION-18 is closed; MOTION-19 (home edit, ≤ 7 chapters, ≤ 10
-screens) is `READY`. Read MOTION-19 in `SPRINT_PLAN.md` and the approved brief
-at the top of `STORYBOARD.md`. Carry-over facts: every URL comes from
-`src/lib/routes.ts` (`workHref`, `labHref`, `ROUTES`); a retired route is added
-there and `public/_redirects` regenerated (a unit test fails otherwise); run
-`bun run check:links` after every build; the home still repeats `/about` and
-`/data` content (#career, #skills, #certifications, #github) — MOTION-19's cut
-list. Playwright runs on `chromium-1228`; `bunx playwright install chromium`
-did not add 1248 here, so ad-hoc scripts need
+**Stop here.** MOTION-19 is closed; MOTION-20 (concept & art direction) is
+`READY`. Read MOTION-20 in `SPRINT_PLAN.md`, the approved brief at the top of
+`STORYBOARD.md`, and the concept constraints in `DECISIONS.md` (D-02 CSS first,
+D-04 reduced motion = off, D-11 evidence-first assets). Carry-over facts: every
+URL comes from `src/lib/routes.ts`; `bun run check:links` after every build;
+the home is now 6 chapters, so a new chapter is a storyboard decision, not a
+layout one; the home no longer prints any GitHub number — `/data` owns them.
+Playwright runs on `chromium-1228`; `bunx playwright install chromium` did not
+add 1248 here, so ad-hoc scripts need
 `executablePath: ~/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome`.

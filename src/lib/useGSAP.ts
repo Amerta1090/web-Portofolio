@@ -31,8 +31,7 @@ export function useGSAP(
       // `SignalLoom` is the trigger in practice: both of its `useGSAP` calls build
       // plain timelines and create zero ScrollTriggers, yet its cleanup ran on
       // every `hydrated` / `edgeCoords` / `guard.paused` change and so wiped the
-      // registry that the remaining ScrollTrigger owners (`ImpactMetrics`,
-      // `CareerSpine`) depend on.
+      // registry that other ScrollTrigger owners (`CareerSpine`) depend on.
       // `src/lib/useGSAP.test.tsx` locks this behaviour in place.
       ctx.revert();
     };

@@ -170,10 +170,10 @@ describe("useGSAP cleanup scope", () => {
 /**
  * NOTE (M1.5): the "real consumer" describe that stood here is deleted, not
  * retargeted. It rendered `JourneyTimeline` because that island owned two
- * scrub triggers; the only remaining real trigger owner, `ImpactMetrics`,
- * cannot fill the role — its trigger is `once: true`, and under jsdom's zero
- * geometry it fires on creation and removes itself, so there is nothing whose
- * survival can be asserted (measured: `getAll()` stays 0 after render). The
+ * scrub triggers; the next candidate, `ImpactMetrics` (deleted in MOTION-19),
+ * could not fill the role — its trigger was `once: true`, and under jsdom's zero
+ * geometry it fired on creation and removed itself, so there is nothing whose
+ * survival could be asserted (measured: `getAll()` stayed 0 after render). The
  * mirror-based describes above assert the identical properties
  * (neighbour survival through `ScrollTriggerOwner`), so no coverage is lost.
  */

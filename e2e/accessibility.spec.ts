@@ -612,16 +612,15 @@ test.describe("Q4.2 — dark, light, and zoom", () => {
   }
 });
 
-// Sprint 5 (M5.2.3) — the homepage carries three evidence surfaces — the Career
-// Spine, the featured project cards, and the certifications bento — and each one
-// was rebuilt in Sprint 1–2 as a no-JS-first component. With scripts off they
-// must still be complete, in reading order, and free of controls that could only
-// work after hydration. Numbers here were measured in a no-JS context first
-// (probe 2026-10-19), then pinned — the same discipline as every claim above.
+// Sprint 5 (M5.2.3) — the homepage carries two evidence surfaces (the flagship
+// project cards and the journey highlights) and the records themselves moved to
+// `/about` in MOTION-19. Each surface was rebuilt in Sprint 1–2 as a
+// no-JS-first component, so with scripts off they must still be complete, in
+// reading order, and free of controls that could only work after hydration.
+// Numbers here were measured in a no-JS context first (probe 2026-10-19), then
+// re-measured for MOTION-19 and pinned — the same discipline as every claim above.
 test.describe("Sprint 5 — evidence surfaces without JavaScript", () => {
-  test("career, project, and certification content stays complete and ordered with scripts off", async ({
-    browser,
-  }) => {
+  test("home evidence stays complete and ordered with scripts off", async ({ browser }) => {
     const context = await browser.newContext({
       viewport: { width: 1440, height: 900 },
       javaScriptEnabled: false,
@@ -629,36 +628,59 @@ test.describe("Sprint 5 — evidence surfaces without JavaScript", () => {
     const page = await context.newPage();
     await page.goto(HOME);
 
-    // Career Spine: the full contract-driven list, with real <time> dates.
-    await expect(page.locator("#career li[data-career-kind]")).toHaveCount(26);
-    await expect(page.locator("#career time[datetime]")).toHaveCount(29);
-    await expect(page.locator("#career li[data-career-year]")).toHaveCount(4);
-    // Featured evidence: four cards, and skill chips are anchors the server
-    // resolved, not buttons that need React (Task 2.2 / 2.4).
-    await expect(page.locator("#projects [data-project-card]")).toHaveCount(4);
-    await expect(page.locator("#projects [data-project-card] a[href^='#']")).toHaveCount(7);
-    // Certifications bento: one native <details> per provider, data-derived total.
-    await expect(page.locator("#certifications details[data-cert-issuer]")).toHaveCount(7);
-    await expect(page.locator("#certifications [data-cert-total]")).toHaveText("62");
+    // Featured evidence: the three flagship cards, and skill chips are anchors
+    // the server resolved, not buttons that need React (Task 2.2 / 2.4).
+    await expect(page.locator("#projects [data-project-card]")).toHaveCount(3);
+    await expect(page.locator("#projects [data-project-card] a[href^='#']")).toHaveCount(6);
+    // Journey highlights: the six experience records, each with real <time>
+    // dates — 11 elements for 6 starts plus 5 ends (ferswit is ongoing).
+    await expect(page.locator("#journey li[data-career-kind]")).toHaveCount(6);
+    await expect(page.locator("#journey time[datetime]")).toHaveCount(11);
+    await expect(page.locator("#journey li[data-career-year]")).toHaveCount(3);
 
-    // Reading order is document order: career → projects → certifications.
+    // Reading order is document order: projects → journey.
     const tops = await page.evaluate(() =>
-      ["#career", "#projects", "#certifications"].map((sel) =>
+      ["#projects", "#journey"].map((sel) =>
         Math.round(
           (document.querySelector(sel)?.getBoundingClientRect().top ?? 0) + window.scrollY,
         ),
       ),
     );
     expect(tops[0]).toBeLessThan(tops[1]);
-    expect(tops[1]).toBeLessThan(tops[2]);
 
-    // No dead controls in any surface: scripts are off, so a button/input here
-    // could never do anything (P5 / Q4.2 D2).
-    for (const sel of ["#career", "#projects", "#certifications"]) {
+    // No dead controls in either surface: scripts are off, so a button/input
+    // here could never do anything (P5 / Q4.2 D2).
+    for (const sel of ["#projects", "#journey"]) {
       await expect(
         page.locator(`${sel} button, ${sel} input, ${sel} select, ${sel} textarea`),
       ).toHaveCount(0);
     }
+
+    await context.close();
+  });
+
+  test("the full career and certification records stay complete on /about", async ({ browser }) => {
+    const context = await browser.newContext({
+      viewport: { width: 1440, height: 900 },
+      javaScriptEnabled: false,
+    });
+    const page = await context.newPage();
+    await page.goto("/about");
+
+    // The canonical career list, unchanged from the measured Sprint 1 shape.
+    await expect(page.locator("#career li[data-career-kind]")).toHaveCount(26);
+    await expect(page.locator("#career time[datetime]")).toHaveCount(29);
+    await expect(page.locator("#career li[data-career-year]")).toHaveCount(4);
+    // Certifications: one native <details> per issuer, and the data-derived
+    // total in the section subtitle (the filter input above it is inert without
+    // scripts, which is why this surface is not in the no-controls loop).
+    await expect(page.locator("#certifications details[data-issuer]")).toHaveCount(7);
+    await expect(page.locator("#certifications")).toContainText("62 professional certifications");
+
+    // The spine's own controls (the desktop rail) never reach a no-JS reader.
+    await expect(
+      page.locator("#career button, #career input, #career select, #career textarea"),
+    ).toHaveCount(0);
 
     await context.close();
   });
@@ -677,7 +699,7 @@ test.describe("Sprint 5 — evidence surfaces without JavaScript", () => {
     await page.goto(HOME);
 
     const links = page.locator("[data-hero-metric]");
-    await expect(links).toHaveCount(4);
+    await expect(links).toHaveCount(3);
     const names = await links.evaluateAll((nodes) =>
       nodes.map((n) => {
         const spans = [...n.querySelectorAll("span")];
@@ -693,7 +715,9 @@ test.describe("Sprint 5 — evidence surfaces without JavaScript", () => {
       expect(kind.length).toBeGreaterThan(0);
       expect(value.length).toBeGreaterThan(0);
       expect(label).toBe(`${kind}: ${value}`);
-      expect(href).toBe("#github-metrics");
+      // MOTION-19: the row points at the pages that list what it counts, never
+      // at a home anchor (the old `#github-metrics`).
+      expect(href).toMatch(/^\/(work|about)/);
     }
 
     await context.close();

@@ -35,6 +35,13 @@ export function getFeaturedProjects(): Project[] {
     .slice(0, 4);
 }
 
+/** The home's flagship proof (MOTION-19), lead first. */
+export function getFlagshipProjects(): Project[] {
+  return getProjects()
+    .filter((p) => typeof p.flagship === "number")
+    .sort((a, b) => (a.flagship ?? 0) - (b.flagship ?? 0));
+}
+
 export function getProjectBySlug(slug: string): Project | undefined {
   return getProjects().find((p) => p.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") === slug);
 }

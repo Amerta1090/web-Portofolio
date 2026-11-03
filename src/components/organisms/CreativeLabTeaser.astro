@@ -1,71 +1,50 @@
 ---
 /**
- * The Creative Lab contact sheet (Prove It, Task 2.5).
+ * The Creative Lab teaser (Prove It Task 2.5; cut to six in MOTION-19).
  *
- * Replaces the `client:visible` island that rendered four hand-picked
- * experiments: the homepage advertised 4 of the 27 experiments the lab
- * actually holds (PRD I4), and inspecting the sheet required a hydrated
- * React island. This is the whole catalog in server HTML — no island, no
- * script, no inline handler (a dead control here is exactly what M1.2's
- * mutation M5 taught this repo to count for: Astro does not escape `on*`
- * attributes), with per-category collapse delegated to a native `<details>`.
+ * The home gives developers a reason to visit the lab without turning into the
+ * gallery itself: six thumbnails picked by the written rule in
+ * `lib/lab-teaser.ts` (one per category, plus one flagship), every one a deep
+ * link into `/lab`. The whole catalog — all experiments, grouped by category —
+ * lives on `/lab`.
  *
- * Every number printed comes from `SiteFacts` (`lab.count` and
- * `lab.byCategory`), never a literal in this file: the header count and the
- * per-category counts are the same figures the rest of the site cites
- * (Rule 7 / P8). The cards come from `lab-gallery.ts`, the join over the
- * same registry, so a category row and the cards underneath it cannot
- * disagree without `lab-gallery.test.ts` going red first — and
- * `creative-lab.spec.ts` checks the agreement on the built page.
+ * Server HTML only: no island, no script, no inline handler (Astro does not
+ * escape `on*` attributes, so a dead control here is something to count, not
+ * assume). The total printed is `SiteFacts.lab.count` (Rule 7 / P8), never a
+ * literal in this file.
  *
- * MOTION-07 adds two presentation hooks and nothing else: `data-lab-sheet`
- * on the wrapper (the chapter body opts out of its single-beat reveal through
- * it), `data-lab-group-reveal` on each heading and `data-lab-card-reveal` on
- * each thumbnail, with `--lab-group-order` / `--lab-card-order` emitted from
- * the loop index. Order therefore comes from the data order, never from
- * `:nth-child`, and no JavaScript is added.
+ * MOTION-07 presentation hooks stay: `data-lab-sheet` on the wrapper (the
+ * chapter body opts out of its single-beat reveal through it) and
+ * `data-lab-card-reveal` on each thumbnail, with `--lab-card-order` emitted
+ * from the selection order, so no JavaScript is added.
  */
-import type { LabCategoryCount } from "../../lib/facts";
+import type { LabGalleryExperiment } from "../../lib/lab-gallery";
 import { ROUTES, labHref } from "../../lib/routes";
-import { LAB_GALLERY_EXPERIMENTS } from "../../lib/lab-gallery";
 
 interface Props {
-  lab: {
-    count: number;
-    byCategory: LabCategoryCount[];
-  };
+  /** Total experiments in the lab (`SiteFacts.lab.count`). */
+  count: number;
+  /** The selection to show, in order (`buildLabTeaser()`). */
+  picks: LabGalleryExperiment[];
 }
 
-const { lab } = Astro.props;
-
-/**
- * The plan's "6 categories" are `LAB_CATEGORY_ORDER`: "All" plus the five
- * declared categories (DEVIASI — sprint-planning §Task 2.5). "All" is the
- * section total in the header: a collapsible containing the whole sheet
- * would duplicate all 27 cards. Zero-count categories never reach here —
- * the facts builder omits them, because an empty group is a dead control
- * (Rule 12) — so every group below has at least one card.
- */
-const groups = lab.byCategory.map((category) => ({
-  ...category,
-  experiments: LAB_GALLERY_EXPERIMENTS.filter((exp) => exp.category === category.category),
-}));
+const { count, picks } = Astro.props;
 ---
 
 <div class="space-y-8" data-lab-sheet>
   <div class="flex flex-wrap items-end justify-between gap-4">
     <p class="max-w-2xl text-sm text-text-secondary">
-      <span class="font-mono tabular-nums text-text-primary" data-lab-count>{lab.count}</span>
-      {" "}interactive experiments — fluid solvers, fractals, cellular automata,
-      n-body gravity and learning models, every one written from scratch and
-      running entirely in your browser. Every thumbnail below opens the live
-      experiment in the lab.
+      <span class="font-mono tabular-nums text-text-primary" data-lab-picks>{picks.length}</span>
+      {" "}of <span class="font-mono tabular-nums text-text-primary" data-lab-count>{count}</span>
+      {" "}interactive experiments — one from each category, plus a flagship. Every
+      one is written from scratch and runs entirely in your browser; each thumbnail
+      opens the live experiment in the lab.
     </p>
     <a
       href={ROUTES.lab}
       class="group inline-flex shrink-0 items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-5 py-2.5 text-sm font-medium text-accent transition-colors hover:border-accent/50 hover:bg-accent/20"
     >
-      Explore the Creative Lab
+      All experiments in the lab
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="16"
@@ -85,70 +64,34 @@ const groups = lab.byCategory.map((category) => ({
     </a>
   </div>
 
-  {
-    groups.map((group, groupIndex) => (
-      <details open class="group" data-lab-group>
-        <summary
-          data-lab-group-reveal
-          style={{ "--lab-group-order": String(groupIndex) }}
-          class="flex cursor-pointer list-none select-none items-center gap-2 py-1 [&::-webkit-details-marker]:hidden"
+  <ul class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+    {picks.map((exp, cardIndex) => (
+      <li data-lab-card-reveal style={{ "--lab-card-order": String(cardIndex) }}>
+        <a
+          href={labHref(exp.id)}
+          data-lab-card
+          data-lab-category={exp.category}
+          class="group/card block overflow-hidden rounded-xl border border-border/50 bg-bg-tertiary/60 transition-colors hover:border-accent/50"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="h-3.5 w-3.5 shrink-0 text-text-secondary transition-transform group-open:rotate-180"
-            aria-hidden="true"
-          >
-            <path d="m9 18 6-6-6-6" />
-          </svg>
-          <span class="section-label text-text-secondary">{group.label}</span>
-          {" "}
-          <span
-            class="rounded-full border border-border/50 px-2 py-0.5 font-mono text-xs tabular-nums text-text-secondary"
-            data-lab-group-count
-          >
-            {group.count}
-          </span>
-        </summary>
-        <ul class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {group.experiments.map((exp, cardIndex) => (
-            <li
-              data-lab-card-reveal
-              style={{ "--lab-card-order": String(cardIndex) }}
-            >
-              <a
-                href={labHref(exp.id)}
-                data-lab-card
-                class="group/card block overflow-hidden rounded-xl border border-border/50 bg-bg-tertiary/60 transition-colors hover:border-accent/50"
-              >
-                <div class="relative aspect-[16/9] overflow-hidden bg-bg-secondary">
-                  <img
-                    src={exp.thumbnail}
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                    width="400"
-                    height="300"
-                    class="h-full w-full object-cover opacity-80 transition-opacity duration-300 group-hover/card:opacity-100"
-                  />
-                </div>
-                <div class="px-3 py-2.5">
-                  <span class="block truncate text-sm font-medium text-text-primary transition-colors group-hover/card:text-accent">
-                    {exp.title}
-                  </span>
-                </div>
-              </a>
-            </li>
-          ))}
-        </ul>
-      </details>
-    ))
-  }
+          <div class="relative aspect-[16/9] overflow-hidden bg-bg-secondary">
+            <img
+              src={exp.thumbnail}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              width="400"
+              height="300"
+              class="h-full w-full object-cover opacity-80 transition-opacity duration-300 group-hover/card:opacity-100"
+            />
+          </div>
+          <div class="px-3 py-2.5">
+            <span class="block truncate text-sm font-medium text-text-primary transition-colors group-hover/card:text-accent">
+              {exp.title}
+            </span>
+            <span class="block truncate text-xs text-text-secondary">{exp.category}</span>
+          </div>
+        </a>
+      </li>
+    ))}
+  </ul>
 </div>

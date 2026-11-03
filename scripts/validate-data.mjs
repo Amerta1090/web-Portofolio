@@ -36,9 +36,6 @@ const schemas = {
   "faq.json": {
     requiredItems: ["id", "category", "keywords", "question", "answer"],
   },
-  "capability-grammars.json": {
-    grammarSymbols: ["capability", "project_blurb", "fact"],
-  },
 };
 
 let errors = 0;
@@ -154,28 +151,30 @@ for (const [file, schema] of Object.entries(schemas)) {
       }
       claimed.set(id, i);
     }
-  }
 
-  if (schema.grammarSymbols) {
-    for (const symbol of schema.grammarSymbols) {
-      const value = data[symbol];
-      if (value === undefined) {
-        console.error(`ERROR: ${file} missing grammar symbol "${symbol}"`);
+    // MOTION-19: the home's flagship proof. Ranks are integers 1..n with no gap
+    // or repeat, and only a featured project can lead the home.
+    const ranks = [];
+    for (let i = 0; i < items.length; i++) {
+      const rank = items[i].flagship;
+      if (rank === undefined) continue;
+      if (!Number.isInteger(rank) || rank < 1) {
+        console.error(`ERROR: projects.json[${i}] flagship must be a positive integer`);
         errors++;
         continue;
       }
-      const expansions = Array.isArray(value) ? value : [value];
-      const valid =
-        expansions.length > 0 && expansions.every((e) => typeof e === "string" && e.length > 0);
-      if (!valid) {
-        console.error(
-          `ERROR: ${file} symbol "${symbol}" must be a non-empty string or array of non-empty strings`,
-        );
+      if (items[i].featured !== true) {
+        console.error(`ERROR: projects.json[${i}] flagship ${rank} is not a featured project`);
         errors++;
       }
+      ranks.push(rank);
+    }
+    const sorted = [...ranks].sort((a, b) => a - b);
+    if (sorted.some((rank, index) => rank !== index + 1)) {
+      console.error(`ERROR: projects.json flagship ranks ${sorted.join(",")} must run 1..${sorted.length} with no gap or repeat`);
+      errors++;
     }
   }
-
 }
 
 /**
@@ -229,8 +228,8 @@ if (existsSync(mlMetricsPath)) {
  * `profile.json` used to assert 18 projects and 54 certifications while the
  * datasets held 22 and 62. Those two fields are now rejected outright above, so
  * the remaining drift vector is a count typed into a sentence:
- * `capability-grammars.json` claims "22 public projects" and `faq.json` claimed
- * "Total 18 project ter.Shipping". Nothing re-derives those numbers, so nothing
+ * `faq.json` claimed "Total 18 project ter.Shipping" (and the since-deleted
+ * `capability-grammars.json` claimed "22 public projects"). Nothing re-derives those numbers, so nothing
  * warned when they stopped matching.
  *
  * The fix is to count the datasets and check every `<n> project(s)` /

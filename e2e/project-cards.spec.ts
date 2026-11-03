@@ -8,29 +8,31 @@ import { waitForIslandHydration } from "./hydration";
  * HTML must be fully usable on its own (no dead controls), because the card is
  * an island (`client:load`): its markup exists before React has attached.
  *
- * The four slugs below are the deterministic output of the shared slug rule
- * (`title.toLowerCase().replace(/[^a-z0-9]+/g, "-")`), the same one used by
- * `/work/[slug]` (`src/lib/routes.ts`) and the observatory index. If the rule changes, both this
- * spec and the unit suite have to move together.
+ * MOTION-19: the home shows the three flagship systems, lead first — the
+ * ranking is data (`projects.json` → `flagship`), so a reorder in the data moves
+ * the cards without touching this file. The full list of 22 lives at `/work`.
+ *
+ * The slugs below are the deterministic output of the shared slug rule
+ * (`case_study` id when a project has one, else the legacy slug) used by
+ * `/work/[slug]` (`src/lib/routes.ts`). If the rule changes, both this spec and
+ * the unit suite have to move together.
  */
 const SLUGS = [
-  "retro-game-inspired-portfolio-website",
-  "nyatetduwit-offline-first-personal-finance-pwa",
-  "ijo-plis-ihsg-usd-idr-forecasting-platform",
-  // MOTION-18: a project with a case study lives at its case-study id.
+  "ai-quranic-tafsir",
   "red-devil-dynamics",
+  "ijo-plis-ihsg-usd-idr-forecasting-platform",
 ];
 
 const CARDS = "#projects [data-project-card]";
 
-test("home renders exactly the four featured project cards", async ({ page }) => {
+test("home renders exactly the three flagship project cards", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(CARDS)).toHaveCount(4);
+  await expect(page.locator(CARDS)).toHaveCount(3);
 });
 
 test("each title is a real link to its /work/<slug> page", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(CARDS)).toHaveCount(4);
+  await expect(page.locator(CARDS)).toHaveCount(3);
   for (const slug of SLUGS) {
     await expect(page.locator(`#projects a[href="/work/${slug}"]`)).toHaveCount(1);
   }
@@ -38,34 +40,33 @@ test("each title is a real link to its /work/<slug> page", async ({ page }) => {
 
 test("external links are real anchors with target and the full rel guard", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(CARDS)).toHaveCount(4);
-  // Each of the four featured projects carries two link rows (8 total).
+  await expect(page.locator(CARDS)).toHaveCount(3);
+  // The three flagship projects carry 1 + 2 + 2 link rows (5 total).
   const external = page.locator('#projects a[target="_blank"]');
-  await expect(external).toHaveCount(8);
+  await expect(external).toHaveCount(5);
   const rels = await external.evaluateAll((anchors) => anchors.map((a) => a.getAttribute("rel")));
   expect(rels.every((rel) => rel === "noopener noreferrer")).toBe(true);
 });
 
 test("media labels are never rendered (they are not openable evidence)", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(CARDS)).toHaveCount(4);
+  await expect(page.locator(CARDS)).toHaveCount(3);
   // `media` on IJO PLIS holds labels ("IHSG Predictor", "IDR Predictor"), not
   // URLs; the card must not present them as things you can open.
   await expect(page.locator("#projects")).not.toContainText("IHSG Predictor");
   await expect(page.locator("#projects")).not.toContainText("IDR Predictor");
 });
 
-// Task 2.3: the card area gained six filter chips, but only *after* hydration.
-// A pre-hydration control is a dead control, so the "no controls" contract is
-// asserted against the server HTML with JavaScript off; the post-hydration
-// contract is the inverse — every button that exists is a live filter chip.
+// The card island ships zero controls: every actionable element is an anchor,
+// so there is no dead control before hydration either. Asserted against the
+// server HTML with JavaScript off.
 test.describe("server HTML (JavaScript disabled)", () => {
   test.use({ javaScriptEnabled: false });
 
   test("the card area has no dead controls", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator(CARDS)).toHaveCount(4);
-    // No chip, no reset — the server ships zero buttons in this section.
+    await expect(page.locator(CARDS)).toHaveCount(3);
+    // No button and no reset — the server ships zero buttons in this section.
     await expect(page.locator("#projects button")).toHaveCount(0);
     // Inline onevent* attributes would be inert-until-hydration controls.
     const withInlineHandlers = await page
@@ -76,50 +77,36 @@ test.describe("server HTML (JavaScript disabled)", () => {
 
   test("skill chips are already real anchors before hydration", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator(CARDS)).toHaveCount(4);
+    await expect(page.locator(CARDS)).toHaveCount(3);
     // Without JS the chip is still a working link into the Capability Map —
     // the server resolved every href, so nothing here needs React (P5).
     await expect(
       page.locator('#projects a[href="#signal-capability-programming-languages"]').first(),
     ).toBeVisible();
-    await expect(page.locator('#projects a[href="#systems-in-motion"]').first()).toBeVisible();
-    await expect(page.locator("#projects [data-project-card] a[href^='#']")).toHaveCount(7);
+    await expect(page.locator("#projects [data-project-card] a[href^='#']")).toHaveCount(6);
   });
-});
-
-test("after hydration every card-area button is a live filter chip", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.locator(CARDS)).toHaveCount(4);
-  await waitForIslandHydration(page, "[data-project-card]");
-  await expect(page.locator("#projects [data-filter-chip]")).toHaveCount(6);
-  // Nothing clickable exists outside the fieldset (the reset button only
-  // appears inside the empty state, which needs an active non-"all" filter).
-  await expect(page.locator("#projects button:not([data-filter-chip])")).toHaveCount(0);
 });
 
 test("clicking a card's title navigates to the real project page", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(CARDS)).toHaveCount(4);
-  const title = page.locator(`#projects a[href="/work/retro-game-inspired-portfolio-website"]`);
-  await Promise.all([
-    page.waitForURL("**/work/retro-game-inspired-portfolio-website"),
-    title.click(),
-  ]);
-  await expect(page).toHaveURL(/\/work\/retro-game-inspired-portfolio-website$/);
+  await expect(page.locator(CARDS)).toHaveCount(3);
+  // The lead card is rank 1 in `projects.json`, so it is the first title on the page.
+  const title = page.locator(`#projects a[href="/work/${SLUGS[0]}"]`);
+  await Promise.all([page.waitForURL(`**/work/${SLUGS[0]}`), title.click()]);
+  await expect(page).toHaveURL(new RegExp(`/work/${SLUGS[0]}$`));
 });
 
 test("cursor spotlight is on when the grid is visible after hydration", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(CARDS)).toHaveCount(4);
+  await expect(page.locator(CARDS)).toHaveCount(3);
   await page.locator("#projects").scrollIntoViewIfNeeded();
   // The grid pauses its spotlight while off-screen (useRafGuard); once it is
-  // visible and hydrated the attribute must be present on all four cards.
+  // visible and hydrated the attribute must be present on all three cards.
   await waitForIslandHydration(page, "[data-project-card]");
-  await expect(page.locator('#projects [data-tilt-spotlight="on"]')).toHaveCount(4);
-  // Post-hydration the six filter chips are real buttons; nothing else in the
-  // card area may be clickable (the dead-control contract lives in the
-  // JS-disabled test above).
-  await expect(page.locator("#projects button:not([data-filter-chip])")).toHaveCount(0);
+  await expect(page.locator('#projects [data-tilt-spotlight="on"]')).toHaveCount(3);
+  // Hydration adds no control at all: every actionable element is still an
+  // anchor, so nothing in the card area is a button.
+  await expect(page.locator("#projects button")).toHaveCount(0);
 });
 
 // Task 4.1 (M4.1.1): the BorderGlow ring is pure CSS — `TiltCard` writes only
@@ -138,13 +125,13 @@ test("BorderGlow ring is a pure-CSS conic-masked ::before reading --glow-x/--glo
   page,
 }) => {
   await page.goto("/");
-  await expect(page.locator(CARDS)).toHaveCount(4);
+  await expect(page.locator(CARDS)).toHaveCount(3);
   // Same setup as the spotlight test above: the grid pauses its spotlight
   // while off-screen (useRafGuard), so the ring's reveal rule can only hold
   // once the guard is live and hydrated.
   await page.locator("#projects").scrollIntoViewIfNeeded();
   await waitForIslandHydration(page, "[data-project-card]");
-  await expect(page.locator('#projects [data-tilt-spotlight="on"]')).toHaveCount(4);
+  await expect(page.locator('#projects [data-tilt-spotlight="on"]')).toHaveCount(3);
 
   const ring = await page
     .locator(CARDS)
@@ -224,26 +211,33 @@ test("BorderGlow ring is a pure-CSS conic-masked ::before reading --glow-x/--glo
 // anchor — a declared capability yields `#signal-<nodeId>`, one the map cannot
 // place yields the section anchor (M2.4.3). Skill → node resolution is asserted
 // against the live page; the unit suite pins the resolution table itself.
+//
+// MOTION-19: the three flagships declare six skills between them, all of which a
+// capability describes, so the honest section fallback has no home chip to run
+// against here. Its rule stays pinned in `ProjectCardGrid.test.tsx` — deleting
+// the e2e variant keeps the suite honest instead of asserting an unreachable state.
 test("skill chips are real cross-links into the Capability Map", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(CARDS)).toHaveCount(4);
-  // Resolved skills point at their capability node (server-resolved hrefs).
+  await expect(page.locator(CARDS)).toHaveCount(3);
+  // Resolved skills point at their capability node (server-resolved hrefs):
+  // Python (all three cards), NLP + Machine Learning, and FastAPI.
   await expect(
     page.locator('#projects a[href="#signal-capability-programming-languages"]'),
-  ).toHaveCount(2);
+  ).toHaveCount(3);
   await expect(
     page.locator('#projects a[href="#signal-capability-machine-learning-ai"]'),
-  ).toHaveCount(1);
-  // A skill no declared capability describes still links to the section itself
-  // (an honest fallback, never a fabricated node id).
-  await expect(page.locator('#projects a[href="#systems-in-motion"]')).toHaveCount(1);
-  // Every chip is a link (no inert `<span>` left behind): 7 chips, all anchors.
-  await expect(page.locator("#projects [data-project-card] a[href^='#']")).toHaveCount(7);
+  ).toHaveCount(2);
+  await expect(page.locator('#projects a[href="#signal-capability-web-development"]')).toHaveCount(
+    1,
+  );
+  // Every chip is a link (no inert `<span>` left behind): 6 chips, all anchors.
+  await expect(page.locator("#projects [data-project-card] a[href^='#']")).toHaveCount(6);
 });
 
 test("clicking a resolved skill chip scrolls to its Capability Map node", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(CARDS)).toHaveCount(4);
+  await expect(page.locator(CARDS)).toHaveCount(3);
+  // FastAPI on the Red Devil card resolves to Web Development.
   const chip = page.locator('#projects a[href="#signal-capability-web-development"]').first();
   await chip.scrollIntoViewIfNeeded();
   await chip.click();
@@ -262,19 +256,6 @@ test("clicking a resolved skill chip scrolls to its Capability Map node", async 
       { timeout: 8000 },
     )
     .toBe("settled");
-});
-
-test("clicking the fallback chip scrolls to the section without a node hash", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.locator(CARDS)).toHaveCount(4);
-  const chip = page.locator('#projects a[href="#systems-in-motion"]').first();
-  await chip.scrollIntoViewIfNeeded();
-  await chip.click();
-
-  await expect(page.locator("#systems-in-motion")).toBeVisible();
-  // The hash is the section, not a `#signal-` node, so `parseSignalHash` cannot
-  // (and must not) select a specific node from it (M2.4.3).
-  await expect(page).toHaveURL(/#systems-in-motion$/);
 });
 
 /**
@@ -328,7 +309,7 @@ test.describe("responsive thumbnails (MOTION-01.5)", () => {
     page,
   }) => {
     await page.goto("/");
-    await expect(page.locator(CARDS)).toHaveCount(4);
+    await expect(page.locator(CARDS)).toHaveCount(3);
     const thumbs = await readThumbs(page);
     expect(thumbs).toHaveLength(4);
 
@@ -353,7 +334,7 @@ test.describe("responsive thumbnails (MOTION-01.5)", () => {
 
   test("every thumbnail declares the largest variant's 16:9 intrinsic size", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator(CARDS)).toHaveCount(4);
+    await expect(page.locator(CARDS)).toHaveCount(3);
     const thumbs = await readThumbs(page);
 
     for (const thumb of thumbs) {
@@ -373,7 +354,7 @@ test.describe("responsive thumbnails (MOTION-01.5)", () => {
     });
 
     await page.goto("/");
-    await expect(page.locator(CARDS)).toHaveCount(4);
+    await expect(page.locator(CARDS)).toHaveCount(3);
     // Lazy loading means the cards only fetch once the section is in view.
     await page.locator("#projects").scrollIntoViewIfNeeded();
     await expect
@@ -393,8 +374,8 @@ test.describe("responsive thumbnails (MOTION-01.5)", () => {
 
 // MOTION-04 — evidence card hierarchy.
 //
-// `#projects` is four pieces of evidence, not one rectangle. The chapter body
-// used to fade all four cards in as a single block; now each card owns a
+// `#projects` is three pieces of evidence, not one rectangle. The chapter body
+// used to fade all cards in as a single block; now each card owns a
 // `view()` beat, and the *order* comes from the data (`--project-card-order`,
 // lead card = 0), never from a `:nth-child` wall that would go stale on a
 // reorder. Two defects are pinned here at the same time, because they share one
@@ -403,7 +384,6 @@ test.describe("responsive thumbnails (MOTION-01.5)", () => {
 // `progress: 1` — so no card (and no chapter body) ever animated. `overflow:
 // clip` clips the same pixels without a scrollport.
 const WRAPPERS = "#projects [data-project-card-reveal]";
-const CHIPS = "#projects [data-filter-chip]";
 
 /** Scroll offset at which a card wrapper first reads as fully opaque. */
 async function settleOffsets(page: import("@playwright/test").Page, indices: number[]) {
@@ -455,7 +435,7 @@ async function settleOffsets(page: import("@playwright/test").Page, indices: num
 test("clipped chapters clip without becoming scroll containers", async ({ page }) => {
   await page.goto("/");
   const overflow = await page.evaluate(() =>
-    ["#projects", "#skills", "#career", "#about"].map((selector) => {
+    ["#projects", "#systems-in-motion", "#journey", "#creative-lab", "#contact"].map((selector) => {
       const el = document.querySelector(selector);
       if (!el) return { selector, overflow: "missing" };
       return { selector, overflow: getComputedStyle(el).overflow };
@@ -469,8 +449,8 @@ test("clipped chapters clip without becoming scroll containers", async ({ page }
 
 test("the project chapter body is not faded as one block", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(CARDS)).toHaveCount(4);
-  await expect(page.locator(WRAPPERS)).toHaveCount(4);
+  await expect(page.locator(CARDS)).toHaveCount(3);
+  await expect(page.locator(WRAPPERS)).toHaveCount(3);
 
   const body = await page.locator("#projects [data-chapter-body]").evaluate((el) => {
     const cs = getComputedStyle(el);
@@ -487,7 +467,7 @@ test("the project chapter body is not faded as one block", async ({ page }) => {
       animation: getComputedStyle(node).animationName,
     })),
   );
-  expect(wrappers.map((wrapper) => wrapper.order)).toEqual(["0", "1", "2", "3"]);
+  expect(wrappers.map((wrapper) => wrapper.order)).toEqual(["0", "1", "2"]);
   expect(wrappers.filter((wrapper) => wrapper.primary)).toHaveLength(1);
   expect(wrappers[0].primary).toBe(true);
   for (const wrapper of wrappers) expect(wrapper.animation).toBe("reveal-fade-up");
@@ -496,12 +476,11 @@ test("the project chapter body is not faded as one block", async ({ page }) => {
 test("the lead card settles before its row neighbour", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 720 });
   await page.goto("/");
-  await expect(page.locator(WRAPPERS)).toHaveCount(4);
-  // Wait for hydration before measuring: the filter fieldset appears above the
-  // grid once React attaches, so any measurement straddling that reflow would
-  // report a gap that is layout, not choreography.
+  await expect(page.locator(WRAPPERS)).toHaveCount(3);
+  // Measure only once React has attached: before that the reveal order custom
+  // property is not written, so a measurement straddling hydration would read a
+  // gap that is layout, not choreography.
   await waitForIslandHydration(page, "[data-project-card]");
-  await expect(page.locator(CHIPS)).toHaveCount(6);
 
   // Cards 0–2 share a row, so their view() timelines start together; the order
   // token (8% of the beat ≙ ~37px here) is the only thing sequencing them.

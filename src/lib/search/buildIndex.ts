@@ -86,7 +86,8 @@ export function buildSearchIndex(): SearchItem[] {
         title: skill.name,
         description: `Skill · ${category.name}`,
         keywords: [category.name],
-        target: "/#skills",
+        // MOTION-19: the skills live on `/about`; home no longer carries the section.
+        target: `${ROUTES.about}#${ABOUT_ANCHORS.skills}`,
       });
     }
   }
@@ -110,7 +111,9 @@ export function buildSearchIndex(): SearchItem[] {
       title: exp.role,
       description: `${exp.company} · ${exp.type}`,
       keywords: withoutEmpty([exp.company, ...(exp.technologies ?? [])]),
-      target: "/#career",
+      // MOTION-19: the career spine is on `/about`; the home keeps a highlights
+      // excerpt at `#journey` and the full record at `/about#career`.
+      target: `${ROUTES.about}#${ABOUT_ANCHORS.career}`,
     });
   }
 

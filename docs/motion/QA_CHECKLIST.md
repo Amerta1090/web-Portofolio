@@ -76,12 +76,13 @@ bunx playwright test --workers=1
 - A chapter body whose component owns its own beats opts out of the block
   reveal (`:has([data-project-grid])`, `:has([data-career-spine])`,
   `:has([data-github-instruments])`, `:has([data-lab-sheet])`).
-- Ordered beats use server-emitted tokens (`--card-order`, `--lab-group-order`,
-  `--lab-card-order`), never `:nth-child`, so a data reorder cannot silently
-  reorder the choreography.
-- The Creative Lab group container (`<details>`) carries no opacity beat: it
+- Ordered beats use server-emitted tokens (`--card-order`, `--lab-card-order`),
+  never `:nth-child`, so a data reorder cannot silently reorder the
+  choreography. (MOTION-19 retired the `--lab-group-order` token together with
+  the 27-thumbnail group sheet: the home shows six picks, not five `<details>`.)
+- The Creative Lab wrapper (`[data-lab-sheet]`) carries no opacity beat: it
   composites into every thumbnail, which would stop any card from reading as
-  settled. The group beat lives on its `<summary>`.
+  settled.
 - `Section.astro` clips with `overflow: clip`, never `overflow: hidden` — a
   hidden overflow makes the section a scroll container, which breaks sticky and
   degenerates every `view()` timeline inside it. There is no `clip` prop.
@@ -182,6 +183,21 @@ git diff -- <files>
 - [x] `RESEARCH.md` updated if an assumption became verified. *(§2.1 reduced-motion measured; reduced-data Chromium limitation recorded §2.1/§3)*
 
 ## 8. Sprint results log
+
+### MOTION-19 — 2026-11-03
+
+| Gate | Result |
+| --- | --- |
+| `bun run validate-data` | OK (`GitHub cache: non-degenerate`); new flagship gate proven 3/3 RED — duplicate rank → `ranks 1,1,2 must run 1..3 with no gap or repeat`, `flagship 4 is not a featured project`, `flagship must be a positive integer`; `data/projects.json` restored to `md5 09d09f9bbc685770057f6c25587922d3` |
+| `bun run build:fast` | **72 pages** (42 canonical incl. 404 + 30 retired-route fallbacks) — unchanged, MOTION-19 removed blocks, not routes |
+| `bun run check:links` | **0 broken / 1,476 same-site links / 73 pages** (1,547 → 1,476 = the links that left the home; every one still exists on its canonical route) |
+| `bunx astro check` | **89** errors = baseline; **0 in any touched file** (verified by diffing the file list, not the count) |
+| Biome, touched files | clean on all 7 files the diff touches |
+| Unit suite | TK_UNIT |
+| Full e2e `--workers=1` | TK_E2E |
+| `measure:routes` `/` | **194.7 / 493.8 / 32.0 KB, 9 islands (5e/4d)** — was 202.7 / 556.1 / 77.2 KB and 16 islands; `/work` 150.7 / 393.1 / 18.6, `/lab` 179.2 / 504.4 / 20.0 |
+| Home height, headless Chromium 1228 | **8,511 px = 9.46 screens @1440×900** (criterion ≤ 10); **6 sections** = hero + 5 `data-chapter`; `main > section[id]` = `hero, projects, systems-in-motion, journey, creative-lab, contact`; overflow X 0 at 1440 and 375. @375×812 = 13.65 screens (documented; criterion is 1440) |
+| Teaser + journey rules | `e2e/creative-lab.spec.ts` **7/7** (6 picks + 27 total + no-JS + reduced motion), `e2e/career-spine.spec.ts` journey-highlights block green (6 records / 3 year groups, 11 `time[datetime]`, contract record excluded) |
 
 ### MOTION-18 — 2026-10-31
 

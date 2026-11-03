@@ -133,30 +133,31 @@ test.describe("Navigation hierarchy — one primary nav, one position readout", 
     //   13 → 14  Task 1.2  added #career (the Career Spine), M1.2.1
     //   14 → 12  Task 1.4  folded #honors + #volunteering into the spine, M1.4.1
     //   12 → 10  Task 1.5  retired #experience + #journey, M1.5.1
+    //   10 →  6  MOTION-19 the six-chapter home (about/skills/certs/github moved
+    //                     to `/about` and `/data` by MOTION-18, then the career
+    //                     chapter became the six-record Journey highlight)
     //
-    // `main > section[id]`, not `section[id]`: M2.1.2 pointed the hero's evidence
-    // row at `#github-metrics`, and that anchor is a `Section` nested *inside*
-    // `#github` (measured section-nesting depth 2 vs 1 for the rest) — one of five
-    // sibling phase sections inside the GitHub Universe. So the bare selector
-    // started counting an in-phase link target as a navigation section and
-    // reported 11 while the readout correctly said "01 / 10". Scope the selector
-    // to the top-level sections the page-owned `sectionIds` list enumerates.
+    // `main > section[id]`, not `section[id]`: M2.1.2 once pointed the hero's
+    // evidence row at `#github-metrics`, a `Section` nested *inside* `#github`,
+    // and the bare selector started counting an in-phase link target as a
+    // navigation section. MOTION-19 removed that anchor, but the scoping stays:
+    // it is the selector the page-owned `sectionIds` list enumerates, and a
+    // future nested anchor must not be able to inflate the count again.
     const sectionCount = await page.locator("main > section[id]").count();
-    expect(sectionCount).toBe(10);
+    expect(sectionCount).toBe(6);
     await expect(counter.locator("[data-section-dot]")).toHaveCount(sectionCount);
     await expect(counter).toHaveText(`01 / ${String(sectionCount).padStart(2, "0")}`);
 
     // Pins the decision above so it cannot be "fixed" the other way. A nested
-    // section with an id is a link target, not a navigation step: the other four
-    // phases of the Universe have no id, so counting this one alone would make
-    // the readout claim "10 / 11" for a section that actually has five parts.
-    // If a second nested anchor ever appears, it has to be added here and
-    // argued for, rather than silently inflating the count.
+    // section with an id is a link target, not a navigation step, and MOTION-19
+    // left none on the home: the GitHub telemetry and its in-phase anchor live
+    // on `/data` now. If a nested anchor ever appears, it has to be added here
+    // and argued for, rather than silently inflating the count.
     expect(
       await page
         .locator("section[id]:not(main > section[id])")
         .evaluateAll((els) => els.map((e) => e.id)),
-    ).toEqual(["github-metrics"]);
+    ).toEqual([]);
 
     // Decorative: it duplicates section landmarks, and the old 11 `aria-label`s
     // on role=generic dots were prohibited by ARIA 1.2.
@@ -171,7 +172,7 @@ test.describe("Navigation hierarchy — one primary nav, one position readout", 
     await page.goto("/");
     const counter = page.locator("[data-section-counter]");
     const start = await counter.textContent();
-    expect(start?.trim()).toBe("01 / 10");
+    expect(start?.trim()).toBe("01 / 06");
 
     // MOTION-18: the nav's one in-page jump is Contact (Work/About/Lab/Data are
     // pages now).
@@ -183,14 +184,14 @@ test.describe("Navigation hierarchy — one primary nav, one position readout", 
     expect(top).toBeLessThan(900);
 
     const after = counter.textContent();
-    expect((await after)?.trim()).not.toBe("01 / 10");
-    // contact is the 10th and last declared section, but it is shorter than the
+    expect((await after)?.trim()).not.toBe("01 / 06");
+    // contact is the 6th and last declared chapter, but it is shorter than the
     // viewport, so the page bottoms out with an earlier chapter still crossing
-    // the observer line: the readout settles on one of the last three (measured
-    // 08 and 10 on identical runs). It must have left 01 and kept the total.
-    // The IntersectionObserver path can stall >5s under memory pressure on this
-    // 3 GB machine (Q4.2), hence the larger budget.
-    await expect(counter).toHaveText(/^(08|09|10) \/ 10$/, { timeout: 15000 });
+    // the observer line: the readout settles on one of the last three. It must
+    // have left 01 and kept the total. The IntersectionObserver path can stall
+    // >5s under memory pressure on this 3 GB machine (Q4.2), hence the larger
+    // budget.
+    await expect(counter).toHaveText(/^(04|05|06) \/ 06$/, { timeout: 15000 });
   });
 });
 

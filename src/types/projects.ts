@@ -20,6 +20,12 @@ export interface Project {
   media?: string[];
   association?: string;
   featured?: boolean;
+  /**
+   * Rank (1 = lead) among the home's flagship proof — the three systems the
+   * owner-approved brief picked by evidence strength (`docs/motion/STORYBOARD.md`).
+   * `validate-data` keeps the ranks contiguous from 1 and only on featured projects.
+   */
+  flagship?: number;
   category?: "ml" | "iot" | "web" | "cli" | "devops";
   screenshots?: string[];
   readme_summary?: string;

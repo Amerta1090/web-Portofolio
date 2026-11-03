@@ -4,6 +4,12 @@ import { expect, test } from "@playwright/test";
 /**
  * MOTION-01 — chapter reveal contract, verified on the built page.
  *
+ * MOTION-19 cut the home to six sections, five of them chapters: flagship work,
+ * how I work, the journey, the lab teaser and contact. The hero is deliberately
+ * not a chapter (it has its own island-driven entrance), and every chapter now
+ * has a title, so the "untitled `#github` chapter" case this spec used to cover
+ * lives on `/data` instead.
+ *
  * Better-known lesson first (Q4.2 #1): `test.use({ reducedMotion })` is
  * silently ignored on this Playwright version, so every preference test
  * emulates the media and reads `matchMedia` back — positive and negative
@@ -15,7 +21,8 @@ import { expect, test } from "@playwright/test";
  * `src/lib/scroll-animations.guard.test.ts`.
  */
 
-const HOME = "/";
+/** Chapters on the home, in document order. The hero is not one. */
+const CHAPTERS = ["projects", "systems-in-motion", "journey", "creative-lab", "contact"];
 
 /** Head/body accessor for a chapter's computed beats. */
 function beats(page: Page, sectionId: string) {
@@ -40,19 +47,17 @@ function beats(page: Page, sectionId: string) {
       headBeforeBody:
         head && body
           ? Boolean(head.compareDocumentPosition(body) & Node.DOCUMENT_POSITION_FOLLOWING)
-          : null, // `null` = GitHub chapter, which has no title and therefore no head
+          : null,
     };
   });
 }
 
 test.describe("chapter markup (MOTION-01)", () => {
-  test("exposes nine chapters, head before body, and the untitled one without a head", async ({
-    page,
-  }) => {
+  test("exposes five chapters, every one titled and head before body", async ({ page }) => {
     await page.goto("/", { waitUntil: "load" });
 
     const chapters = page.locator("main > section[data-chapter]");
-    await expect(chapters).toHaveCount(9);
+    await expect(chapters).toHaveCount(CHAPTERS.length);
 
     const hooks = await page.evaluate(() =>
       [...document.querySelectorAll("main > section[data-chapter]")].map((section) => ({
@@ -62,30 +67,19 @@ test.describe("chapter markup (MOTION-01)", () => {
       })),
     );
 
-    // Eight titled chapters get one head + one body; `#github` borrows its
-    // title from the universe phase, so it only has a body.
-    const titled = hooks.filter((chapter) => chapter.heads === 1);
-    expect(titled).toHaveLength(8);
+    // Every chapter is `Section chapter title=…`, so each gets exactly one head
+    // and one body. The old "eight titled + one untitled" split belonged to the
+    // GitHub chapter that now lives on `/data`.
+    expect(hooks.map((chapter) => chapter.id)).toEqual(CHAPTERS);
     for (const chapter of hooks) {
-      expect(chapter.bodies).toBe(1);
-      expect(chapter.heads).toBeLessThanOrEqual(1);
+      expect(chapter.heads, `${chapter.id}: one head`).toBe(1);
+      expect(chapter.bodies, `${chapter.id}: one body`).toBe(1);
     }
 
-    for (const sectionId of [
-      "about",
-      "systems-in-motion",
-      "career",
-      "projects",
-      "creative-lab",
-      "skills",
-      "certifications",
-      "contact",
-    ]) {
+    for (const sectionId of CHAPTERS) {
       const chapter = await beats(page, sectionId);
       expect(chapter.headBeforeBody, `${sectionId}: head before body`).toBe(true);
     }
-    const github = await beats(page, "github");
-    expect(github.headBeforeBody).toBe(null);
   });
 });
 
@@ -93,7 +87,10 @@ test.describe("chapter animation ranges", () => {
   test("head settles before the body: different, ordered ranges", async ({ page }) => {
     await page.goto("/", { waitUntil: "load" });
 
-    const chapter = await beats(page, "about");
+    // `#contact` is the one chapter whose body still owns the block beat:
+    // the project grid, the career spine and the lab sheet each opt out so their
+    // children can animate individually (MOTION-03/04/07).
+    const chapter = await beats(page, "contact");
     expect(chapter.head?.animationTimeline).toBe("view()");
     expect(chapter.body?.animationTimeline).toBe("view()");
     expect(chapter.head?.animationName).toBe("reveal-fade-up");
@@ -106,18 +103,18 @@ test.describe("chapter animation ranges", () => {
 
   test("scrolling past a chapter settles it fully (no stuck-hidden content)", async ({ page }) => {
     await page.goto("/", { waitUntil: "load" });
-    // `#about` is the shortest titled chapter: one paragraph plus the metric
-    // row. Two viewport heights past its start can only be past its entry
-    // range, so a reader who kept scrolling always reaches the settled state.
+    // `#contact` closes the document: two viewport heights past its start can
+    // only be past its entry range, so a reader who kept scrolling always
+    // reaches the settled state.
     await page
-      .locator("#about")
+      .locator("#contact")
       .evaluate((el) => el.scrollIntoView({ behavior: "instant", block: "start" }));
     await page.evaluate(() =>
       window.scrollBy({ top: window.innerHeight * 2, behavior: "instant" }),
     );
     await page.waitForTimeout(300);
 
-    const chapter = await beats(page, "about");
+    const chapter = await beats(page, "contact");
     expect(chapter.head?.opacity).toBe("1");
     expect(chapter.body?.opacity).toBe("1");
     expect(chapter.head?.transform).toBe("matrix(1, 0, 0, 1, 0, 0)");
@@ -133,7 +130,7 @@ test.describe("reduced motion is a real off switch", () => {
       true,
     );
 
-    const chapter = await beats(page, "about");
+    const chapter = await beats(page, "contact");
     for (const [beat, expectation] of [
       ["head", chapter.head],
       ["body", chapter.body],
@@ -167,7 +164,7 @@ test.describe("reduced motion is a real off switch", () => {
       false,
     );
 
-    const chapter = await beats(page, "about");
+    const chapter = await beats(page, "contact");
     expect(chapter.head?.animationName).toBe("reveal-fade-up");
     expect(chapter.body?.animationName).toBe("reveal-fade-up-body");
   });
@@ -187,7 +184,7 @@ test.describe("reduced motion is a real off switch", () => {
     // let the source guard hold the CSS rule in place.
     test.skip(matches === false, "Chromium does not emulate prefers-reduced-data");
 
-    const chapter = await beats(page, "about");
+    const chapter = await beats(page, "contact");
     expect(chapter.head?.animationName).toBe("none");
     expect(chapter.body?.animationName).toBe("none");
     await context.close();
@@ -212,6 +209,7 @@ test.describe("scroll progress bar (MOTION-01)", () => {
           animationName: style.animationName,
           animationTimeline: style.animationTimeline,
           scrollY: window.scrollY,
+          rectWidth: rect.width,
         };
       });
 
@@ -241,9 +239,13 @@ test.describe("no-JS readers", () => {
     const page = await context.newPage();
     await page.goto("/", { waitUntil: "load" });
 
-    await expect(page.locator("main > section[data-chapter]")).toHaveCount(9);
-    const about = page.locator("#about [data-chapter-body]");
-    expect(await about.textContent()).toContain("applied machine learning");
+    await expect(page.locator("main > section[data-chapter]")).toHaveCount(CHAPTERS.length);
+    // MOTION-19 replaced the removed About prose with the journey chapter: the
+    // career records and the link to the full record are server markup, so a
+    // reader without JavaScript still gets the six contributions.
+    const journey = page.locator("#journey [data-chapter-body]");
+    expect(await journey.textContent()).toContain("The full career record");
+    await expect(page.locator("#journey li[data-career-kind]")).toHaveCount(6);
     await context.close();
   });
 });

@@ -101,8 +101,10 @@ test("career spine pins only from lg up, stays a single column below (M5.3.4)", 
 
   // Below lg the rail cell is `hidden` outright and the root is not a grid at
   // all: the spine is one static column — nothing is pinned and nothing can be.
+  // MOTION-19 moved the full spine to `/about`; the home keeps a six-record
+  // highlight with the same component and the same breakpoints.
   await page.setViewportSize({ width: 768, height: 900 });
-  await page.goto("/");
+  await page.goto("/about");
   await expect(railCell).toBeHidden();
   expect(await root.evaluate((el) => getComputedStyle(el).display)).toBe("block");
 

@@ -52,6 +52,7 @@
     {
       "title": "IJO PLIS — IHSG & USD/IDR Forecasting Platform",
       "featured": true,
+      "flagship": 3,
       "category": "ml",
       "period": "May 2026 – Jun 2026",
       "description": "Developed IJO PLIS, a forecasting platform for IHSG (Indonesia Composite Index) and USD/IDR exchange rate prediction using Facebook Prophet and historical financial data (~10 years). Built an end-to-end ML-powered web platform with: Forecast visualization and confidence intervals, Multi-timeframe prediction (7/30/90 days), Trend decomposition (weekly, yearly seasonality), SMA indicators and volatility analysis, Automated retraining pipeline and model versioning, and Dark-mode interactive dashboard. Designed the system architecture using Django, PostgreSQL, Tailwind CSS, Chart.js, Docker, and Railway deployment, with optional background task scheduling via Celery + Redis. Implemented automated data ingestion, model retraining, evaluation (MAE/RMSE), and API endpoints for prediction and decomposition insights.",
@@ -94,6 +95,7 @@
       "title": "Red Devil Dynamics — AI Goal Timing Predictor for Manchester United",
       "case_study": "red-devil-dynamics",
       "featured": true,
+      "flagship": 2,
       "category": "ml",
       "period": "Mar 2026 – Mar 2026",
       "description": "Red Devil Dynamics is a football analytics project that predicts the probability of Manchester United scoring within the next 10 minutes of a match. The model applies concepts from survival analysis to treat a goal as a time-to-event problem. Using match context variables such as current minute, cumulative shots, expected goals (xG), and home/away conditions, the system estimates scoring probability through a Poisson-based scoring intensity model and survival probability transformation. The project integrates machine learning modeling, API development with FastAPI, and a custom frontend interface. It demonstrates how statistical methods commonly used in reliability engineering and medical research—such as Survival Function S(t), Hazard Function h(t), and censoring—can be adapted for sports analytics. The system is deployed as a live web application and structured as a lightweight end-to-end AI product, from model development to cloud deployment.",
@@ -134,6 +136,7 @@
       "title": "AI Quranic Tafsir Assistant: Hybrid Sparse-Dense Retrieval & RAG",
       "case_study": "ai-quranic-tafsir",
       "featured": true,
+      "flagship": 1,
       "category": "ml",
       "period": "Sep 2025 – Jan 2026",
       "association": "Universitas AMIKOM Yogyakarta",

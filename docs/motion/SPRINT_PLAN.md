@@ -1237,7 +1237,7 @@ themes, e2e for the host chapter, docs.
 
 ## MOTION-19 — Home edit (≤ 7 chapters, ≤ 10 screens)
 
-**Status:** `READY` (MOTION-18 `DONE` 2026-10-31; added 2026-10-31, `RESEARCH.md` §8)
+**Status:** `DONE` (2026-11-03)
 **Priority:** P0
 **Objective:** Turn the 28-screen home into a story a recruiter finishes.
 **Outcome:** Home follows the MOTION-17 storyboard: hero → flagship proof (3) → how I work (condensed capability map) → journey highlights (5–6, link to `/about`) → lab teaser (6 picks, link to `/lab`) → contact. GitHub statistics leave the home for `/data`.
@@ -1248,11 +1248,11 @@ themes, e2e for the host chapter, docs.
 **Exclusions:** no new section types; reuse existing organisms, condensed.
 
 **Tasks**
-- [ ] M19.1 Measure: height per chapter @1440 and 375 (today 25,542 px; career 6,015 + GitHub 6,133 = 47.6 %).
-- [ ] M19.2 Condense career to highlights derived from data (rule written, not hand-picked), with a link to the full spine.
-- [ ] M19.3 Condense the Signal Loom to the default narrative + map; full map stays interactive.
-- [ ] M19.4 Lab teaser: 6 experiments chosen by a written rule (one per category + flagship).
-- [ ] M19.5 Re-run motion chapter specs, payload, runtime.
+- [x] M19.1 Measure: height per chapter @1440 and 375 (today 25,542 px; career 6,015 + GitHub 6,133 = 47.6 %).
+- [x] M19.2 Condense career to highlights derived from data (rule written, not hand-picked), with a link to the full spine.
+- [x] M19.3 Condense the Signal Loom to the default narrative + map; full map stays interactive.
+- [x] M19.4 Lab teaser: 6 experiments chosen by a written rule (one per category + flagship).
+- [x] M19.5 Re-run motion chapter specs, payload, runtime.
 
 **Acceptance criteria**
 - Home ≤ 10 screens @1440×900 and ≤ 7 chapters (rubric N3 = 2).
@@ -1261,11 +1261,71 @@ themes, e2e for the host chapter, docs.
 
 **Definition of Done / verification:** height probe, e2e, payload, runtime, docs.
 
+### Result (measured 2026-11-03)
+
+| Gate | Before (MOTION-18) | After | Evidence |
+| --- | --- | --- | --- |
+| Home height @1440×900 | ≈ 28 screens | **9.46 screens** (8,511 px) | headless Chromium 1228 probe, scroll-then-settle |
+| Home height @375×812 | — | 13.65 screens (documented; criterion is 1440) | same probe |
+| Chapters | 9 `data-chapter` + hero | **6 sections** = hero + 5 `data-chapter` | `main > section[id]` = `hero, projects, systems-in-motion, journey, creative-lab, contact` |
+| Payload `/` (initial / reachable / html) | 202.7 / 556.1 / 77.2 KB, 16 islands | **194.7 / 493.8 / 32.0 KB, 9 islands (5e/4d)** | `bun run measure:routes` |
+| Overflow X (1440 / 375) | 0 | 0 | same probe |
+
+**What the six chapters are:** hero (unchanged island, new metric row) →
+`#projects` (3 flagships from `projects.json` + "All 22 projects" → `/work`) →
+`#systems-in-motion` (Signal Loom, 30 nodes / 31 edges untouched) → `#journey`
+(6 rule-derived highlights + links to `/about`) → `#creative-lab` (6-pick teaser
++ `/lab`) → `#contact`.
+
+**Deviations (all deliberate, each with a reason)**
+
+1. **Six chapters, not seven** — inherited from MOTION-17 (no seventh message had
+   proof). Hero is a plain `<section id="hero">` without `data-chapter`, as in
+   M01; `main > section[data-chapter]` = 5.
+2. **Flagship ranking is data, not a list in the page.** `projects.json` gained
+   `flagship: 1..3`, and `scripts/validate-data.mjs` rejects non-integers,
+   non-contiguous ranks, and a `flagship` on a project without `featured: true`.
+   `getFlagshipProjects()` orders by that rank, so re-ranking is an edit to data.
+3. **Journey = rule, not hand-picked (`toCareerHighlights`).** Every record whose
+   `type` is `contract` is excluded (`CAREER_HIGHLIGHT_EXCLUDED_TYPE`); the rest
+   are taken newest-first with the year-group cap that keeps the surface ~6
+   records. The home keeps the same 6-record / 3-year-group surface the spec
+   pins; the 26-record spine, the scrub and the rail live on `/about`.
+4. **The lab teaser rule lives in `src/lib/lab-teaser.ts`**, outside
+   `lab-gallery.ts`, so the rule never enters the `/lab` grid's client bundle:
+   one experiment per `LAB_CATEGORIES` entry (first `featured`, else the
+   category's first) plus one flagship that is not already chosen.
+5. **Hero metrics changed subject.** The row used to count GitHub activity
+   (contributions / streak / day / month) and link to `#github-metrics`; that
+   block now lives on `/data`, so the row counts *work you can check* —
+   Projects → `/work`, Certifications → `/about#certifications`, Experience →
+   `/about#career` (`HERO_METRIC_HREFS`, `HeroMetricId`).
+6. **Deleted with their last consumer (Rule 6):** `organisms/About.astro`,
+   `organisms/Certifications.astro`, `islands/ImpactMetrics.tsx`,
+   `islands/SkillsExplorer.tsx`, `components/molecules/CapabilityGenerator.tsx`,
+   `src/lib/tracery/*`, `data/capability-grammars.json`, and the specs
+   `about-metrics`, `capability-generator`, `certifications`, `project-filter`
+   (the last one because the category filter lost its only in-page home when the
+   chapter went). The `/about` page keeps skills, certifications and the spine.
+7. **Copy correction: the journey link does not print `facts.timeline.count`.**
+   That count is 22 (experience + dated certifications); the spine renders 26
+   records. Printing it next to a link to the spine would have made the home
+   contradict `/about`, so the link reads "The full career record →".
+8. **`[data-lab-group-reveal]` was dead** (no markup emits it after the teaser
+   rewrite) → removed from both the reduced-motion and reduced-data blocks of
+   `src/lib/scroll-animations.css` and from the guard assertion.
+9. **Command palette targets followed the content:** skill items now navigate to
+   `/about#skills` and experience items to `/about#career`; the in-page `/#…`
+   branch stays because Contact is still `/#contact`.
+10. **Hero fixtures in `TimeAwareHero.test.tsx` were rewritten** with real
+    `HeroMetricId`s; the old `contributions` / `longest-streak` fixtures were the
+    only source of 7 new `astro check` errors.
+
 ---
 
 ## MOTION-20 — Concept & art direction
 
-**Status:** `PLANNED` (added 2026-10-31, `RESEARCH.md` §8)
+**Status:** `READY` (MOTION-19 `DONE` 2026-11-03; added 2026-10-31, `RESEARCH.md` §8)
 **Priority:** P1
 **Objective:** One visual idea that ties the site together, so "wow" comes from coherence, not from effects.
 **Outcome:** A written concept (one sentence + 3 rules), a storyboard frame per home chapter, the four asset families with "one family per chapter", and the signature-moment brief for MOTION-21.

@@ -327,9 +327,11 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
     const isSelected = node.id === selectedId;
     const isCapability = node.kind === "capability";
     const kindLabel = isCapability ? "Capability" : "Evidence";
-    const cardClass = `flex h-32 flex-col items-start justify-center gap-1 rounded-md border p-3.5 text-left transition motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-brand focus-visible:outline-offset-2 ${
-      isCapability ? "md:h-16 md:flex-row md:items-center md:gap-3" : ""
-    } ${
+    // MOTION-19: one compact row per node (kind + title) for both columns, so the
+    // map reads in about two screens instead of four. The summary stays in the
+    // subtree (`sr-only`) for browse mode and is announced on selection by the
+    // live region below; the selected project's detail panel shows the rest.
+    const cardClass = `flex min-h-11 w-full flex-col items-start justify-center gap-0.5 rounded-md border px-3 py-2 text-left transition motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-brand focus-visible:outline-offset-2 md:flex-row md:items-center md:gap-3 ${
       isSelected
         ? "border-brand bg-brand/10 ring-1 ring-brand/40"
         : "border-border/70 bg-bg-secondary/80 hover:border-brand hover:bg-brand/10 focus-visible:border-brand focus-visible:bg-brand/10"
@@ -338,19 +340,10 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
     const content = (
       <>
         <span className="section-label shrink-0 text-brand">{kindLabel}</span>
-        <span
-          className={`line-clamp-2 font-display text-h4 leading-snug text-text-primary ${
-            isCapability ? "md:line-clamp-1 md:min-w-0" : ""
-          }`}
-        >
+        <span className="line-clamp-1 min-w-0 font-display text-base leading-snug text-text-primary">
           {node.label}
         </span>
-        <span
-          className={`line-clamp-1 text-xs leading-relaxed text-text-secondary ${
-            isCapability ? "md:hidden" : ""
-          }`}
-          data-node-summary
-        >
+        <span className="sr-only" data-node-summary>
           {node.summary}
         </span>
       </>
@@ -493,7 +486,7 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
           <h3 className="section-label text-text-secondary">Capability groups</h3>
           <ul
             aria-label="Capabilities"
-            className="mt-3 grid list-none grid-cols-1 gap-3"
+            className="mt-3 grid list-none grid-cols-1 gap-2"
             onKeyDown={handleKeyDown}
           >
             {capabilityNodes.map((node) => renderNode(node))}
@@ -504,7 +497,7 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
           <h3 className="section-label text-text-secondary">Project evidence</h3>
           <ul
             aria-label="Projects"
-            className="mt-3 grid list-none grid-cols-1 gap-3"
+            className="mt-3 grid list-none grid-cols-1 gap-2"
             onKeyDown={handleKeyDown}
           >
             {projectNodes.map((node) => renderNode(node))}

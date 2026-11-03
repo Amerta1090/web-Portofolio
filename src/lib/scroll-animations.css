@@ -176,46 +176,14 @@
       calc(var(--card-beat-span) + var(--project-card-order, 0) * var(--card-order-step));
   }
 
-  /* A filter interaction *replaces* the entry choreography. The reader is
-   * already at the grid, so re-running the scroll beat would be a second
-   * animation: the FLIP's opacity tween wins while it runs, then the card snaps
-   * back to whatever reveal progress the reflow gave it. Settling the wrappers
-   * leaves exactly one animation — the FLIP. */
-  [data-project-grid][data-project-revealed] [data-project-card-reveal] {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
-
-  /* ── GitHub Command Center instruments (MOTION-06) ──
-   * `#github` chapter body contains the Command Center (MetricCards, LanguageRadial,
-   * ActivityWave, ContributionHeatmap). These instruments own their entry via
-   * IntersectionObserver (not CSS scroll-driven), so the chapter-body beat must
-   * opt out. Structural selector so any future page with instruments inside a
-   * chapter inherits the same rule.
-   */
-  [data-chapter-body]:has([data-github-instruments]) {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
-
-  /* ── Creative Lab contact sheet (MOTION-07) ──
-   * 27 thumbnails over ~2,030 px (desktop) / ~2,492 px (mobile). The
-   * chapter-body beat faded all of it as one rectangle and finished by
-   * scrollY +810 (measured: body opacity 0 → 1 across four offsets), so a
-   * reader scrolling the index saw an empty 2,000 px panel settle once.
+  /* ── Creative Lab teaser (MOTION-07, cut to six in MOTION-19) ──
+   * The chapter-body beat would fade the sheet as one rectangle, so the body
+   * opts out with the same structural rule the career spine and the project
+   * grid use, and every thumbnail owns a beat on its own view timeline.
    *
-   * The body opts out with the same structural rule the career spine, the
-   * project grid, and the GitHub instruments use. The *group container* is
-   * deliberately not animated: an opacity on `<details>` multiplies into every
-   * card's own beat (composite), so a card could never read as settled until
-   * its whole group had. The group beat therefore lives on its heading, and
-   * every thumbnail owns a beat on its own view timeline.
-   *
-   * Order comes from `--lab-group-order` / `--lab-card-order`, emitted by the
-   * server template from the data order — never `:nth-child`, which would
-   * encode today's `data/*.json` order in CSS (the MOTION-03 trap).
+   * Order comes from `--lab-card-order`, emitted by the server template from
+   * the selection order — never `:nth-child`, which would encode today's
+   * `data/*.json` order in CSS (the MOTION-03 trap).
    */
   [data-chapter-body]:has([data-lab-sheet]) {
     animation: none;
@@ -224,22 +192,9 @@
   }
 
   [data-lab-sheet] {
-    --lab-group-start: 0%;
-    --lab-group-span: 25%;
-    --lab-group-step: 4%;
     --lab-card-start: 10%;
     --lab-card-span: 32%;
     --lab-card-step: 5%;
-  }
-
-  [data-lab-group-reveal] {
-    opacity: 0;
-    transform: translateY(12px);
-    animation: reveal-fade-up linear forwards;
-    animation-timeline: view();
-    animation-range: entry
-      calc(var(--lab-group-start) + var(--lab-group-order, 0) * var(--lab-group-step)) entry
-      calc(var(--lab-group-span) + var(--lab-group-order, 0) * var(--lab-group-step));
   }
 
   /* Cards share a row, so their own timelines start together; the order token
@@ -334,7 +289,6 @@
   [data-career-year] > h3,
   [data-career-kind],
   [data-project-card-reveal],
-  [data-lab-group-reveal],
   [data-lab-card-reveal],
   [data-reveal] > *,
   [data-hero-handoff] [data-hero-scroll-cue] {
@@ -354,7 +308,6 @@
   [data-career-year] > h3,
   [data-career-kind],
   [data-project-card-reveal],
-  [data-lab-group-reveal],
   [data-lab-card-reveal],
   [data-reveal] > *,
   [data-hero-handoff] [data-hero-scroll-cue] {

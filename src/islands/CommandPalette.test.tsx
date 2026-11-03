@@ -107,15 +107,29 @@ describe("CommandPalette", () => {
     expect(assignSpy).toHaveBeenCalledWith("/lab#galaxy-formation");
   });
 
-  it("scrolls to an anchor section for skill items", () => {
+  it("navigates to the About page for skill items (MOTION-19)", () => {
+    render(<CommandPalette />);
+    openWithKey();
+    const input = screen.getByRole("searchbox");
+    fireEvent.change(input, { target: { value: "docker" } });
+    const option = getOptions()[0];
+    expect(option).toBeTruthy();
+    fireEvent.keyDown(window, { key: "Enter" });
+    // MOTION-19: skills live on `/about#skills`; the home no longer has the
+    // section, so the palette must navigate there instead of scrolling.
+    expect(assignSpy).toHaveBeenCalledWith("/about#skills");
+    expect(scrollSpy).not.toHaveBeenCalled();
+  });
+
+  it("scrolls to a home anchor for page items", () => {
     const anchor = document.createElement("div");
-    anchor.id = "skills";
+    anchor.id = "contact";
     document.body.appendChild(anchor);
 
     render(<CommandPalette />);
     openWithKey();
     const input = screen.getByRole("searchbox");
-    fireEvent.change(input, { target: { value: "docker" } });
+    fireEvent.change(input, { target: { value: "contact" } });
     const option = getOptions()[0];
     expect(option).toBeTruthy();
     fireEvent.keyDown(window, { key: "Enter" });

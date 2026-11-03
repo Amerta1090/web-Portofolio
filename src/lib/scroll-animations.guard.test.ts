@@ -132,9 +132,6 @@ describe("scroll-animations.css reveal contract", () => {
       expect(media, `${preference} overrides the project evidence cards`).toContain(
         "[data-project-card-reveal]",
       );
-      expect(media, `${preference} overrides the Creative Lab group headings`).toContain(
-        "[data-lab-group-reveal]",
-      );
       expect(media, `${preference} overrides the Creative Lab thumbnails`).toContain(
         "[data-lab-card-reveal]",
       );
@@ -225,9 +222,9 @@ describe("chapter authoring hooks", () => {
     expect(section).toMatch(/"data-chapter-body":\s*""/);
   });
 
-  it("opts exactly nine homepage sections into the chapter model", () => {
+  it("opts exactly five homepage sections into the chapter model", () => {
     const chapterProps = index.match(/\bchapter\b/g) ?? [];
-    expect(chapterProps).toHaveLength(9);
+    expect(chapterProps).toHaveLength(5);
     expect(index).not.toContain("data-reveal");
     // `overflow: clip` keeps sticky rails and view() timelines alive, so the
     // per-section escape hatch MOTION-03 added has no reason to exist (Rule 6).
@@ -274,31 +271,19 @@ describe("evidence card hierarchy (MOTION-04)", () => {
     expect(wrapper).not.toMatch(/nth-child/);
   });
 
-  it("lets a filter replace the entry beat instead of stacking on it", () => {
-    const settled = blockAfter(
-      view(),
-      "[data-project-grid][data-project-revealed] [data-project-card-reveal]",
-    ).body;
-
-    expect(settled).toMatch(/animation:\s*none/);
-    expect(settled).toMatch(/opacity:\s*1/);
-    expect(settled).toMatch(/transform:\s*none/);
-  });
-
-  it("publishes the order token and the filtered state from the island", () => {
+  it("publishes the order token from the island, with no filter state left", () => {
     expect(island).toMatch(/data-project-grid=""/);
-    expect(island).toMatch(/data-project-revealed=\{revealed \? "" : undefined\}/);
     expect(island).toMatch(/data-project-card-reveal=""/);
     expect(island).toMatch(/data-project-primary=\{order === 0 \? "" : undefined\}/);
     expect(island).toMatch(/style=\{\{ "--project-card-order": order \}/);
-    expect(island).toMatch(/setRevealed\(true\)/);
+    // MOTION-19: the filter and its settle rule left with their last use.
+    expect(island).not.toMatch(/data-project-revealed/);
+    expect(view()).not.toMatch(/data-project-revealed/);
   });
 
-  it("keeps the scroll beat and the FLIP on different elements", () => {
-    // A WAAPI tween beats a CSS animation while it runs, then hands control
-    // back; sharing one node makes the card snap to its scroll progress when
-    // the tween ends (M4.1). The reveal wrapper must therefore be an ancestor
-    // of the `<article>` the FLIP measures, not the article itself.
+  it("keeps the scroll beat and the tilt on different elements", () => {
+    // The reveal wrapper is an ancestor of the `<article>` the tilt transforms,
+    // so the two never write `transform` on one node.
     const wrapper = island.slice(island.indexOf('data-project-card-reveal=""'));
     const article = wrapper.indexOf('data-project-card=""');
 
@@ -324,19 +309,12 @@ describe("creative lab contact sheet (MOTION-07)", () => {
     expect(body).not.toMatch(/!important/);
   });
 
-  it("gives group headings and thumbnails their own beats, ordered by data", () => {
+  it("gives every thumbnail its own beat, ordered by data", () => {
     const sheet = view();
 
-    expect(sheet).toMatch(/--lab-group-start:\s*0%/);
-    expect(sheet).toMatch(/--lab-group-span:\s*25%/);
-    expect(sheet).toMatch(/--lab-group-step:\s*4%/);
     expect(sheet).toMatch(/--lab-card-start:\s*10%/);
     expect(sheet).toMatch(/--lab-card-span:\s*32%/);
     expect(sheet).toMatch(/--lab-card-step:\s*5%/);
-
-    const group = blockAfter(sheet, "[data-lab-group-reveal]").body;
-    expect(group).toMatch(/animation-timeline:\s*view\(\)/);
-    expect(group).toMatch(/--lab-group-order/);
 
     const card = blockAfter(sheet, "[data-lab-card-reveal]").body;
     expect(card).toMatch(/animation-timeline:\s*view\(\)/);
@@ -345,14 +323,8 @@ describe("creative lab contact sheet (MOTION-07)", () => {
     // A `:nth-child` wall would encode today's gallery order in CSS and go
     // stale the first time `data/lab-registry.ts` reorders (MOTION-03 trap).
     expect(card).not.toMatch(/nth-child/);
-    expect(group).not.toMatch(/nth-child/);
-  });
-
-  it("does not fade the group container into its own thumbnails", () => {
-    // An opacity on `<details>` composites with every card's beat, so a card
-    // could never read as settled until its whole group had. The measured
-    // rhythm lives on the heading and the cards only.
-    expect(view()).not.toMatch(/\[data-lab-group\](?![-\w])/);
+    // MOTION-19: the teaser has no category groups, so no group beat survives.
+    expect(sheet).not.toMatch(/data-lab-group/);
   });
 
   it("publishes the hooks and the order tokens from the server template", () => {
@@ -361,9 +333,7 @@ describe("creative lab contact sheet (MOTION-07)", () => {
     // property — counted here because a rename would silently drop both rules
     // back to the body beat.
     expect(creativeLab).toMatch(/data-lab-sheet/);
-    expect(creativeLab).toMatch(/data-lab-group-reveal/);
     expect(creativeLab).toMatch(/data-lab-card-reveal/);
-    expect(creativeLab).toMatch(/"--lab-group-order":\s*String\(groupIndex\)/);
     expect(creativeLab).toMatch(/"--lab-card-order":\s*String\(cardIndex\)/);
     expect(creativeLab).not.toMatch(/\son[a-z]+=/);
   });
@@ -371,7 +341,6 @@ describe("creative lab contact sheet (MOTION-07)", () => {
   it("animates only compositor properties in every contact-sheet rule", () => {
     const blocks = [
       blockAfter(view(), "[data-chapter-body]:has([data-lab-sheet])").body,
-      blockAfter(view(), "[data-lab-group-reveal]").body,
       blockAfter(view(), "[data-lab-card-reveal]").body,
     ];
 

@@ -30,23 +30,30 @@ vi.mock("motion/react", async (importOriginal) => {
   };
 });
 
-/** Two of the four rows, enough to prove the row maps 1:1 and keeps its order. */
+/**
+ * Two of the three rows, enough to prove the row maps 1:1 and keeps its order.
+ *
+ * MOTION-19: the row now sends you to the page that lists what it counts
+ * (`/work`, `/about#certifications`) instead of a home anchor, and the ids are
+ * the builder's own (`HeroMetricId`) — a fixture that invents an id would type
+ * check as `any`-ish furniture and stop proving the map.
+ */
 const METRICS = [
   {
-    id: "contributions" as const,
-    label: "Contributions",
-    value: "571",
+    id: "projects" as const,
+    label: "Projects",
+    value: "22",
     suffix: "",
-    href: "#github",
-    name: "Contributions: 571",
+    href: "/work",
+    name: "Projects: 22",
   },
   {
-    id: "longest-streak" as const,
-    label: "Longest streak",
-    value: "27",
-    suffix: "days",
-    href: "#github",
-    name: "Longest streak: 27 days",
+    id: "certifications" as const,
+    label: "Certifications",
+    value: "62",
+    suffix: "",
+    href: "/about#certifications",
+    name: "Certifications: 62",
   },
 ];
 

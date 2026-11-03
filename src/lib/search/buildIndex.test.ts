@@ -33,14 +33,14 @@ describe("buildSearchIndex", () => {
     }
   });
 
-  it("indexes every skill targetting #skills with category keyword", () => {
+  it("indexes every skill targeting /about#skills with category keyword", () => {
     const byType = groupByType(buildSearchIndex());
     const skills = byType["skill"];
     const totalSkills = getSkills()
       .categories.reduce((n, c) => n + c.skills.length, 0);
     expect(skills).toHaveLength(totalSkills);
     for (const s of skills) {
-      expect(s.target).toBe("/#skills");
+      expect(s.target).toBe("/about#skills");
       expect(s.keywords.length).toBeGreaterThanOrEqual(1);
     }
   });
@@ -64,8 +64,9 @@ describe("buildSearchIndex", () => {
     }
     for (const e of byType["experience"]) {
       // Experience records live on the Career Spine since M1.4 — the items
-      // keep their role titles, only the jump target moved with the section.
-      expect(e.target).toBe("/#career");
+      // keep their role titles; MOTION-19 moved the spine to `/about`, so the
+      // jump target moved with it.
+      expect(e.target).toBe("/about#career");
     }
   });
 

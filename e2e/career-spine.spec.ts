@@ -5,6 +5,11 @@ import { waitForIslandHydration } from "./hydration";
 /**
  * `#career` — the Career Spine: server-rendered in full, upgraded in place by one island.
  *
+ * MOTION-19 moved the **full** spine to `/about`; the home keeps a six-record
+ * Journey highlight built by the same contract (`toCareerHighlights`). Everything
+ * below except the final `journey highlights — home` describe now reads `/about`,
+ * because that is where the 26-event record lives.
+ *
  * Why this spec exists rather than a unit test: the numbers M1.2.4 and M1.3 ask to
  * be pinned are "how many events reach the page" and "what does the rail do to
  * them", and only the built page can answer either. The unit suite already pins
@@ -28,8 +33,15 @@ const EVENT_COUNT = 26;
 const CERT_CAP = 15;
 /** Honors carry a bare year, which has no valid `<time datetime>` (DEVIASI 4). */
 const YEAR_ONLY_EVENTS = 3;
-/** Year groups on the page: 2026, 2025, 2024, 2023. */
+/** Year groups on the full spine: 2026, 2025, 2024, 2023. */
 const YEARS = [2026, 2025, 2024, 2023];
+/**
+ * Home highlights (MOTION-19): every experience record except the contract gig
+ * (`CAREER_HIGHLIGHT_EXCLUDED_TYPE`), in spine order — six records in three
+ * year groups.
+ */
+const HIGHLIGHT_COUNT = 6;
+const HIGHLIGHT_YEARS = [2026, 2024, 2023];
 /**
  * Width at which `client:media="(min-width: 1024px)"` hydrates, and the rail
  * cell (`hidden lg:block`) becomes visible.
@@ -186,7 +198,7 @@ function motionOf(page: Page, selector: string) {
 
 test.describe("career spine — server-rendered shape", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/about");
   });
 
   test("renders every event the contract produced, grouped by year", async ({ page }) => {
@@ -255,7 +267,7 @@ test.describe("career spine — server-rendered shape", () => {
     // with scripting unavailable only in the sense that it costs them a request
     // — but `client:media` is what makes the scrub desktop-only, and that claim
     // needs the raw response too.
-    const response = await page.request.get("/");
+    const response = await page.request.get("/about");
     const html = await response.text();
     expect(html).toContain(`component-url="/_astro/CareerSpine.`);
     expect(html).toContain('ssr client="media"');
@@ -401,7 +413,7 @@ test.describe("career spine — island hydration", () => {
     // not a thumb). Astro keeps `ssr` on `<astro-island>` until it hydrates, so
     // the attribute is the condition — no production flag needed.
     await page.setViewportSize({ width: 375, height: 812 });
-    await page.goto("/");
+    await page.goto("/about");
     await page.locator("#career").scrollIntoViewIfNeeded();
     await page.waitForTimeout(750);
 
@@ -423,7 +435,7 @@ test.describe("career spine — island hydration", () => {
 
   test("hydrates at the desktop breakpoint and adds the rail after hydration", async ({ page }) => {
     await page.setViewportSize(DESKTOP);
-    await page.goto("/");
+    await page.goto("/about");
     await waitForIslandHydration(page, "#career [data-career-rail-host]");
 
     const steps = page.locator("#career [data-career-step]");
@@ -444,7 +456,7 @@ test.describe("career spine — island hydration", () => {
     // Barrier B. The rail is an enhancement, so it must never trade records for
     // focus: no record is hidden, collapsed, or moved off the reading measure.
     await page.setViewportSize(DESKTOP);
-    await page.goto("/");
+    await page.goto("/about");
     await waitForRail(page);
     expect(await collapsedRecords(page)).toEqual([]);
 
@@ -456,7 +468,7 @@ test.describe("career spine — island hydration", () => {
 test.describe("career spine — rail", () => {
   test.beforeEach(async ({ page }) => {
     await page.setViewportSize(DESKTOP);
-    await page.goto("/");
+    await page.goto("/about");
     await waitForRail(page);
   });
 
@@ -741,8 +753,8 @@ test.describe("career spine — rail", () => {
 
   test("resolves an event deep link to its own year on arrival", async ({ page }) => {
     // NOTE: this test must perform a real cross-document load. The `rail`
-    // describe's `beforeEach` already did `goto("/")`, so a bare
-    // `goto("/#career-<id>")` from there is a same-document navigation: it
+    // describe's `beforeEach` already did `goto("/about")`, so a bare
+    // `goto("/about#career-<id>")` from there is a same-document navigation: it
     // fires `hashchange` without reloading, and the test would exercise the
     // announce path while asserting the silent-arrival path. The hop below
     // makes the arrival real — caught when the status read "2025: 16 records"
@@ -752,10 +764,10 @@ test.describe("career spine — rail", () => {
       .first()
       .getAttribute("data-career-id");
     // Leave first: the hop makes the hash navigation below a real
-    // cross-document load (gallery → home), so the browser scrolls to the
+    // cross-document load (lab → about), so the browser scrolls to the
     // anchor on arrival and the island takes the silent mount path.
     await page.goto("/lab");
-    await page.goto(`/#career-${eventId}`);
+    await page.goto(`/about#career-${eventId}`);
     await waitForRail(page);
 
     await expect(page.locator("#career [data-career-step='2025']")).toHaveAttribute(
@@ -781,23 +793,25 @@ test.describe("career spine — rail", () => {
 });
 
 test.describe("career spine — choreography (MOTION-03)", () => {
-  test("reveals each record instead of fading the whole chapter body", async ({ page }) => {
-    // The MOTION-01 defect measured on this section: `[data-chapter-body]` wraps
-    // ~6,000 px of records, so its single beat dims and shifts the entire spine
-    // while the reader is already inside it (probe: opacity 0.94 at the section
-    // top, still translating). The fix is structural, so both halves are
-    // asserted: the body is out, the records own the beat.
+  test("never sits inside a chapter body, and every record owns its beat", async ({ page }) => {
+    // The MOTION-01 defect measured on the *home* section: `[data-chapter-body]`
+    // wrapped ~6,000 px of records, so its single beat dimmed and shifted the
+    // entire spine while the reader was already inside it (probe: opacity 0.94
+    // at the section top, still translating). MOTION-18 moved the full spine to
+    // `/about`, whose `Section` is not a chapter at all — so the structural
+    // opt-out is `animation: none` through `:has([data-career-spine])` AND the
+    // absence of a chapter body above it. Both halves are asserted.
     await page.setViewportSize(DESKTOP);
-    await page.goto("/");
+    await page.goto("/about");
     const sectionTop = await page
       .locator("#career")
       .evaluate((node) => node.getBoundingClientRect().top + window.scrollY);
     await scrollToInstant(page, sectionTop);
 
-    const body = await motionOf(page, "#career [data-chapter-body]");
-    expect(body.animationName).toBe("none");
-    expect(body.opacity).toBe("1");
-    expect(body.transform).toBe("none");
+    // No block beat can wrap the spine on this page: the section is not a
+    // chapter, so there is nothing to opt out of in the first place.
+    await expect(page.locator("#career [data-chapter-body]")).toHaveCount(0);
+    await expect(page.locator("#career [data-chapter]")).toHaveCount(0);
 
     const first = await motionOf(page, "#career li[data-career-kind]");
     expect(first.animationName).toBe("reveal-fade-up");
@@ -826,7 +840,7 @@ test.describe("career spine — choreography (MOTION-03)", () => {
     // still below the fold (opacity 0). A single shared body beat cannot do
     // this — it moves the whole spine at once.
     await page.setViewportSize(DESKTOP);
-    await page.goto("/");
+    await page.goto("/about");
 
     for (const year of YEARS) {
       const target = await page
@@ -862,7 +876,7 @@ test.describe("career spine — choreography (MOTION-03)", () => {
     // settled state, so it is measured after the last record: `fill: forwards`
     // holds the final keyframe, and the reading line is past every entry range.
     await page.setViewportSize(DESKTOP);
-    await page.goto("/");
+    await page.goto("/about");
 
     const target = await page.evaluate(() => {
       const records = [...document.querySelectorAll("#career li[data-career-kind]")];
@@ -884,14 +898,14 @@ test.describe("career spine — choreography (MOTION-03)", () => {
     // `#career-<id>` is already past that record's entry range when the page
     // loads, so it must be fully visible without scrolling.
     await page.setViewportSize(DESKTOP);
-    await page.goto("/");
+    await page.goto("/about");
     const eventId = await page
       .locator("#career li[data-career-year='2025'] li[data-career-id]")
       .first()
       .getAttribute("data-career-id");
     // Cross-document load: a bare `goto` from `/` would only fire `hashchange`.
     await page.goto("/lab");
-    await page.goto(`/#career-${eventId}`);
+    await page.goto(`/about#career-${eventId}`);
 
     const record = page.locator(`#career-${eventId}`);
     await expect(record).toBeVisible();
@@ -917,7 +931,7 @@ test.describe("career spine — reduced motion", () => {
     // it passes without testing anything (Q4.2 #1).
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.setViewportSize(DESKTOP);
-    await page.goto("/");
+    await page.goto("/about");
     await waitForRail(page);
 
     // Positive control for the emulation itself. The fixture that this test
@@ -928,14 +942,12 @@ test.describe("career spine — reduced motion", () => {
       true,
     );
 
-    // MOTION-03: the two new career reveals are off switches, not just
-    // non-issues. Read at the top of the page, before the section is scrolled
-    // to, so "opacity 1" cannot be the settled end of a beat that ran anyway.
-    for (const selector of [
-      "#career [data-chapter-body]",
-      "#career li[data-career-year] > h3",
-      "#career li[data-career-kind]",
-    ]) {
+    // MOTION-03: the career reveals are off switches, not just non-issues. Read
+    // at the top of the page, before the section is scrolled to, so "opacity 1"
+    // cannot be the settled end of a beat that ran anyway. There is no
+    // `[data-chapter-body]` above the spine on `/about` (MOTION-19), so the two
+    // career selectors are the whole list.
+    for (const selector of ["#career li[data-career-year] > h3", "#career li[data-career-kind]"]) {
       expect(await motionOf(page, selector), `${selector} still animates`).toMatchObject({
         animationName: "none",
         opacity: "1",
@@ -967,5 +979,92 @@ test.describe("career spine — reduced motion", () => {
     await expect
       .poll(() => pinnedTops(page), { timeout: 8000 })
       .toMatchObject({ railPosition: "sticky", rail: 96 });
+  });
+});
+
+/**
+ * `#journey` — the home keeps a six-record highlight of the same contract.
+ *
+ * MOTION-19 cut the home to six chapters, so the full 26-event spine moved to
+ * `/about` and the home keeps the experience records a reader needs to place the
+ * work in time. Both surfaces are built by one contract
+ * (`buildCareerHighlights` → `toCareerHighlights`): the home cannot drift into a
+ * hand-picked list, and the exclusion rule (`CAREER_HIGHLIGHT_EXCLUDED_TYPE`)
+ * is asserted here because it is the only place the filter is visible.
+ */
+test.describe("journey highlights — home (MOTION-19)", () => {
+  test("renders six experience records in three year groups", async ({ page }) => {
+    await page.setViewportSize(DESKTOP);
+    await page.goto("/");
+
+    const section = page.locator("#journey");
+    await expect(section.locator("li[data-career-kind]")).toHaveCount(HIGHLIGHT_COUNT);
+
+    // The exclusion rule, read from the page: the contract gig is an experience
+    // record that the highlight drops, so a regression here shows up as a
+    // seventh record above rather than as a silently different list.
+    const kinds = await section
+      .locator("li[data-career-kind]")
+      .evaluateAll((nodes) => [
+        ...new Set(nodes.map((node) => node.getAttribute("data-career-kind"))),
+      ]);
+    expect(kinds).toEqual(["experience"]);
+
+    const years = await section
+      .locator("li[data-career-year]")
+      .evaluateAll((nodes) => nodes.map((node) => Number(node.getAttribute("data-career-year"))));
+    expect(years).toEqual(HIGHLIGHT_YEARS);
+  });
+
+  test("keeps every record on its own beat inside a chapter that opts out", async ({ page }) => {
+    await page.setViewportSize(DESKTOP);
+    await page.goto("/");
+
+    // MOTION-19 put the highlights inside a chapter (`Section chapter`), so the
+    // body beat must be switched off structurally — the same rule the full
+    // spine relies on — or six records would fade in as one rectangle.
+    const body = await motionOf(page, "#journey [data-chapter-body]");
+    expect(body.animationName).toBe("none");
+    expect(body.opacity).toBe("1");
+
+    const first = await motionOf(page, "#journey li[data-career-kind]");
+    expect(first.animationName).toBe("reveal-fade-up");
+    expect(first.animationTimeline).toBe("view()");
+    expect(first.animationRange).toBe("entry 10% entry 60%");
+  });
+
+  test("links the rest of the record to its canonical anchors", async ({ page }) => {
+    await page.setViewportSize(DESKTOP);
+    await page.goto("/");
+
+    const links = page.locator("#journey [data-journey-more] a");
+    await expect(links).toHaveCount(2);
+    expect(
+      await links.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("href"))),
+    ).toEqual(["/about#certifications", "/about#career"]);
+    // The copy no longer prints `facts.timeline.count`: that figure (22) counts
+    // the 15 capped certifications, so on a six-record highlight it contradicted
+    // the 26 records one click away.
+    await expect(links.nth(1)).toHaveText("The full career record →");
+  });
+
+  test("keeps all six records visible when motion is reduced", async ({ page }) => {
+    // `page.emulateMedia`, never `test.use({ reducedMotion })` — see the full
+    // spine's reduced-motion test for the read-back that proves it applied.
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize(DESKTOP);
+    await page.goto("/");
+    expect(await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches)).toBe(
+      true,
+    );
+
+    for (const selector of ["#journey [data-chapter-body]", "#journey li[data-career-kind]"]) {
+      expect(await motionOf(page, selector), `${selector} still animates`).toMatchObject({
+        animationName: "none",
+        opacity: "1",
+        transform: "none",
+      });
+    }
+    await expect(page.locator("#journey li[data-career-kind]")).toHaveCount(HIGHLIGHT_COUNT);
   });
 });

@@ -129,21 +129,34 @@ test.describe("M4.1.5 — BorderGlow contrast measured (not assumed)", () => {
     expect(counts.spotlighted).toBe(counts.tilts);
   });
 
-  test("M4.1.4 surfaces exist: hero layer (decorative) + section wrapper", async ({ page }) => {
+  /**
+   * DEVIASI MOTION-19: the second M4.1.4 surface — a static ring on the
+   * ImpactMetrics wrapper in `#about` — is gone with the metric cards it framed.
+   * What remains is the hero's decorative layer plus the one ring per project
+   * card (tested above). The assertion is written as the property that must
+   * hold rather than as "the section wrapper": every `.border-glow` outside a
+   * tilt card is decoration and must say so, so a future static surface cannot
+   * ship as an unlabeled interactive-looking overlay.
+   */
+  test("M4.1.4 surfaces exist: decorative layers are labelled as such", async ({ page }) => {
     await page.goto("/");
     const surfaces = await page.evaluate(() => {
       const hero = document.querySelector(
         ".border-glow[data-tilt-spotlight='on'][aria-hidden='true']",
       );
-      const section = document.querySelector("#about .border-glow[data-tilt-spotlight='on']");
+      const staticLayers = [...document.querySelectorAll(".border-glow")].filter(
+        (el) => !el.closest(".tilt-card"),
+      );
       return {
         heroHidden: hero?.getAttribute("aria-hidden"),
         heroZ: hero ? getComputedStyle(hero).zIndex : null,
-        sectionPresent: section !== null,
+        staticLayers: staticLayers.length,
+        labelled: staticLayers.filter((el) => el.getAttribute("aria-hidden") === "true").length,
       };
     });
     expect(surfaces.heroHidden).toBe("true");
     expect(surfaces.heroZ).toBe("15");
-    expect(surfaces.sectionPresent).toBe(true);
+    expect(surfaces.staticLayers).toBeGreaterThan(0);
+    expect(surfaces.labelled).toBe(surfaces.staticLayers);
   });
 });
