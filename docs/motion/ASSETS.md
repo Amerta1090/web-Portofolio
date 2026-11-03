@@ -506,3 +506,18 @@ four cards. The `/work` and `/gallery` shifts are ≤0.2 KB in chunks this chang
 does not add: identifiable shared chunks kept their raw size (`data.*.js` is
 7,854 B before and after, different hash), so those two are the rename cascade,
 not new code. **Trade: −2.6 MB of images for +0.4 KB of JS.**
+
+## 14. Asset families per chapter (MOTION-20, 2026-11-03)
+
+The concept (D-13, `STORYBOARD.md` §Concept) fixes four families and maps at
+most one to each home chapter. Nothing new is acquired by this decision; every
+asset below is already owned and registered above.
+
+| Chapter | Family | Served today | Rule for the next sprint that touches it |
+| --- | --- | --- | --- |
+| `hero` | Owned photography | `hero-bg-{768,1280,1920}.webp` + hexagon avatar | one portrait only; per-width `object-position` keeps the subject in frame at 375 (verified in the MOTION-20 mock: 30 svh band, subject visible) — MOTION-11 |
+| `projects` | Product evidence, one frame style | `red-devil-dynamics-*.webp`, `ijo-plis-*.webp`, Tafsir = `placeholder/project.svg` | 16:10 frame, top-left anchored, caption names the source; no placeholder — a project without a capture shows its measured number — MOTION-11 |
+| `systems-in-motion` | Data-derived diagram | Signal Loom SVG | the SVG grammar: stroke = quantity, neutral ink, signal colour only when active, round caps, no dashes |
+| `journey` | Data-derived diagram | none (logos are identifiers) | same grammar: a time axis with one filled bar per record |
+| `creative-lab` | Generative visuals | 6 lab SVG thumbnails | the only multi-colour surface on the home |
+| `contact` | none (type) | 4 icon boxes | no picture; icons are chrome, not a family — MOTION-12 decides |

@@ -311,3 +311,42 @@ view-transition pseudo-element, verified by `e2e/page-continuity.spec.ts`.
 measured need, a reduced-motion path, and compatibility with ClientRouter scroll
 restoration.
 
+
+---
+
+## D-13 — Concept "Resolve": every surface is a readout, motion shows data resolving once
+
+**Date:** 2026-11-03 · **Status:** Proposed (MOTION-20) — awaiting owner sign-off
+
+**Context.** MOTION-17 fixed the audience and the argument, MOTION-18/19 the
+routes and the six-chapter home. What remained was the one idea that makes the
+six chapters read as one piece; the §6 audit called the site "a well-built
+template" because every chapter shares one fade-and-rise beat and the chrome
+(eyebrows, mono labels, ordinals, hairline boxes) carries no information. The
+taste inspector measured the home at **16 FAIL / 5 WARN** (2026-11-03).
+
+**Decision.** Keep D-01 "Editorial Instrument" and give it a subject-derived
+concept, *Resolve*: every surface is a readout of real data, and motion only
+ever shows that data resolving — once, plainly, at reading speed. Three rules:
+(1) the signal colour means data — accent only on measured values and links to
+evidence, chrome is neutral tone steps; (2) draw only what was measured — four
+asset families, one per chapter, diagrams in one SVG grammar; (3) motion is the
+resolve, played once — quiet entrances, one loud moment (chapter 3, "the map
+resolves"), the page turn as connective tissue, reduced motion = resolved state.
+Full text, family map, frames and the MOTION-21 brief: `STORYBOARD.md`
+§Concept.
+
+**Alternatives considered.**
+- *Signature in the hero (hero → proof hand-off).* Rejected for the loud
+  moment: slows the 5-second recruiter read; kept as a quiet transition.
+- *"Signal trace" — one continuous line connecting all chapters.* Rejected: a
+  decorative line through the page is the hairline tell, and it is not data.
+- *Field Atlas plates (D-11 alternative).* Still deferred; rule 2 admits a plate
+  only if it is evidence, which none of the candidates is.
+
+**Consequences.** MOTION-12 removes chrome that is not data (eyebrows, mono
+labels, ordinals, outlined boxes, button glow) and settles one type system;
+MOTION-14 picks one signal hue (clay retires as UI accent); MOTION-11 fills the
+product-evidence frame and retires the duplicate avatar; MOTION-21 builds
+"the map resolves" with two variants. Nothing in the concept needs a new
+dependency (D-05) or a canvas in an editorial chapter.

@@ -1325,7 +1325,7 @@ themes, e2e for the host chapter, docs.
 
 ## MOTION-20 — Concept & art direction
 
-**Status:** `READY` (MOTION-19 `DONE` 2026-11-03; added 2026-10-31, `RESEARCH.md` §8)
+**Status:** `BLOCKED` — work complete 2026-11-03, **awaiting owner sign-off** on concept, rules and frames (added 2026-10-31, `RESEARCH.md` §8)
 **Priority:** P1
 **Objective:** One visual idea that ties the site together, so "wow" comes from coherence, not from effects.
 **Outcome:** A written concept (one sentence + 3 rules), a storyboard frame per home chapter, the four asset families with "one family per chapter", and the signature-moment brief for MOTION-21.
@@ -1336,16 +1336,35 @@ themes, e2e for the host chapter, docs.
 **Exclusions:** no production code beyond throwaway mock pages; no stock or AI imagery.
 
 **Tasks**
-- [ ] M20.1 Derive the concept from the subject (systems that turn sensor/data into decisions) — not from a trend; check it against the taste tells registry.
-- [ ] M20.2 Asset families: owned photography · product evidence in one frame style · data-derived diagrams in one SVG style · generative visuals (lab only). Map one family per chapter.
-- [ ] M20.3 Motion language: chapter entrances quiet; one signature moment loud; page turn (MOTION-08) as connective tissue.
-- [ ] M20.4 Frame each chapter at 1440 and 375; review with impeccable `critique` + taste `inspect`.
+- [x] M20.1 Derive the concept from the subject (systems that turn sensor/data into decisions) — not from a trend; check it against the taste tells registry.
+- [x] M20.2 Asset families: owned photography · product evidence in one frame style · data-derived diagrams in one SVG style · generative visuals (lab only). Map one family per chapter.
+- [x] M20.3 Motion language: chapter entrances quiet; one signature moment loud; page turn (MOTION-08) as connective tissue.
+- [x] M20.4 Frame each chapter at 1440 and 375; review with impeccable `critique` + taste `inspect`.
 
 **Acceptance criteria**
 - Concept, rules, and frames approved by the owner.
 - Every chapter has one asset family and one purpose.
 
 **Definition of Done / verification:** frames in `SESSION_LOG.md`, decision D-13.
+
+### Result (2026-11-03, pending sign-off)
+
+| Deliverable | Where |
+| --- | --- |
+| Concept "Resolve": one sentence + 3 rules, checked against the tells registry | `STORYBOARD.md` §Concept, D-13 |
+| Four asset families, at most one per chapter | `STORYBOARD.md` §Concept table, `ASSETS.md` §14 |
+| Motion language per chapter (quiet / one loud / page turn) | `STORYBOARD.md` §Concept |
+| Frames @1440 and 375, today vs target, + signature keyframes | `docs/motion/frames/motion-20-{today,target,signature}.jpg` |
+| Reviews | taste `inspect.mjs`: today 16 FAIL / 5 WARN → target mock 6 FAIL / 8 WARN; impeccable heuristic notes in `SESSION_LOG.md` |
+| MOTION-21 brief | `STORYBOARD.md` §Concept → "MOTION-21 brief" |
+
+**Deviations.** (1) Contact has no asset family (type only) — a picture there
+would be decoration; the acceptance line "one asset family per chapter" is met
+as "at most one". (2) The signature moment is chapter 3, not the hero hand-off
+listed as the MOTION-21 candidate — the approved brief already named chapter 3
+and the hero would slow the recruiter read. (3) Frames are committed as three
+compressed contact sheets (597 KB total) so the owner can approve them; the
+HTML mock itself was deleted, as the sprint requires.
 
 ---
 
@@ -1354,7 +1373,7 @@ themes, e2e for the host chapter, docs.
 **Status:** `PLANNED` (added 2026-10-31, `RESEARCH.md` §8)
 **Priority:** P1
 **Objective:** Build the one interaction people remember and describe unprompted.
-**Outcome:** One signature moment (candidate: the hero → proof hand-off driven by real project data), progressive: static meaning without JS, full on capable devices, equivalent still under reduced motion.
+**Outcome:** One signature moment — "the map resolves" in `#systems-in-motion` (MOTION-20 brief, `STORYBOARD.md` §Concept; variants A weigh-in / B rank-then-weigh), progressive: static meaning without JS, full on capable devices, equivalent still under reduced motion.
 
 **Dependencies:** MOTION-20, MOTION-14 (palette).
 

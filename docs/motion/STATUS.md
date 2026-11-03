@@ -1,8 +1,8 @@
 # Motion Programme — Status
 
-**Last updated:** 2026-11-03 (MOTION-19 `DONE`)
+**Last updated:** 2026-11-03 (MOTION-20 work complete, awaiting owner sign-off)
 **Branch:** `main` · **HEAD at session start:** `d571c5f` (MOTION-18)
-**Active sprint:** none — MOTION-19 `DONE` (home cut to 6 chapters / 9.46 screens 2026-11-03); **MOTION-20 (concept & art direction) READY**
+**Active sprint:** MOTION-20 (concept & art direction) — `BLOCKED` on owner sign-off; concept "Resolve" (D-13), frames in `docs/motion/frames/`. After sign-off: MOTION-20 `DONE`, **MOTION-11 READY**.
 
 ## One-paragraph state
 
@@ -232,13 +232,14 @@ perception thresholds with ≥ 5 recruiters and ≥ 5 developers.
 
 ## Next action
 
-**Stop here.** MOTION-19 is closed; MOTION-20 (concept & art direction) is
-`READY`. Read MOTION-20 in `SPRINT_PLAN.md`, the approved brief at the top of
-`STORYBOARD.md`, and the concept constraints in `DECISIONS.md` (D-02 CSS first,
-D-04 reduced motion = off, D-11 evidence-first assets). Carry-over facts: every
-URL comes from `src/lib/routes.ts`; `bun run check:links` after every build;
-the home is now 6 chapters, so a new chapter is a storyboard decision, not a
-layout one; the home no longer prints any GitHub number — `/data` owns them.
-Playwright runs on `chromium-1228`; `bunx playwright install chromium` did not
-add 1248 here, so ad-hoc scripts need
-`executablePath: ~/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome`.
+**Owner decision needed.** MOTION-20's deliverables are written: concept
+"Resolve" (one sentence + 3 rules) in `STORYBOARD.md` §Concept and D-13, the
+asset family per chapter (`ASSETS.md` §14), the motion language, frames at 1440
+and 375 (`docs/motion/frames/motion-20-{today,target,signature}.jpg`), and the
+MOTION-21 brief ("the map resolves" in `#systems-in-motion`). Taste inspector:
+today 16 FAIL / 5 WARN, target mock 6 FAIL / 8 WARN (classified in
+`SESSION_LOG.md`). On approval: mark MOTION-20 `DONE` and MOTION-11 (project
+evidence imagery) `READY`. On rejection: record the owner's objection here and
+revise the concept in the same sprint. Carry-over facts are unchanged: URLs from
+`src/lib/routes.ts`, `bun run check:links` after builds, Playwright on
+`chromium-1228` (`executablePath` override for ad-hoc scripts).

@@ -75,10 +75,152 @@ candidate for the MOTION-21 signature moment. Everything else is reading.
 5. Principles from the benchmark (`RESEARCH.md` §9.2) are binding; no layout is
    copied from a reference site.
 
+## Concept — "Resolve" (MOTION-20, 2026-11-03)
+
+> **Status: awaiting owner sign-off** (`SESSION_LOG.md` 2026-11-03). Decision
+> record: `DECISIONS.md` D-13. Frames: `docs/motion/frames/motion-20-*.jpg`.
+> Concept refines D-01 "Editorial Instrument"; it does not replace it.
+
+**Derived from the subject, not a trend.** The person builds systems that take a
+raw signal (a sensor reading, a price series, a page of tafsir) and resolve it
+into a decision someone can check. The site should behave the same way.
+
+**The concept in one sentence.** *Every surface is a readout of real data, and
+motion only ever shows that data resolving — once, plainly, at reading speed.*
+
+**Three rules** (each is testable on a screenshot or in the source):
+
+1. **The signal colour means data.** The accent appears only on a value that was
+   measured, or on a link to the evidence behind it (a proof number, a card's
+   measured line, an active map edge, the current journey bar, the email).
+   Chrome — eyebrows, borders, chips, icons, labels — is neutral, built from tone
+   steps of the ground. Test: every accent pixel in a frame sits on a number, an
+   active edge, or a link to source.
+2. **Draw only what was measured.** Every picture belongs to one of the four
+   asset families below, one family per chapter. A diagram is generated from
+   data in one SVG grammar (stroke weight = a quantity, no decorative shapes,
+   no dashes, no arrowheads unless direction is the data). A chapter with no
+   honest picture shows its number or its type, never a placeholder.
+3. **Motion is the resolve, played once.** An element moves from its raw state
+   to its resolved state exactly once per entry: an unweighted link takes its
+   weight, a list takes its rank, a stage takes its place. Chapter entrances are
+   quiet (opacity, ≤ 240 ms, no rise); one chapter carries the loud moment
+   (chapter 3); the page turn (MOTION-08, 140/240 ms on `<main>`) is the
+   connective tissue. No loop except the signal dot in the one map, paused
+   off-screen. Reduced motion shows the resolved state with no movement (D-04).
+
+**Checked against the taste tells registry** (`design-taste-frontend`
+`references/tells.md`). The rules remove, by construction, the tells the site
+carries today — literal "Section" eyebrows, JetBrains Mono micro-labels, 2-digit
+index numbering, 1px outlined boxes, glow on buttons, uniform fade-and-rise —
+because none of them is data (rule 1) or a resolve (rule 3). Two inherited
+tells are *not* fixed by the concept and are routed: the clay accent (third-wave
+"terracotta" tell → MOTION-14 triadic palette; rule 1 needs exactly one signal
+hue) and the two type systems (Fraunces hero vs bold Inter h2 → MOTION-12). The
+"avoidance aesthetic" risk (§8 of the registry) is answered by rule 3: the gap
+is filled by the resolve, not by an absence of tells. Measured with the
+registry's own inspector (`inspect.mjs`, 1440 + 390): **today 16 FAIL / 5 WARN,
+target frame 6 FAIL / 8 WARN** — the six remaining are listed and classified in
+`SESSION_LOG.md`.
+
+### Asset families — one per chapter (M20.2)
+
+| # | Chapter | Purpose (one) | Asset family (one) | What it is | Gap / owner |
+| ---: | --- | --- | --- | --- | --- |
+| 1 | `hero` | Who, what, where, next action | **Owned photography** | the single portrait (`hero-bg-*`), art-directed crop per width (`object-position` ≈ 68 % 70 % desktop, 70 % 72 % at 375) with a place caption | the hexagon avatar duplicates the person → retire (MOTION-11/12) |
+| 2 | `projects` | Three shipped systems, each with one measured line | **Product evidence, one frame style** | real UI captures in a 16:10 tone-step frame, top-left anchored, caption names the source (case study · live · repo) | Tafsir has no owned capture → frame shows its measured number (0.972) until MOTION-11 supplies one; Red Devil/IJO PLIS lack an accuracy metric (MOTION-15) |
+| 3 | `systems-in-motion` | How capabilities connect to evidence; the one place to play | **Data-derived diagram** | Signal Loom: 30 nodes / 31 edges, width = shared skills | — (the signature moment lives here) |
+| 4 | `journey` | Sustained growth in six records | **Data-derived diagram** (same SVG grammar) | a time axis 2023 → now, one filled bar per record, current role in the signal colour; issuer/employer logos stay small identifiers, not imagery | — |
+| 5 | `creative-lab` | A reason for developers to stay | **Generative visuals (lab only)** | the 27 lab thumbnails; the multi-colour exception lives here and nowhere else | — |
+| 6 | `contact` | The shortest path to a conversation | **None — type only** (deviation: no family) | the email at display size in the signal colour, then phone, LinkedIn, GitHub, CV | a picture here would be decoration (rule 2, D-11) |
+
+Families appear at most once per chapter; two chapters share the diagram
+grammar, which is the point: one way of drawing data across the site.
+
+### Motion language per chapter (M20.3)
+
+| Chapter | Entrance (quiet) | What resolves (once) | Loud? | Reduced motion |
+| --- | --- | --- | --- | --- |
+| hero | name and role present at first paint; no word-by-word cascade | proof numbers are already final — no count-up | no | identical |
+| projects | cards fade in lead-first (existing `--project-card-order`) | the measured line is the last thing to settle in each card | no | static |
+| systems-in-motion | head, then body | **the map resolves** (signature, MOTION-21 brief below) | **yes** | resolved map, no movement |
+| journey | head, then rows | bars grow from their start date to their end date (`scaleX`, origin = start) | no | final bars |
+| creative-lab | contact sheet laid down (existing MOTION-07 beats) | — | no | static |
+| contact | none | — | no | static |
+| between pages | MOTION-08 page turn on `<main>` | — | — | Astro's `animation: none` |
+
+### Frames (M20.4)
+
+Contact sheets, first screen of every chapter at 1440×900 and 375×812:
+
+- `frames/motion-20-today.jpg` — the home at HEAD `131eb75`.
+- `frames/motion-20-target.jpg` — a throwaway HTML mock of the concept built
+  from the real data layer (graph exported from `buildSignalLoomGraph`, journey
+  from `toCareerHighlights` output, flagship metrics from the case studies).
+  The mock was deleted before the commit; its generator is described in
+  `SESSION_LOG.md`.
+- `frames/motion-20-signature.jpg` — the resolved map plus the three
+  signature keyframes.
+
+What each target frame commits to:
+
+| Chapter | 1440×900 | 375×812 |
+| --- | --- | --- |
+| hero | split: copy left (name 2–3 lines, role sentence, current role + UTC+7, "See the work" + email, proof row 22 / 62 / 2 in signal colour), photograph right half, subject on the bench | photograph band 30 svh on top with the subject visible, copy below; role, CTA and proof row inside the first screen |
+| projects | title "Three shipped systems", three equal frames; Tafsir's frame is its number; measured line in signal colour under each title; "All 22 projects" | one column; frame first, measured line before description |
+| systems-in-motion | sentence with the counts, default path (busiest capability, 3 strongest ties) beside the intro, resolved map below | map hidden (as today below `md`); the ranked default path *is* the chapter |
+| journey | "Since 2023", time axis of six filled bars, six one-line rows (dates · role · organisation), two links to `/about` | rows stack; axis compresses to the same width |
+| creative-lab | six thumbnails, sentence-case captions, "All 27 experiments" | two columns |
+| contact | "Let's talk about your system.", email at display size, four plain links; the form is a MOTION-12 question (keep below or move to `/about`) | same, links wrap |
+
+Mock lengths (header and the interactive card grid of chapter 3 omitted, so not
+a claim about the shipped home): 5,707 px = 6.34 screens @1440, 5,763 px =
+7.10 screens @375.
+
+### MOTION-21 brief — the signature moment
+
+**Where.** Chapter 3, `#systems-in-motion`, as the approved brief already says.
+The hero → proof hand-off (the earlier candidate) stays a quiet transition
+(MOTION-02): putting the loud moment in the hero would slow the 5-second
+recruiter read (brief rule 3) and every reference with a memorable moment has
+exactly one (`RESEARCH.md` §9.2 #3).
+
+**What it is: "the map resolves."** On first entry the 31 links arrive as the
+data arrives — capabilities in file order, every link the same weight — and
+resolve in ≈ 700 ms into the map people then use: capabilities rank by reach
+(9, 6, 4, 4, 3, 2, 2, 1), links take their weight (width = shared skills), and
+the busiest capability's path lights. Then the reader drives (selection, hover,
+deep links unchanged). It is the site's argument — data in, decision out —
+performed once, by the real graph.
+
+**Two variants for the A/B (M21.1):**
+- **A — Weigh-in.** Order unchanged; links go from equal weight to their weight,
+  then the default path lights. Smallest change, no layout movement.
+- **B — Rank, then weigh.** Capability cards first move to their degree order
+  (transform-only FLIP), then A plays. More legible story, more risk to the
+  "one `measureEdges()` pass per layout" invariant — B must measure after the
+  FLIP, never during.
+
+**At 375.** The SVG map is hidden below `md` today; the mobile equivalent is the
+ranked default-path list resolving (rows settle in rank order, once). No canvas.
+
+**Budget and invariants** (from MOTION-21 tasks, restated as the brief): ≤ +40 KB
+gzip reachable on `/` (expected ≈ 1–3 KB: GSAP is already in the island's
+graph), 0 new scroll listeners (trigger from the existing IO / `view()`), 60 fps
+on the 4-core / 3 GB box, pause off-screen, Signal Loom invariants intact
+(30 / 31, one measure pass per layout). Stroke-width tweens are paint, not
+composite: 31 lines once is acceptable; anything per-frame after resolve is not.
+**No-JS:** the server markup already states the default path in words (the
+3 strongest ties) — the meaning survives without the map. **Reduced motion:**
+the resolved frame, immediately.
+
+**Frames to beat:** `frames/motion-20-signature.jpg` (0 ms raw · ~300 ms
+ranked · ~700 ms resolved).
+
 ## Creative directions considered
 
-> Pre-MOTION-20 record. MOTION-20 (concept & art direction) re-decides the
-> direction against this brief; until then "Editorial Instrument" stands.
+> Pre-MOTION-20 record. MOTION-20 kept "Editorial Instrument" and refined it
+> into the "Resolve" concept above (D-13).
 
 | Direction | Promise | Why it was/wasn't chosen |
 | --- | --- | --- |
