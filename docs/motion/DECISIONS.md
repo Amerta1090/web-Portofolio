@@ -314,39 +314,44 @@ restoration.
 
 ---
 
-## D-13 — Concept "Resolve": every surface is a readout, motion shows data resolving once
+## D-13 — Concept "The dark room": real outputs as lit exhibits (rev. 2)
 
-**Date:** 2026-11-03 · **Status:** Proposed (MOTION-20) — awaiting owner sign-off
+**Date:** 2026-11-03 · **Status:** Proposed (MOTION-20 rev. 2) — awaiting owner sign-off
 
-**Context.** MOTION-17 fixed the audience and the argument, MOTION-18/19 the
-routes and the six-chapter home. What remained was the one idea that makes the
-six chapters read as one piece; the §6 audit called the site "a well-built
-template" because every chapter shares one fade-and-rise beat and the chrome
-(eyebrows, mono labels, ordinals, hairline boxes) carries no information. The
-taste inspector measured the home at **16 FAIL / 5 WARN** (2026-11-03).
+**Context.** MOTION-17 fixed the audience and argument, MOTION-18/19 the routes
+and the six-chapter home. Rev. 1 of this decision ("Resolve") kept the
+existing look and removed its ornaments; the owner rejected it the same day
+because it does not amaze, and asked for a world-class visual judged by more
+than one source. The taste inspector measured today's home at **16 FAIL /
+5 WARN**.
 
-**Decision.** Keep D-01 "Editorial Instrument" and give it a subject-derived
-concept, *Resolve*: every surface is a readout of real data, and motion only
-ever shows that data resolving — once, plainly, at reading speed. Three rules:
-(1) the signal colour means data — accent only on measured values and links to
-evidence, chrome is neutral tone steps; (2) draw only what was measured — four
-asset families, one per chapter, diagrams in one SVG grammar; (3) motion is the
-resolve, played once — quiet entrances, one loud moment (chapter 3, "the map
-resolves"), the page turn as connective tissue, reduced motion = resolved state.
-Full text, family map, frames and the MOTION-21 brief: `STORYBOARD.md`
-§Concept.
+**Decision (proposed).** Adopt the dealt *dark room* direction (taste draw,
+seed `207625105`): one dark field in which each screen lights one real
+exhibit — the person in Tulungagung, then the outputs of three shipped systems
+(0.972 / 13.8 % / 7·30·90), the capability map, the career record, 27 lab
+stills, and a contact card on the Ngrowo river. Archivo (one family), palette
+soot `#0f0f0f` / ink `#f2f2ee` / one lime action `#dafa9c`. Three rules: light
+means evidence; every picture owned or credited; the lights do the motion.
+Full text and chapter table: `STORYBOARD.md` §Concept.
+
+**Evidence.** A throwaway mock built from the real data layer reached 0 FAIL on
+the taste inspector and 0 findings on the impeccable detector, and an
+independent three-juror panel scored it 6.25 → 7.0 → 7.27 → 7.5 over four
+fix rounds (`SESSION_LOG.md`).
 
 **Alternatives considered.**
-- *Signature in the hero (hero → proof hand-off).* Rejected for the loud
-  moment: slows the 5-second recruiter read; kept as a quiet transition.
-- *"Signal trace" — one continuous line connecting all chapters.* Rejected: a
-  decorative line through the page is the hairline tell, and it is not data.
-- *Field Atlas plates (D-11 alternative).* Still deferred; rule 2 admits a plate
-  only if it is evidence, which none of the candidates is.
+- *Rev. 1 "Resolve"* — rejected by the owner (clean but not memorable).
+- *Name as monument*, *quiet instrument* — dealt alongside; the dark room was
+  the only one whose device carries the subject's own outputs.
+- *Keep Fraunces / mono labels / sage-clay* — the inspector fails mono labels,
+  eyebrows, ordinals and clay as a set; keeping them keeps the 16 FAILs.
 
-**Consequences.** MOTION-12 removes chrome that is not data (eyebrows, mono
-labels, ordinals, outlined boxes, button glow) and settles one type system;
-MOTION-14 picks one signal hue (clay retires as UI accent); MOTION-11 fills the
-product-evidence frame and retires the duplicate avatar; MOTION-21 builds
-"the map resolves" with two variants. Nothing in the concept needs a new
-dependency (D-05) or a canvas in an editorial chapter.
+**Consequences.** This is a rebrand: Fraunces, JetBrains Mono labels and the
+sage/clay palette retire if approved, and MOTION-14 (colour) becomes "apply
+and verify the dark-room palette in both themes" instead of choosing a triad
+(the light theme needs its own pass). MOTION-11 gains concrete asset asks
+(lit portrait, owned Tafsir capture, screen recordings). MOTION-21 builds "the
+map lights" plus "the room lights". The two dead live demos (HTTP 404) are a
+content defect independent of the decision. The panel puts the layout-only
+ceiling at about 8.2; above that needs owner-supplied photography, motion
+footage and outside proof.

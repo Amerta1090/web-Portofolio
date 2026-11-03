@@ -1,8 +1,8 @@
 # Motion Programme — Status
 
-**Last updated:** 2026-11-03 (MOTION-20 work complete, awaiting owner sign-off)
+**Last updated:** 2026-11-03 (MOTION-20 rev. 2 complete, awaiting owner sign-off)
 **Branch:** `main` · **HEAD at session start:** `d571c5f` (MOTION-18)
-**Active sprint:** MOTION-20 (concept & art direction) — `BLOCKED` on owner sign-off; concept "Resolve" (D-13), frames in `docs/motion/frames/`. After sign-off: MOTION-20 `DONE`, **MOTION-11 READY**.
+**Active sprint:** MOTION-20 (concept & art direction) — `BLOCKED` on owner sign-off of rev. 2 "The dark room" (D-13; rev. 1 rejected). After sign-off: MOTION-20 `DONE`, **MOTION-11 READY**.
 
 ## One-paragraph state
 
@@ -232,14 +232,12 @@ perception thresholds with ≥ 5 recruiters and ≥ 5 developers.
 
 ## Next action
 
-**Owner decision needed.** MOTION-20's deliverables are written: concept
-"Resolve" (one sentence + 3 rules) in `STORYBOARD.md` §Concept and D-13, the
-asset family per chapter (`ASSETS.md` §14), the motion language, frames at 1440
-and 375 (`docs/motion/frames/motion-20-{today,target,signature}.jpg`), and the
-MOTION-21 brief ("the map resolves" in `#systems-in-motion`). Taste inspector:
-today 16 FAIL / 5 WARN, target mock 6 FAIL / 8 WARN (classified in
-`SESSION_LOG.md`). On approval: mark MOTION-20 `DONE` and MOTION-11 (project
-evidence imagery) `READY`. On rejection: record the owner's objection here and
-revise the concept in the same sprint. Carry-over facts are unchanged: URLs from
-`src/lib/routes.ts`, `bun run check:links` after builds, Playwright on
-`chromium-1228` (`executablePath` override for ad-hoc scripts).
+**Owner decision needed on MOTION-20 rev. 2 ("The dark room", D-13).** It is a
+rebrand (Archivo, soot/lime) judged by an independent panel: mean 6.25 → 7.50
+over four rounds, taste inspector 0 FAIL (today 16). The panel's ceiling for
+layout-only work is ≈ 8.2; 9+ needs owner inputs: working live demos (both
+return 404 today — a defect on the shipped site too), a screen recording of a
+system working, a lit portrait, an owned Tafsir capture, outside proof. On
+approval: MOTION-20 `DONE`, MOTION-11 `READY` with those asks; MOTION-14
+becomes "apply the dark-room palette in both themes". Mock and found pictures
+are in the session scratchpad, not the repo.

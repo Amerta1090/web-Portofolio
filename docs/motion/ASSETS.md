@@ -507,17 +507,22 @@ does not add: identifiable shared chunks kept their raw size (`data.*.js` is
 7,854 B before and after, different hash), so those two are the rename cascade,
 not new code. **Trade: −2.6 MB of images for +0.4 KB of JS.**
 
-## 14. Asset families per chapter (MOTION-20, 2026-11-03)
+## 14. Asset families per chapter (MOTION-20 rev. 2, 2026-11-03)
 
-The concept (D-13, `STORYBOARD.md` §Concept) fixes four families and maps at
-most one to each home chapter. Nothing new is acquired by this decision; every
-asset below is already owned and registered above.
+Pending owner sign-off (D-13). Families, one per chapter: hero = owned
+photography (graded); projects = live UI captures + one archival page;
+systems-in-motion and journey = data-derived diagrams; creative-lab =
+**stills captured from the running experiments** (owned); contact = a credited
+place photograph.
 
-| Chapter | Family | Served today | Rule for the next sprint that touches it |
+| Asset | Source | Licence | Status |
 | --- | --- | --- | --- |
-| `hero` | Owned photography | `hero-bg-{768,1280,1920}.webp` + hexagon avatar | one portrait only; per-width `object-position` keeps the subject in frame at 375 (verified in the MOTION-20 mock: 30 svh band, subject visible) — MOTION-11 |
-| `projects` | Product evidence, one frame style | `red-devil-dynamics-*.webp`, `ijo-plis-*.webp`, Tafsir = `placeholder/project.svg` | 16:10 frame, top-left anchored, caption names the source; no placeholder — a project without a capture shows its measured number — MOTION-11 |
-| `systems-in-motion` | Data-derived diagram | Signal Loom SVG | the SVG grammar: stroke = quantity, neutral ink, signal colour only when active, round caps, no dashes |
-| `journey` | Data-derived diagram | none (logos are identifiers) | same grammar: a time axis with one filled bar per record |
-| `creative-lab` | Generative visuals | 6 lab SVG thumbnails | the only multi-colour surface on the home |
-| `contact` | none (type) | 4 icon boxes | no picture; icons are chrome, not a family — MOTION-12 decides |
+| Hero portrait `hero-bg-*` | owner | own | in use; panel asks for a deliberately lit portrait |
+| Red Devil / IJO PLIS captures | owner (existing files) | own | in use; Red Devil source is only 800 px wide |
+| Tafsir al-Qurtubi 6 (BnF Arabe 687) | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tafsir_al-Qurtubi_6_bnf.jpg) | public domain | mock only; stands in for the missing owned Tafsir capture, captioned as the world the assistant reads |
+| Daerah Aliran Sungai Ngrowo | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Daerah_Aliran_Sungai_Ngrowo.jpg), Muhammad Hanif Ramdhani | CC BY-SA 4.0 (credit required) | mock only; contact background |
+| 27 lab stills | captured from `/lab#<id>` with Playwright, 1150×701 | own | 20 pass the rule "≥ 0.6 % of pixels brighter than 45/255"; 7 open blank until used (a `/lab` finding) and keep their SVG thumbnails |
+| Rejected | Kedungcangkring, Pagerwojo (a stranger seated mid-frame would read as the owner); Stasiun Tulungagung (bright midday, not low-key) | — | not used |
+
+Nothing from this table is in the repository yet; the found pictures were
+downloaded to the session scratchpad only.

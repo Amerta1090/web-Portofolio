@@ -1325,7 +1325,7 @@ themes, e2e for the host chapter, docs.
 
 ## MOTION-20 — Concept & art direction
 
-**Status:** `BLOCKED` — work complete 2026-11-03, **awaiting owner sign-off** on concept, rules and frames (added 2026-10-31, `RESEARCH.md` §8)
+**Status:** `BLOCKED` — rev. 2 complete 2026-11-03 (rev. 1 rejected by the owner), **awaiting owner sign-off** on the dark-room direction, the rebrand it implies, and the asset asks (added 2026-10-31, `RESEARCH.md` §8)
 **Priority:** P1
 **Objective:** One visual idea that ties the site together, so "wow" comes from coherence, not from effects.
 **Outcome:** A written concept (one sentence + 3 rules), a storyboard frame per home chapter, the four asset families with "one family per chapter", and the signature-moment brief for MOTION-21.
@@ -1347,24 +1347,22 @@ themes, e2e for the host chapter, docs.
 
 **Definition of Done / verification:** frames in `SESSION_LOG.md`, decision D-13.
 
-### Result (2026-11-03, pending sign-off)
+### Result (2026-11-03, rev. 2, pending sign-off)
 
 | Deliverable | Where |
 | --- | --- |
-| Concept "Resolve": one sentence + 3 rules, checked against the tells registry | `STORYBOARD.md` §Concept, D-13 |
-| Four asset families, at most one per chapter | `STORYBOARD.md` §Concept table, `ASSETS.md` §14 |
-| Motion language per chapter (quiet / one loud / page turn) | `STORYBOARD.md` §Concept |
-| Frames @1440 and 375, today vs target, + signature keyframes | `docs/motion/frames/motion-20-{today,target,signature}.jpg` |
-| Reviews | taste `inspect.mjs`: today 16 FAIL / 5 WARN → target mock 6 FAIL / 8 WARN; impeccable heuristic notes in `SESSION_LOG.md` |
-| MOTION-21 brief | `STORYBOARD.md` §Concept → "MOTION-21 brief" |
+| Concept "The dark room": idea sentence + 3 rules, dealt direction (seed 207625105) | `STORYBOARD.md` §Concept, D-13 |
+| Asset family per chapter, sources and licences | `STORYBOARD.md` §Concept, `ASSETS.md` §14 |
+| Frames @1440 / 768 / 390 | `docs/motion/frames/motion-20-{today,target}.jpg` |
+| Reviews | taste inspector 16 FAIL (today) → 0 FAIL; impeccable 0; three-juror panel 6.25 → 7.50 over 4 rounds (`SESSION_LOG.md`) |
+| MOTION-21 brief | "the map lights" + "the room lights" (`STORYBOARD.md`) |
 
-**Deviations.** (1) Contact has no asset family (type only) — a picture there
-would be decoration; the acceptance line "one asset family per chapter" is met
-as "at most one". (2) The signature moment is chapter 3, not the hero hand-off
-listed as the MOTION-21 candidate — the approved brief already named chapter 3
-and the hero would slow the recruiter read. (3) Frames are committed as three
-compressed contact sheets (597 KB total) so the owner can approve them; the
-HTML mock itself was deleted, as the sprint requires.
+**Deviations.** (1) Rev. 1 ("Resolve") rejected by the owner; rev. 2 is a
+rebrand (type, palette) that pre-empts MOTION-14 — the owner decides. (2) Two
+found archival/place pictures enter the asset plan (D-11 allowed one plate
+pilot; these are evidence-of-world with credits). (3) Contact has a credited
+place photograph instead of "type only". (4) Target 10/10 was not reached:
+mean 7.5, panel ceiling ≈ 8.2 without owner-supplied assets.
 
 ---
 
@@ -1373,7 +1371,7 @@ HTML mock itself was deleted, as the sprint requires.
 **Status:** `PLANNED` (added 2026-10-31, `RESEARCH.md` §8)
 **Priority:** P1
 **Objective:** Build the one interaction people remember and describe unprompted.
-**Outcome:** One signature moment — "the map resolves" in `#systems-in-motion` (MOTION-20 brief, `STORYBOARD.md` §Concept; variants A weigh-in / B rank-then-weigh), progressive: static meaning without JS, full on capable devices, equivalent still under reduced motion.
+**Outcome:** One signature moment — "the map lights" in `#systems-in-motion`, with "the room lights" on the flagship exhibits as the second beat (MOTION-20 rev. 2, `STORYBOARD.md` §Concept), progressive: static meaning without JS, full on capable devices, equivalent still under reduced motion.
 
 **Dependencies:** MOTION-20, MOTION-14 (palette).
 

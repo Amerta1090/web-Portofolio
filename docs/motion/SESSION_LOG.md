@@ -933,3 +933,58 @@ was deleted).
 
 **Owner sign-off:** pending. MOTION-20 stays `BLOCKED` until the owner approves
 the concept, rules and frames; then MOTION-20 `DONE` and MOTION-11 `READY`.
+
+### 2026-11-03 (MOTION-20 rev. 2) — owner rejected rev. 1; dark-room direction, four judged rounds
+
+**Owner feedback (verbatim, translated):** the whole site does not amaze; with
+all the skills available the work should say plainly it is not 10/10 — rebuild
+if needed. Then: keep looping and judging until 10/10, judged by more than one
+source (internet, skills, plugins), so the score is objective.
+
+1. **Honest rating first.** Home today ≈ 5/10 visually; rev. 1 mock ≈ 6/10
+   (it only removed ornaments — the registry's "avoidance aesthetic").
+2. **Process:** `design-taste-frontend` run. Inventory (Amerta; Tulungagung;
+   UTC+7; i3 / 4 GB; 0.972 / 5.93 s / 6,500+ pages / 10 volumes; 13.8 %;
+   ~10 years IHSG, 7/30/90; 22 / 62 / 27 / 31). `draw.mjs` dealt three
+   directions; chose **dark room** (seed 207625105). Redraws, each for a
+   stated reason: work → *small index, large picture* (the dealt strip needs
+   4–6 pictures per project; Tafsir has none); about → *side facts, wide
+   paragraph* (its two lists match 6 roles and 7 issuers); how-it-works →
+   the existing live capability map (the live thing).
+3. **Found pictures** via `assets.mjs` (licences checked): Tafsir al-Qurtubi
+   (BnF, PD), Ngrowo river (CC BY-SA 4.0). Rejected two (see `ASSETS.md` §14).
+4. **Lab stills:** all 27 experiments opened at `/lab#<id>` on the local build
+   and photographed; 20 kept by a lit-pixel rule, 7 open blank until
+   interacted with — a real `/lab` finding (first impression of those
+   experiments is an empty canvas).
+5. **Live demos are down (VERIFIED, curl):** Red Devil
+   `red-devil-dynamics.abdulmajidr708.workers.dev` → 404; IJO PLIS
+   `ihsg-ijo-plis-django-production.up.railway.app` → 404. The shipped site
+   labels both "Live". IJO PLIS's URL in `projects.json` also carries
+   `?utm_source=chatgpt.com`.
+6. **Judging panel** (owner asked for several sources): taste `inspect.mjs`
+   (measured), impeccable `detect` (deterministic, 0 findings),
+   web-design-guidelines (Vercel rules, fetched live), Awwwards weights from
+   the web (Design 40 / Usability 30 / Creativity 20 / Content 10 — reported
+   by several blogs, official page not confirmed), and three fresh sub-agent
+   jurors who only saw screenshots: (A) Awwwards-weighted, (B) taste
+   `critique.md` with caps, (C) product-design critique (the installed Design
+   plugin's skill was not loadable inside the sub-agent; noted by the juror).
+   Lighthouse could not run: chrome-devtools MCP finds no Chrome and no local
+   lighthouse package exists (installing one needs approval).
+
+| Round | Main changes | Inspector | A | B | C | Mean |
+| --- | --- | --- | ---: | ---: | ---: | ---: |
+| 1 | first dark-room build | 0 FAIL (after 6 fix passes) | 6.2 | 6.3 | — | 6.25 |
+| 2 | card no longer clips; exhibits larger; graded hero; lab stills; credits once | 0 FAIL | 6.9 | 7.4 | 6.6 | 6.97 |
+| 3 | project name leads each exhibit; tablet stacks; map on one screen; certification table off the home; ends on contact; lab ← → | 0 FAIL | 7.1 | 7.7 | 7.0 | 7.27 |
+| 4 | phone hero graded full-bleed; map labels wrap; real lab descriptions; credits strip; lime marker in the index | 0 FAIL | 7.3 | 7.8 | 7.4 | 7.50 |
+
+7. **Ceiling (all three jurors, independently):** ≈ 8.2 for layout-only work.
+   9+ needs moving proof (a recording of a system working), lit photography,
+   outside proof of outcomes, and working live demos. These are owner inputs.
+8. Mock lived in the scratchpad (served on :4399) and is not committed; the
+   final frames are `frames/motion-20-target.jpg`. Rev. 1's signature sheet
+   was removed as superseded.
+
+**Owner sign-off:** pending on rev. 2 (direction, rebrand, and the asset asks).
