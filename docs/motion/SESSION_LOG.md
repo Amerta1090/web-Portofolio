@@ -1018,3 +1018,47 @@ signature the visitor can operate on the real work (e.g. move Red Devil's
 match inputs and watch the probability change), footage of a system running,
 lit photography of the person and the work, outside proof, and live demos that
 load (both return 404).
+
+#### Round 6 — what code *can* supply: a live model, footage, outside proof (2026-11-03)
+
+Owner challenged "9+ needs material code cannot make". Re-sorted the jurors'
+list into what code can and cannot supply, then built the first three:
+
+1. **Live Red Devil instrument (VERIFIED).** The repo
+   `Amerta1090/Red-Devil-Dynamics-` serves a statsmodels Poisson GLM
+   (`app/services/prediction.py`). Coefficients taken from the notebook's
+   printed summary, not by unpickling: const −2.6705, minute −0.0214, side
+   0.1534, shots −0.0250, xG 1.3614, fast break −0.7372 (n = 2,268). Ported
+   the same steps (two 5-min intervals, `1 − e^{−Σλ}`) to the page. Python and
+   browser agree: 13.71 / 10.68 / 15.80 % for three input sets. It reproduces
+   the 13.8 % in the owner's own screenshot within 4-dp rounding (13.7 %).
+   Finding: the deployed Red Devil frontend calls `http://127.0.0.1:8000/predict`,
+   so no visitor could ever have run it; the "Survival model" label does not
+   match the code (Poisson GLM) and was corrected in the mock.
+2. **Footage.** Galaxy Formation recorded running in `/lab` (Playwright video),
+   cropped to the spiral, 6 s muted loop, VP9, 106 KB, poster = densest frame.
+   Reduced motion: no autoplay.
+3. **Third-party proof from the data layer:** "Selected by Bangkit Academy
+   (Google, Tokopedia, Gojek, Traveloka) · Samsung Innovation Campus · IDCamp",
+   certifications with the two largest issuers named (derived from
+   `SiteFacts.certifications.byIssuer`).
+
+| Juror | Round 5 (B) | Round 6 |
+| --- | ---: | ---: |
+| Awwwards-weighted | 7.37 | 7.77 |
+| taste critique.md (live-thing cap lifted) | 7.78 | 8.2 |
+| product-design | 7.6 | 8.0 |
+| **Mean** | **7.58** | **7.99** |
+
+Post-round-6 fixes (not re-scored): labelled 0/50/100 % y-axis and a taller
+curve, lime only on the current-minute dot, 2-column phone controls, smaller
+phone gaps, densest-frame poster. Taste inspector 0 FAIL throughout. Note:
+the inspector's own Chrome hung on a GNOME keyring prompt; a wrapper adding
+`--password-store=basic` fixed it (Playwright already passes that flag).
+
+**Still not possible from code, per the jurors:** IJO PLIS as an instrument
+needs the owner's Prophet model run (unpickling a joblib model + installing
+prophet/cmdstan — needs approval; a home-made forecast labelled IJO PLIS would
+be dishonest); Tafsir needs a recording of the real system; a lit portrait;
+outside measures of use. Jurors' ceilings now: 8.2–8.8 depending on whether
+IJO PLIS and Tafsir become operable.

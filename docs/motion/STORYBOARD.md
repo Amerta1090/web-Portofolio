@@ -125,6 +125,15 @@ engineer cannot put these numbers or this manuscript or this town on the page.
 | creative-lab | *small frames, wide space*: a draggable row of all 27 with ← → controls, real stills + real one-line descriptions | generative (captured) | each still |
 | contact | *visit card on a photograph*: dark card, full name, channels, lime "Email me" on the river at dusk; credits strip | credited place photograph | the card |
 
+**The operable exhibit (round 6).** Red Devil Dynamics is shown as an
+instrument, not a screenshot: the visitor sets minute, shots, xG and ground,
+and the author's own Poisson GLM (six coefficients from the repository's
+notebook) recomputes the next-ten-minutes goal chance and the curve over the
+match, in the browser, with the fit's caveat printed (ground p = 0.32). It is
+the panel's most-cited element and the reason "the room lights" becomes
+"the room runs". IJO PLIS and Tafsir follow the same rule only when their
+real models or real recordings are available.
+
 **MOTION-21 brief (updated).** The signature stays in chapter 3 — *the map
 lights*: on entry the 31 links take their weight, then the busiest capability
 (Machine Learning & AI, 9) lights with its projects; the reader drives after
@@ -143,7 +152,7 @@ programmes), always with a key. Big numbers use Archivo `wdth` 125, weight 300.
 
 **Measured result of the mock (VERIFIED 2026-11-03).** Taste inspector: 0 FAIL
 (home today: 16 FAIL). Impeccable detector: 0 findings. Independent panel,
-average of three jurors per round: **6.25 → 7.0 → 7.27 → 7.5 → 7.58** (round 5 = triad + wide numerals, judged with the scroll film) (round 4:
+average of three jurors per round: **6.25 → 7.0 → 7.27 → 7.5 → 7.58 → 7.99** (round 5 = triad + wide numerals with the scroll film; round 6 = the Red Devil model running in the page, a recorded lab loop, third-party proof) (round 4:
 taste-critique 7.8, Awwwards-weighted 7.3, product-design 7.4). All three
 jurors independently put the ceiling for layout-only work at ≈ 8.2.
 
