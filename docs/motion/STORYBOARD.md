@@ -131,8 +131,12 @@ and the author's own Poisson GLM (six coefficients from the repository's
 notebook) recomputes the next-ten-minutes goal chance and the curve over the
 match, in the browser, with the fit's caveat printed (ground p = 0.32). It is
 the panel's most-cited element and the reason "the room lights" becomes
-"the room runs". IJO PLIS and Tafsir follow the same rule only when their
-real models or real recordings are available.
+"the room runs". **Rounds 7–8 made all three flagships operable** on the same
+rule (the owner's own artefact, never a stand-in): IJO PLIS runs the
+repository's saved Prophet models (market × horizon, 80 % band, trading days
+only, bad closes drawn as gaps by a stated rule); Tafsir re-runs the
+assistant's BM25 retrieval over its 1,896 passages for four questions, with
+the unrun dense half and generated answer named in the caption.
 
 **MOTION-21 brief (updated).** The signature stays in chapter 3 — *the map
 lights*: on entry the 31 links take their weight, then the busiest capability
@@ -152,21 +156,29 @@ programmes), always with a key. Big numbers use Archivo `wdth` 125, weight 300.
 
 **Measured result of the mock (VERIFIED 2026-11-03).** Taste inspector: 0 FAIL
 (home today: 16 FAIL). Impeccable detector: 0 findings. Independent panel,
-average of three jurors per round: **6.25 → 7.0 → 7.27 → 7.5 → 7.58 → 7.99** (round 5 = triad + wide numerals with the scroll film; round 6 = the Red Devil model running in the page, a recorded lab loop, third-party proof) (round 4:
+average of three jurors per round: **6.25 → 7.0 → 7.27 → 7.5 → 7.58 → 7.99 → 8.2 → 8.37 → 8.5** (round 5 = triad + wide numerals with the scroll film; round 6 = the Red Devil model running in the page, a recorded lab loop, third-party proof; round 7 = IJO PLIS live; round 8 = Tafsir retrieval live; round 9 = the jurors' convergent defects) (round 4:
 taste-critique 7.8, Awwwards-weighted 7.3, product-design 7.4). All three
-jurors independently put the ceiling for layout-only work at ≈ 8.2.
+jurors independently put the ceiling for layout-only work at ≈ 8.2; with
+the three live instruments their code-only ceiling is **8.5–8.9**.
 
 **What layout cannot do — owner inputs needed for 9+ (from all three jurors)**
 1. **Both live demos are down** (VERIFIED: Red Devil `workers.dev` and IJO PLIS
    `railway.app` return HTTP 404). The site — today and in this mock — claims
    "Live". Either restore them or the copy must drop "Live" (rule 7).
-2. **Moving proof**: a short screen recording of a system working (Tafsir
-   answering on the i3 laptop, the predictor updating) — the panel's #1 ask.
+2. **Moving proof** — *now supplied in the page for all three flagships*
+   (rounds 6–8). A recording of the full Tafsir answer (dense half + LLM) is
+   still the only way to show the generated answer.
 3. **Photography**: a deliberately lit portrait for the dark room and a picture
    of the work in progress; the current hero is a phone snapshot.
 4. **Outside proof**: users, adoption or a result someone else measured.
 5. **Tafsir has no owned capture**; the archival page stands in honestly but an
    owned capture is stronger.
+6. **Defects found in the owner's repositories while making them run**
+   (VERIFIED, see SESSION_LOG rounds 6–8): Red Devil's frontend calls
+   `127.0.0.1:8000` and is labelled "Survival model" (it is a Poisson GLM);
+   IJO's Prophet models return negative prices on weekends and start ≈ 8 %
+   above the last close; Tafsir's query encoder (1024-dim) cannot match its
+   384-dim passage index, so it is BM25-only and misses Indonesian queries.
 
 ## Creative directions considered
 

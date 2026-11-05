@@ -1062,3 +1062,104 @@ prophet/cmdstan — needs approval; a home-made forecast labelled IJO PLIS would
 be dishonest); Tafsir needs a recording of the real system; a lit portrait;
 outside measures of use. Jurors' ceilings now: 8.2–8.8 depending on whether
 IJO PLIS and Tafsir become operable.
+
+#### Round 7 — IJO PLIS runs the owner's Prophet models (2026-11-05)
+
+Owner approved installing `prophet` and loading the repository's saved
+`ihsg_prophet_model.joblib` / `usdidr_prophet_model.joblib` (throwaway venv in
+`.motion-mock/`, excluded from git). Ran them exactly as
+`apps/predictor/services.py` does (`make_future_dataframe(periods=90)` →
+`predict` → `tail(90)`) and exported the result once with one year of the
+history each model was fitted on. The exhibit lets the visitor pick market
+(IHSG, USD/IDR) and horizon (7/30/90 days); the number, label, chart and 80 %
+band come from that export, trading days only. Default reading: IHSG 6,640
+for 26 Jun 2026, 30 days after the last close (6,127), band 6,418 – 6,828.
+
+Findings (VERIFIED, owner's repository — not fixed by us):
+- The models' multiplicative seasonality returns **negative prices on weekend
+  dates**, and the app stores all 90 rows (`predict` keeps weekends).
+- The first forecast day sits **+8 % above the last close** (IHSG 6,127 →
+  ≈ 6,640): the trend is fitted far above the last year's fall.
+- The IJO demo link carries `?utm_source=chatgpt.com`.
+
+| Juror | Round 6 | Round 7 |
+| --- | ---: | ---: |
+| Awwwards-weighted | 7.77 | 8.0 |
+| taste critique.md | 8.2 | 8.4 |
+| product-design | 8.0 | 8.2 |
+| **Mean** | **7.99** | **8.2** |
+
+#### Round 8 — Tafsir retrieval runs in the page (2026-11-05)
+
+The Tafsir exhibit became the third instrument: the assistant's sparse
+retrieval step re-run on its 1,896 passages (`rank_bm25` `BM25Okapi` on the
+`text` column, the app's own tokenizer `text.lower().split()`; the repo's
+`bm25_model.pkl` was **not** unpickled). Four questions; each shows the top
+passage with sura/ayah, BM25 score and time, plus the next two hits:
+Ramadan → Al-Baqarah 183–184 (22.01), Yusuf → Yusuf 89–92 (14.37), Al-Qadr →
+Al-Qadr 1–5 (24.33), "Mengapa riba diharamkan?" → Al-Baqarah 275 (11.41).
+The caption states the dense half and the generated answer are not run (the
+answer needs the owner's language-model key, which we did not use).
+
+Findings (VERIFIED, owner's repository):
+- `app.py` loads **384-dim** passage embeddings but encodes queries with
+  **1024-dim** `e5-large`, so the dense half of the "hybrid" can never match —
+  retrieval is BM25 only in practice.
+- The corpus is English: the Indonesian query "sabar" gets **0 BM25 matches**,
+  and an Ayat al-Kursi query misses Al-Baqarah 255. ("Mengapa riba
+  diharamkan?" works only because "riba" is a shared token.)
+
+The mock was rebuilt in a persistent, git-excluded `.motion-mock/` after a
+reboot wiped the scratchpad (`gen.py` fills `tpl.html` from `data/*.json`).
+Inspector 0 FAIL, 3 WARN, all deliberate: the lab side-scroller, the lab's
+empty middle (the same row), and the 3-screen work pin, where each screen is a
+new instrument.
+
+| Juror | Round 7 | Round 8 |
+| --- | ---: | ---: |
+| Awwwards-weighted | 8.0 | 8.2 |
+| taste critique.md | 8.4 | 8.5 |
+| product-design | 8.2 | 8.4 |
+| **Mean** | **8.2** | **8.37** |
+
+Defects all three converged on: the IJO caption claimed **one** bad USD/IDR
+close while the chart showed several spikes; the Tafsir passage read as raw
+scraped text (heading fused into the body, cut mid-word) in a lopsided layout;
+phone axis labels collided with the dates.
+
+#### Round 9 — the jurors' convergent defects (2026-11-05)
+
+1. **Bad closes by rule, not by date.** A close is drawn as a gap when it sits
+   more than 10 × the series' median daily move from the median of its six
+   neighbours. That flags exactly **5 USD/IDR closes** (12, 17, 19 Jun and
+   28, 31 Oct 2025; 12–22 × typical) and **0 IHSG closes**: a fixed 2 % rule
+   would have flagged 15 real IHSG moves. The note is generated per market,
+   with the count and dates.
+2. **Tafsir passage.** The heading is split from the body (an early `)` ends
+   it; otherwise the body starts at the first capitalised word, 2+ words in,
+   followed by an ordinary lowercase word): right for all 4 displayed
+   passages, wrong for 2 of 8 secondary hits, which only appear as references.
+   The excerpt ends on a sentence; scraped possessives ("Allahs", "Yusufs")
+   get their apostrophe back. The manuscript fills the column's full height.
+3. **Phone.** Captions now render under each instrument (the IJO note was
+   missing), sliders are one per row, and the axis labels are cleared of the
+   date row.
+
+| Juror | Round 8 | Round 9 |
+| --- | ---: | ---: |
+| Awwwards-weighted | 8.2 | 8.3 |
+| taste critique.md | 8.5 | 8.6 |
+| product-design | 8.4 | 8.6 |
+| **Mean** | **8.37** | **8.5** |
+
+Post-round-9 fixes (not re-scored, precedent round 6): floor labels restored
+above the line (dropping them traded a collision for an unlabelled floor), the
+work column sizes to its tallest reading so the switcher sits right under it
+(no dead band), Ground radios inline. Still open: on phone "50 %" touches the
+start of the Red Devil curve; the phone charts are short (~200–230 px); the
+capability map spans two screens at 1440; exhibits still change by cut.
+
+**The panel's code-only ceiling is 8.5–8.9** (all three jurors). Past 9 needs
+what code cannot make: a portrait lit for the dark room or photographs of the
+work, an outcome someone else measured (users, a deployment, an outside
+evaluation), and, per two jurors, a display face or numerals with character.
