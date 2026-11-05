@@ -316,7 +316,7 @@ restoration.
 
 ## D-13 — Concept "The dark room": real outputs as lit exhibits (rev. 2)
 
-**Date:** 2026-11-03 · **Status:** Proposed (MOTION-20 rev. 2) — awaiting owner sign-off
+**Date:** 2026-11-03 · **Status:** Accepted — approved by the owner 2026-11-05 ("Approve rev. 2")
 
 **Context.** MOTION-17 fixed the audience and argument, MOTION-18/19 the routes
 and the six-chapter home. Rev. 1 of this decision ("Resolve") kept the
@@ -325,7 +325,7 @@ because it does not amaze, and asked for a world-class visual judged by more
 than one source. The taste inspector measured today's home at **16 FAIL /
 5 WARN**.
 
-**Decision (proposed).** Adopt the dealt *dark room* direction (taste draw,
+**Decision.** Adopt the dealt *dark room* direction (taste draw,
 seed `207625105`): one dark field in which each screen lights one real
 exhibit — the person in Tulungagung, then the outputs of three shipped systems
 (0.972 / 13.8 % / 7·30·90), the capability map, the career record, 27 lab
@@ -336,8 +336,9 @@ Full text and chapter table: `STORYBOARD.md` §Concept.
 
 **Evidence.** A throwaway mock built from the real data layer reached 0 FAIL on
 the taste inspector and 0 findings on the impeccable detector, and an
-independent three-juror panel scored it 6.25 → 7.0 → 7.27 → 7.5 over four
-fix rounds (`SESSION_LOG.md`).
+independent three-juror panel scored it 6.25 → 7.0 → 7.27 → 7.5 → 7.58 →
+7.99 → 8.2 → 8.37 → 8.5 over nine rounds; rounds 6–8 made the three flagships
+run the owner's own models in the page (`SESSION_LOG.md`).
 
 **Alternatives considered.**
 - *Rev. 1 "Resolve"* — rejected by the owner (clean but not memorable).
@@ -347,11 +348,13 @@ fix rounds (`SESSION_LOG.md`).
   eyebrows, ordinals and clay as a set; keeping them keeps the 16 FAILs.
 
 **Consequences.** This is a rebrand: Fraunces, JetBrains Mono labels and the
-sage/clay palette retire if approved, and MOTION-14 (colour) becomes "apply
+sage/clay palette retire, and MOTION-14 (colour) becomes "apply
 and verify the dark-room palette in both themes" instead of choosing a triad
 (the light theme needs its own pass). MOTION-11 gains concrete asset asks
 (lit portrait, owned Tafsir capture, screen recordings). MOTION-21 builds "the
 map lights" plus "the room lights". The two dead live demos (HTTP 404) are a
-content defect independent of the decision. The panel puts the layout-only
-ceiling at about 8.2; above that needs owner-supplied photography, motion
-footage and outside proof.
+content defect independent of the decision. The panel puts the code-only
+ceiling at 8.5–8.9; above that needs owner-supplied photography (a lit
+portrait, the work in progress) and outside proof. The flagship exhibits are
+operable instruments running the owner's own artefacts (Red Devil Poisson GLM,
+IJO PLIS Prophet models, Tafsir BM25), never stand-ins.

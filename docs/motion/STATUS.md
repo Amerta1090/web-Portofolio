@@ -1,8 +1,8 @@
 # Motion Programme — Status
 
-**Last updated:** 2026-11-05 (MOTION-20 rev. 2 round 9, awaiting owner sign-off)
+**Last updated:** 2026-11-05 (MOTION-20 `DONE`: rev. 2 "The dark room" approved by the owner)
 **Branch:** `main` · **HEAD at session start:** `d571c5f` (MOTION-18)
-**Active sprint:** MOTION-20 (concept & art direction) — `BLOCKED` on owner sign-off of rev. 2 "The dark room" (D-13; rev. 1 rejected). After sign-off: MOTION-20 `DONE`, **MOTION-11 READY**.
+**Active sprint:** none — MOTION-20 `DONE` (D-13 accepted 2026-11-05). **Next: MOTION-11 `READY`** (project evidence imagery, with the D-13 owner asks).
 
 ## One-paragraph state
 
@@ -232,7 +232,7 @@ perception thresholds with ≥ 5 recruiters and ≥ 5 developers.
 
 ## Next action
 
-**Owner decision needed on MOTION-20 rev. 2 ("The dark room", D-13).** It is a
+**MOTION-20 rev. 2 ("The dark room", D-13) approved 2026-11-05; next is MOTION-11.** It is a
 rebrand (Archivo, soot/lime, lime-free data triad) judged by an independent
 panel: mean 6.25 → 8.5 over nine rounds (rounds 6–8 made all three flagships
 run the owner's own work in the page: Red Devil's Poisson GLM, IJO PLIS's
@@ -241,8 +241,8 @@ The panel's code-only ceiling is 8.5–8.9; 9+ needs owner inputs: working live
 demos (both return 404 today — a defect on the shipped site too), a lit
 portrait or photographs of the work, outside proof (users, a deployment, an
 outside evaluation). Defects found in the three repositories are listed in
-STORYBOARD §Concept. On
-approval: MOTION-20 `DONE`, MOTION-11 `READY` with those asks; MOTION-14
+STORYBOARD §Concept. Now
+that it is approved: MOTION-20 `DONE`, MOTION-11 `READY` with those asks; MOTION-14
 becomes "apply the dark-room palette in both themes". The mock (`gen.py` + `tpl.html` +
 data exports) lives in `.motion-mock/`, excluded from git via
 `.git/info/exclude`; it is a throwaway, not product code.

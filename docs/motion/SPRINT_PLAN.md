@@ -820,7 +820,7 @@ regression.
 
 ## MOTION-11 — Project evidence imagery
 
-**Status:** `PLANNED` (added 2026-10-31 from the visual/asset audit, `RESEARCH.md` §6)
+**Status:** `READY` (MOTION-20 approved 2026-11-05; added 2026-10-31 from the visual/asset audit, `RESEARCH.md` §6). Owner asks from D-13: a portrait lit for the dark room, photographs of the work in progress, an owned Tafsir capture; the three flagship exhibits are the instruments built in MOTION-20 rev. 2.
 **Priority:** P1 (largest visual gap measured)
 **Objective:** Every project a reader can open shows real evidence of the work,
 not a generic placeholder.
@@ -952,7 +952,10 @@ reduced-motion e2e with `emulateMedia` + `matchMedia` readback, docs.
 **Status:** `PLANNED` (added 2026-10-31, `RESEARCH.md` §7.4)
 **Priority:** P2
 **Objective:** Replace the accidental sage + clay pair with a palette derived
-from a named scheme, legible in both themes.
+from a named scheme, legible in both themes. **Re-scoped by D-13 (approved
+2026-11-05):** apply and verify the dark-room palette (soot `#0f0f0f`, ink
+`#f2f2ee`, lime action `#dafa9c`, lime-free OKLCH data triad teal/amber/violet)
+in both themes; the light theme needs its own pass.
 **Outcome:** Rubric V3 = 2: tokens generated from OKLCH, every text/UI pair
 ≥ AA in light and dark, hex and `-rgb` tokens agree.
 
@@ -1325,7 +1328,7 @@ themes, e2e for the host chapter, docs.
 
 ## MOTION-20 — Concept & art direction
 
-**Status:** `BLOCKED` — rev. 2 complete 2026-11-03 (rev. 1 rejected by the owner), **awaiting owner sign-off** on the dark-room direction, the rebrand it implies, and the asset asks (added 2026-10-31, `RESEARCH.md` §8)
+**Status:** `DONE` — rev. 2 "The dark room" approved by the owner 2026-11-05 (rev. 1 rejected 2026-11-03; added 2026-10-31, `RESEARCH.md` §8)
 **Priority:** P1
 **Objective:** One visual idea that ties the site together, so "wow" comes from coherence, not from effects.
 **Outcome:** A written concept (one sentence + 3 rules), a storyboard frame per home chapter, the four asset families with "one family per chapter", and the signature-moment brief for MOTION-21.
@@ -1347,14 +1350,14 @@ themes, e2e for the host chapter, docs.
 
 **Definition of Done / verification:** frames in `SESSION_LOG.md`, decision D-13.
 
-### Result (2026-11-03, rev. 2, pending sign-off)
+### Result (rev. 2, approved 2026-11-05)
 
 | Deliverable | Where |
 | --- | --- |
 | Concept "The dark room": idea sentence + 3 rules, dealt direction (seed 207625105) | `STORYBOARD.md` §Concept, D-13 |
 | Asset family per chapter, sources and licences | `STORYBOARD.md` §Concept, `ASSETS.md` §14 |
 | Frames @1440 / 768 / 390 | `docs/motion/frames/motion-20-{today,target}.jpg` |
-| Reviews | taste inspector 16 FAIL (today) → 0 FAIL; impeccable 0; three-juror panel 6.25 → 7.50 over 4 rounds (`SESSION_LOG.md`) |
+| Reviews | taste inspector 16 FAIL (today) → 0 FAIL; impeccable 0; three-juror panel 6.25 → 8.5 over 9 rounds, three flagships operable (`SESSION_LOG.md`) |
 | MOTION-21 brief | "the map lights" + "the room lights" (`STORYBOARD.md`) |
 
 **Deviations.** (1) Rev. 1 ("Resolve") rejected by the owner; rev. 2 is a
@@ -1362,7 +1365,9 @@ rebrand (type, palette) that pre-empts MOTION-14 — the owner decides. (2) Two
 found archival/place pictures enter the asset plan (D-11 allowed one plate
 pilot; these are evidence-of-world with credits). (3) Contact has a credited
 place photograph instead of "type only". (4) Target 10/10 was not reached:
-mean 7.5, panel ceiling ≈ 8.2 without owner-supplied assets.
+mean 8.5, panel code-only ceiling 8.5–8.9; 9+ needs owner-supplied
+photography and outside proof. (5) Defects found in the three flagship
+repositories are recorded in `STORYBOARD.md` §Concept, not fixed here.
 
 ---
 
