@@ -13,3 +13,4 @@ prompt.txt
 love.*.mp3
 test-results/
 .opencode/
+.claude/
