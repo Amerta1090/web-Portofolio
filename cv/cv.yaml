@@ -1,0 +1,119 @@
+cv:
+  name: Abdul Majid Ridwan Tyastonoatmaja
+  headline: Full-Stack AI Engineer — Business Systems, ML & Automation
+  location: Tulungagung, East Java, Indonesia
+  email: abdulmajidr708@gmail.com
+  phone: "+62 859-2745-0991"
+  website: https://portfolio.abdulmajidr708.workers.dev/
+  social_networks:
+    - network: LinkedIn
+      username: abdulmajidr708
+    - network: GitHub
+      username: Amerta1090
+  sections:
+    summary:
+      - "Full-stack engineer (S.Kom. 2026, GPA 3.99) and sole developer at Ferswit Indonesia, extending the inherited warehouse system used by ~20 staff and running the sales, marketing and automation services around it. Builds ML end to end in research and competition work: a hybrid-RAG thesis (ARCADIA 2026, 2nd place) and SweetLife (AMICTA 2025 AI winner)."
+    experience:
+      - company: Ferswit Indonesia
+        position: Full-Stack Systems Engineer (AI & Automation)
+        start_date: 2026-05
+        end_date: present
+        location: Tulungagung
+        highlights:
+          - "Took over the existing company WMS (Node.js/Express, React, PostgreSQL) used by ~20 staff across 3 warehouses and added inter-entity stock transfers with debt settlement, a searchable purchase-order list and a point-of-sale module."
+          - Built the marketing and reseller-management modules as a Django + PostgreSQL service, both in daily use; set up ERPNext HRMS for HR records.
+          - "Replaced three manual routines with Celery jobs (daily off-site database backups, marketing-record sync to Google Sheets via the Sheets API, TikTok video-stats collection), saving an estimated 30 minutes of manual work a day."
+          - Deployed and operated every service alone on the production VPS as Docker containers.
+      - company: Informatics Study Program, Universitas AMIKOM
+        position: AI Engineer (Part-time)
+        start_date: 2024-11
+        end_date: 2025-04
+        location: Yogyakarta
+        highlights:
+          - Built a RAG chatbot on Pinecone vector search, and an embedding-based clustering of thesis titles by theme that surfaced trending topics and recurring research objects.
+    projects:
+      - name: "[Hybrid-RAG Tafsir Assistant (Thesis, ARCADIA 2026 2nd Place)](https://github.com/Amerta1090/Chatbot_Kathir_Streamlit)"
+        start_date: 2025-09
+        end_date: 2026-01
+        location: Universitas AMIKOM
+        highlights:
+          - "Indexed 1,896 passages of Tafsir Ibn Kathir (6,500+ pages) for hybrid BM25 + E5-large multilingual retrieval; the hybrid retriever scored nDCG@10 0.94 (lexical relevance) and 0.99 (semantic relevance) on 154 queries auto-extracted from the corpus."
+          - Grounded LLaMA 3.2 3B answers (served via Hugging Face API) in cited passages; 0.972 context relevance (embedding cosine to the source) and 5.93 s average response, with retrieval on a CPU-only 4 GB machine.
+      - name: "[IJO PLIS: IHSG & USD/IDR Forecasting Platform](https://github.com/Amerta1090/IHSG-Ijo-Plis-Django)"
+        start_date: 2026-05
+        end_date: 2026-06
+        location: Personal
+        highlights:
+          - Built a Django + PostgreSQL app that forecasts the Indonesia Composite Index and USD/IDR 7, 30 and 90 days ahead with Prophet on ~10 years of data, with trend and seasonality decomposition.
+          - Automated weekly retraining (GitHub Actions cron, Celery Beat), versioning every model and promoting the lowest-MAE one; 9 unit tests, 6 JSON API endpoints, Docker.
+          - "Backtested over 11 rolling origins (2024 – 2026): Prophet did not beat a naive last-value baseline (90-day MAPE 7.4% vs 5.0% on IHSG, 1.8% vs 1.7% on USD/IDR); the dashboard shows forecasts as confidence bands, not price targets."
+      - name: "[NyatetDuwit: Offline-First Finance PWA](https://nyatet-duwit.abdulmajidr708.workers.dev/)"
+        start_date: 2026-05
+        end_date: present
+        location: Personal
+        highlights:
+          - Built an installable PWA that logs an expense in under 3 seconds with no account or server — IndexedDB storage, budgets, recurring entries, reminders and JSON backup.
+    education:
+      - institution: Universitas AMIKOM Yogyakarta
+        area: "Informatics, GPA 3.99/4.00"
+        degree: S.Kom.
+        start_date: 2022
+        end_date: 2026
+        location: Yogyakarta
+        highlights:
+          - "Laboratory Assistant (part-time, Sep 2024 – Jan 2026): assisted practical sessions and administered exams in Python, data science, Tableau and SPSS"
+    awards:
+      - bullet: "Winner, AI category, AMICTA 2025: SweetLife, a team-built diabetes-care app (Bangkit ML capstone) with nutrition detection from food photos, diabetes-risk prediction, an LLM chatbot and meal and exercise recommendations"
+      - bullet: "2nd Place, AI, ARCADIA Award 2026: the Hybrid-RAG Tafsir Assistant (thesis above)"
+      - bullet: "2nd Place, IoT, Ignition Informatics 2024: Smart Laundry Bin, an ESP8266 load and detergent monitor"
+    skills:
+      - label: Backend & data
+        details: Python, Django, Node.js / Express, PostgreSQL, SQL, Celery + Redis, REST APIs
+      - label: Frontend
+        details: React, JavaScript, Tailwind CSS, Chart.js, PWA / IndexedDB
+      - label: AI / ML
+        details: RAG, LLMs, embeddings / vector search, TensorFlow, Prophet / time series, clustering
+      - label: Ops & tools
+        details: Docker, Linux / VPS, Git, GitHub Actions, ERPNext, Google Sheets API, Pinecone
+      - label: Languages
+        details: Indonesian (native), English (professional, EF SET C2 Proficient)
+locale:
+  language: english
+  month_abbreviations: [Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec]
+design:
+  theme: engineeringresumes
+  page:
+    size: a4
+    top_margin: 1.3cm
+    bottom_margin: 1.2cm
+    left_margin: 1.5cm
+    right_margin: 1.5cm
+    show_top_note: false
+    show_footer: false
+  typography:
+    line_spacing: 0.5em
+    font_size:
+      body: 9.6pt
+      name: 22pt
+      headline: 10.5pt
+      connections: 9pt
+      section_titles: 11.5pt
+  links:
+    show_external_link_icon: false
+  header:
+    space_below_name: 0.25cm
+    space_below_headline: 0.2cm
+    space_below_connections: 0.2cm
+    connections:
+      phone_number_format: international
+  section_titles:
+    space_above: 0.4cm
+    space_below: 0.15cm
+  sections:
+    space_between_regular_entries: 0.22cm
+    space_between_text_based_entries: 0.1cm
+  entries:
+    date_and_location_width: 3.6cm
+    highlights:
+      space_above: 0.06cm
+      space_between_items: 0.05cm

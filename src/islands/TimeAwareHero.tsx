@@ -253,6 +253,7 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl, metr
               </a>
               <a
                 href={resumeUrl}
+                download={resumeUrl.endsWith(".pdf") ? "" : undefined}
                 className="inline-flex items-center gap-2 border border-border text-text-primary font-medium px-6 py-3 rounded-lg hover:border-brand/40 transition-all duration-300"
               >
                 <span>Download Resume</span>

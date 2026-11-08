@@ -26,6 +26,7 @@ export const ROUTES = {
   data: "/data",
   contact: "/#contact",
   resume: "/resume",
+  resumePdf: "/cv/Abdul-Majid-Ridwan-Tyastonoatmaja-CV.pdf",
   blog: "/blog",
 } as const;
 

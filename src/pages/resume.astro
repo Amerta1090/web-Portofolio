@@ -2,6 +2,7 @@
 import Container from "../components/atoms/Container.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getExperience, getProfile, getSkills } from "../lib/data";
+import { ROUTES } from "../lib/routes";
 
 const profile = getProfile();
 const experience = getExperience();
@@ -15,6 +16,7 @@ const { contact } = profile;
       <div class="flex items-center justify-between py-6">
         <p class="text-sm text-text-secondary">ATS-optimized. Print or save as PDF.</p>
         <div class="flex gap-3">
+          <a href={ROUTES.resumePdf} download class="inline-flex items-center justify-center px-6 py-3 rounded-xl border border-border text-text-primary font-medium hover:border-brand/40 transition-all text-base">Download PDF</a>
           <button id="print-resume" class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-gradient-to-r from-brand to-brand-warm text-on-brand font-medium hover:brightness-110 transition-all text-base shadow-lg shadow-brand/20">Print / Save PDF</button>
         </div>
       </div>

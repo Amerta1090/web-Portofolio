@@ -30,7 +30,7 @@ function normalizeProfile(raw) {
     metrics: {
       languages: (raw.skills?.languages || []).map((l) => l.language),
     },
-    resume_url: "/resume.pdf",
+    resume_url: "/cv/Abdul-Majid-Ridwan-Tyastonoatmaja-CV.pdf",
   };
 }
 

@@ -1,0 +1,42 @@
+{
+ "^JKSE": {
+  "7": {
+   "prophet": 4.26,
+   "naive": 1.46,
+   "prophet_mae": 331.0,
+   "naive_mae": 109.6
+  },
+  "30": {
+   "prophet": 6.31,
+   "naive": 2.42,
+   "prophet_mae": 474.4,
+   "naive_mae": 176.9
+  },
+  "90": {
+   "prophet": 7.4,
+   "naive": 5.02,
+   "prophet_mae": 558.9,
+   "naive_mae": 372.8
+  }
+ },
+ "IDR=X": {
+  "7": {
+   "prophet": 1.5,
+   "naive": 0.48,
+   "prophet_mae": 241.2,
+   "naive_mae": 77.6
+  },
+  "30": {
+   "prophet": 1.66,
+   "naive": 1.17,
+   "prophet_mae": 266.5,
+   "naive_mae": 186.1
+  },
+  "90": {
+   "prophet": 1.83,
+   "naive": 1.72,
+   "prophet_mae": 295.3,
+   "naive_mae": 276.6
+  }
+ }
+}
