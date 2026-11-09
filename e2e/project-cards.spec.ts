@@ -304,16 +304,24 @@ async function readThumbs(page: import("@playwright/test").Page): Promise<ThumbC
   );
 }
 
-test.describe("responsive thumbnails (MOTION-01.5)", () => {
-  test("each featured thumbnail ships a WebP srcset of two or more real widths", async ({
+test.describe("project card evidence imagery (MOTION-01.5, MOTION-11)", () => {
+  test("raster thumbnails ship a WebP srcset; the vector map ships a single SVG", async ({
     page,
   }) => {
     await page.goto("/");
     await expect(page.locator(CARDS)).toHaveCount(3);
     const thumbs = await readThumbs(page);
-    expect(thumbs).toHaveLength(4);
+    // Three flagship cards, one image each. MOTION-11 removed the generic
+    // placeholder together with the fourth image it used to add.
+    expect(thumbs).toHaveLength(3);
 
-    for (const thumb of thumbs) {
+    const rasters = thumbs.filter((thumb) => thumb.src && !thumb.src.endsWith(".svg"));
+    const vectors = thumbs.filter((thumb) => thumb.src?.endsWith(".svg"));
+
+    // Owned screenshots keep the MOTION-01.5 contract: generated WebP
+    // candidates, ascending widths, and a measured `sizes`.
+    expect(rasters.length).toBeGreaterThanOrEqual(2);
+    for (const thumb of rasters) {
       expect(
         thumb.candidates.length,
         `${thumb.src} needs at least two candidates`,
@@ -330,14 +338,27 @@ test.describe("responsive thumbnails (MOTION-01.5)", () => {
       expect(thumb.sizes).toBeTruthy();
       expect(thumb.sizes).toContain("px");
     }
+
+    // The Tafsir card has no screenshot, so its evidence is a build-time SVG
+    // derived from the case study's model stage: one vector file, no raster
+    // candidates, and no placeholder.
+    expect(vectors).toHaveLength(1);
+    expect(vectors[0].src).toBe("/images/evidence/tafsir-system-map.svg");
+    expect(vectors[0].candidates).toEqual([]);
+    expect(vectors[0].sizes).toBeNull();
+    for (const thumb of thumbs) {
+      expect(thumb.src).not.toContain("/placeholder/");
+    }
   });
 
-  test("every thumbnail declares the largest variant's 16:9 intrinsic size", async ({ page }) => {
+  test("every raster thumbnail declares the largest variant's 16:9 intrinsic size", async ({
+    page,
+  }) => {
     await page.goto("/");
     await expect(page.locator(CARDS)).toHaveCount(3);
     const thumbs = await readThumbs(page);
 
-    for (const thumb of thumbs) {
+    for (const thumb of thumbs.filter((item) => item.src && !item.src.endsWith(".svg"))) {
       const largest = Math.max(...thumb.candidates.map((candidate) => candidate.width));
       expect(thumb.width, `${thumb.src} width`).toBe(largest);
       expect(thumb.height, `${thumb.src} height`).toBe(Math.round((largest * 9) / 16));
@@ -364,7 +385,7 @@ test.describe("responsive thumbnails (MOTION-01.5)", () => {
       .toBe(true);
 
     const thumbs = await readThumbs(page);
-    for (const thumb of thumbs) {
+    for (const thumb of thumbs.filter((item) => item.src && !item.src.endsWith(".svg"))) {
       // The browser actually picked a variant, not the `src` fallback.
       expect(thumb.currentSrc).toMatch(/\.webp$/);
     }

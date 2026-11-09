@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import type { ProjectImageVariant } from "../../types/projects";
 
 interface ProjectThumbnailProps {
@@ -18,42 +19,55 @@ interface ProjectThumbnailProps {
 const CARD_SIZES = "(min-width: 1280px) 361px, (min-width: 768px) 341px, calc(100vw - 46px)";
 
 /**
- * The fallback is an 800×600 SVG, so a source-less thumbnail can declare its own
- * intrinsic size instead of leaving the browser to guess before CSS lands. The
- * card box still crops it to 16:9 (`aspect-video` + `object-cover`).
+ * MOTION-11: a project without owned evidence renders no image at all.
+ *
+ * There is deliberately no placeholder art. A generic "project" illustration
+ * presents a design that was never built, which is a claim the data layer
+ * cannot back. `ProjectCardGrid` gives the title room to breathe instead
+ * (`data-project-no-image`).
+ *
+ * A missing or failed file also resolves to `null`: a card whose file was
+ * renamed must look like a card without an image, not like a request for an
+ * asset that was never captured.
  */
-const PLACEHOLDER = {
-  src: "/images/placeholder/project.svg",
-  width: 800,
-  height: 600,
-} as const;
-
 export default function ProjectThumbnail({
   src,
   variants = [],
   alt,
   className = "",
 }: ProjectThumbnailProps) {
-  const imageSrc = src || PLACEHOLDER.src;
-  const ordered = src && variants.length > 0 ? [...variants].sort((a, b) => a.width - b.width) : [];
+  const [failed, setFailed] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  // `onError` only fires for loads that fail after hydration. A cached failure
+  // can be settled before React attaches, so check once on mount as well.
+  // `currentSrc` is empty in jsdom (and for a source-less image), which keeps
+  // the check from firing where no request was ever made.
+  useEffect(() => {
+    const img = imgRef.current;
+    if (img?.complete && img.naturalWidth === 0 && img.currentSrc) {
+      setFailed(true);
+    }
+  }, []);
+
+  if (!src || failed) return null;
+
+  const ordered = variants.length > 0 ? [...variants].sort((a, b) => a.width - b.width) : [];
   const srcSet = ordered.map((variant) => `${variant.src} ${variant.width}w`).join(", ");
   // Every generated variant is a 16:9 crop of the source (recorded in
   // `docs/motion/ASSETS.md`), so the intrinsic height follows from the largest
   // width. Declaring it matches the box and removes layout shift entirely.
   const largest = ordered.at(-1);
-  const width = largest?.width ?? (src ? undefined : PLACEHOLDER.width);
-  const height = largest
-    ? Math.round((largest.width * 9) / 16)
-    : src
-      ? undefined
-      : PLACEHOLDER.height;
+  const width = largest?.width;
+  const height = largest ? Math.round((largest.width * 9) / 16) : undefined;
 
   return (
     <div
       className={`relative overflow-hidden aspect-video bg-surface-tertiary rounded-t-lg ${className}`}
     >
       <img
-        src={imageSrc}
+        ref={imgRef}
+        src={src}
         srcSet={srcSet || undefined}
         sizes={srcSet ? CARD_SIZES : undefined}
         width={width}
@@ -62,19 +76,8 @@ export default function ProjectThumbnail({
         className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
         loading="lazy"
         decoding="async"
-        onError={(event) => {
-          const image = event.currentTarget;
-          // A stale variant must fall back as a unit; leaving `srcset` in place
-          // lets the browser retry a broken candidate instead of the placeholder.
-          image.srcset = "";
-          image.src = PLACEHOLDER.src;
-        }}
+        onError={() => setFailed(true)}
       />
-      {!src && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-xs text-text-secondary/40">{/* ASSET NEEDED */}</span>
-        </div>
-      )}
     </div>
   );
 }

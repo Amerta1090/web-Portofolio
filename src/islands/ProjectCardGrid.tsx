@@ -59,14 +59,14 @@ export default function ProjectCardGrid({ projects, skillHrefs = {} }: Props) {
   // selector.
 
   return (
-    <div
-      ref={gridRef}
-      data-project-grid=""
-      className="container-query-grid"
-    >
+    <div ref={gridRef} data-project-grid="" className="container-query-grid">
       <div className="cq-grid-item grid gap-5">
         {projects.map((project, order) => {
           const links = (project.links ?? []).filter((link) => link.url);
+          // MOTION-11: only a project with owned evidence gets a picture.
+          // `ProjectThumbnail` also returns null when the file fails, so the
+          // attribute describes the authored state, not a transient error.
+          const hasImage = Boolean(project.image);
 
           return (
             // The scroll-driven reveal owns this wrapper (MOTION-04), and the
@@ -87,15 +87,18 @@ export default function ProjectCardGrid({ projects, skillHrefs = {} }: Props) {
               >
                 <article
                   data-project-card=""
+                  data-project-no-image={hasImage ? undefined : ""}
                   className="card border-glow group relative flex h-full flex-col overflow-hidden bg-bg-secondary border border-border rounded-lg transition-all duration-300"
                 >
-                  <ProjectThumbnail
-                    src={project.image}
-                    variants={project.image_variants}
-                    alt={project.title}
-                  />
+                  {hasImage && (
+                    <ProjectThumbnail
+                      src={project.image}
+                      variants={project.image_variants}
+                      alt={project.image_alt ?? project.title}
+                    />
+                  )}
 
-                  <div className="flex flex-1 flex-col p-5">
+                  <div className={`flex flex-1 flex-col ${hasImage ? "p-5" : "p-6"}`}>
                     <div className="mb-2 flex items-start justify-between gap-3">
                       {project.category && (
                         <span className="text-xs text-text-secondary">

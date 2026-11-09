@@ -209,6 +209,24 @@
       calc(var(--lab-card-span) + var(--lab-card-order, 0) * var(--lab-card-step));
   }
 
+  /* ── Capability Map deep links (MOTION-11) ──
+   * Every map node carries `id="signal-<nodeId>"`, and project skill chips link
+   * straight to it. Chromium resolves a same-document anchor from the element's
+   * *transformed* border box, so a body that is still at `translateY(20px)`
+   * when the click lands makes the browser scroll 20px too far: the node
+   * settles at 60px instead of the 80px `scroll-padding-top` promises, with its
+   * top edge under the fixed header. Heading and body share one beat here, so
+   * the body opts out with the same structural rule the career spine uses —
+   * the head still rises, the anchor lands exactly where scroll padding says.
+   * A translated ancestor is the only thing that can corrupt that target, so
+   * this is the one chapter whose body cannot host the move.
+   */
+  [data-chapter-body]:has([data-signal-node]) {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
   /* ── Legacy container reveal ──
    * Pages that put `data-reveal` on their own wrapper (blog grids, timeline,
    * capability architecture) keep the single-beat fade. Chapters use the

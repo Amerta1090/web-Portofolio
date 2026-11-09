@@ -32,6 +32,13 @@ export interface Project {
   /** Primary project image — card thumbnail & detail hero */
   image?: string;
   /**
+   * Alt text for `image` when the title alone would not describe what the
+   * picture shows. A diagram needs this: "AI Quranic Tafsir Assistant…" does
+   * not say that the image is a retrieval system map. Absent → the card uses
+   * the project title.
+   */
+  image_alt?: string;
+  /**
    * Responsive WebP variants for the card thumbnail, generated from `image`.
    * Only populated when the variants actually exist in `public/`; the card
    * renders the original `image` as the fallback for browsers without WebP.

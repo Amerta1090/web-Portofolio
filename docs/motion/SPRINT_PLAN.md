@@ -820,13 +820,14 @@ regression.
 
 ## MOTION-11 — Project evidence imagery
 
-**Status:** `READY` (MOTION-20 approved 2026-11-05; added 2026-10-31 from the visual/asset audit, `RESEARCH.md` §6). Owner asks from D-13: a portrait lit for the dark room, photographs of the work in progress, an owned Tafsir capture; the three flagship exhibits are the instruments built in MOTION-20 rev. 2.
+**Status:** `DONE` (2026-11-09). The only home-visible placeholder, Tafsir, now uses a data-derived system map; the other 16 placeholder project entries have no image field and use intentional text-first card layouts. Five existing owned project images remain only where data records them; `/work` does not render them.
 **Priority:** P1 (largest visual gap measured)
 **Objective:** Every project a reader can open shows real evidence of the work,
 not a generic placeholder.
-**Outcome:** The 17 of 22 projects whose only image is
-`/images/placeholder/project.svg` either ship an owned, captioned evidence image
-or render an intentional no-image layout. No generic placeholder reaches a page.
+**Outcome:** All 22 projects are reviewed; 17 placeholder references were
+removed, Tafsir receives an authored-data-derived system map, and the remaining
+16 use intentional no-image layouts. No generic placeholder reaches data or
+build output.
 
 **Dependencies:** MOTION-20 (asset families), MOTION-01.5 (variant pipeline, `ProjectThumbnail` `srcset`),
 D-11 (evidence first, owned assets only).
@@ -838,34 +839,50 @@ D-11 (evidence first, owned assets only).
 without an `ASSETS.md` row.
 
 **Tasks**
-- [ ] M11.1 Inventory: per project, what owned evidence exists (repo README
+- [x] M11.1 Inventory: per project, what owned evidence exists (repo README
       screenshots, CLI output, architecture notes, deployed URL). Record in
-      `ASSETS.md`.
-- [ ] M11.2 Produce owned evidence per kind: UI screenshots for web/app
+      `ASSETS.md` §15. **VERIFIED:** only the existing owned image set and the
+      authored Tafsir case-study diagram are local evidence; other projects have
+      no owned screenshots or terminal captures in the repository.
+- [x] M11.2 Produce owned evidence per kind: UI screenshots for web/app
       projects (capture from the live app or local build), real terminal
       captures for CLI tools (text-rendered SVG/PNG from an actual run), and a
       data-derived SVG diagram for ML/agent systems (built from the case-study
       metadata, same pure-geometry approach as the Case Study Reactor).
-- [ ] M11.3 Run every new image through the MOTION-01.5 pipeline (WebP variants,
+      **DEVIATION (owner decision):** no captures were fabricated; one 800×450
+      SVG is generated from Tafsir's authored process-stage diagram. Raster
+      variants are not applicable to vector output.
+- [x] M11.3 Run every new image through the MOTION-01.5 pipeline (WebP variants,
       `srcset`/`sizes`, explicit dimensions, lazy below the fold) and record
-      bytes.
-- [ ] M11.4 Where no honest evidence exists, delete the placeholder and render
+      bytes. **VERIFIED:** 3,253 B SVG, 800×450; directly emitted by the
+      prerendered endpoint; no raster variants needed.
+- [x] M11.4 Where no honest evidence exists, delete the placeholder and render
       the card without an image slot (P6: no invented evidence).
-- [ ] M11.5 Fix hero art direction at narrow widths: the 375 px crop shows the
+      `ProjectThumbnail` now returns no image on missing/failed source, and
+      `ProjectCardGrid` renders an explicit no-image layout.
+- [x] M11.5 Fix hero art direction at narrow widths: the 375 px crop shows the
       gate, not the person (`RESEARCH.md` §6.1); choose a per-breakpoint focal
       point or a portrait crop variant, and drop the duplicate hexagon avatar
-      if the photo carries the face.
-- [ ] M11.6 Re-run the image-transfer probe at 1440 and 375 (`QA_CHECKLIST.md`
+      if the photo carries the face. **VERIFIED:** at 375px, `object-position:
+      72% 50%` shows the subject; the hexagon avatar remains because the face
+      is only about 30–40 CSS px in the full hero image.
+- [x] M11.6 Re-run the image-transfer probe at 1440 and 375 (`QA_CHECKLIST.md`
       §4.5) and the taste/impeccable visual review on `/projects`.
+      **VERIFIED:** Playwright `project-cards` + `projects-detail` 22/22;
+      `/projects` is a retired-route fallback under MOTION-18. Visual probes
+      covered the home cards, 800×450 Tafsir map and 375px hero crop; canonical
+      `/work` detail routes were covered by e2e, not a separate taste panel.
 
 **Acceptance criteria**
 - `rg 'placeholder/project.svg' data dist` = 0.
 - Homepage image transfer stays within the §7 budget of `ASSETS.md`.
 - Every new image has an `ASSETS.md` row (source, owner, date, bytes).
+- Reduced motion remains a real off switch; image/layout behavior does not gate
+  content; no section uses `overflow: hidden`.
 
 **Definition of Done / verification:** `validate-data` (+ a new gate rejecting
-placeholder paths), build, image probe 1440/375, `project-cards` +
-`projects-detail` e2e, docs.
+placeholder paths), full 72-page build, image probe 1440/375,
+`project-cards` + `projects-detail` e2e, docs, and commit.
 
 ---
 

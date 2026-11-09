@@ -5,6 +5,9 @@ and what remains.
 
 ---
 
+
+---
+
 ## 2026-10-21 — Programme setup
 
 **Goal:** Turn `prompt.txt` into a durable controller and establish planning docs
@@ -1163,3 +1166,63 @@ capability map spans two screens at 1440; exhibits still change by cut.
 what code cannot make: a portrait lit for the dark room or photographs of the
 work, an outcome someone else measured (users, a deployment, an outside
 evaluation), and, per two jurors, a display face or numerals with character.
+
+---
+
+## 2026-11-09 — MOTION-11 Project evidence imagery
+
+**Goal:** Remove generic project placeholders, supply authored evidence where
+available, make all other project cards intentionally image-free, correct the
+narrow hero crop, and measure the image budget.
+
+**VERIFIED — implementation**
+- Removed all 17 `/images/placeholder/project.svg` data references and deleted
+  the asset. `validate-data` now rejects placeholder project image paths and
+  unresolved `/images/` sources. `rg 'placeholder/project.svg' data dist` → 0.
+- Tafsir card uses a build-time endpoint and pure SVG geometry derived from the
+  authored `caseStudies` model diagram (BM25 / E5 → rank fusion → re-ranker →
+  LLaMA 3.2 3B). Output is 800×450, 3,253 B; no raster variant is justified.
+- The 16 projects without owned evidence use text-first cards; missing and
+  failed image sources return no thumbnail. Existing media labels are not
+  rendered as image links. Hero `object-position` changes to `72% 50%` at
+  `max-aspect-ratio: 16/10`; section clipping remains `overflow: clip`.
+- Scroll-chip e2e initially landed at 60px instead of the 80px scroll padding.
+  **VERIFIED root cause:** Chromium resolved the anchor against a scroll-driven
+  `translateY(20px)` ancestor. A targeted body opt-out removes that transformed
+  anchor box while leaving the chapter heading beat intact; reduced-motion
+  remains static through the existing off switch.
+
+**VERIFIED — gates and measurements**
+- `bun run validate-data` → OK; GitHub cache non-degenerate.
+- `bun run build:fast` → 72 pages. Initial sandbox build could not resolve
+  `api.fontsource.org` for the existing OG renderer; reran with approved network
+  access, then build completed.
+- `bun run check:links` → 1,477 same-site links across 73 pages, 0 broken.
+- `bunx astro check` → 89 errors, 0 warnings, 74 hints; matches the 89-error
+  baseline. The new endpoint's collection entry is explicitly typed.
+- Targeted Vitest → 21/21. Playwright `project-cards.spec.ts` plus
+  `projects-detail.spec.ts` → 22/22, including the previously failing anchor,
+  no-JS cards, raster srcset contract, and Tafsir SVG.
+- `measure:routes` → `/` 194.8 KB initial / 493.9 KB reachable / 32.1 KB HTML,
+  9 islands (5 eager / 4 deferred); `/work/ai-quranic-tafsir` 150.7 / 393.1 /
+  18.6 KB; `/lab` 179.2 / 504.5 / 20.0 KB.
+- `.opencode/probe-images.mjs` using the specified Chromium 1228 binary, cold
+  context and full lazy-image scroll: `/` 502.3 KB at 1440×900 and 141.2 KB at
+  375×812. Both remain inside `ASSETS.md` §7. Tafsir SVG transfer is 1.2 KB.
+- The first Playwright invocations used the config's `webServer`, whose
+  sandboxed build stopped before writing `dist/index.html`; tests therefore
+  saw Astro's 404 page. Rebuilt successfully and ran the suite against the
+  completed preview using a temporary config with the required Chromium 1228
+  executable path; all 22 tests passed.
+- Biome formatted the touched files and all touched-file diagnostics were
+  rerun after formatting → 0 diagnostics. Final source rebuild completed with
+  72 pages; final targeted e2e rerun → 22/22. Final `measure:routes` and
+  `check:links` remained 194.8 / 493.9 / 32.1 KB, 9 islands and 1,477 links /
+  73 pages, 0 broken.
+
+**DOCUMENTED:** `ASSETS.md` §15 contains current transfer measurements and an
+all-22-project evidence register. `STATUS.md` closes MOTION-11 and marks
+MOTION-14 `READY`; `prompt.txt` is synchronized to that next sprint. No MOTION-12
+work was started.
+
+**Commit:** `motion: MOTION-11 project evidence imagery` (created after verification).

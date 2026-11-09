@@ -101,6 +101,34 @@ describe("ProjectCardGrid", () => {
     expect(container.textContent).not.toContain("IDR Predictor");
   });
 
+  it("uses image_alt when the picture needs more than the project title (MOTION-11)", () => {
+    const withAlt: CardProject = {
+      ...FULL,
+      image_alt: "Retrieval system map: BM25 and E5 fused into one grounded prompt",
+    };
+    render(<ProjectCardGrid projects={[withAlt]} />);
+    expect(
+      screen.getByRole("img", {
+        name: "Retrieval system map: BM25 and E5 fused into one grounded prompt",
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("renders an intentional no-image card when the project owns no evidence (MOTION-11)", () => {
+    const { container } = render(<ProjectCardGrid projects={[MINIMAL]} />);
+    const card = container.querySelector("[data-project-card]");
+    expect(card).toHaveAttribute("data-project-no-image");
+    expect(card?.querySelector("img")).toBeNull();
+    // The evidence gap is never filled with generic placeholder art.
+    expect(container.innerHTML).not.toContain("placeholder/project.svg");
+  });
+
+  it("gives the no-image card roomier padding instead of an empty media box", () => {
+    const { container } = render(<ProjectCardGrid projects={[MINIMAL]} />);
+    const content = container.querySelector("[data-project-card] > div");
+    expect(content?.className).toContain("p-6");
+  });
+
   it("keeps the featured badge class the :has() CSS depends on", () => {
     const { container } = render(<ProjectCardGrid projects={[FULL]} />);
     expect(container.querySelector(".card .featured-badge")).toBeTruthy();

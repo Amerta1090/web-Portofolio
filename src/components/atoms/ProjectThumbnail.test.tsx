@@ -68,19 +68,15 @@ describe("ProjectThumbnail (MOTION-01.5)", () => {
     expect(img).not.toHaveAttribute("height");
   });
 
-  it("falls back to the placeholder with its own intrinsic size when src is missing", () => {
+  it("renders nothing when src is missing (MOTION-11: no placeholder art)", () => {
     const { container } = render(<ProjectThumbnail alt="Missing" />);
-    const img = screen.getByRole("img", { name: "Missing" });
-    expect(img).toHaveAttribute("src", "/images/placeholder/project.svg");
-    // 800×600 is the real size of `public/images/placeholder/project.svg`.
-    expect(img).toHaveAttribute("width", "800");
-    expect(img).toHaveAttribute("height", "600");
-    expect(img).not.toHaveAttribute("srcset");
-    // The asset-needed marker still renders, so the gap is visible in review.
-    expect(container.querySelector("span[class*='text-text-secondary']")).not.toBeNull();
+    // A project without owned evidence gets an intentional no-image layout,
+    // not a generic illustration that claims a design that was never built.
+    expect(screen.queryByRole("img", { name: "Missing" })).toBeNull();
+    expect(container).toBeEmptyDOMElement();
   });
 
-  it("drops the whole srcset on error so the browser cannot retry a broken candidate", () => {
+  it("removes the image when the file fails to load", () => {
     render(
       <ProjectThumbnail
         src="/images/projects/retro-game-portfolio.png"
@@ -90,7 +86,7 @@ describe("ProjectThumbnail (MOTION-01.5)", () => {
     );
     const img = screen.getByRole("img", { name: "Retro" });
     fireEvent.error(img);
-    expect(img.getAttribute("srcset")).toBe("");
-    expect(img).toHaveAttribute("src", "/images/placeholder/project.svg");
+    // A renamed file must degrade to the no-image card, not to a broken box.
+    expect(screen.queryByRole("img", { name: "Retro" })).toBeNull();
   });
 });

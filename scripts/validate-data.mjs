@@ -112,9 +112,7 @@ for (const [file, schema] of Object.entries(schemas)) {
       }
       const parts = period.split(dash).map((s) => s.trim());
       if (parts.length !== 2) {
-        console.error(
-          `ERROR: projects.json[${i}] period "${period}" is not "Mon YYYY – Mon YYYY"`,
-        );
+        console.error(`ERROR: projects.json[${i}] period "${period}" is not "Mon YYYY – Mon YYYY"`);
         errors++;
         continue;
       }
@@ -142,11 +140,15 @@ for (const [file, schema] of Object.entries(schemas)) {
         continue;
       }
       if (!existsSync(resolve(dataDir, "..", "src/content/case-studies", `${id}.mdx`))) {
-        console.error(`ERROR: projects.json[${i}] case_study "${id}" has no src/content/case-studies/${id}.mdx`);
+        console.error(
+          `ERROR: projects.json[${i}] case_study "${id}" has no src/content/case-studies/${id}.mdx`,
+        );
         errors++;
       }
       if (claimed.has(id)) {
-        console.error(`ERROR: projects.json[${i}] case_study "${id}" is already claimed by projects.json[${claimed.get(id)}]`);
+        console.error(
+          `ERROR: projects.json[${i}] case_study "${id}" is already claimed by projects.json[${claimed.get(id)}]`,
+        );
         errors++;
       }
       claimed.set(id, i);
@@ -171,8 +173,51 @@ for (const [file, schema] of Object.entries(schemas)) {
     }
     const sorted = [...ranks].sort((a, b) => a - b);
     if (sorted.some((rank, index) => rank !== index + 1)) {
-      console.error(`ERROR: projects.json flagship ranks ${sorted.join(",")} must run 1..${sorted.length} with no gap or repeat`);
+      console.error(
+        `ERROR: projects.json flagship ranks ${sorted.join(",")} must run 1..${sorted.length} with no gap or repeat`,
+      );
       errors++;
+    }
+
+    // MOTION-11: a project image is evidence, not decoration.
+    //
+    // The generic placeholder made an evidence slot look filled when nothing
+    // was captured, so its path is retired: any reappearance means a project
+    // lost its evidence in a merge. And every remaining path must resolve to
+    // something that is actually published — a file in `public/`, or a
+    // build-time endpoint under `src/pages/` that emits the file into `dist/`.
+    // Without the second half, a renamed source would ship a 404 thumbnail
+    // that no test renders and no build step notices.
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      const refs = [];
+      if (typeof item.image === "string") refs.push(item.image);
+      for (const variant of item.image_variants ?? []) {
+        if (typeof variant?.src === "string") refs.push(variant.src);
+      }
+      for (const image of item.images ?? []) {
+        if (typeof image === "string") refs.push(image);
+      }
+
+      for (const ref of refs) {
+        if (ref.includes("/placeholder/")) {
+          console.error(
+            `ERROR: projects.json[${i}] references placeholder asset "${ref}" — a project without evidence must have no image`,
+          );
+          errors++;
+          continue;
+        }
+        if (!ref.startsWith("/images/")) continue;
+        const relative = ref.slice(1);
+        const inPublic = existsSync(resolve(dataDir, "..", "public", relative));
+        const endpoint = resolve(dataDir, "..", "src/pages", `${relative}.ts`);
+        if (!inPublic && !existsSync(endpoint)) {
+          console.error(
+            `ERROR: projects.json[${i}] image "${ref}" is neither in public/ nor produced by src/pages/${relative}.ts`,
+          );
+          errors++;
+        }
+      }
     }
   }
 }

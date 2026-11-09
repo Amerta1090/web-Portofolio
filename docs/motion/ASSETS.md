@@ -1,6 +1,6 @@
 # Motion Programme — Visual Asset Strategy
 
-**Status:** Research decision, 2026-10-21. No external asset is approved for production. The only candidate is a staged pilot behind two prerequisites.
+**Status:** Active asset register. MOTION-11 evidence is verified 2026-11-09; no external asset is approved for production.
 **Decision:** `DECISIONS.md` D-11.
 **Scope:** Images, archival plates, illustration, textures, icons, 3D assets, and animation assets. This document does not authorize a download, a redesign, a new dependency, or a sprint. It records what is worth considering and what is not.
 
@@ -52,7 +52,7 @@ existing evidence is efficient.
 | Asset class | Files / bytes | Where it appears | Current state | Verdict |
 | --- | --- | --- | --- | --- |
 | Hero photograph | 4 files / 1.81 MB | `/` hero, above the fold | Responsive WebP set (768/1280/1920) + 1920 JPEG; 619.7 KB desktop, 112.8 KB mobile | Keep; tune compression, do not replace |
-| Project screenshots | 7 files / 4.94 MB | 4 on `/`; 3 data-only | Raw `<img>`, no `srcset`, no explicit dimensions; 1.83 MB + 554 KB dominate | Optimize; generate variants |
+| Project evidence | 5 existing source images + generated Tafsir SVG | 3 cards on `/`; `/work` text-first | Card images use responsive WebP variants; Tafsir map is generated from authored case-study data | Keep; no placeholder art |
 | Lab thumbnails | 27 files / 52.5 KB | `/` contact sheet, `/gallery` | ~1.9 KB each; lazy; 0 JS | Keep; the gallery is the color exception |
 | Issuer logos | 16 files / 49.4 KB | Career spine; not in the certifications bento | 1.5–5.1 KB each | Keep; optional bento is not recommended |
 | Profile images | 4 files / 87.4 KB | Hero avatar, profile surfaces | WebP/JPEG variants with `srcset` | Keep |
@@ -88,8 +88,10 @@ After MOTION-01.5 (2026-10-22, same method and script):
 | 1440 × 900 | 38 | **543.5 KB** (−2,603.5 KB, −82.7%) | hero **437.0 KB (80.4%)**, retro-384 **10.3 KB**, red-devil-384 **8.6 KB**, ijo-384 **6.6 KB** |
 | 375 × 812 | 44 | **187.9 KB** (−2,455.1 KB, −92.9%) | hero **75.9 KB (40.4%)**, retro-384 **10.3 KB**, red-devil-384 **8.6 KB**, ijo-384 **6.6 KB** |
 
-The four project thumbnails now cost **28.3 KB together** (they were 2,446.0 KB),
-and the hero is the only remaining offender. Full byte record: §13.
+The three raster project thumbnails cost **15.2 KB** on `/`; the Tafsir SVG
+adds 1.2 KB. The hero remains the largest image. MOTION-11 measured the complete
+home at **502.3 KB desktop / 141.2 KB mobile**; see §15. Full prior byte record:
+§13.
 
 ### 2.3 Project thumbnail math
 
@@ -437,11 +439,12 @@ live at 1100 px — `currentSrc` = `retro-game-portfolio-384.webp`, `naturalWidt
 ### 13.3 Explicit dimensions
 
 `width`/`height` come from the largest variant (3× is the ratio the bounding box
-can never exceed), 16:9. The placeholder path (`src` missing) declares the real
-placeholder size, 800×600. A source with no variants declares **no** dimensions:
-inventing a ratio for a file nobody measured is exactly the kind of claim this
-programme refuses (P6). No such card renders today — all four featured projects
-have variants, which the e2e spec pins.
+can never exceed), 16:9. Missing or failed image sources now render no image
+element; there is no placeholder size or fallback. Sources without measured
+variants declare no dimensions. The data-derived Tafsir SVG is vector at
+800×450 and is emitted directly by an Astro endpoint, so raster WebP variants
+would increase complexity without reducing transfer; measured transfer is
+3,253 B (1.2 KB over HTTP).
 
 ### 13.4 Hero A/B (accepted)
 
@@ -483,8 +486,8 @@ only texture noise along leaf edges; no banding in the sky, no structure removed
 
 ### 13.5 Resulting transfer and the JS cost
 
-Image transfer: §2.2 (543.5 KB @1440, 187.9 KB @375 — both from the same method
-as the baseline, so they are comparable).
+Image transfer at the time of this record: §2.2 (543.5 KB @1440, 187.9 KB @375).
+MOTION-11 current measurements are in §15.
 
 The change costs **0.4 KB of JS and 0.3 KB of HTML on `/`**, measured A/B by
 rebuilding HEAD's four sources in the same tree (which reproduced the recorded
@@ -526,3 +529,64 @@ place photograph.
 
 Nothing from this table is in the repository yet; the found pictures were
 downloaded to the session scratchpad only.
+
+## 15. Project evidence (MOTION-11, 2026-11-09)
+
+**VERIFIED:** `data/projects.json` has 22 projects and zero references to
+`placeholder/project.svg`; the static build emits no such path in `dist/`.
+Tafsir's SVG is generated at build time from the authored `caseStudies` model
+stage. The other 16 projects without owned visual evidence use an intentional
+text-first card, with no image element or reserved image slot. Existing images
+remain only where the repository already owns evidence. No stock photo, AI
+illustration, mock dashboard, or external image was added.
+
+### 15.1 Homepage transfer
+
+**VERIFIED:** `.opencode/probe-images.mjs` using Chromium 1228, cold page context,
+full scroll to load lazy images, `performance` resource transfer sizes:
+
+| Viewport | Image resources | Transfer | Largest resources |
+| --- | ---: | ---: | --- |
+| 1440 × 900 | 19 | **502.3 KB** | hero 437.0 KB; profile 21.9 KB; Red Devil 8.6 KB; IJO PLIS 6.6 KB; Tafsir SVG 1.2 KB |
+| 375 × 812 | 19 | **141.2 KB** | hero 75.9 KB; profile 21.9 KB; Red Devil 8.6 KB; IJO PLIS 6.6 KB; Tafsir SVG 1.2 KB |
+
+Both measurements are within §7: hero ≤450 KB at desktop, each card image
+≤80 KB at 2×. Versus the 2026-10-22 baseline, totals are −41.2 KB desktop and
+−46.7 KB mobile; this difference includes the changed set of rendered page
+images and should not be interpreted as a single-file compression delta.
+
+### 15.2 Evidence register — all 22 projects
+
+“Owner” means the portfolio author owns the existing source or authored data.
+Existing source files were already present before this sprint; their original
+capture dates are **DOCUMENTED as unknown**. The only new image is the Tafsir
+system map, whose source, owner, date, and bytes are recorded explicitly.
+
+| Project | Evidence rendered | Source / owner / date / bytes |
+| --- | --- | --- |
+| Retro Game-Inspired Portfolio Website | No image rendered (not a home flagship); owned source remains in data | Existing `public/images/projects/retro-game-portfolio.png`; portfolio author; original date unknown; source 1,873,549 B; variants 10,218 / 31,174 / 56,372 B (§13.1) |
+| NyatetDuwit — Offline-First Personal Finance PWA | No image rendered; legacy source remains unserved | Existing `public/images/projects/nyatet-duwit.png`; portfolio author; original date unknown; source 37,340 B; variant 2,238 / 3,104 B (§13.1) |
+| IJO PLIS — IHSG & USD/IDR Forecasting Platform | Responsive WebP thumbnail | Existing owned `public/images/projects/ijo-plis.png`; portfolio author; original date unknown; source 567,020 B; served 6,442 / 18,212 / 31,342 B (§13.1) |
+| Premium Sudoku: Overengineered Puzzle Experience | No image rendered; legacy source remains unserved | Existing `public/images/projects/sudoku-premium.png`; portfolio author; original date unknown; source 1,852,209 B; no served thumbnail |
+| Red Devil Dynamics — AI Goal Timing Predictor | Responsive WebP thumbnail | Existing owned `public/images/projects/red-devil-dynamics.jpg`; portfolio author; original date unknown; source 25,625 B; served 8,466 / 17,918 B (§13.1) |
+| TreeMake: CLI Project Scaffolding Tool | No image | No owned terminal capture in repository; intentional no-image layout |
+| AI Quranic Tafsir Assistant | Data-derived system map | Authored `caseStudies` model-stage diagram; portfolio author; generated 2026-11-09; SVG 3,253 B; 800×450; no raster variants |
+| TemuSehat ADK — Herbal AI Agent | No image | No owned evidence image in repository; intentional no-image layout |
+| Journal CLI — Automated Micro-Journaling | No image | No owned terminal capture in repository; intentional no-image layout |
+| Pathwise Career AI | No image | No owned evidence image in repository; intentional no-image layout |
+| Production-Ready MLOps Pipeline | No image | No owned evidence image in repository; intentional no-image layout |
+| CLI Productivity Engine | No image | No owned terminal capture in repository; intentional no-image layout |
+| MLOps Integration with MLflow | No image | No owned evidence image in repository; intentional no-image layout |
+| Resepku — Multi-Modal Recipe Discovery | No image | No owned evidence image in repository; intentional no-image layout |
+| Google Workspace Automation | No image | No owned evidence image in repository; intentional no-image layout |
+| Personalized Book Recommendation System | No image | No owned evidence image in repository; intentional no-image layout |
+| Predictive Analytics for Real Estate | No image | No owned evidence image in repository; intentional no-image layout |
+| Algorithmic Image Compressor | No image | No owned evidence image in repository; intentional no-image layout |
+| SweetLife Mobile App | No image | No owned app capture in repository; intentional no-image layout |
+| Smart Laundry Bin | No image | No owned device capture in repository; intentional no-image layout |
+| Student Retention Analysis System | No image | No owned evidence image in repository; intentional no-image layout |
+| Automated Chicken Coop Environment Controller | No image | No owned device capture in repository; intentional no-image layout |
+
+The remaining existing NyatetDuwit and Sudoku originals remain in the data
+layer as unserved media inputs, not card images. This sprint does not delete
+those files or rewrite the Observatory's asset metric.

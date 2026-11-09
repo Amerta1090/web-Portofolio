@@ -415,3 +415,19 @@ pre {
   border-color: rgba(255, 255, 255, 0.06);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
+
+/* ── Hero media framing (MOTION-11) ── */
+/* The owned hero photograph (1920×1080, ASSETS.md) keeps the subject near the
+   right edge — original x ≈ 1180–1400 of 1920. A tall narrow viewport crops the
+   sides, so the default 50% focal point cut the person out at 375 px. Shifting
+   the focal point right keeps the face inside the frame at every aspect ratio
+   narrower than 16:10, while wide screens keep the centred composition. */
+.hero-media {
+  object-position: 50% 50%;
+}
+
+@media (max-aspect-ratio: 16/10) {
+  .hero-media {
+    object-position: 72% 50%;
+  }
+}

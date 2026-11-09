@@ -152,7 +152,7 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl, metr
 
   return (
     <section
-      className="relative min-h-[calc(100vh-4rem)] flex flex-col justify-center overflow-hidden z-10"
+      className="relative min-h-[calc(100vh-4rem)] flex flex-col justify-center overflow-clip z-10"
       data-hero-handoff
     >
       <motion.picture
@@ -171,7 +171,7 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl, metr
         <img
           src="/images/hero/hero-bg-1920.jpg"
           alt=""
-          className="object-cover w-full h-full"
+          className="hero-media object-cover w-full h-full"
           loading="eager"
           decoding="async"
         />

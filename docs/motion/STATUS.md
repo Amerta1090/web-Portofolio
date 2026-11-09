@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-11-05 (MOTION-20 `DONE`: rev. 2 "The dark room" approved by the owner)
 **Branch:** `main` · **HEAD at session start:** `d571c5f` (MOTION-18)
-**Active sprint:** none — MOTION-20 `DONE` (D-13 accepted 2026-11-05). **Next: MOTION-11 `READY`** (project evidence imagery, with the D-13 owner asks).
+**Active sprint:** none — MOTION-11 `DONE` (2026-11-09). **Next: MOTION-14 `READY`** (apply the approved dark-room palette in both themes).
 
 ## One-paragraph state
 
@@ -210,8 +210,11 @@ perception thresholds with ≥ 5 recruiters and ≥ 5 developers.
   disjoint route graphs. Use per-route `measure:routes` instead.
 - **Lenis (D-10 → D-12, RESOLVED by removal):** the bootstrap never ran (UMD
   build, no default export); deleted in MOTION-08.
-- **Project imagery gap (VERIFIED, owner MOTION-11):** 17/22 projects ship only
-  `placeholder/project.svg`; hero crops the subject out at 375 px.
+- **Project imagery (VERIFIED, MOTION-11, 2026-11-09):** 17 placeholder references
+  removed; Tafsir uses a 3,253 B build-time SVG derived from its authored
+  process-stage diagram; the remaining 16 former placeholder projects have
+  intentional no-image layouts. `rg 'placeholder/project.svg' data dist` = 0.
+  Hero focal point at narrow widths is `72% 50%`, showing the person at 375 px.
 - **Image debt was the largest asset cost (RESOLVED by MOTION-01.5):** the
   homepage went from 3,147.0 KB / 2,643.0 KB of images to **543.5 KB / 187.9 KB**
   for +0.4 KB of JS. The hero is now the single remaining offender
@@ -223,8 +226,9 @@ perception thresholds with ≥ 5 recruiters and ≥ 5 developers.
   terminal typing metaphor.
 - **No image-budget gate (VERIFIED, still true):** `measure:routes` counts JS
   only, so image transfer must be measured with resource timing
-  (`.opencode/probe-images.mjs`, 1440 and 375). The task that needed it is done;
-  the missing gate is not, and a future image change must re-run the probe.
+  (`.opencode/probe-images.mjs`, 1440 and 375). MOTION-11 reran it at
+  **502.3 / 141.2 KB**, inside the §7 budget; a future image change must re-run
+  the probe.
 - **Asset rights unverified for BHL/LoC/Unsplash/Heritage Type (VERIFIED
   limitation):** never claim commercial usability without a live source. OBI is
   the only source with terms read this session; its 1883/1882 items are
@@ -232,17 +236,13 @@ perception thresholds with ≥ 5 recruiters and ≥ 5 developers.
 
 ## Next action
 
-**MOTION-20 rev. 2 ("The dark room", D-13) approved 2026-11-05; next is MOTION-11.** It is a
-rebrand (Archivo, soot/lime, lime-free data triad) judged by an independent
-panel: mean 6.25 → 8.5 over nine rounds (rounds 6–8 made all three flagships
-run the owner's own work in the page: Red Devil's Poisson GLM, IJO PLIS's
-Prophet models, Tafsir's BM25 retrieval), taste inspector 0 FAIL (today 16).
-The panel's code-only ceiling is 8.5–8.9; 9+ needs owner inputs: working live
-demos (both return 404 today — a defect on the shipped site too), a lit
-portrait or photographs of the work, outside proof (users, a deployment, an
-outside evaluation). Defects found in the three repositories are listed in
-STORYBOARD §Concept. Now
-that it is approved: MOTION-20 `DONE`, MOTION-11 `READY` with those asks; MOTION-14
-becomes "apply the dark-room palette in both themes". The mock (`gen.py` + `tpl.html` +
-data exports) lives in `.motion-mock/`, excluded from git via
-`.git/info/exclude`; it is a throwaway, not product code.
+**MOTION-11 is DONE (2026-11-09). Next: MOTION-14 `READY`; do not start it in
+this execution.** Verified: all 22 project entries reviewed; no placeholder
+path in `data/` or `dist/`; 72-page build; link checker 1,477 links / 73 pages,
+0 broken; targeted unit tests 21/21; `project-cards` + `projects-detail` e2e
+22/22; image transfer 502.3 KB @1440 and 141.2 KB @375; `/` route payload
+194.8 / 493.9 / 32.1 KB and 9 islands. `astro check` returned 89 errors,
+matching the recorded baseline after explicitly typing the new content entry.
+Visual review confirmed the Tafsir map at 800×450 and at card scale, plus the
+375px hero focal point. Full gates and the build/network exception are recorded
+in `SESSION_LOG.md`; asset register is `ASSETS.md` §15.

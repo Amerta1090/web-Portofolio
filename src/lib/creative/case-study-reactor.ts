@@ -354,7 +354,7 @@ function charsPerLine(nodeWidth: number, font: number): number {
  * authored order: a malformed diagram degrades to a readable tail instead of
  * hanging, dropping content, or throwing.
  */
-function assignLayers(
+export function assignLayers(
   nodes: readonly ProcessStageDiagramNode[],
   edges: readonly ProcessStageEdge[],
 ): Map<string, number> {

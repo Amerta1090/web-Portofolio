@@ -123,7 +123,7 @@ bun run measure:routes
 | `/` HTML | 75.3 KB | chapter wrappers and per-card `srcset` add a few bytes; record |
 | Scroll listeners | 16–17 | no new scroll listener from the sprint |
 | MotionScore `/` | B 56–59 | no D/F findings; grade range accepted |
-| Image transfer `/` @1440 / @375 | 543.5 / 187.9 KB | `measure:routes` cannot see this; use `.opencode/probe-images.mjs` |
+| Image transfer `/` @1440 / @375 | 543.5 / 187.9 KB (2026-10-22 baseline); MOTION-11: **502.3 / 141.2 KB** | `measure:routes` cannot see this; use `.opencode/probe-images.mjs` |
 
 ### 4.5 Visual-asset gate
 
