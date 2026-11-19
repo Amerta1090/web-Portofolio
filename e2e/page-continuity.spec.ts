@@ -59,12 +59,36 @@ test.describe("Cross-page continuity (MOTION-08)", () => {
   test("back restores the reading position instantly and refocuses the activated link", async ({
     page,
   }) => {
+    // "Instantly" is a shape, not a stopwatch: the documented defect was the
+    // user seeing the page fly through every chapter while the browser
+    // animated the restore. A stopwatch cannot tell that apart from a slow
+    // machine, so record scrollY on every frame instead and demand a jump.
+    await page.addInitScript(() => {
+      const w = window as unknown as { __scrollTrace: number[] };
+      w.__scrollTrace = [];
+      const tick = () => {
+        w.__scrollTrace.push(Math.round(window.scrollY));
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
     await page.goto("/", { waitUntil: "load" });
-    const link = page.locator('#projects a[href^="/work/"]').first();
+    // MOTION-19 cut the home to 6 chapters, so the three flagship cards that
+    // used to sit below y=2,000 are now at y≈1,320 and can no longer carry the
+    // reading position this test needs. This is the lab teaser's link, the
+    // deepest static anchor on the page (y≈6,497 at 1440×900); the Capability
+    // Map evidence nodes are deeper still but hydrate on `client:visible`, so
+    // focusing one races the island swapping its markup.
+    const link = page.locator('main #creative-lab a[href="/lab"]').first();
     await link.scrollIntoViewIfNeeded();
     await expect.poll(() => link.evaluate((a) => a.getBoundingClientRect().top)).toBeGreaterThan(0);
     const before = await page.evaluate(() => Math.round(scrollY));
-    expect(before).toBeGreaterThan(2000);
+    // Derived, not typed: the position has to be deep enough that a smooth
+    // fly-through would still be in flight, and the page height is the only
+    // honest yardstick for "deep". Measured 2026-11-18: the home is 8,511 px
+    // tall at 1440×900 (a quarter = 2,128) and this link lands at 6,028.
+    const pageHeight = await page.evaluate(() => document.documentElement.scrollHeight);
+    expect(before).toBeGreaterThan(pageHeight / 4);
     const href = (await link.getAttribute("href")) as string;
 
     await link.focus();
@@ -72,14 +96,18 @@ test.describe("Cross-page continuity (MOTION-08)", () => {
     await page.waitForURL(`**${href}`);
     await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
 
-    const backAt = Date.now();
     await page.goBack();
     await page.waitForURL((url) => url.pathname === "/");
-    // Instant: the old smooth fly-through was still short of the target after 2 s.
+    // The router restores the entry once the swapped document has laid out;
+    // written as a generous ceiling so a loaded 4-core box is not the verdict.
     await expect
-      .poll(() => page.evaluate(() => Math.round(scrollY)), { timeout: 3000 })
+      .poll(() => page.evaluate(() => Math.round(scrollY)), { timeout: 10_000 })
       .toBe(before);
-    expect(Date.now() - backAt).toBeLessThan(3000);
+    const trace = await page.evaluate(
+      () => (window as unknown as { __scrollTrace: number[] }).__scrollTrace,
+    );
+    const inFlight = trace.filter((y) => y > 20 && y < before - 20);
+    expect(inFlight).toEqual([]);
     await expect
       .poll(() => page.evaluate(() => document.activeElement?.getAttribute("href") ?? null))
       .toBe(href);

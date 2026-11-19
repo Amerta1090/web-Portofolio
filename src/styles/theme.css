@@ -1,39 +1,87 @@
+/**
+ * MOTION-14 — the dark-room palette (D-13, approved 2026-11-05).
+ *
+ * One rule holds the whole file: **light means evidence, lime means action.**
+ * Soot and ink build the room; the lime action colour is never used to key a
+ * data series. Category colours live in their own lime-free OKLCH triad
+ * (teal / amber / violet, equal L .78 and C .11 in the dark theme) so a chart
+ * can be read without competing with the one thing a visitor may click.
+ *
+ * Each token is written twice: a hex for humans and an `-rgb` triplet for
+ * Tailwind's `rgb(var(--x-rgb) / <alpha>)`. `src/lib/theme-tokens.test.ts`
+ * fails if the two ever disagree; the light block carried a stale
+ * `--color-brand-rgb: 93 107 84` against `#7a8c6f` until this sprint.
+ *
+ * The light theme is not a tint of the dark one. Paper `#f2f2ee` is the
+ * ground, soot `#111110` is the text, and the action colour is the same olive
+ * hue family pushed dark enough to hold AA on paper (7.52:1). OKLCH L/C/H is
+ * recorded per group in the comments; the values come from
+ * `/tmp/opencode/palette.mjs` (throwaway calculator, not shipped).
+ */
+
+/* ── Light: paper, soot ink, deep-olive action ──
+   ground   L 96.0 C .005 H 106.5 · ink L 17.7 C .002 H 106.6
+   action   L 41.4 C .095 H 125.6 (7.52:1 on paper) */
 :root,
 .light {
   --radius: 0.5rem;
+  /* Decorative only: the time-of-day script scales the BorderGlow warm stops
+     through this scalar (0.3–1). It is a number, not a colour, so the palette
+     cannot be overridden at runtime (D-14). */
+  --glow-warmth: 1;
 
   /* ── Semantic tokens ── */
-  --color-surface-primary: #fafaf8;
-  --color-surface-primary-rgb: 250 250 248;
-  --color-surface-secondary: #f4f5f2;
-  --color-surface-secondary-rgb: 244 245 242;
-  --color-surface-tertiary: #edefea;
-  --color-surface-tertiary-rgb: 237 239 234;
-  --color-text-primary: #121310;
-  --color-text-primary-rgb: 18 19 16;
-  --color-text-secondary: #6b7268;
-  --color-text-secondary-rgb: 107 114 104;
-  --color-brand: #7a8c6f;
-  --color-brand-rgb: 93 107 84;
-  --color-brand-text: #5d6b54;
-  --color-brand-text-rgb: 93 107 84;
-  --color-brand-muted: #8fa284;
-  --color-brand-muted-rgb: 143 162 132;
-  --color-brand-warm: #c17f59;
-  --color-brand-warm-rgb: 193 127 89;
-  --color-border: #e2e4de;
-  --color-border-rgb: 226 228 222;
-  --color-danger: #b42318;
-  --color-danger-rgb: 180 35 24;
-  --color-on-accent: #fafaf8;
-  --color-on-accent-rgb: 250 250 248;
-  --color-on-brand: #fafaf8;
-  --color-on-brand-rgb: 250 250 248;
+  --color-surface-primary: #f2f2ee;
+  --color-surface-primary-rgb: 242 242 238;
+  --color-surface-secondary: #e9e9e2;
+  --color-surface-secondary-rgb: 233 233 226;
+  --color-surface-tertiary: #dcdcd4;
+  --color-surface-tertiary-rgb: 220 220 212;
+  --color-text-primary: #111110;
+  --color-text-primary-rgb: 17 17 16;
+  --color-text-secondary: #4f504a;
+  --color-text-secondary-rgb: 79 80 74;
+  --color-brand: #3f5410;
+  --color-brand-rgb: 63 84 16;
+  --color-brand-text: #3f5410;
+  --color-brand-text-rgb: 63 84 16;
+  --color-brand-muted: #2f3f0c;
+  --color-brand-muted-rgb: 47 63 12;
+  --color-brand-warm: #8a5023;
+  --color-brand-warm-rgb: 138 80 35;
+  --color-border: #cdcec5;
+  --color-border-rgb: 205 206 197;
+  /* Meaningful boundaries (form controls) need 3:1; the decorative hairline
+     above is 1.35:1 on paper and stays decorative on purpose. */
+  --color-border-strong: #7b7c74;
+  --color-border-strong-rgb: 123 124 116;
+  --color-danger: #a3241a;
+  --color-danger-rgb: 163 36 26;
+  --color-on-accent: #f2f2ee;
+  --color-on-accent-rgb: 242 242 238;
+  --color-on-brand: #f2f2ee;
+  --color-on-brand-rgb: 242 242 238;
+
+  /* ── Data triad (lime-free, keyed) ──
+     The same three hues as the dark theme, stepped down in lightness so they
+     hold ≥3:1 on paper: teal L 48.8 · amber L 49.0 · violet L 48.3. */
+  --color-data-ml: #0d6f65;
+  --color-data-ml-rgb: 13 111 101;
+  --color-data-web: #8a5023;
+  --color-data-web-rgb: 138 80 35;
+  --color-data-iot: #6a4a9c;
+  --color-data-iot-rgb: 106 74 156;
+  --color-data-cli: #2f8a7e;
+  --color-data-cli-rgb: 47 138 126;
+  --color-data-devops: #8a63bd;
+  --color-data-devops-rgb: 138 99 189;
+  --color-data-other: #5a5b55;
+  --color-data-other-rgb: 90 91 85;
 
   /* ── Elevation shadows ── */
-  --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
-  --shadow-3: 0 12px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-1: 0 1px 3px rgba(17, 17, 16, 0.08), 0 1px 2px rgba(17, 17, 16, 0.06);
+  --shadow-2: 0 4px 12px rgba(17, 17, 16, 0.1), 0 2px 4px rgba(17, 17, 16, 0.06);
+  --shadow-3: 0 12px 40px rgba(17, 17, 16, 0.12), 0 4px 12px rgba(17, 17, 16, 0.08);
 
   /* ── Backward-compatible legacy tokens ── */
   --bg-primary: var(--color-surface-primary);
@@ -46,14 +94,17 @@
   --text-primary-rgb: var(--color-text-primary-rgb);
   --text-secondary: var(--color-text-secondary);
   --text-secondary-rgb: var(--color-text-secondary-rgb);
-  --accent: #5d6b54;
-  --accent-rgb: 93 107 84;
+  /* `--accent` is the link/selection/focus tone. The brand *is* AA text in
+     this palette (7.52:1), so light and dark no longer need separate values. */
+  --accent: var(--color-brand);
+  --accent-rgb: var(--color-brand-rgb);
   --accent-muted: var(--color-brand-muted);
   --accent-muted-rgb: var(--color-brand-muted-rgb);
   --accent-glow: rgba(var(--accent-rgb), 0.15);
   --accent-warm: var(--color-brand-warm);
   --accent-warm-rgb: var(--color-brand-warm-rgb);
   --border: var(--color-border);
+  --border-strong: var(--color-border-strong);
   --danger: var(--color-danger);
   --danger-rgb: var(--color-danger-rgb);
   --on-accent: var(--color-on-accent);
@@ -62,92 +113,54 @@
   --on-brand-rgb: var(--color-on-brand-rgb);
 }
 
-.light.dark-mode {
-  --color-surface-primary: #0e0f0c;
-  --color-surface-primary-rgb: 14 15 12;
-  --color-surface-secondary: #151714;
-  --color-surface-secondary-rgb: 21 23 20;
-  --color-surface-tertiary: #1e211d;
-  --color-surface-tertiary-rgb: 30 33 29;
-  --color-text-primary: #ededed;
-  --color-text-primary-rgb: 237 237 237;
-  --color-text-secondary: #9ca39c;
-  --color-text-secondary-rgb: 156 163 156;
-  --color-brand: #7a8c6f;
-  --color-brand-rgb: 122 140 111;
-  --color-brand-text: #7a8c6f;
-  --color-brand-text-rgb: 122 140 111;
-  --color-brand-muted: #5d6b54;
-  --color-brand-muted-rgb: 93 107 84;
-  --color-brand-warm: #c17f59;
-  --color-brand-warm-rgb: 193 127 89;
-  --color-border: #2a3028;
-  --color-border-rgb: 42 48 40;
-  --color-danger: #f2b8b5;
-  --color-danger-rgb: 242 184 181;
-  --color-on-accent: #0e0f0c;
-  --color-on-accent-rgb: 14 15 12;
-  --color-on-brand: #0e0f0c;
-  --color-on-brand-rgb: 14 15 12;
-
-  /* ── Elevation shadows ── */
-  --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.25);
-  --shadow-3: 0 12px 40px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3);
-
-  --bg-primary: var(--color-surface-primary);
-  --bg-primary-rgb: var(--color-surface-primary-rgb);
-  --bg-secondary: var(--color-surface-secondary);
-  --bg-secondary-rgb: var(--color-surface-secondary-rgb);
-  --bg-tertiary: var(--color-surface-tertiary);
-  --bg-tertiary-rgb: var(--color-surface-tertiary-rgb);
-  --text-primary: var(--color-text-primary);
-  --text-primary-rgb: var(--color-text-primary-rgb);
-  --text-secondary: var(--color-text-secondary);
-  --text-secondary-rgb: var(--color-text-secondary-rgb);
-  --accent: var(--color-brand);
-  --accent-rgb: var(--color-brand-rgb);
-  --accent-muted: var(--color-brand-muted);
-  --accent-muted-rgb: var(--color-brand-muted-rgb);
-  --accent-glow: rgba(var(--color-brand-rgb), 0.3);
-  --accent-warm: var(--color-brand-warm);
-  --accent-warm-rgb: var(--color-brand-warm-rgb);
-  --border: var(--color-border);
-  --danger: var(--color-danger);
-  --danger-rgb: var(--color-danger-rgb);
-  --on-accent: var(--color-on-accent);
-  --on-accent-rgb: var(--color-on-accent-rgb);
-  --on-brand: var(--color-on-brand);
-  --on-brand-rgb: var(--color-on-brand-rgb);
-}
-
+/* ── Dark: the room ──
+   soot L 16.8 · raised L 20.0 / 23.4 · ink L 96.0
+   action lime L 94.1 C .124 H 124.1 (16.55:1 on soot)
+   data teal L 77.9 C .110 H 184.0 · amber L 78.0 C .110 H 63.7 ·
+        violet L 78.1 C .110 H 304.1 (equal L/C so no series reads louder) */
 .dark {
-  --color-surface-primary: #0e0f0c;
-  --color-surface-primary-rgb: 14 15 12;
-  --color-surface-secondary: #151714;
-  --color-surface-secondary-rgb: 21 23 20;
-  --color-surface-tertiary: #1e211d;
-  --color-surface-tertiary-rgb: 30 33 29;
-  --color-text-primary: #ededed;
-  --color-text-primary-rgb: 237 237 237;
-  --color-text-secondary: #9ca39c;
-  --color-text-secondary-rgb: 156 163 156;
-  --color-brand: #7a8c6f;
-  --color-brand-rgb: 122 140 111;
-  --color-brand-text: #7a8c6f;
-  --color-brand-text-rgb: 122 140 111;
-  --color-brand-muted: #5d6b54;
-  --color-brand-muted-rgb: 93 107 84;
-  --color-brand-warm: #c17f59;
-  --color-brand-warm-rgb: 193 127 89;
-  --color-border: #2a3028;
-  --color-border-rgb: 42 48 40;
+  --color-surface-primary: #0f0f0f;
+  --color-surface-primary-rgb: 15 15 15;
+  --color-surface-secondary: #161615;
+  --color-surface-secondary-rgb: 22 22 21;
+  --color-surface-tertiary: #1e1e1c;
+  --color-surface-tertiary-rgb: 30 30 28;
+  --color-text-primary: #f2f2ee;
+  --color-text-primary-rgb: 242 242 238;
+  --color-text-secondary: #a5a69e;
+  --color-text-secondary-rgb: 165 166 158;
+  --color-brand: #dafa9c;
+  --color-brand-rgb: 218 250 156;
+  --color-brand-text: #dafa9c;
+  --color-brand-text-rgb: 218 250 156;
+  --color-brand-muted: #bfe078;
+  --color-brand-muted-rgb: 191 224 120;
+  --color-brand-warm: #e9a86a;
+  --color-brand-warm-rgb: 233 168 106;
+  --color-border: #2c2c29;
+  --color-border-rgb: 44 44 41;
+  --color-border-strong: #696a62;
+  --color-border-strong-rgb: 105 106 98;
   --color-danger: #f2b8b5;
   --color-danger-rgb: 242 184 181;
-  --color-on-accent: #0e0f0c;
-  --color-on-accent-rgb: 14 15 12;
-  --color-on-brand: #0e0f0c;
-  --color-on-brand-rgb: 14 15 12;
+  --color-on-accent: #0f0f0f;
+  --color-on-accent-rgb: 15 15 15;
+  --color-on-brand: #0f0f0f;
+  --color-on-brand-rgb: 15 15 15;
+
+  /* ── Data triad (lime-free, keyed) ── */
+  --color-data-ml: #56cebf;
+  --color-data-ml-rgb: 86 206 191;
+  --color-data-web: #e9a86a;
+  --color-data-web-rgb: 233 168 106;
+  --color-data-iot: #c7a6f1;
+  --color-data-iot-rgb: 199 166 241;
+  --color-data-cli: #8fd9cd;
+  --color-data-cli-rgb: 143 217 205;
+  --color-data-devops: #a98ada;
+  --color-data-devops-rgb: 169 138 218;
+  --color-data-other: #9c9d95;
+  --color-data-other-rgb: 156 157 149;
 
   /* ── Elevation shadows ── */
   --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
@@ -172,6 +185,7 @@
   --accent-warm: var(--color-brand-warm);
   --accent-warm-rgb: var(--color-brand-warm-rgb);
   --border: var(--color-border);
+  --border-strong: var(--color-border-strong);
   --danger: var(--color-danger);
   --danger-rgb: var(--color-danger-rgb);
   --on-accent: var(--color-on-accent);

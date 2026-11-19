@@ -42,7 +42,8 @@ bun run test
 
 | Gate | Baseline | Rule |
 | --- | --- | --- |
-| Unit suite | 1197 tests / 104 files (2026-10-30) | no new failures |
+| Unit suite | 1168 tests / 104 files (2026-11-18; −29 vs 1197 because `useThemeStore.test.ts` no longer tests eight accents and four presets, D-14) | no new failures |
+| Colour tokens | `src/lib/theme-tokens.test.ts` 13/13 | hex↔`-rgb` parity, token-name set, approved palette, no retired sage/clay |
 | TimeAwareHero alone | 11/11 | must stay green |
 | Source guards | new in MOTION-01 | must fail when the guarded rule is violated |
 
@@ -58,7 +59,8 @@ bunx playwright test --workers=1
 
 | Gate | Baseline | Rule |
 | --- | --- | --- |
-| E2E suite | 394 tests / 37 files (2026-10-30) | no new failures |
+| E2E suite | 429 tests / 36 files (2026-11-18; MOTION-14 added `palette.spec.ts`) | no new failures |
+| `palette` | 16 tests (8 per theme) | computed-style AA, live hex/`-rgb` parity, no inline palette write, positive control |
 | `motion-chapters` | new | must have a reduced-motion positive control |
 | `career-spine` | 18 tests | sticky/jump/deep-link must stay green |
 
@@ -137,7 +139,7 @@ not a sprint**; it produces `ASSETS.md` and D-11, not a sprint status.
 | Intrinsic dimensions | `width`/`height` present; `srcset`/`sizes` for screenshots and hero variants. |
 | Loading | `loading="lazy"` + `decoding="async"` below the fold. No lazy hero. |
 | Caption test | A plate that carries an argument has a real caption (`<figcaption>`); a decorative plate has `alt=""` and no caption. If deleting the caption loses nothing, the plate is decoration and does not ship. |
-| Palette | Duotone via grayscale + blend overlay using sage `#7a8c6f` / clay `#c17f59`; no multicolour stock. Gallery thumbnails keep their colour exception. |
+| Palette | Duotone via grayscale + blend overlay using the theme tokens (soot `#0f0f0f` / ink `#f2f2ee` in dark, paper `#f2f2ee` / soot `#111110` in light); lime is action only and never a duotone wash. No multicolour stock. Gallery thumbnails keep their colour exception. |
 | Runtime | 0 new JS, 0 canvas, 0 Lottie/Rive/Spline, 0 parallax/Ken Burns. At most a one-shot reveal. |
 | Rights row | Item URL, license URL, date checked, attribution requirement, and local path recorded in `ASSETS.md`. No claim without a live source. |
 | Separate measurement | `measure:routes` does not see images. Measure `transferSize` via `performance.getEntriesByType("resource")` at 1440 and 375, and record total + top offenders. |

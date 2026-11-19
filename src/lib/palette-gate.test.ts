@@ -17,6 +17,11 @@
  *   ~13 semantic tokens × light/dark for one decorative surface (see the
  *   interface comment there).
  *
+ * MOTION-14 adds a second scan: the retired sage/clay palette (and the old
+ * near-black surfaces) must not come back. The sprint replaced them with
+ * tokens, and a literal `#7a8c6f` in a component is invisible to the utility
+ * pattern above while being just as wrong — it would not follow the theme.
+ *
  * The gate scans the SOURCE tree (not dist) so ordinary edits elsewhere are
  * caught before build; exclusions are explicit paths, not submodule regexes,
  * so a new UI file is covered by default.
@@ -43,6 +48,31 @@ const WHITELIST = [
 
 const PALETTE =
   /red-500|amber-500|emerald-|bg-amber|amber-[3467-9]00\b|text-amber|border-amber|from-amber|to-amber|via-amber/;
+
+/**
+ * MOTION-14 — palette literals that no longer exist in the design system.
+ * Each entry is a hex or an RGB triplet, not a regex: the point is that these
+ * exact values must not reappear. Tests are excluded from the scan because
+ * they quote these values on purpose (theme-tokens.test.ts does).
+ */
+const RETIRED = [
+  { label: "sage brand (was --color-brand)", pattern: /#7a8c6f/i },
+  { label: "clay warm (was --color-brand-warm)", pattern: /#c17f59/i },
+  { label: "sage light accent", pattern: /#5d6b54/i },
+  { label: "sage muted", pattern: /#8fa284/i },
+  { label: "sage brand rgb triplet", pattern: /\b122 140 111\b/ },
+  { label: "sage light-accent rgb triplet", pattern: /\b93 107 84\b/ },
+  { label: "clay warm rgb triplet", pattern: /\b193 127 89\b/ },
+  { label: "old amber action", pattern: /#f59e0b/i },
+  { label: "old near-black surface", pattern: /#0f0f11/i },
+  { label: "old near-black surface (galaxy)", pattern: /#06070a/i },
+  { label: "old raised surface (galaxy)", pattern: /#0e0f11/i },
+];
+
+/** Remove comments so a note *describing* a retired value is not an offence. */
+function stripComments(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/^\s*\/\/.*$/gm, " ");
+}
 
 function collectFiles(dir: string): string[] {
   const out: string[] = [];
@@ -73,6 +103,19 @@ for (const file of files) {
   if (PALETTE.test(source)) offenders.push(rel);
 }
 
+const retiredOffenders: string[] = [];
+for (const file of files) {
+  if (/\.test\.[tj]sx?$/.test(file)) continue;
+  if (file.endsWith(join("palette-gate.test.ts"))) continue;
+  const rel = relative(root, file);
+  if (whitelistAbs.has(resolve(file)) || [...whitelistAbs].some((w) => file.startsWith(w + sep))) {
+    continue;
+  }
+  const source = stripComments(readFileSync(file, "utf-8"));
+  const hits = RETIRED.filter((entry) => entry.pattern.test(source)).map((entry) => entry.label);
+  if (hits.length > 0) retiredOffenders.push(`${rel}: ${hits.join(", ")}`);
+}
+
 describe("palette gate — DOM color via tokens only (Task 4.6)", () => {
   it("matches every source file the exclusions are meant to protect", () => {
     // Positive control that the scan walks the tree: the two exception roots
@@ -89,6 +132,27 @@ describe("palette gate — DOM color via tokens only (Task 4.6)", () => {
 
   it("no Tailwind palette utilities outside the documented exceptions", () => {
     expect(offenders).toEqual([]);
+  });
+
+  it("no retired palette literals outside the documented exceptions", () => {
+    // MOTION-14 replaced the sage/clay palette with theme tokens. A literal
+    // hex here would survive the utility scan above and ignore the theme.
+    expect(retiredOffenders).toEqual([]);
+  });
+
+  it("the retired-value scan keeps its teeth", () => {
+    const matches = (value: string) => RETIRED.some((entry) => entry.pattern.test(value));
+    expect(matches("#7a8c6f")).toBe(true);
+    expect(matches("#C17F59")).toBe(true);
+    expect(matches("rgb(122 140 111 / 0.6)")).toBe(true);
+    expect(matches("#0f0f11")).toBe(true);
+    // Live tokens and the approved palette must not match.
+    expect(matches("var(--color-brand)")).toBe(false);
+    expect(matches("#dafa9c")).toBe(false);
+    expect(matches("#3f5410")).toBe(false);
+    expect(matches("#56cebf")).toBe(false);
+    // A comment naming a retired value is documentation, not a colour.
+    expect(stripComments("/* was #7a8c6f */ color: var(--color-brand);")).not.toMatch(/#7a8c6f/i);
   });
 
   it("the pattern itself keeps its teeth — matches and misses as intended", () => {

@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import { projectNodeId, requireLinkedProject } from "./project-data";
+import { themeTriplet } from "./theme-tokens";
 
 // Q4.2 — accessibility and browser behaviour for the two sprint features.
 //
@@ -526,24 +527,38 @@ test.describe("Q4.2 — dark, light, and zoom", () => {
       };
     });
 
+    // Expectations come from `src/styles/theme.css`, not from this file: a
+    // palette change must move the number, while the assertion still catches
+    // a light theme that resolves the dark block's value.
+    const expected = {
+      brand: themeTriplet("light", "color-brand"),
+      border: themeTriplet("light", "color-border"),
+      text: themeTriplet("light", "color-text-primary"),
+    };
+
     // Regression: the theme store wrote the default accent as an inline style on
     // <html>, which outranks :root and .dark — so light mode kept the dark
-    // palette's brand (122 140 111) and its weaker contrast while every other
-    // token (border, text) correctly resolved to the light palette.
+    // palette's brand and its weaker contrast while every other token (border,
+    // text) correctly resolved to the light palette.
     expect(light.inlineBrand).toBe("");
-    expect(light.brandRgb).toBe("93 107 84");
-    expect(light.borderRgb).toBe("226 228 222");
-    expect(light.text).toBe("18 19 16");
+    expect(light.brandRgb).toBe(expected.brand);
+    expect(light.borderRgb).toBe(expected.border);
+    expect(light.text).toBe(expected.text);
+
+    // Without this the test above passes vacuously if both blocks ever carry
+    // the same brand — the light/dark distinction is what was broken.
+    expect(themeTriplet("light", "color-brand")).not.toBe(themeTriplet("dark", "color-brand"));
   });
 
   test("dark mode still uses the dark brand after the same round trip", async ({ page }) => {
     await page.goto(HOME);
     await expect(page.locator("html")).toHaveClass(/dark/);
+    const darkBrand = themeTriplet("dark", "color-brand");
     expect(
       await page.evaluate(() =>
         getComputedStyle(document.documentElement).getPropertyValue("--color-brand-rgb").trim(),
       ),
-    ).toBe("122 140 111");
+    ).toBe(darkBrand);
 
     await page.locator("[data-theme-toggle]").click();
     await page.locator("[data-theme-toggle]").click();
@@ -552,7 +567,7 @@ test.describe("Q4.2 — dark, light, and zoom", () => {
       await page.evaluate(() =>
         getComputedStyle(document.documentElement).getPropertyValue("--color-brand-rgb").trim(),
       ),
-    ).toBe("122 140 111");
+    ).toBe(darkBrand);
   });
 
   test("both features stay readable and interactive in light mode", async ({ page }) => {

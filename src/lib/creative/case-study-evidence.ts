@@ -76,15 +76,18 @@ export interface EvidenceDiagramGeometry {
   edges: EvidenceEdgeLayout[];
 }
 
+// The diagram is served as a standalone `.svg` (an `<img>` source), where CSS
+// variables from the page do not resolve. It is an exhibit on its own soot
+// ground, like the lab stills: one dark room, identical in both themes.
 const COLORS = {
-  background: "#0e0f0c",
-  node: "#171913",
-  nodeStroke: "#3d4436",
-  edge: "#7a8c6f",
-  label: "#fafaf8",
-  note: "#a7b09c",
-  eyebrow: "#7a8c6f",
-  caption: "#6b7263",
+  background: "#0f0f0f",
+  node: "#161615",
+  nodeStroke: "#2c2c29",
+  edge: "#8b8c84",
+  label: "#f2f2ee",
+  note: "#a5a69e",
+  eyebrow: "#dafa9c",
+  caption: "#8b8c84",
 } as const;
 
 function charsPerLine(nodeWidth: number, font: number): number {

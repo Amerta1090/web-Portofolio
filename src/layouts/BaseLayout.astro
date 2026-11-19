@@ -236,11 +236,9 @@ const pageTurn: TransitionDirectionalAnimations = {
         else if (hour >= 12 && hour < 17) warmth = 1.0;
         else if (hour >= 17 && hour < 21) warmth = 0.7;
         else warmth = 0.3;
-        var v = Math.round(warmth * 255);
-        document.documentElement.style.setProperty(
-          "--color-brand-warm-rgb",
-          v + " " + Math.round(v * 0.7) + " " + Math.round(v * 0.4)
-        );
+        // Decorative scalar only. Writing a colour token here would outrank
+        // `:root`/`.dark` (D-14) and repaint `text-brand-warm` off-palette.
+        document.documentElement.style.setProperty("--glow-warmth", String(warmth));
       })();
     </script>
 

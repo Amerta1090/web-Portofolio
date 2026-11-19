@@ -1,6 +1,6 @@
+import { type CollectionEntry, getCollection } from "astro:content";
 import type { APIRoute } from "astro";
 import { OGImageRoute } from "astro-og-canvas";
-import { type CollectionEntry, getCollection } from "astro:content";
 import { getProjects } from "../../lib/data";
 import { workSlug } from "../../lib/routes";
 
@@ -9,8 +9,11 @@ const blogEntries = await getCollection("blog");
 const projects = getProjects();
 
 const AUTHOR = "Abdul Majid Ridwan Tyastonoatmaja";
-const SAGE: [number, number, number] = [93, 107, 84];
-const DARK: [number, number, number] = [14, 15, 12];
+// MOTION-14 dark-room OG card: soot ground, ink title, lime keyline only.
+const LIME: [number, number, number] = [218, 250, 156];
+const INK: [number, number, number] = [242, 242, 238];
+const INK_SECONDARY: [number, number, number] = [165, 166, 158];
+const SOOT: [number, number, number] = [15, 15, 15];
 
 const pages: Record<string, { title: string; description: string }> = {
   index: {
@@ -71,27 +74,30 @@ for (const entry of blogEntries) {
   }
 }
 
-export const { getStaticPaths, GET } = await OGImageRoute({
+export const { getStaticPaths, GET } = (await OGImageRoute({
   pages,
   getImageOptions: (_path, page) => ({
     title: page.title,
     description: page.description,
-    bgGradient: [DARK],
-    border: { color: SAGE, width: 6, side: "block-end" },
+    bgGradient: [SOOT],
+    border: { color: LIME, width: 6, side: "block-end" },
     padding: 60,
     font: {
       title: {
-        color: [255, 255, 255],
+        color: INK,
         size: 64,
         weight: "Bold",
         lineHeight: 1.1,
       },
       description: {
-        color: SAGE,
+        color: INK_SECONDARY,
         size: 32,
         weight: "Regular",
         lineHeight: 1.3,
       },
     },
   }),
-}) as { getStaticPaths: () => Promise<{ params: { route: string }; props: unknown }[]>; GET: APIRoute };
+})) as {
+  getStaticPaths: () => Promise<{ params: { route: string }; props: unknown }[]>;
+  GET: APIRoute;
+};

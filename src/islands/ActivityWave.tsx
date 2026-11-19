@@ -18,7 +18,7 @@ const DAY_LABELS: Record<string, string> = {
   sat: "Sat",
   sun: "Sun",
 };
-const COLORS = ["#7A8C6F", "#7A8C6F", "#7A8C6F", "#7A8C6F", "#7A8C6F", "#C17F59", "#C17F59"];
+const COLORS = ["var(--color-data-ml)", "var(--color-data-ml)", "var(--color-data-ml)", "var(--color-data-ml)", "var(--color-data-ml)", "var(--color-data-web)", "var(--color-data-web)"];
 
 const WIDTH = 600;
 const HEIGHT = 180;
@@ -111,8 +111,8 @@ export default function ActivityWave({ data }: Props) {
           >
             <defs>
               <linearGradient id="wave-gradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#7A8C6F" stopOpacity={0.3} />
-                <stop offset="100%" stopColor="#7A8C6F" stopOpacity={0} />
+                <stop offset="0%" stopColor="var(--color-data-ml)" stopOpacity={0.3} />
+                <stop offset="100%" stopColor="var(--color-data-ml)" stopOpacity={0} />
               </linearGradient>
             </defs>
             {/* Empty chart — axes only */}
@@ -156,15 +156,15 @@ export default function ActivityWave({ data }: Props) {
         >
           <defs>
             <linearGradient id="wave-gradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#7A8C6F" stopOpacity={0.3} />
-              <stop offset="100%" stopColor="#7A8C6F" stopOpacity={0} />
+              <stop offset="0%" stopColor="var(--color-data-ml)" stopOpacity={0.3} />
+              <stop offset="100%" stopColor="var(--color-data-ml)" stopOpacity={0} />
             </linearGradient>
           </defs>
 
           <motion.path
             d={pathD}
             fill="none"
-            stroke="#7A8C6F"
+            stroke="var(--color-data-ml)"
             strokeWidth={2}
             strokeLinecap="round"
             strokeLinejoin="round"

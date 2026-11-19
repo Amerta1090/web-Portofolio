@@ -1,4 +1,5 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { themeTriplet } from "./theme-tokens";
 
 test.describe("Craft details: selection/scrollbar/focus/tabular-nums", () => {
   test("selection is brand-colored with adaptive contrast text in both modes", async ({ page }) => {
@@ -21,19 +22,25 @@ test.describe("Craft details: selection/scrollbar/focus/tabular-nums", () => {
         return { bg: s.backgroundColor, color: s.color };
       });
 
+    // Expectations derive from `src/styles/theme.css` (MOTION-14), so a palette
+    // change moves them, and a theme that resolves the other block still fails.
+    const brand = (theme: "light" | "dark") =>
+      `rgb(${themeTriplet(theme, "color-brand").split(" ").join(", ")})`;
+
     const dark = await readSelection();
-    expect(dark.bg).toBe("rgb(122, 140, 111)");
+    expect(dark.bg).toBe(brand("dark"));
 
     await page.evaluate(() => document.documentElement.classList.remove("dark"));
     const light = await readSelection();
-    expect(light.bg).toBe("rgb(93, 107, 84)");
+    expect(light.bg).toBe(brand("light"));
+    expect(light.bg).not.toBe(dark.bg);
     expect(light.color).not.toBe(dark.color);
   });
 
   test("thin scrollbar styled via border→brand tokens in webkit + firefox", async ({ page }) => {
     await page.goto("/");
-    const scrollbarWidth = await page.evaluate(() =>
-      getComputedStyle(document.documentElement).scrollbarWidth
+    const scrollbarWidth = await page.evaluate(
+      () => getComputedStyle(document.documentElement).scrollbarWidth,
     );
     expect(scrollbarWidth).toBe("thin");
 
@@ -59,7 +66,10 @@ test.describe("Craft details: selection/scrollbar/focus/tabular-nums", () => {
     expect(Object.keys(rules).length).toBeGreaterThan(0);
     const baseRule = Object.entries(rules).find(([k]) => k.endsWith("::-webkit-scrollbar"));
     expect(baseRule?.[1]).toContain("width: 8px");
-    const hoverRule = Object.values(rules).find((css) => css.includes("rgb(122, 140, 111)") || css.includes("var(--color-brand)"));
+    // The hover thumb must follow the brand token, not a literal: a literal
+    // would not change with the theme (the reason MOTION-14 retired the
+    // hardcoded sage values).
+    const hoverRule = Object.values(rules).find((css) => css.includes("var(--color-brand)"));
     expect(hoverRule).toBeTruthy();
   });
 

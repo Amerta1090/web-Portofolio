@@ -1,25 +1,18 @@
+import { Palette, RotateCcw, X, Zap } from "lucide-react";
 import { useReducedMotion } from "motion/react";
 import { AnimatePresence, motion } from "motion/react";
-import { Palette, RotateCcw, X, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { distance, duration, easing } from "../lib/motion";
+import { distance, easing } from "../lib/motion";
 import { useExperienceTier } from "../lib/useExperienceTier";
-import { ACCENT_COLORS, PRESET_THEMES, useThemeStore } from "../lib/useThemeStore";
-import { useTimeOfDay } from "../lib/useTimeOfDay";
+import { useThemeStore } from "../lib/useThemeStore";
 
 export default function ThemeCustomizer() {
   const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const prefersReduced = useReducedMotion();
-  const { period } = useTimeOfDay();
-
-  const accentColor = useThemeStore((s) => s.accentColor);
   const density = useThemeStore((s) => s.density);
-  const preset = useThemeStore((s) => s.preset);
-  const setAccentColor = useThemeStore((s) => s.setAccentColor);
   const setDensity = useThemeStore((s) => s.setDensity);
-  const applyPreset = useThemeStore((s) => s.applyPreset);
   const reset = useThemeStore((s) => s.reset);
   const lightningMode = useExperienceTier((s) => s.lightningMode);
   const toggleLightningMode = useExperienceTier((s) => s.toggleLightningMode);
@@ -27,9 +20,6 @@ export default function ThemeCustomizer() {
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  const isDawnLike = period === "dawn" || period === "morning";
-  const iconColor = isDawnLike ? "text-brand-warm" : "text-brand";
 
   if (!mounted) return null;
 
@@ -62,49 +52,6 @@ export default function ThemeCustomizer() {
               >
                 <X size={16} />
               </button>
-            </div>
-
-            {/* Preset themes */}
-            <div className="mb-4">
-              <span className="text-xs text-text-secondary mb-2 block">Presets</span>
-              <div className="grid grid-cols-2 gap-2">
-                {PRESET_THEMES.map((p) => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => applyPreset(p.id)}
-                    className={`text-xs px-3 py-2 rounded-lg border transition-all ${
-                      preset === p.id
-                        ? "border-brand bg-brand/10 text-brand"
-                        : "border-border text-text-secondary hover:border-brand/30"
-                    }`}
-                  >
-                    {p.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Accent color */}
-            <div className="mb-4">
-              <span className="text-xs text-text-secondary mb-2 block">Accent Color</span>
-              <div className="flex flex-wrap gap-2">
-                {ACCENT_COLORS.map((c) => (
-                  <button
-                    key={c.id}
-                    type="button"
-                    onClick={() => setAccentColor(c.value)}
-                    className={`w-7 h-7 rounded-full border-2 transition-all ${
-                      accentColor === c.value
-                        ? "border-text-primary scale-110"
-                        : "border-border hover:scale-110"
-                    }`}
-                    style={{ backgroundColor: c.value }}
-                    aria-label={c.label}
-                    title={c.label}
-                  />
-                ))}
-              </div>
             </div>
 
             {/* Density */}

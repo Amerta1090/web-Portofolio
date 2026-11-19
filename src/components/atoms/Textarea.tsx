@@ -7,7 +7,7 @@ const textareaVariants = cva(
   {
     variants: {
       variant: {
-        default: "border-border",
+        default: "border-border-strong",
         ghost: "border-transparent bg-transparent",
       },
       size: {

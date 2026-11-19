@@ -16,7 +16,6 @@ import {
   type SimulationLinkDatum,
   type SimulationNodeDatum,
 } from "d3";
-import { useThemeStore } from "../../lib/useThemeStore";
 
 export interface GraphNode {
   id: string;
@@ -44,29 +43,35 @@ interface SimLink extends SimulationLinkDatum<SimNode> {
   label?: string;
 }
 
-function themeColors(isDark: boolean) {
+// MOTION-14: colours come from `theme.css`, so the graph follows the theme
+// without re-running the simulation and no longer pins the old palette in JS.
+function themeColors() {
   return {
-    node: isDark ? "#7A8C6F" : "#5D6B54",
-    nodeStroke: isDark ? "#2A3028" : "#E2E4DE",
-    text: isDark ? "#EDEDED" : "#121310",
-    textSecondary: isDark ? "#9CA39C" : "#6B7268",
-    link: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.15)",
+    nodeStroke: "var(--color-border)",
+    textSecondary: "var(--color-text-secondary)",
+    link: "var(--color-border)",
     linkWidth: 1.5,
-    bg: isDark ? "#0E0F0C" : "#FAFAF8",
-    tooltipBg: isDark ? "#1E211D" : "#FFFFFF",
-    tooltipBorder: isDark ? "#2A3028" : "#E2E4DE",
+    bg: "var(--color-surface-primary)",
+    tooltipBg: "var(--color-surface-secondary)",
+    tooltipBorder: "var(--color-border)",
   };
 }
 
-function groupColor(group: string, isDark: boolean): string {
-  const palette = isDark
-    ? ["#7A8C6F", "#C17F59", "#6B8FA3", "#A38F6B", "#8F6BA3", "#6BA38F"]
-    : ["#5D6B54", "#A66A4A", "#4A6B7A", "#7A6B4A", "#6B4A7A", "#4A7A6B"];
+const GROUP_PALETTE = [
+  "var(--color-data-ml)",
+  "var(--color-data-web)",
+  "var(--color-data-iot)",
+  "var(--color-data-cli)",
+  "var(--color-data-devops)",
+  "var(--color-data-other)",
+];
+
+function groupColor(group: string): string {
   let hash = 0;
   for (let i = 0; i < group.length; i++) {
     hash = group.charCodeAt(i) + ((hash << 5) - hash);
   }
-  return palette[Math.abs(hash) % palette.length];
+  return GROUP_PALETTE[Math.abs(hash) % GROUP_PALETTE.length];
 }
 
 export default function NetworkGraph({
@@ -85,8 +90,6 @@ export default function NetworkGraph({
     height: propHeight ?? 400,
   });
   const prefersReduced = useReducedMotion();
-  const theme = useThemeStore((s) => s.theme);
-  const isDark = theme === "dark";
 
   useEffect(() => {
     const container = containerRef.current;
@@ -113,7 +116,7 @@ export default function NetworkGraph({
 
     const svg = select(svgRef.current);
     const { width, height } = dimensions;
-    const colors = themeColors(isDark);
+    const colors = themeColors();
 
     svg.selectAll("*").remove();
 
@@ -159,7 +162,7 @@ export default function NetworkGraph({
     const circleGroup = nodeGroup
       .append("circle")
       .attr("r", (d: SimNode) => (d.size ?? 1) * 6 + 4)
-      .attr("fill", (d: SimNode) => groupColor(d.group ?? "default", isDark))
+      .attr("fill", (d: SimNode) => groupColor(d.group ?? "default"))
       .attr("stroke", colors.nodeStroke)
       .attr("stroke-width", 1.5)
       .attr("stroke-opacity", 0.8);
@@ -283,7 +286,7 @@ export default function NetworkGraph({
     return () => {
       simulation.stop();
     };
-  }, [propNodes, propLinks, dimensions, isDark, prefersReduced]);
+  }, [propNodes, propLinks, dimensions, prefersReduced]);
 
   return (
     <div ref={containerRef} className={`relative w-full ${className}`}>
@@ -294,16 +297,16 @@ export default function NetworkGraph({
         className="w-full h-auto rounded-lg"
         role="img"
         aria-label="Interactive network graph"
-        style={{ background: themeColors(isDark).bg }}
+        style={{ background: themeColors().bg }}
       />
       <div
         ref={tooltipRef}
         className="pointer-events-none absolute z-50 rounded-lg border px-3 py-2 text-xs shadow-lg transition-opacity duration-150"
         style={{
           opacity: 0,
-          background: themeColors(isDark).tooltipBg,
-          borderColor: themeColors(isDark).tooltipBorder,
-          color: themeColors(isDark).textSecondary,
+          background: themeColors().tooltipBg,
+          borderColor: themeColors().tooltipBorder,
+          color: themeColors().textSecondary,
         }}
       />
       {/* M4.7: same node/link arrays the force simulation draws. Link

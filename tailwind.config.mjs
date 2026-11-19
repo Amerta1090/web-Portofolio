@@ -20,6 +20,7 @@ export default {
           warm: "rgb(var(--color-brand-warm-rgb) / <alpha-value>)",
         },
         border: "rgb(var(--color-border-rgb) / <alpha-value>)",
+        "border-strong": "rgb(var(--color-border-strong-rgb) / <alpha-value>)",
         danger: "rgb(var(--color-danger-rgb) / <alpha-value>)",
         "on-accent": "rgb(var(--color-on-accent-rgb) / <alpha-value>)",
         "on-brand": "rgb(var(--color-on-brand-rgb) / <alpha-value>)",

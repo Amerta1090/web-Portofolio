@@ -131,7 +131,7 @@ export default function EasterEgg({
             const msg = args.join(" ");
             const secret = secrets.find((s) => msg.includes(s.trigger));
             if (secret) {
-              originalLog(`%c${secret.response}`, "color: #f59e0b; font-weight: bold; font-size: 12px;");
+              originalLog(`%c${secret.response}`, "color: #dafa9c; font-weight: bold; font-size: 12px;");
               secret.effect?.();
               activate(`console-${secret.trigger}`);
             }
@@ -149,7 +149,7 @@ export default function EasterEgg({
     // Display welcome message
     originalLog(
       "%c🐣 Easter Egg Hunt!",
-      "color: #f59e0b; font-size: 16px; font-weight: bold;",
+      "color: #dafa9c; font-size: 16px; font-weight: bold;",
     );
     originalLog(
       "%cType 'help' in the console for available commands.",

@@ -52,11 +52,17 @@
     border-radius: inherit;
     padding: 1px;
     background: radial-gradient(at 80% 55%, rgb(var(--color-brand-rgb) / 0.9) 0px, transparent 50%),
-      radial-gradient(at 69% 34%, rgb(var(--color-brand-warm-rgb) / 0.9) 0px, transparent 50%),
-      radial-gradient(at 8% 6%, rgb(var(--color-brand-muted-rgb) / 0.9) 0px, transparent 50%),
+      radial-gradient(
+        at 69% 34%,
+        rgb(var(--color-brand-warm-rgb) / calc(0.9 * var(--glow-warmth))) 0px,
+        transparent 50%
+      ), radial-gradient(at 8% 6%, rgb(var(--color-brand-muted-rgb) / 0.9) 0px, transparent 50%),
       radial-gradient(at 41% 38%, rgb(var(--color-brand-rgb) / 0.9) 0px, transparent 50%),
-      radial-gradient(at 86% 85%, rgb(var(--color-brand-warm-rgb) / 0.9) 0px, transparent 50%),
-      radial-gradient(at 82% 18%, rgb(var(--color-brand-muted-rgb) / 0.9) 0px, transparent 50%),
+      radial-gradient(
+        at 86% 85%,
+        rgb(var(--color-brand-warm-rgb) / calc(0.9 * var(--glow-warmth))) 0px,
+        transparent 50%
+      ), radial-gradient(at 82% 18%, rgb(var(--color-brand-muted-rgb) / 0.9) 0px, transparent 50%),
       radial-gradient(at 51% 4%, rgb(var(--color-brand-rgb) / 0.9) 0px, transparent 50%),
       linear-gradient(rgb(var(--color-brand-rgb)) 0 100%);
     -webkit-mask: conic-gradient(

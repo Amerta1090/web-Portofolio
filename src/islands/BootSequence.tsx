@@ -109,7 +109,7 @@ export default function BootSequence({ gitHubData, profileName, onComplete }: Pr
           duration: 0.05,
         })
         .to(glitchRef.current, {
-          textShadow: "0 0 24px rgb(122 140 111 / 0.6)",
+          textShadow: "0 0 24px rgb(218 250 156 / 0.6)",
           duration: 0.5,
           ease: "power2.out",
         });

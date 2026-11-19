@@ -1,8 +1,8 @@
 # Motion Programme — Status
 
-**Last updated:** 2026-11-05 (MOTION-20 `DONE`: rev. 2 "The dark room" approved by the owner)
-**Branch:** `main` · **HEAD at session start:** `d571c5f` (MOTION-18)
-**Active sprint:** none — MOTION-11 `DONE` (2026-11-09). **Next: MOTION-14 `READY`** (apply the approved dark-room palette in both themes).
+**Last updated:** 2026-11-18 (MOTION-14 `DONE`: dark-room palette applied and measured in both themes)
+**Branch:** `main` · **HEAD at session start:** `2304183` (MOTION-11)
+**Active sprint:** none — MOTION-14 `DONE` (2026-11-18). **Next: MOTION-24 `READY`** (final asset set / lit exhibits).
 
 ## One-paragraph state
 
@@ -64,6 +64,21 @@ data (`projects.json` `flagship`), the journey is a rule over `type !==
 **194.7 / 493.8 / 32.0 KB**; islands 16 → 9. Nothing was removed from the site —
 only from the home.
 
+**MOTION-14 applied the dark-room palette in both themes** (D-13). Dark is soot
+`#0f0f0f` with ink `#f2f2ee` and one lime action `#dafa9c`; light is not a tint
+but its own pass — paper `#f2f2ee`, soot ink `#111110`, deep-olive action
+`#3f5410` (7.52:1). Keyed data uses a lime-free OKLCH triad
+(teal/amber/violet at equal L .78 / C .11 in dark, stepped down in light) so a
+chart never competes with the one thing a visitor may click. A new
+`--color-border-strong` carries the ≥3:1 boundary for form controls while the
+decorative hairline stays decorative. Two mechanisms could repaint the palette
+from JavaScript — the accent customiser and the time-of-day warmth script — and
+both were removed or re-pointed (D-14): the customiser is density/lightning/reset
+only, and the warmth script now writes a scalar `--glow-warmth` that scales the
+BorderGlow ring instead of overwriting a colour token (it used to drag light-mode
+`text-brand-warm` to 1.57:1). Every text token clears AA on all three surfaces in
+both themes, measured from computed styles.
+
 ## Verified baseline (2026-10-21 unless noted)
 
 | Fact | Evidence | Label |
@@ -72,6 +87,9 @@ only from the home.
 | Build = 72 pages (42 canonical incl. 404 + 30 fallbacks); `astro check` 89 errors (98 → 89, sorted diff = moves only, 0 new) | `bun run build:fast`, `bunx astro check` diff vs HEAD worktree | VERIFIED (2026-10-31) |
 | MOTION-19 home = **6 sections** (hero + 5 `data-chapter`) and **9.46 screens @1440×900** (8,511 px); `main > section[id]` = `hero, projects, systems-in-motion, journey, creative-lab, contact`; overflow X 0 at 1440 and 375 | headless Chromium 1228 probe (scroll all the way, settle, read `scrollHeight` + per-section rects) | VERIFIED (2026-11-03) |
 | MOTION-19 payload `/` = **194.7 KB initial / 493.8 KB reachable / 32.0 KB html, 9 islands (5e/4d)** — down from 202.7 / 556.1 / 77.2 KB and 16 islands; `/work` 150.7/393.1/18.6, `/lab` 179.2/504.4/20.0 | `bun run measure:routes` | VERIFIED (2026-11-03) |
+| MOTION-14 palette: both themes resolve authored tokens, hex = `-rgb` for every colour token, data colours never equal the action colour; lowest text pair is 4.68:1 (light warm) and lowest series 3.01:1 (light cli) | `src/lib/theme-tokens.test.ts` (13), `e2e/palette.spec.ts` (16, computed styles) | VERIFIED (2026-11-18) |
+| No inline palette write on `<html>` in either theme; time-of-day warmth writes the scalar `--glow-warmth` (0.3–1) only | `e2e/palette.spec.ts` "writes no inline palette override", `BaseLayout.astro` | VERIFIED (2026-11-18) |
+| MOTION-14 payload `/` = **193.4 / 492.7 / 32.2 KB**, 9 islands (5e/4d) — flat vs 194.7 / 493.8 / 32.0 (tokens only); `/work` 149.4/391.8/18.7, `/lab` 177.9/503.1/20.0 | `bun run measure:routes` | VERIFIED (2026-11-18) |
 | MOTION-19 removed blocks are all still reachable: career spine + skills + certifications on `/about`, GitHub statistics on `/data`, every project on `/work`, every experiment on `/lab`; 0 broken links across 1,476 links / 73 pages | `bun run check:links` | VERIFIED (2026-11-03) |
 | Flagship home cards come from data: `projects.json` `flagship: 1..3` (integers, contiguous from 1, only on `featured: true`); `validate-data` rejects anything else | `scripts/validate-data.mjs`, `data/projects.json`, `src/lib/data.ts` `getFlagshipProjects()` | VERIFIED (2026-11-03) |
 | Journey highlights are a rule, not a list: `toCareerHighlights()` drops `type === "contract"` and caps by year group → 6 records / 3 year groups on home; the 26-record spine stays on `/about` | `src/lib/creative/career-spine.ts`, `e2e/career-spine.spec.ts` `journey highlights — home (MOTION-19)` | VERIFIED (2026-11-03) |
@@ -236,13 +254,14 @@ perception thresholds with ≥ 5 recruiters and ≥ 5 developers.
 
 ## Next action
 
-**MOTION-11 is DONE (2026-11-09). Next: MOTION-14 `READY`; do not start it in
-this execution.** Verified: all 22 project entries reviewed; no placeholder
-path in `data/` or `dist/`; 72-page build; link checker 1,477 links / 73 pages,
-0 broken; targeted unit tests 21/21; `project-cards` + `projects-detail` e2e
-22/22; image transfer 502.3 KB @1440 and 141.2 KB @375; `/` route payload
-194.8 / 493.9 / 32.1 KB and 9 islands. `astro check` returned 89 errors,
-matching the recorded baseline after explicitly typing the new content entry.
-Visual review confirmed the Tafsir map at 800×450 and at card scale, plus the
-375px hero focal point. Full gates and the build/network exception are recorded
-in `SESSION_LOG.md`; asset register is `ASSETS.md` §15.
+**MOTION-14 is DONE (2026-11-18). Next: MOTION-24 `READY`; do not start it in
+this execution.** Verified: both themes resolve authored tokens with hex =
+`-rgb`, every text pair ≥ AA (lowest 4.68:1, light warm) and every data series
+≥ 3.01:1; the inline palette override is gone, so the time-of-day warmth is a
+scalar and no JS writes a colour token; accent customisation removed under D-14.
+Gates: unit 1,168/1,168 (104 files), `astro check` 89, 72-page build, link
+checker 1,477 links / 73 pages 0 broken, `/` payload 193.4 / 492.7 / 32.2 KB
+with 9 islands, full Playwright 428 passed / 1 skipped / 0 failed. Screenshots
+at 1440 and 375 in both themes are in `docs/motion/frames/m14-*.jpg`; evidence
+and the obsolete page-continuity literal it uncovered are in `SESSION_LOG.md`;
+the decision is `DECISIONS.md` D-14.

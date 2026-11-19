@@ -18,16 +18,13 @@ export default function CustomCursor({ enableOnTouch = false }: CustomCursorProp
 
     const cursor = document.createElement("div");
     cursor.className = "custom-cursor";
+    // Colours and hover sizes live in `global.css` (`.custom-cursor*`) so the
+    // cursor follows the active theme instead of pinning the palette in JS.
     cursor.style.cssText = `
       position: fixed;
       pointer-events: none;
       z-index: 9999;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #C17F59;
       transform: translate(-50%, -50%);
-      transition: width var(--dur-base) var(--ease-out), height var(--dur-base) var(--ease-out), background var(--dur-base) var(--ease-out);
       opacity: 0;
     `;
     document.body.appendChild(cursor);
@@ -38,12 +35,7 @@ export default function CustomCursor({ enableOnTouch = false }: CustomCursorProp
       position: fixed;
       pointer-events: none;
       z-index: 9998;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: 1.5px solid #7A8C6F;
       transform: translate(-50%, -50%);
-      transition: width var(--dur-slow) var(--ease-out), height var(--dur-slow) var(--ease-out), border-color var(--dur-base) var(--ease-out);
       opacity: 0;
     `;
     document.body.appendChild(ring);
@@ -75,22 +67,14 @@ export default function CustomCursor({ enableOnTouch = false }: CustomCursorProp
     const onHoverableEnter = (e: Event) => {
       const target = e.currentTarget as HTMLElement;
       if (target.dataset.cursorHover === "button") {
-        cursor.style.width = "20px";
-        cursor.style.height = "20px";
-        cursor.style.background = "#7A8C6F";
-        ring.style.width = "48px";
-        ring.style.height = "48px";
-        ring.style.borderColor = "#C17F59";
+        cursor.dataset.hover = "true";
+        ring.dataset.hover = "true";
       }
     };
 
     const onHoverableLeave = () => {
-      cursor.style.width = "12px";
-      cursor.style.height = "12px";
-      cursor.style.background = "#C17F59";
-      ring.style.width = "36px";
-      ring.style.height = "36px";
-      ring.style.borderColor = "#7A8C6F";
+      delete cursor.dataset.hover;
+      delete ring.dataset.hover;
     };
 
     document.addEventListener("mousemove", onMove, { passive: true });

@@ -358,3 +358,53 @@ ceiling at 8.5–8.9; above that needs owner-supplied photography (a lit
 portrait, the work in progress) and outside proof. The flagship exhibits are
 operable instruments running the owner's own artefacts (Red Devil Poisson GLM,
 IJO PLIS Prophet models, Tafsir BM25), never stand-ins.
+
+---
+
+## D-14 — The palette is a decision, not a preference (no runtime colour overrides)
+
+**Date:** 2026-11-18 · **Status:** Accepted (implements D-13)
+
+**Context.** MOTION-14 found two mechanisms repainting the palette at runtime,
+both by writing an inline custom property on `<html>`:
+
+1. **Accent customiser** — eight accent swatches and four preset themes applied
+   `--color-brand` as an inline style.
+2. **Time-of-day warmth** (`BaseLayout.astro`) — wrote a generated
+   `--color-brand-warm-rgb` (`255 179 102` at midday) onto `<html>`.
+
+Inline custom properties outrank both `:root` and `.dark`, so the authored
+palette never applied for those tokens. Measured in the browser: light-mode
+`text-brand-warm` fell from the authored **5.75:1** to **1.57:1** on paper.
+Separately, one accent hex cannot clear AA as text in both themes: lime
+`#dafa9c` is 16.55:1 on soot but ~1.2:1 on paper, while olive `#3f5410` is
+7.52:1 on paper but ~1.5:1 on soot. A single custom accent is therefore either
+illegible in one theme or the customiser has to know which theme it is in and
+swap values — which is exactly what a palette decision already does.
+
+**Decision.** Remove accent customisation entirely — `ACCENT_COLORS`,
+`PRESET_THEMES`, `setAccentColor`, `applyPreset`, `hexToRgb` and the accent
+branch of `applyCSSVariables`. `ThemeCustomizer` keeps Density, Lightning Mode
+and Reset; the store is `version: 1` with a `migrate` that drops persisted
+`accentColor`/`preset`, and `reset()` resets the theme too (resetting the class
+without the state would resurrect light). Keep the time-of-day *behaviour* but
+as a scalar: the script writes `--glow-warmth` (0.3–1) and the two warm stops
+of the BorderGlow ring multiply their alpha by it. No JavaScript may write a
+`--color-*` or `--accent*` property on `<html>`; `e2e/palette.spec.ts` fails if
+one appears.
+
+**Alternatives considered.**
+- *Keep swatches, add per-theme variants* — doubles the token set per accent and
+  still leaves every custom accent unverified; the contrast gate can only test
+  authored values.
+- *Keep the warm script and exempt it from the gate* — the exemption would be
+  the same for any future "dynamic" colour, and the failure was silent (all
+  layout and unit gates passed while the text was unreadable).
+- *Delete the warmth effect* — possible, but the scalar preserves the intended
+  behaviour at zero palette risk; MOTION-13 can still remove it on its own
+  evidence.
+
+**Consequences.** Users can no longer choose an accent; the palette is the
+brand. A future accent feature must ship per-theme pairs that both pass AA and
+must remove the inline-override gate deliberately. Density remains the only
+legitimate inline write from the customiser.

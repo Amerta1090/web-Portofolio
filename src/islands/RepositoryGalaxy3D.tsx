@@ -58,12 +58,12 @@ function GalaxyCenter() {
     <group>
       <mesh>
         <sphereGeometry args={[0.6, 16, 16]} />
-        <meshBasicMaterial color="#f59e0b" transparent opacity={0.3} />
+        <meshBasicMaterial color="#dafa9c" transparent opacity={0.3} />
       </mesh>
-      <pointLight color="#f59e0b" intensity={2} distance={15} decay={2} />
+      <pointLight color="#dafa9c" intensity={2} distance={15} decay={2} />
       <mesh>
         <sphereGeometry args={[0.3, 12, 12]} />
-        <meshBasicMaterial color="#f59e0b" />
+        <meshBasicMaterial color="#dafa9c" />
       </mesh>
     </group>
   );
@@ -224,7 +224,7 @@ function GalaxySceneInner({
 
       <AdaptiveDpr pixelated />
       <ambientLight intensity={0.2} />
-      <pointLight position={[0, 0, 0]} intensity={0.5} color="#f59e0b" />
+      <pointLight position={[0, 0, 0]} intensity={0.5} color="#dafa9c" />
     </>
   );
 }
@@ -244,7 +244,7 @@ export default function RepositoryGalaxy3D({ planets, repos, gitHubData }: Props
           alpha: false,
           powerPreference: "high-performance",
         }}
-        style={{ background: "#06070a" }}
+        style={{ background: "#0f0f0f" }}
       >
         <GalaxySceneInner
           planets={planets}
@@ -290,7 +290,7 @@ function DetailCardOverlay({
       transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
       className="absolute bottom-4 left-4 right-4 md:left-auto md:right-4 md:bottom-4 md:w-80 z-10"
     >
-      <div className="relative bg-[#0e0f11]/95 backdrop-blur-xl border border-white/10 rounded-xl p-4 shadow-2xl">
+      <div className="relative bg-[#161615]/95 backdrop-blur-xl border border-white/10 rounded-xl p-4 shadow-2xl">
         <button
           onClick={onClose}
           type="button"
@@ -306,10 +306,10 @@ function DetailCardOverlay({
           rel="noopener noreferrer"
           className="group inline-flex items-center gap-1.5 mb-2"
         >
-          <h3 className="text-sm font-semibold text-white group-hover:text-[#f59e0b] transition-colors">
+          <h3 className="text-sm font-semibold text-white group-hover:text-[#dafa9c] transition-colors">
             {repo.name}
           </h3>
-          <ExternalLink className="w-3 h-3 text-white/30 group-hover:text-[#f59e0b] transition-colors" />
+          <ExternalLink className="w-3 h-3 text-white/30 group-hover:text-[#dafa9c] transition-colors" />
         </a>
 
         <p className="text-xs text-white/50 mb-3 line-clamp-2">
@@ -342,7 +342,7 @@ function DetailCardOverlay({
             href={repo.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#f59e0b]/70 hover:text-[#f59e0b] transition-colors"
+            className="text-[#dafa9c]/70 hover:text-[#dafa9c] transition-colors"
           >
             View on GitHub →
           </a>

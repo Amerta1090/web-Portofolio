@@ -374,7 +374,7 @@ export default function CodeDNAHelix({ gitHubData }: Props) {
                 transform: "translate(-50%, -100%)",
               }}
             >
-              <div className="bg-[#0f0f11]/90 backdrop-blur-md border border-border/50 rounded-lg px-3 py-2 shadow-xl whitespace-nowrap">
+              <div className="bg-surface-secondary/95 backdrop-blur-md border border-border/50 rounded-lg px-3 py-2 shadow-xl whitespace-nowrap">
                 <p className="text-sm font-semibold text-text-primary">
                   {tooltip.lang}
                 </p>

@@ -212,6 +212,38 @@ pre {
   top: 0;
 }
 
+/* Custom cursor — the DOM node is created by `CustomCursor.tsx`; every colour
+   and the hover size live here so the cursor follows the active theme. */
+.custom-cursor {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-brand-warm);
+  transition: width var(--dur-base) var(--ease-out), height var(--dur-base) var(--ease-out),
+    background var(--dur-base) var(--ease-out);
+}
+
+.custom-cursor-ring {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-brand);
+  transition: width var(--dur-slow) var(--ease-out), height var(--dur-slow) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+}
+
+.custom-cursor[data-hover="true"] {
+  width: 20px;
+  height: 20px;
+  background: var(--color-brand);
+}
+
+.custom-cursor-ring[data-hover="true"] {
+  width: 48px;
+  height: 48px;
+  border-color: var(--color-brand-warm);
+}
+
 /* Scrollbar — tipis 8px, token-driven, konsisten dark/light */
 ::-webkit-scrollbar {
   width: 8px;
@@ -426,7 +458,7 @@ pre {
   object-position: 50% 50%;
 }
 
-@media (max-aspect-ratio: 16/10) {
+@media (max-aspect-ratio: 16 / 10) {
   .hero-media {
     object-position: 72% 50%;
   }

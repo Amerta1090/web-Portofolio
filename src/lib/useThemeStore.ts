@@ -2,79 +2,45 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 type Theme = "dark" | "light";
+type Density = "comfortable" | "compact";
 
+/**
+ * MOTION-14 / D-14: the palette is a design decision, not a preference.
+ *
+ * This store used to offer eight accent swatches and four preset themes. A hex
+ * accent picked for one background cannot hold AA on the other, so the
+ * customiser shipped either a low-contrast link colour or a lie about it. The
+ * palette now comes from `theme.css` alone; only density and the theme itself
+ * remain user-controlled.
+ */
 export interface ThemeConfig {
-  accentColor: string;
-  density: "comfortable" | "compact";
-  preset: string | null;
+  density: Density;
 }
-
-const ACCENT_COLORS = [
-  { id: "sage", label: "Sage", value: "#7A8C6F" },
-  { id: "terracotta", label: "Terracotta", value: "#C17F59" },
-  { id: "indigo", label: "Indigo", value: "#6C47FF" },
-  { id: "blue", label: "Royal Blue", value: "#2563EB" },
-  { id: "rose", label: "Rose", value: "#E11D48" },
-  { id: "teal", label: "Teal", value: "#0D9488" },
-  { id: "amber", label: "Amber", value: "#D97706" },
-  { id: "slate", label: "Slate", value: "#64748B" },
-] as const;
-
-const PRESET_THEMES = [
-  {
-    id: "midnight",
-    label: "Midnight",
-    config: { accentColor: "#6C47FF", density: "comfortable" as const },
-  },
-  {
-    id: "dawn",
-    label: "Dawn",
-    config: { accentColor: "#C17F59", density: "comfortable" as const },
-  },
-  {
-    id: "ocean",
-    label: "Ocean",
-    config: { accentColor: "#2563EB", density: "comfortable" as const },
-  },
-  {
-    id: "forest",
-    label: "Forest",
-    config: { accentColor: "#7A8C6F", density: "comfortable" as const },
-  },
-] as const;
 
 interface ThemeState extends ThemeConfig {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
-  setAccentColor: (color: string) => void;
-  setDensity: (density: "comfortable" | "compact") => void;
-  applyPreset: (presetId: string) => void;
+  setDensity: (density: Density) => void;
   reset: () => void;
 }
 
 const DEFAULT_CONFIG: ThemeConfig = {
-  accentColor: "#7A8C6F",
   density: "comfortable",
-  preset: null,
 };
+
+const DENSITY_VARIABLES = [
+  "--section-padding-y",
+  "--section-padding-y-md",
+  "--section-padding-y-lg",
+  "--space-lg",
+  "--space-xl",
+  "--space-2xl",
+] as const;
 
 function applyCSSVariables(config: ThemeConfig) {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
-
-  // The default accent is the theme's own value, not a user override. Pinning it
-  // as an inline style beats `:root` and `.dark`, which left light mode stuck on
-  // the dark palette's brand (and its lower-contrast accent) the moment this
-  // store rehydrated. Only a genuinely different accent overrides, and then it
-  // applies in both themes on purpose.
-  if (config.accentColor.toLowerCase() === DEFAULT_CONFIG.accentColor.toLowerCase()) {
-    root.style.removeProperty("--color-brand");
-    root.style.removeProperty("--color-brand-rgb");
-  } else {
-    root.style.setProperty("--color-brand", config.accentColor);
-    root.style.setProperty("--color-brand-rgb", hexToRgb(config.accentColor));
-  }
 
   if (config.density === "compact") {
     root.style.setProperty("--section-padding-y", "3rem");
@@ -84,37 +50,14 @@ function applyCSSVariables(config: ThemeConfig) {
     root.style.setProperty("--space-xl", "32px");
     root.style.setProperty("--space-2xl", "64px");
   } else {
-    root.style.removeProperty("--section-padding-y");
-    root.style.removeProperty("--section-padding-y-md");
-    root.style.removeProperty("--section-padding-y-lg");
-    root.style.removeProperty("--space-lg");
-    root.style.removeProperty("--space-xl");
-    root.style.removeProperty("--space-2xl");
+    for (const key of DENSITY_VARIABLES) root.style.removeProperty(key);
   }
-}
-
-function hexToRgb(hex: string): string {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  if (!result) return "122 140 111";
-  return `${Number.parseInt(result[1], 16)} ${Number.parseInt(result[2], 16)} ${Number.parseInt(result[3], 16)}`;
 }
 
 function resetCSSVariables() {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
-  const defaults = [
-    "--color-brand",
-    "--color-brand-rgb",
-    "--section-padding-y",
-    "--section-padding-y-md",
-    "--section-padding-y-lg",
-    "--space-lg",
-    "--space-xl",
-    "--space-2xl",
-  ];
-  for (const key of defaults) {
-    root.style.removeProperty(key);
-  }
+  for (const key of DENSITY_VARIABLES) root.style.removeProperty(key);
 }
 
 export const useThemeStore = create<ThemeState>()(
@@ -140,56 +83,42 @@ export const useThemeStore = create<ThemeState>()(
         });
       },
 
-      setAccentColor: (color) => {
-        const config = {
-          accentColor: color,
-          density: useThemeStore.getState().density,
-          preset: null,
-        };
-        applyCSSVariables(config);
-        set({ accentColor: color, preset: null });
-      },
-
       setDensity: (density) => {
-        const config = { ...useThemeStore.getState(), density };
-        applyCSSVariables(config);
+        applyCSSVariables({ density });
         set({ density });
-      },
-
-      applyPreset: (presetId) => {
-        const preset = PRESET_THEMES.find((p) => p.id === presetId);
-        if (!preset) return;
-        const config = { ...preset.config, preset: presetId };
-        applyCSSVariables(config);
-        set({
-          accentColor: preset.config.accentColor,
-          density: preset.config.density,
-          preset: presetId,
-        });
       },
 
       reset: () => {
         resetCSSVariables();
-        set({ ...DEFAULT_CONFIG });
-        document.documentElement.classList.toggle("dark", true);
+        // `theme` is part of the reset: toggling the class without updating
+        // state leaves the store saying "light" while the DOM is dark, and the
+        // next persist write resurrects the light theme.
+        set({ ...DEFAULT_CONFIG, theme: "dark" });
+        if (typeof document !== "undefined") {
+          document.documentElement.classList.toggle("dark", true);
+        }
       },
     }),
     {
       name: "theme",
+      version: 1,
+      // v0 stored `accentColor` and `preset`. They are gone; drop them instead
+      // of letting dead keys ride along in every visitor's localStorage.
+      migrate: (persisted) => {
+        const previous = (persisted ?? {}) as Partial<ThemeState>;
+        return {
+          theme: previous.theme === "light" ? "light" : "dark",
+          density: previous.density === "compact" ? "compact" : DEFAULT_CONFIG.density,
+        } as ThemeState;
+      },
       onRehydrateStorage: () => (state) => {
         if (state && typeof document !== "undefined") {
           document.documentElement.classList.toggle("dark", state.theme === "dark");
-          const config: ThemeConfig = {
-            accentColor: state.accentColor || DEFAULT_CONFIG.accentColor,
-            density: state.density || DEFAULT_CONFIG.density,
-            preset: state.preset || null,
-          };
-          applyCSSVariables(config);
+          applyCSSVariables({ density: state.density ?? DEFAULT_CONFIG.density });
         }
       },
     },
   ),
 );
 
-export { ACCENT_COLORS, PRESET_THEMES };
-export type { Theme };
+export type { Theme, Density };

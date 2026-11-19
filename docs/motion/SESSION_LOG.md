@@ -1226,3 +1226,147 @@ MOTION-14 `READY`; `prompt.txt` is synchronized to that next sprint. No MOTION-1
 work was started.
 
 **Commit:** `motion: MOTION-11 project evidence imagery` (created after verification).
+
+---
+
+## 2026-11-18 — MOTION-14 Colour system (dark room in both themes)
+
+**Goal:** Ship the owner-approved D-13 palette — soot / ink / lime with a
+lime-free OKLCH data triad — and prove it in **both** themes: every text pair
+≥ AA, every meaningful boundary ≥ 3:1, hex and `-rgb` tokens in agreement, and
+no JS writing a colour token at runtime.
+
+**Files changed**
+- Tokens: `src/styles/theme.css` (rewritten), `src/styles/global.css`,
+  `tailwind.config.mjs` (`border-strong`).
+- Store/UI: `src/lib/useThemeStore.ts`, `src/lib/useThemeStore.test.ts`,
+  `src/islands/ThemeCustomizer.tsx` (D-14), `src/islands/CustomCursor.tsx`.
+- Warmth: `src/layouts/BaseLayout.astro`, `src/lib/layout-queries.css`.
+- Palette consumers: `src/lib/observatory/visual.ts`,
+  `src/lib/creative/case-study-evidence.ts`, `src/pages/og/[...route].ts`,
+  `src/pages/data.astro`, `ActivityWave`, `LanguageRadial`, `LanguageNebula`,
+  `NetworkGraph`, `RepositoryGalaxy`, `RepositoryGalaxy3D`, `EasterEgg`,
+  `SceneContent`, `BootSequence`, `ContributionHeatmap`, `CodeDNAHelix`,
+  `Input`, `Textarea`.
+- Gates: `src/lib/theme-tokens.test.ts` (new, 13),
+  `src/lib/palette-gate.test.ts` (+`RETIRED` scan), `e2e/theme-tokens.ts` (new
+  shared parser), `e2e/palette.spec.ts` (new, 16), `e2e/accessibility.spec.ts`,
+  `e2e/craft.spec.ts`.
+- Evidence: `docs/motion/frames/m14-{dark,light}-{1440,375}.jpg`.
+
+**Implementation (VERIFIED)**
+- **Dark** (`.dark`): soot surfaces `#0f0f0f` / `#161615` / `#1e1e1c`, ink
+  `#f2f2ee`, secondary `#a5a69e`, lime action `#dafa9c`, warm `#e9a86a`,
+  danger `#f2b8b5`, `on-brand` = soot.
+- **Light** (`:root, .light`): paper `#f2f2ee`, soot ink `#111110`, secondary
+  `#4f504a`, deep-olive action `#3f5410`, warm `#8a5023`, danger `#a3241a`,
+  `on-brand` = paper. The light block is its own pass, not a tint.
+- **Data triad**, lime never keys data: dark teal `#56cebf` (ml), amber
+  `#e9a86a` (web), violet `#c7a6f1` (iot) at equal OKLCH L .78 / C .11, with
+  lightness steps for cli/devops and a neutral `other`; light steps down to
+  L ≈ 48–49 so each series clears 3:1 on paper. Exposed per theme as
+  `--color-data-*` (+`-rgb`) and consumed by `observatory/visual.ts`, the chart
+  islands and `case-study-evidence.ts`. WebGL ambient scenes and the standalone
+  Tafsir evidence SVG keep literal soot/ink/lime because they cannot read CSS.
+- **Boundaries:** `--color-border` (1.35:1 on paper) is decorative and stays
+  so; new `--color-border-strong` (`#696a62` dark, `#7b7c74` light) carries the
+  ≥ 3:1 form-control boundary and is mapped to Tailwind `border-strong`;
+  `Input`/`Textarea` use it.
+
+**Contrast (VERIFIED — computed styles in the browser, `e2e/palette.spec.ts`)**
+
+| Token | Dark (3 surfaces) | Light (3 surfaces) |
+| --- | --- | --- |
+| primary ink | 17.08 / 16.13 / 14.88 | 16.83 / 15.49 / 13.70 |
+| secondary | 7.80 / 7.37 / 6.80 | 7.26 / 6.68 / 5.91 |
+| brand (action) | 16.55 / 15.64 / 14.42 | 7.52 / 6.92 / 6.12 |
+| warm | 9.38 / 8.86 / 8.17 | 5.75 / 5.29 / 4.68 |
+| danger | 11.23 / 10.61 / 9.78 | 6.62 / 6.10 / 5.39 |
+
+Data series floor: dark ≥ 5.83, light **3.01** (cli, a non-text series). The
+lowest *text* value in either theme is light warm **4.68**.
+
+**Deviation that mattered most — D-14: accent customisation removed.**
+`e2e/palette.spec.ts` failed on light `text-brand-warm` at **1.57:1**, which
+traced to `BaseLayout.astro` writing `--color-brand-warm-rgb` inline on
+`<html>` for the time-of-day warmth: an inline custom property outranks both
+theme blocks, so one theme's value leaked into the other. Two consequences:
+the warmth now writes a scalar `--glow-warmth` (0.3–1) that multiplies the two
+warm BorderGlow stops in `layout-queries.css` — same behaviour, no colour token
+touched — and the customiser's eight swatches plus four presets went, because a
+single hex cannot clear AA on both grounds. `ThemeCustomizer` keeps Density,
+Lightning Mode and Reset; the store is `version: 1` with a `migrate` that drops
+persisted `accentColor`/`preset`, and `reset()` now resets `theme` too (toggling
+the class without the state resurrects light on the next persist write).
+
+Other deviations, all recorded in `SPRINT_PLAN.md`: `.light.dark-mode` was an
+unused duplicate of `.dark` → deleted; "lime means action" applied to data
+surfaces (solid `bg-brand-warm` tech bar, OG card lime as keyline only); cursor
+colour/size moved from inline JS to CSS classes; the new `RETIRED` scan found
+six surviving literals (`SceneContent`, `BootSequence` text-shadow,
+`ContributionHeatmap`/`CodeDNAHelix` tooltips) which were fixed.
+
+**Gates (VERIFIED, final tree)**
+- unit **1168/1168** across **104 files**; `bunx astro check` **89** (baseline);
+  `validate-data` OK; `build:fast` **72 pages**.
+- `check:links` → **1,477 same-site links / 73 pages, 0 broken**.
+- `measure:routes` → `/` **193.4 / 492.7 / 32.2 KB**, 9 islands (5e/4d);
+  `/work/ai-quranic-tafsir` 149.4 / 391.8 / 18.7; `/lab` 177.9 / 503.1 / 20.0.
+  Initial is slightly **below** the 194.7 KB MOTION-11 baseline (tokens only).
+- targeted Playwright `palette + craft + border-glow-contrast` → **24/24**.
+- full Playwright `--workers=1` → **429 tests / 36 files: 428 passed, 1 skipped,
+  0 failed** (11.5 m).
+
+**M14.3 screenshots (VERIFIED)** — `docs/motion/frames/m14-{dark,light}-{1440,375}.jpg`,
+captured full-page at 1440×900 and 375×812 from the built preview. Each frame
+was taken with `reducedMotion: "reduce"`, which is the only honest way to
+photograph a palette: the reveals' final state is set explicitly before any
+scrolling, so the still cannot show content mid-fade. The capture script reads
+the live tokens back and asserts it, rather than trusting the seed:
+dark `ink #f2f2ee / brand #dafa9c / data-ml #56cebf`, light `ink #111110 /
+brand #3f5410 / data-ml #0d6f65`, document heights 8,511 px (desktop) and
+11,060 px (phone), **0** reveal elements left below full opacity.
+
+**Defect found by the gate — an obsolete literal, not a palette bug.**
+The full suite reported `e2e/page-continuity.spec.ts:59` failing on
+`expect(before).toBeGreaterThan(2000)` with **993**. It pre-existed this sprint,
+and that was proved rather than assumed: a HEAD `2304183` worktree with its own
+`bun install`, its own `build:fast` and a preview on :4322 produced
+**byte-identical geometry** — document 8,348 px at 1280×720, `#projects` 764,
+first project link 1,320; at 1440×900 the document is **8,511 px**, all three
+flagship cards share one row at **1,320**, and the deepest static anchor is the
+lab teaser's `/lab` link at **6,497** (restore target 6,028). The literal was
+written when home had three tall project sections; MOTION-19 cut the home to six
+chapters and made `> 2000` unreachable, and nothing re-derived it.
+
+The fix keeps the *claim* and drops the *stopwatch*. The anchor is the deepest
+static one (`main #creative-lab a[href="/lab"]`); "deep enough" is derived
+(`before > scrollHeight / 4`); and "instantly" is now a **shape**: the test
+records `scrollY` on every frame (`__scrollTrace`) and requires that no frame
+sits strictly between the start and the target beyond the first/last 20 px.
+Rejected candidate: `main a[href^="/work/"].last()` — the Capability Map nodes
+are deeper, but that island hydrates on `client:visible` and swaps its markup
+under the focus, so the test would be measuring the island, not the router.
+
+**Teeth (VERIFIED by mutation).** `src/lib/page-continuity.ts:90` `"auto"` →
+`"smooth"`, rebuild, run: the spec fails **on `inFlight`**, not on the restore
+poll, with seven intermediate positions recorded
+(`96, 333, 1993, 4236, 5458, 5903, 5994`). Restored from
+`/tmp/opencode/m14-bak/`, `md5sum` back to `aba1656af071ba63e43a49670a51c609`,
+rebuild, **6/6** green, then the whole suite.
+
+**DOCUMENTED:** `STATUS.md` closes MOTION-14 and marks MOTION-24 `READY`;
+`DECISIONS.md` gains **D-14** (palette is a design decision, warmth is a scalar,
+no JS writes a colour token); `QA_CHECKLIST.md` records the new unit/e2e
+baselines and the colour-gate rows; `AGENTS.md` carries the sprint bullet.
+
+**TODO (out of scope, named not fixed):** `--color-brand` doubles as text and
+fill (~96 `text-brand` uses) — MOTION-12 owns the hierarchy pass; the
+decorative gradient text (`from-brand to-brand-warm` in `data.astro`,
+`lab.astro`, `resume.astro`) may need its own documented decision; GitHub
+language colours and gallery experiment colours remain documented
+external-identity exceptions; MOTION-13 still owns whether the warmth effect
+stays at all.
+
+**Commit:** `motion: MOTION-14 dark-room palette in both themes` (created after
+verification).

@@ -966,7 +966,7 @@ reduced-motion e2e with `emulateMedia` + `matchMedia` readback, docs.
 
 ## MOTION-14 — Colour system (triadic, OKLCH)
 
-**Status:** `PLANNED` (added 2026-10-31, `RESEARCH.md` §7.4)
+**Status:** `DONE` (2026-11-18) — was `PLANNED` (added 2026-10-31, `RESEARCH.md` §7.4)
 **Priority:** P2
 **Objective:** Replace the accidental sage + clay pair with a palette derived
 from a named scheme, legible in both themes. **Re-scoped by D-13 (approved
@@ -986,28 +986,118 @@ chart/category colour moves, `palette-gate.test.ts`, contrast e2e,
 layout. No colour library at runtime.
 
 **Tasks**
-- [ ] M14.1 Fix the measured token drift first: light `:root`
+- [x] M14.1 Fix the measured token drift first: light `:root`
       `--color-brand-rgb` is `93 107 84` while `--color-brand` is `#7a8c6f`;
       add a unit gate that every `--x` hex equals its `--x-rgb` triplet.
-- [ ] M14.2 Build the scheme in OKLCH from the sage anchor (H 133.7°): neutrals
+- [x] M14.2 Build the scheme in OKLCH from the sage anchor (H 133.7°): neutrals
       60 %, sage 30 % (C ~0.08), triad partner 10 % as the single UI accent,
       third triad hue for data/category only. Candidates and contrasts are in
       `RESEARCH.md` §7.4; record the chosen L/C/H per token.
-- [ ] M14.3 Screenshot A/B (current vs triadic vs analogous) at 1440 and 375 in
+- [x] M14.3 Screenshot A/B (current vs triadic vs analogous) at 1440 and 375 in
       both themes; pick with the rubric (V3, V1) and write the decision.
-- [ ] M14.4 Contrast gate: every text token on every surface token ≥ 4.5:1,
+- [x] M14.4 Contrast gate: every text token on every surface token ≥ 4.5:1,
       UI/border-meaningful ≥ 3:1, both themes, read from computed styles in
       the browser (Sprint 4 lesson: never from constants in the test).
-- [ ] M14.5 Re-run the palette grep gate and the existing contrast specs.
+- [x] M14.5 Re-run the palette grep gate and the existing contrast specs.
+
+**Delivered (2026-11-18) — D-13 palette, not a new triad.** M14.2's
+sage-anchored OKLCH exercise was superseded by D-13 (owner-approved
+2026-11-05): the palette is soot `#0f0f0f` / ink `#f2f2ee` / lime `#dafa9c`,
+and this sprint applies and proves it in both themes. The light theme is a
+separate pass, not a tint of the dark one.
+
+- **Dark** (`.dark`): soot surfaces `#0f0f0f` / `#161615` / `#1e1e1c`, ink text
+  `#f2f2ee`, secondary `#a5a69e`, lime action `#dafa9c` (16.55:1 on soot),
+  warm `#e9a86a` (9.38:1), danger `#f2b8b5` (11.23:1), `on-brand` = soot.
+- **Light** (`:root, .light`): paper ground `#f2f2ee`, soot ink `#111110`
+  (16.83:1), secondary `#4f504a` (7.26:1), deep-olive action `#3f5410`
+  (7.52:1), warm `#8a5023` (5.75:1), danger `#a3241a` (6.62:1), `on-brand` =
+  paper. L/C/H per group is recorded in `theme.css` comments.
+- **Data triad** (lime-free, keyed): dark teal `#56cebf` (ml), amber `#e9a86a`
+  (web), violet `#c7a6f1` (iot) at equal OKLCH L .78 / C .11, plus lightness
+  steps for cli `#8fd9cd` and devops `#a98ada` and a neutral `other`
+  `#9c9d95`; light steps down to L ~48–49 so every series clears 3:1 on paper
+  (teal `#0d6f65`, amber `#8a5023`, violet `#6a4a9c`, cli `#2f8a7e`, devops
+  `#8a63bd`, other `#5a5b55`). Exposed as per-theme `--color-data-*`
+  (+`-rgb`) and consumed by `observatory/visual.ts`, the chart islands and
+  `case-study-evidence.ts`; WebGL ambient scenes and the standalone Tafsir
+  evidence SVG keep literal soot/ink/lime because they cannot read CSS.
+- **Boundaries:** `--color-border` is decorative (1.35:1 on paper) and stays
+  so; new `--color-border-strong` (`#696a62` dark, `#7b7c74` light) carries
+  the ≥3:1 form-control boundary and is mapped to Tailwind
+  `border-strong`. `Input`/`Textarea` use it.
+- **M14.1 gate:** `src/lib/theme-tokens.test.ts` (13 tests) parses both blocks
+  and fails on hex↔`-rgb` drift, a triplet/hex without its sibling, a
+  different colour-token name set between themes, a missing required token, a
+  data colour equal to the brand, a retired sage/clay value, a duplicated
+  `.light.dark-mode` block, or a missing Tailwind `border-strong` mapping.
+- **M14.4 gate:** `e2e/palette.spec.ts` (16 tests, 8 per theme) reads computed
+  styles in the browser: text AA on all three surfaces, `on-brand` AA, the
+  meaningful boundary ≥3:1, data ≥3:1 and never equal to the action colour,
+  live hex/`-rgb` parity, the theme resolves its own block, no inline palette
+  write on `<html>`, and a positive control that the decorative hairline
+  fails 3:1 (so a broken contrast helper cannot go green). Shared parser:
+  `e2e/theme-tokens.ts`.
+- **M14.5:** `palette-gate.test.ts` gained a `RETIRED` scan (comment-stripped)
+  for `#7a8c6f`, `#c17f59`, `#5d6b54`, `#8fa284`, `122 140 111`,
+  `93 107 84`, `193 127 89`, `#f59e0b`, `#0f0f11`, `#06070a`, `#0e0f11` with
+  a teeth test. `accessibility.spec.ts` and `craft.spec.ts` no longer pin
+  palette constants: brand/border/text/`::selection` values are derived from
+  `theme.css` and a light≠dark control keeps the derivation meaningful.
+
+**Deviations**
+1. **D-14 — accent customisation removed.** A single hex cannot clear AA in
+   both themes, so `ACCENT_COLORS`, `PRESET_THEMES`, `setAccentColor`,
+   `applyPreset`, `hexToRgb` and the accent branch of `applyCSSVariables` are
+   gone; `ThemeCustomizer` keeps Density, Lightning Mode and Reset. The store
+   is `version: 1` with a `migrate` that drops persisted `accentColor`/`preset`,
+   and `reset()` now resets `theme` too (state/DOM divergence would otherwise
+   resurrect light).
+2. `.light.dark-mode` was an unused duplicate of `.dark` → deleted.
+3. **Time-of-day warmth re-pointed.** `BaseLayout.astro` used to write
+   `--color-brand-warm-rgb` inline on `<html>`; an inline custom property
+   outranks both theme blocks, so in light mode `text-brand-warm` fell to
+   **1.57:1** and the palette spec's inline-override gate failed. It now
+   writes a scalar `--glow-warmth` (0.3–1) that multiplies the two warm stops
+   of the BorderGlow ring — same "the site warms through the day" behaviour,
+   no colour token touched. MOTION-13 still owns whether the effect stays.
+4. **"Lime means action" applied to data surfaces:** the `/data` technology
+   bar is solid `bg-brand-warm` instead of a gradient ending in lime, and the
+   OG card uses lime only as a keyline with secondary-ink description.
+5. **Custom cursor moved from JS to CSS.** Colour/size were inline styles in
+   `CustomCursor.tsx`; they are now classes in `global.css` (`.custom-cursor`,
+   `.custom-cursor-ring`, `[data-hover="true"]`) and the island only toggles
+   `dataset.hover`.
+6. **Retired literals found by the new scan** and fixed: `SceneContent`
+   `#7A8C6F`/`#C17F59` → lime/ink, `BootSequence` text-shadow
+   `122 140 111` → `218 250 156`, `ContributionHeatmap`/`CodeDNAHelix`
+   tooltips `bg-[#0f0f11]/90` → `bg-surface-secondary/95`.
+
+**Verification (2026-11-18)**
+- unit **1168/1168** across 104 files (`bun run test`); +13 theme-token tests,
+  `useThemeStore` rewritten without accent/preset cases.
+- `bunx astro check` → **89 errors**, unchanged baseline.
+- `bun run build:fast` → **72 pages**; `check:links` → **1,477 links / 73 pages,
+  0 broken**; `validate-data` OK.
+- `measure:routes` → `/` **193.4 KB initial / 492.7 KB reachable / 32.2 KB
+  html**, 9 islands (5e/4d) — flat/slightly lower than the 194.7 / 493.8 /
+  32.0 baseline (tokens only).
+- targeted Playwright `palette + craft + border-glow-contrast` → **24/24**.
+- full Playwright `--workers=1` → **429 tests / 36 files** (recorded in
+  `SESSION_LOG.md`).
 
 **Acceptance criteria**
 - 0 AA failures for text pairs in either theme (today: sage 3.46, muted 2.62,
-  clay 3.12 on the light surface).
-- hex/`-rgb` parity gate green.
-- Payload flat (tokens only).
+  clay 3.12 on the light surface). **MET** — every text token clears AA on all
+  three surfaces in both themes (lowest: light data-cli 3.01 as a non-text
+  series, warm 4.68 as text).
+- hex/`-rgb` parity gate green. **MET** (unit + live browser).
+- Payload flat (tokens only). **MET** (193.4 vs 194.7 KB initial).
 
 **Definition of Done / verification:** contrast e2e both themes, palette gate,
-unit, build, screenshots in `SESSION_LOG.md`.
+unit, build, screenshots in `SESSION_LOG.md`. **MET** — screenshots at 1440 and
+375 in both themes are recorded in `SESSION_LOG.md`; commit
+`motion: MOTION-14 …`.
 
 ---
 

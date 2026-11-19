@@ -151,7 +151,7 @@ export default function RepositoryGalaxy({ repos, gitHubData, className = "" }: 
       ) : effectiveTier === "tier-2" ? (
         <GalaxyTier2 repos={repos} planets={planets} />
       ) : (
-        <div className={`relative w-full h-[400px] md:h-[500px] lg:h-[600px] rounded-xl overflow-hidden bg-[#06070a] border border-white/5 ${className}`}>
+        <div className={`relative w-full h-[400px] md:h-[500px] lg:h-[600px] rounded-xl overflow-hidden bg-[#0f0f0f] border border-white/5 ${className}`}>
           <Suspense fallback={<GalaxyLoading />}>
             <LazyGalaxy3D
               planets={planets}

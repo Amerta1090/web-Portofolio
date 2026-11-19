@@ -8,17 +8,15 @@ interface Props {
   allRepos?: GitHubRepo[];
 }
 
+// MOTION-14: the six lime-free data tokens, cycled. Language names are data,
+// so none of these is the action colour.
 const COLORS = [
-  "#7A8C6F",
-  "#3b82f6",
-  "#22c55e",
-  "#C17F59",
-  "#a855f7",
-  "#06b6d4",
-  "#5D6B54",
-  "#84cc16",
-  "#ec4899",
-  "#14b8a6",
+  "var(--color-data-ml)",
+  "var(--color-data-web)",
+  "var(--color-data-iot)",
+  "var(--color-data-cli)",
+  "var(--color-data-devops)",
+  "var(--color-data-other)",
 ];
 
 const PARTICLE_COUNT = 30;

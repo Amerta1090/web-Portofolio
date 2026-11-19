@@ -8,13 +8,15 @@ import { parsePeriod, pointIndex } from "./parsePeriod";
  * data always yields identical SVG output at build time.
  */
 
+// MOTION-14: category colours are theme tokens (lime-free data triad), so the
+// chart follows the active theme instead of pinning the sage/clay palette.
 export const CATEGORY_COLORS: Record<string, string> = {
-  ml: "#7a8c6f",
-  web: "#c17f59",
-  iot: "#4d7a9b",
-  cli: "#9a86c9",
-  devops: "#c9a227",
-  other: "#9ca39c",
+  ml: "var(--color-data-ml)",
+  web: "var(--color-data-web)",
+  iot: "var(--color-data-iot)",
+  cli: "var(--color-data-cli)",
+  devops: "var(--color-data-devops)",
+  other: "var(--color-data-other)",
 };
 
 export const CATEGORY_KEYS = Object.keys(CATEGORY_COLORS);
