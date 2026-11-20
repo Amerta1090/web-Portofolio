@@ -1,8 +1,8 @@
 # Motion Programme — Status
 
-**Last updated:** 2026-11-18 (MOTION-14 `DONE`: dark-room palette applied and measured in both themes)
-**Branch:** `main` · **HEAD at session start:** `2304183` (MOTION-11)
-**Active sprint:** none — MOTION-14 `DONE` (2026-11-18). **Next: MOTION-24 `READY`** (final asset set / lit exhibits).
+**Last updated:** 2026-11-20 (MOTION-24 `DONE`: asset audit → **A0**, no new assets)
+**Branch:** `main` · **HEAD at session start:** `7226178` (MOTION-14)
+**Active sprint:** none — MOTION-24 `DONE` (2026-11-20). **Next: MOTION-12 `READY`** (taste pass).
 
 ## One-paragraph state
 
@@ -90,6 +90,10 @@ both themes, measured from computed styles.
 | MOTION-14 palette: both themes resolve authored tokens, hex = `-rgb` for every colour token, data colours never equal the action colour; lowest text pair is 4.68:1 (light warm) and lowest series 3.01:1 (light cli) | `src/lib/theme-tokens.test.ts` (13), `e2e/palette.spec.ts` (16, computed styles) | VERIFIED (2026-11-18) |
 | No inline palette write on `<html>` in either theme; time-of-day warmth writes the scalar `--glow-warmth` (0.3–1) only | `e2e/palette.spec.ts` "writes no inline palette override", `BaseLayout.astro` | VERIFIED (2026-11-18) |
 | MOTION-14 payload `/` = **193.4 / 492.7 / 32.2 KB**, 9 islands (5e/4d) — flat vs 194.7 / 493.8 / 32.0 (tokens only); `/work` 149.4/391.8/18.7, `/lab` 177.9/503.1/20.0 | `bun run measure:routes` | VERIFIED (2026-11-18) |
+| MOTION-24 asset inventory: `public/images` **369 files / 18,939,355 B** (was 380 / 19,012,932); 10 files + `ProfileImage.astro` removed; markup references 53 files (2.17 MB) | `.opencode/probe-served-images.mjs`, `du`/`find` | VERIFIED (2026-11-20) |
+| MOTION-24 homepage image transfer **502.3 KB @1440 / 141.2 KB @375**, unchanged by the deletions (every removed file was never transferred) | `.opencode/probe-m24-images.mjs` (deterministic scroll, reduced motion) | VERIFIED (2026-11-20) |
+| MOTION-24 chapter geometry: page **8,511 px @1440×900 / 11,080 px @375×812**; first Signal Loom node 670 / 767 px into `#systems-in-motion`; fold slack **230 / 45 px** | `.opencode/probe-m24-geo2.mjs` | VERIFIED (2026-11-20) |
+| MOTION-24 plate budget: OBI telephone 1200×721 → WebP **301,104 B q78** / 249,670 q50 / AVIF 202,163 q45; ≤80 KB only at 640 px (78,020 B); comet 876×1200 → 43,712 B q78 | `sharp` encode on the downloaded originals | VERIFIED (2026-11-20) |
 | MOTION-19 removed blocks are all still reachable: career spine + skills + certifications on `/about`, GitHub statistics on `/data`, every project on `/work`, every experiment on `/lab`; 0 broken links across 1,476 links / 73 pages | `bun run check:links` | VERIFIED (2026-11-03) |
 | Flagship home cards come from data: `projects.json` `flagship: 1..3` (integers, contiguous from 1, only on `featured: true`); `validate-data` rejects anything else | `scripts/validate-data.mjs`, `data/projects.json`, `src/lib/data.ts` `getFlagshipProjects()` | VERIFIED (2026-11-03) |
 | Journey highlights are a rule, not a list: `toCareerHighlights()` drops `type === "contract"` and caps by year group → 6 records / 3 year groups on home; the 26-record spine stays on `/about` | `src/lib/creative/career-spine.ts`, `e2e/career-spine.spec.ts` `journey highlights — home (MOTION-19)` | VERIFIED (2026-11-03) |
@@ -171,11 +175,11 @@ both themes, measured from computed styles.
 
 ## Active work
 
-**None in progress.** MOTION-00 … MOTION-19 are verified. `MOTION-19` cut the
-home to the owner-approved six chapters (9.46 screens @1440, 194.7 / 493.8 KB)
-and deleted four organisms, three libs and four specs that lost their last
-consumer. **One sprint completed — do not start MOTION-20 in the same
-execution.**
+**None in progress.** MOTION-00 … MOTION-24 are verified. `MOTION-24` closed as
+**A0 — no new assets** (2026-11-20): the audit removed 10 dead files and one
+consumer-less atom, and the archival-plate pilot was declined by its own
+measured kill criteria rather than by taste. **One sprint completed — do not
+start MOTION-12 in the same execution.**
 
 **Agent skills (2026-10-31):** 13 review/design skills installed user-level
 (taste, impeccable, Emil ×5, GSAP ×5, web-design-guidelines); usage rules in
@@ -254,14 +258,18 @@ perception thresholds with ≥ 5 recruiters and ≥ 5 developers.
 
 ## Next action
 
-**MOTION-14 is DONE (2026-11-18). Next: MOTION-24 `READY`; do not start it in
-this execution.** Verified: both themes resolve authored tokens with hex =
-`-rgb`, every text pair ≥ AA (lowest 4.68:1, light warm) and every data series
-≥ 3.01:1; the inline palette override is gone, so the time-of-day warmth is a
-scalar and no JS writes a colour token; accent customisation removed under D-14.
-Gates: unit 1,168/1,168 (104 files), `astro check` 89, 72-page build, link
-checker 1,477 links / 73 pages 0 broken, `/` payload 193.4 / 492.7 / 32.2 KB
-with 9 islands, full Playwright 428 passed / 1 skipped / 0 failed. Screenshots
-at 1440 and 375 in both themes are in `docs/motion/frames/m14-*.jpg`; evidence
-and the obsolete page-continuity literal it uncovered are in `SESSION_LOG.md`;
-the decision is `DECISIONS.md` D-14.
+**MOTION-24 is DONE (2026-11-20) with verdict A0 — no new assets. Next:
+MOTION-12 `READY` (taste pass); do not start it in this execution.** The asset
+question is closed: `ASSETS.md` now carries a verdict for every file, the
+telephone plate fails its placement criterion at 375 px (45 px of fold left, a
+plate is ≥185 px) and its budget clause at 1200 px (301,104 B WebP), and the
+comet is deferred by the first pilot's dependency. Ten dead files (72,793 B) and
+`ProfileImage.astro` were removed; homepage transfer is unchanged at
+**502.3 KB @1440 / 141.2 KB @375**. Gates: unit 1,168/1,168 (104 files),
+`astro check` 89, 72-page build, link checker 1,477 links / 73 pages 0 broken,
+`/` payload 193.4 / 492.7 / 32.2 KB with 9 islands, full Playwright
+**427 passed / 1 skipped / 0 failed** (23.7 min; the one first-run failure was
+the gallery helper's documented hydration race, fixed by deleting its local copy
+in favour of `e2e/hydration.ts`, then 72/72).
+Evidence and the markup-scan blind spot that would have deleted a live file are
+in `ASSETS.md` §16 and `SESSION_LOG.md`.

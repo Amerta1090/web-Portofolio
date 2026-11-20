@@ -888,7 +888,7 @@ placeholder paths), full 72-page build, image probe 1440/375,
 
 ## MOTION-12 — Taste pass: tells audit and one signature move
 
-**Status:** `PLANNED` (added 2026-10-31, `RESEARCH.md` §6)
+**Status:** `READY` (2026-11-20, handed over by MOTION-24's close)
 **Priority:** P2
 **Objective:** Measure the site against the dated "AI tells" registry and keep
 only the devices that carry information; give the homepage one recognisable
@@ -1188,7 +1188,8 @@ follow-up sprint is created.
 
 ## MOTION-24 — Asset audit & "cherry on top" pilot
 
-**Status:** `PLANNED` (added 2026-10-31)
+**Status:** `DONE` (2026-11-20) — **verdict A0: no new assets.** Commit
+`motion: MOTION-24 asset audit — A0 with measured kill criterion`.
 **Priority:** P2
 **Objective:** Re-audit every asset against the MOTION-20 concept and decide,
 with evidence, whether one or two external "cherry on top" images earn a place.
@@ -1214,24 +1215,30 @@ Rive/Spline) stay rejected unless this sprint records new evidence; no bulk
 download; no hotlinking.
 
 **Tasks**
-- [ ] M24.1 Audit owned assets: served vs unserved (`sudoku-premium.png`,
+- [x] M24.1 Audit owned assets: served vs unserved (`sudoku-premium.png`,
       `ijo-plis-usdidr.png`, `nyatet-duwit-ui.jpg` — decide what the
       Observatory asset metric should count before deleting), issuer logos
       (career only, or also the certifications bento?), hero + duplicate
       hexagon avatar, lab thumbnails, gallery sequence/audio. Verdict per item.
-- [ ] M24.2 Re-run the candidate register against the concept: OBI
+- [x] M24.2 Re-run the candidate register against the concept: OBI
       "Central Telephone Office and Exchange" (1883, license verified, the only
       candidate that passed the narrative test) for the capability-map chapter;
       OBI "Great Comet of 1881" (1882, deferred) for `/data`; plus any new
       candidate the concept suggests, each license-verified from a live page.
-- [ ] M24.3 Pilot at most two, following `ASSETS.md` §5.1 (≤ 80 KB WebP at
+- [x] M24.3 Pilot at most two, following `ASSETS.md` §5.1 (≤ 80 KB WebP at
       1200 px, `<figure>` + real caption, duotone from the MOTION-14 palette in
-      both themes, one-shot reveal, static under reduced motion).
-- [ ] M24.4 Caption test: show the chapter with and without the image to 3
+      both themes, one-shot reveal, static under reduced motion). — **Not
+      shipped: the placement criterion fails at 375 by measurement and the
+      budget clause is unsatisfiable at 1200 px (§5.1 amendment).**
+- [x] M24.4 Caption test: show the chapter with and without the image to 3
       people; keep it only if it improves "what is this section about?" answers.
       Apply the kill criteria in `ASSETS.md` §5.1; record the verdict either way.
-- [ ] M24.5 Image probe at 1440 and 375; `ASSETS.md` license register row per
-      shipped item; taste `inspect` on the chapter.
+      — **Not run: there is no image to compare; recorded as not run.**
+- [x] M24.5 Image probe at 1440 and 375; `ASSETS.md` license register row per
+      shipped item; taste `inspect` on the chapter. — **Probe run (502.3 /
+      141.2 KB, unchanged). No item shipped, so no license row. `taste` has no
+      installed binary in this repo; recorded as not runnable, with the
+      screenshot/manual equivalent standing in.**
 
 **Acceptance criteria**
 - Every asset in the site has a verdict row; every external one has a verified

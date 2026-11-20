@@ -1,6 +1,8 @@
 # Motion Programme — Visual Asset Strategy
 
-**Status:** Active asset register. MOTION-11 evidence is verified 2026-11-09; no external asset is approved for production.
+**Status:** Active asset register. MOTION-11 evidence is verified 2026-11-09;
+**MOTION-24 (2026-11-20) closed the register with verdict A0 — no new assets**
+(§16). No external asset is approved for production.
 **Decision:** `DECISIONS.md` D-11.
 **Scope:** Images, archival plates, illustration, textures, icons, 3D assets, and animation assets. This document does not authorize a download, a redesign, a new dependency, or a sprint. It records what is worth considering and what is not.
 
@@ -34,7 +36,8 @@ Do these in order:
 4. **At most one archival plate, as a pilot, after 1–2.** The 1883 telephone
    exchange in `#systems-in-motion` is the only candidate that passed license and
    narrative review. It must earn its place with a caption; if it reads as
-   vintage decoration, remove it.
+   vintage decoration, remove it. **MOTION-24 evaluated it and declined it on
+   measurement, not taste — see §5.1's amendment and §16.**
 5. **No new external layer.** "No new assets" is a valid final outcome. The
    default is no external asset.
 
@@ -51,15 +54,22 @@ existing evidence is efficient.
 
 | Asset class | Files / bytes | Where it appears | Current state | Verdict |
 | --- | --- | --- | --- | --- |
-| Hero photograph | 4 files / 1.81 MB | `/` hero, above the fold | Responsive WebP set (768/1280/1920) + 1920 JPEG; 619.7 KB desktop, 112.8 KB mobile | Keep; tune compression, do not replace |
-| Project evidence | 5 existing source images + generated Tafsir SVG | 3 cards on `/`; `/work` text-first | Card images use responsive WebP variants; Tafsir map is generated from authored case-study data | Keep; no placeholder art |
-| Lab thumbnails | 27 files / 52.5 KB | `/` contact sheet, `/gallery` | ~1.9 KB each; lazy; 0 JS | Keep; the gallery is the color exception |
-| Issuer logos | 16 files / 49.4 KB | Career spine; not in the certifications bento | 1.5–5.1 KB each | Keep; optional bento is not recommended |
-| Profile images | 4 files / 87.4 KB | Hero avatar, profile surfaces | WebP/JPEG variants with `srcset` | Keep |
+| Hero photograph | 4 files / 1.49 MB | `/` hero, above the fold | Responsive WebP set (768/1280/1920) + a 1920 JPEG fallback; 437.0 KB desktop, 75.9 KB mobile | Keep; tune compression, do not replace |
+| Project evidence | 17 files / 5.12 MB (5 sources, 8 WebP variants, 1 unused portrait, Tafsir SVG) | 3 flagship cards on `/`; `/work` text-first | The 3 flagships use 384/768/1152 WebP variants; 10 files are unserved sources or fallbacks (§2.5) | Keep; no placeholder art |
+| Lab thumbnails | 27 files / 52.5 KB | `/` contact sheet, `/lab` | ~1.9 KB each; lazy; 0 JS | Keep; the gallery is the color exception |
+| Issuer logos | 15 files / 46.2 KB | Career spine only; not in the certifications bento | 2.1–5.1 KB each; 11 render in the spine, 4 back `badge` fields no surface shows (§2.5) | Keep; bento stays text-only |
+| Profile images | 1 file / 22.2 KB | Hero avatar, via `<image href>` in `HeroAvatar.tsx` | single 400×500 WebP; the three unused rasters were deleted in MOTION-24 | Keep |
 | Sequence frames | 302 files / 12.19 MB | `/gallery` experiment only | Lazy; wheel-driven | Out of scope; gallery budget |
 | Audio | 1 file / 5.03 MB | `/gallery` experiments | User-initiated | Out of scope |
 | SVG diagrams | inline | Signal Loom, career spine, charts | ~0 transfer beyond HTML | Keep; core language |
 | Noise overlay | CSS/SVG | Global | Tiny | Keep |
+
+**Measured total, 2026-11-20:** `public/images` holds **369 files / 18,939,355 B**.
+MOTION-24 removed 10 files (6 placeholder SVGs, 1 unused issuer logo, 3 unused
+profile rasters) and one dead atom; before it the tree was 380 files /
+19,012,932 B. Only **2.17 MB** of what remains is referenced by markup — §2.5
+gives a verdict for every unserved file rather than treating "unserved" as
+"waste".
 
 **Existing files are treated as owned by the site author.** No external license
 is recorded for them; this register covers new external assets. The project
@@ -91,7 +101,9 @@ After MOTION-01.5 (2026-10-22, same method and script):
 The three raster project thumbnails cost **15.2 KB** on `/`; the Tafsir SVG
 adds 1.2 KB. The hero remains the largest image. MOTION-11 measured the complete
 home at **502.3 KB desktop / 141.2 KB mobile**; see §15. Full prior byte record:
-§13.
+§13. Re-measured after MOTION-24's deletions (2026-11-20,
+`.opencode/probe-m24-images.mjs`): **502.3 / 141.2 KB, unchanged** — every file
+that was removed was already never transferred.
 
 ### 2.3 Project thumbnail math
 
@@ -119,40 +131,58 @@ Table, `sizes` expression, and the hero A/B: §13.
 
 ### 2.4 Page shape
 
-At 1440 px the homepage is **25,542 px** tall. `#career` is 6,015 px and
-`#github` is 6,133 px; together they are **47.6%** of the page. The page is long
-because of evidence, not because of missing decoration. Adding a plate adds
-length; it must sit **beside** content or replace empty space, never create a new
-band.
+**VERIFIED (2026-11-20, `.opencode/probe-m24-geo2.mjs`, Chromium 1228, reduced
+motion):** the homepage is six chapters — hero → projects → systems-in-motion →
+journey → creative-lab → contact (MOTION-19). The table below **replaces** the
+pre-MOTION-19 ten-chapter measurement (25,542 px) that used to stand here; that
+number described a page that no longer exists, and §5.1's pilot was being
+evaluated against it.
 
-| Section | Height @1440 |
-| --- | --- |
-| Hero | 836 |
-| About | 1,137 |
-| Systems in Motion | 3,752 |
-| Career | 6,015 |
-| Projects | 1,545 |
-| Creative Lab | 2,449 |
-| Skills | 2,020 |
-| Certifications | 808 |
-| GitHub | 6,133 |
-| Contact | 847 |
+| Chapter | Height @1440×900 | Height @375×812 |
+| --- | ---: | ---: |
+| Hero | 836 | 748 |
+| Projects (3 flagships) | 996 | 1,835 |
+| Systems in Motion | 2,003 | 2,975 |
+| Journey highlights | 2,306 | 2,634 |
+| Creative Lab teaser | 1,037 | 949 |
+| Contact | 847 | 1,141 |
+| **Page** | **8,511** = 9.46 screens | **11,080** = 13.65 screens |
 
-### 2.5 Owned but unserved
+The page is long because of evidence, not because of missing decoration. Adding
+a plate adds length; it must sit **beside** content or replace empty space, never
+create a new band. §5.1 shows what that rule costs at 375.
 
-- `projects.json` `images[]` has three files that are **not rendered anywhere**:
-  `sudoku-premium.png` (1,852,209 B), `ijo-plis-usdidr.png` (571,976 B),
-  `nyatet-duwit-ui.jpg` (11,186 B). They are counted by
-  `src/lib/observatory/metrics.ts` as an asset signal, so deleting them would
-  change a displayed complexity score. **Do not delete blindly**; decide whether
-  the metric should count unserved files first.
-- 16 issuer logos exist in `public/images/logos/` and are used by the career
-  spine. The certifications bento is text-only. Adding logos to the bento is an
-  owned-asset opportunity, but it is **not recommended now**: the spine already
-  provides visual recognition, and the bento's typographic hierarchy is working.
-- `public/images/sequence/` (12.19 MB, 302 files) and `public/audio/` (5.03 MB)
-  belong to gallery experiments. They are user-initiated and lazy; the gallery
-  owns the experimental budget. Out of scope.
+### 2.5 Owned but unserved — verdict per item (MOTION-24, 2026-11-20)
+
+**Method.** `.opencode/probe-served-images.mjs` walks every `dist/**/*.html` and
+`.css`, collects the paths a browser actually fetches (`<img src>`,
+`<img srcset>`, `<source srcset>`, CSS `url()`), and diffs them against
+`dist/images`: **370 files in `dist`; 53 referenced by markup (2.17 MB), 317 not
+referenced (15.90 MB)**, of which 302 are sequence frames (11.62 MB). The method
+has two blind spots, and both are named in the rows that hit them: it cannot see
+`<image href>` inside inline SVG, and it cannot see island props. "Unserved" is a
+fact about transfer, not a verdict; the verdict is the last column.
+
+| Item | Bytes | Why nothing fetches it | Verdict |
+| --- | ---: | --- | --- |
+| `projects/retro-game-portfolio.png` + `-1152/-768/-384.webp` | 1,873,549 + 56,372 + 31,174 + 10,218 | MOTION-19 cut home to three flagships and `/work` renders no card images, so the project appears on no surface | **Keep.** Backs `projects.json` (`image`, `image_variants`) and the Observatory asset count; never transferred, so it costs 0 bytes. Deleting would change a displayed `/observatory` number |
+| `projects/sudoku-premium.png` | 1,852,209 | Not a flagship; reaches the page only as serialized island props, and no card renders it | **Keep**, same reason |
+| `projects/ijo-plis-usdidr.png` | 571,976 | 1,856 × 2,561 portrait; the card box is 16:9, so `object-cover` would crop most of it, and no variants were generated | **Keep** as an unused source; recorded as unusable for the card shape |
+| `projects/nyatet-duwit.png`, `-500.webp`, `-384.webp`, `nyatet-duwit-ui.jpg` | 37,340 + 3,104 + 2,238 + 11,186 | Nyatet is not a flagship and `/work` is text-first | **Keep**, same reason |
+| `profile/profile-400x500.webp` | 22,168 | **Probe false positive.** `HeroAvatar.tsx` renders `<image href>`, which the markup scan cannot see; the transfer probe fetches 21.9 KB on `/` at both widths | **Keep, treat as served.** Never delete on the strength of a markup scan alone |
+| `logos/skilvul.jpg`, `google.jpg`, `cisco.jpg`, `efset.jpg` | 3,243 + 2,861 + 2,214 + 2,079 | The spine renders the 15 most recent dated certifications, and all 15 come from 3 issuers (Dicoding, DeepLearning.AI, Google Cloud Skills Boost); the certifications bento is text-only | **Keep.** They back `badge` fields on 14 certifications; deleting them would break `validate-data`'s file check. "Logos in the bento" stays available and still not recommended |
+| `placeholder/{avatar,badge,blog,company,issuer,trophy}.svg` | 4,422 | No data file may reference `/placeholder/` (`validate-data.mjs`) and no markup did | **Deleted 2026-11-20**; verified 0 references in `src`, `data`, `dist` |
+| `logos/coursera-standford.jpg` | 3,161 | No `certifications.json` record names Coursera or Stanford, and no file references this logo. (The unused `data/licenses_certifications.json` does mention them inside an issuer string, but it points at no image and no code imports it.) | **Deleted 2026-11-20** |
+| `ProfileImage.astro` + `profile-400x500.jpg` + `profile-{300x375,200x250}.webp` | 777 B code + 43,156 + 14,354 + 7,700 | The atom had 0 consumers; the 400×500 WebP it pointed at is the file `HeroAvatar` actually uses, so it stayed | **Deleted 2026-11-20** |
+| `hero/hero-bg-1920.jpg` | 755,619 | Referenced as the `<img>` fallback inside `<picture>`; WebP-capable browsers fetch only the `<source>` | **Keep** as the no-WebP fallback. In `dist`, never transferred by modern browsers — a fallback, not waste |
+| `projects/ijo-plis.png` | 567,020 | Same class: the `<img src>` fallback behind a WebP `srcset` | **Keep** as fallback |
+| `sequence/` 302 frames | 11.62 MB | `/gallery` experiment only; loaded on wheel or click | Out of scope; the gallery owns that budget |
+| `public/audio/love.mp3` | 5.03 MB | Fetched only when a demo button is clicked in `AudioVisualizer` | Out of scope; user-initiated |
+
+**Net effect:** 10 files (72,793 B) and one dead atom removed; homepage transfer
+unchanged at 502.3 / 141.2 KB; no reader-visible change. The files that remain
+unserved are kept for a stated reason, and each of those reasons is a data
+dependency or a fallback, not a hope.
 
 ### 2.6 Structural defects that assets cannot fix
 
@@ -227,6 +257,11 @@ or 3D icon packs as a new visual layer.
 This is the default inside A. If the plate pilot fails its caption test, A
 collapses to A0. That is an acceptable final answer, not a failure.
 
+**MOTION-24 took A0 (2026-11-20).** It did not get as far as a caption test: the
+§5.1 placement fails its own kill criterion by measurement at 375 px, the budget
+clause cannot be met at 1200 px, and the image family contradicts the approved
+MOTION-20 direction. Record and evidence: §16.
+
 ## 5. Candidate register (plausible)
 
 Heritage Type and Old Book Illustrations were **starting examples, not a
@@ -236,8 +271,8 @@ narrative test.
 
 | Candidate | Section & job | Identity contribution | Motion potential | License / credit | Format / budget | Verdict |
 | --- | --- | --- | --- | --- | --- | --- |
-| **OBI — “Central Telephone Office and Exchange,” 1883**<br>[item](https://www.oldbookillustrations.com/illustrations/opera-telephone-exchange/) · [1600 JPEG](https://www.oldbookillustrations.com/site/assets/high-res/n-d-1883/opera-telephone-exchange-1600.jpg) · [1200 JPEG](https://www.oldbookillustrations.com/site/assets/high-res/n-d-1883/opera-telephone-exchange-1200.jpg) | `#systems-in-motion`, compact figure before the map; caption connects a manual switchboard to the capability map | Monochrome wood engraving: operators, cables, under-floor cutaway. Literal ancestor of “systems in motion”; matches sage/clay and the SVG diagram language; not a generic vintage texture | One-shot reveal only; no parallax; static under reduced motion; must not compete with the signal dots | OBI: no use restriction, no warranty; 1883 work is pre-1928 US public domain; no credit required, credit “Old Book Illustrations / Wellcome Library”; local law is the user's responsibility | 1600×961, 512,290 B JPEG; 1200 px 287,725 B; target 1200×721 WebP ≤80 KB (**ASSUMPTION**); lazy/async; explicit dimensions; `<figure>` + `<figcaption>` | **Staged pilot only.** Kill if it reads as decoration or does not improve first-view comprehension |
-| **OBI — “The Great Comet of 1881,” 1882**<br>[item](https://www.oldbookillustrations.com/illustrations/comet-1881/) · [1600 JPEG](https://www.oldbookillustrations.com/site/assets/high-res/1882/comet-1881-1600.jpg) · [1200 JPEG](https://www.oldbookillustrations.com/site/assets/high-res/1882/comet-1881-1200.jpg) | `/observatory`, compact figure near the timeline or insights; “observation as measurement” | Color lithograph by Trouvelot; beautiful, but colorful and portrait; needs duotone to fit the editorial palette | One-shot reveal; no orbit; static under reduced motion | OBI: no use restriction; 1882 work is public domain; credit “Old Book Illustrations / NYPL”; no credit required | 1600 px JPEG 135,269 B; 1200 px 71,198 B; portrait; target ≤60 KB WebP at 1200 px; mobile may be tall | **Defer.** Second pilot only if the first succeeds and `/observatory` needs a method marker |
+| **OBI — “Central Telephone Office and Exchange,” 1883**<br>[item](https://www.oldbookillustrations.com/illustrations/opera-telephone-exchange/) · [1600 JPEG](https://www.oldbookillustrations.com/site/assets/high-res/n-d-1883/opera-telephone-exchange-1600.jpg) · [1200 JPEG](https://www.oldbookillustrations.com/site/assets/high-res/n-d-1883/opera-telephone-exchange-1200.jpg) | `#systems-in-motion`, compact figure before the map; caption connects a manual switchboard to the capability map | Monochrome wood engraving: operators, cables, under-floor cutaway. Literal ancestor of “systems in motion”; matches sage/clay and the SVG diagram language; not a generic vintage texture | One-shot reveal only; no parallax; static under reduced motion; must not compete with the signal dots | OBI: no use restriction, no warranty; 1883 work is pre-1928 US public domain; no credit required, credit “Old Book Illustrations / Wellcome Library”; local law is the user's responsibility | 1600×961, 512,290 B JPEG; 1200 px 287,725 B; **measured 2026-11-20:** 1200×721 WebP q78 = 301,104 B (q50 = 249,670 B; AVIF q45 = 202,163 B); 640 px q78 = 78,020 B; lazy/async; explicit dimensions; `<figure>` + `<figcaption>` | **Not shipped (MOTION-24).** The placement kill criterion was measured and failed at 375 (45 px of fold left, plate ≥185 px), and the ≤80 KB clause only holds at ≤640 px (§5.1, §16) |
+| **OBI — “The Great Comet of 1881,” 1882**<br>[item](https://www.oldbookillustrations.com/illustrations/comet-1881/) · [1600 JPEG](https://www.oldbookillustrations.com/site/assets/high-res/1882/comet-1881-1600.jpg) · [1200 JPEG](https://www.oldbookillustrations.com/site/assets/high-res/1882/comet-1881-1200.jpg) | `/observatory`, compact figure near the timeline or insights; “observation as measurement” | Color lithograph by Trouvelot; beautiful, but colorful and portrait; needs duotone to fit the editorial palette | One-shot reveal; no orbit; static under reduced motion | OBI: no use restriction; 1882 work is public domain; credit “Old Book Illustrations / NYPL”; no credit required | 1600 px JPEG 135,269 B; 1200 px 71,198 B; **measured 2026-11-20: 876 × 1200 portrait; WebP q78 = 43,712 B**; target ≤60 KB WebP at 1200 px; mobile may be tall | **Deferred by its own dependency.** It is explicitly the *second* pilot, gated on the first succeeding — and there is no first. Its budget does fit; its chapter's family (data-derived charts) did not change |
 | **Biodiversity Heritage Library** | None yet; natural-history plates would need a narrative job | Could support a “specimen/classification” metaphor, but it would add a museum layer | None | **NOT VERIFIED.** Licensing page returned 404 twice this session; report-sourced only | Unknown | **Do not use** until the license is verified from a live source |
 | **Wikimedia Commons** | Fallback for a specific historical image | Variable; must be chosen per item | One-shot | Per-file `extmetadata`; some files are CC BY-SA (attribution/share-alike) or PD; audit each file | Variable; originals are often huge; downscale | **Fallback only**, not a source for a layer |
 | **Library of Congress** | Possible historical image; no item selected | Variable | One-shot | **NOT VERIFIED.** Item rights returned 403; many items are PD, some are restricted | Variable; often large TIFF/JPEG | **Defer** until item-level rights are verified |
@@ -274,6 +309,43 @@ scrub. Reduced motion: static, final state, before scroll.
 - It reads as a vintage skin rather than an argument about connection.
 - It adds a second motion focus that competes with the signal dots.
 
+#### Amendment — measured 2026-11-20 (MOTION-24)
+
+**The pilot does not ship, and it stopped before the caption test.** Three
+independent grounds, each measured:
+
+1. **Placement fails its own kill criterion at 375.** `#systems-in-motion` starts
+   at y=2,647 and its first `[data-signal-node]` at y=3,414 — **767 px into a
+   2,975 px chapter, leaving 45 px of the 812 px fold**. The intro row above the
+   map is 463 px tall. A plate in the reading column (≈329 px wide) is **198 px
+   tall** at the engraving's 1200:721 ratio (185 px for a 16:9 crop), so the
+   first map node would land at 952–965 px — **140–153 px below the fold**.
+   There is no version of "above the map" that fits in 45 px.
+2. **At 1440 it could fit, which is exactly why the mobile number decides.** The
+   chapter is 2,003 px, the first node sits 670 px in with **230 px** of fold
+   left, and the intro row is 302 px. A third column would grow that row to
+   ~360 px (600 px wide at 1200:721) and move the node to ~728 px — still inside
+   the fold. A placement that works on one viewport and breaks the other is not
+   a placement; the spec says "above or beside the map intro", and the "above"
+   half is what 375 forbids.
+3. **The budget clause is unsatisfiable at 1200 px.** The 1200×721 engraving
+   compresses to **301,104 B** at WebP q78 (q50 = 249,670 B; AVIF q45 =
+   202,163 B) — 3.8× the 80 KB ceiling, because dense wood engraving is the worst
+   case for a block codec. ≤80 KB is reachable only at **≤640 px** (78,020 B),
+   which is 1× in a 600 px desktop column and visibly soft at 2× DPR. The file
+   would have to ship at a size the site does not use for evidence images.
+
+**A fourth, non-geometric ground.** MOTION-20's approved direction (§14) gives
+`#systems-in-motion` **data-derived diagrams** and reserves the single archival
+page for projects. A found 1883 engraving is a different family from "real
+outputs as lit exhibits"; adding it would be a new direction, not a cherry on the
+approved one.
+
+**Caption test: not run.** M24.4 asks for three readers to compare the chapter
+with and without the image. There is no image to compare, and the kill criterion
+above stops the pilot before a caption exists. Recording "not run" is the honest
+result; inventing a test would be the false record this sprint exists to avoid.
+
 ## 6. Rejected or deferred groups
 
 For rejected sources, the link is to the collection/license page; no individual
@@ -301,6 +373,9 @@ type, JetBrains Mono for labels. No replacement is proposed.
    1280 variants for cards; explicit `width`/`height`; no CLS.
 3. **Budget.** Plate ≤80 KB at 1200 px; project card ≤80 KB at 2×; hero ≤450 KB
    at 1440. Record actual bytes in this file. If it exceeds, compress or reject.
+   **Measured 2026-11-20:** a dense wood engraving lands at **301 KB** at 1200 px
+   WebP q78 and only reaches 78 KB at 640 px — the ceiling is a real filter, not
+   a formality (§5.1).
 4. **Loading.** `loading="lazy"` and `decoding="async"` below the fold; the hero
    is not lazy; no above-the-fold replacement with an external asset.
 5. **Color.** Duotone via CSS `filter: grayscale(1)` + `mix-blend-mode` on a
@@ -342,8 +417,8 @@ type, JetBrains Mono for labels. No replacement is proposed.
 | Item | Terms read | Commercial | Attribution | Date | Label |
 | --- | --- | --- | --- | --- | --- |
 | OBI — Terms of Use | “We don't limit the use of the illustrations available on our site, but we accept no responsibility…” Text content is CC BY-NC-SA 4.0; structured data asks for credit/link | Not restricted by OBI; the user must comply with local copyright law | Not required for illustrations; recommended. Text/structured data have their own terms | 2026-10-21 | VERIFIED ([terms](https://www.oldbookillustrations.com/terms-of-use/)) |
-| OBI — telephone exchange | 1883; wood engraving; engraver E. Alix; source Wellcome Library / Internet Archive; *Les nouvelles conquêtes de la science*, vol. 1, Figuier; p. 427; 1600×961; 512,290 B; 1200 px 287,725 B | Underlying 1883 work is pre-1928 US public domain; OBI does not restrict use | Credit “Old Book Illustrations / Wellcome Library” (recommended) | 2026-10-21 | VERIFIED ([item](https://www.oldbookillustrations.com/illustrations/opera-telephone-exchange/)) |
-| OBI — comet of 1881 | 1882; lithograph; Trouvelot; source NYPL; *The Trouvelot astronomical drawings: atlas*; 1600 px JPEG 135,269 B; 1200 px 71,198 B | Underlying 1882 work is public domain; OBI does not restrict use | Credit “Old Book Illustrations / NYPL” (recommended) | 2026-10-21 | VERIFIED (bytes; dimensions TODO) |
+| OBI — telephone exchange | 1883; wood engraving; engraver E. Alix; source Wellcome Library / Internet Archive; *Les nouvelles conquêtes de la science*, vol. 1, Figuier; p. 427; 1600×961; 512,290 B; 1200 px 287,725 B (1200×721) | Underlying 1883 work is pre-1928 US public domain; OBI does not restrict use | Credit “Old Book Illustrations / Wellcome Library” (recommended) | 2026-10-21, re-read 2026-11-20 | VERIFIED ([item](https://www.oldbookillustrations.com/illustrations/opera-telephone-exchange/)) |
+| OBI — comet of 1881 | 1882; lithograph; Trouvelot (1827–1895); source NYPL; *The Trouvelot astronomical drawings: atlas*, New York: Charles Scribner's Sons, plate 11; **876 × 1200 portrait** (measured 2026-11-20); 1600 px JPEG 135,269 B; 1200 px 71,198 B; WebP q78 43,712 B | Underlying 1882 work is public domain; OBI does not restrict use | Credit “Old Book Illustrations / NYPL” (recommended) | 2026-10-21, re-read 2026-11-20 | VERIFIED ([item](https://www.oldbookillustrations.com/illustrations/comet-1881/)) |
 | BHL | Licensing page 404 twice this session; report-sourced only | **Do not claim** | Unknown | 2026-10-21 | TODO |
 | LoC | Item rights 403; report-sourced only | **Do not claim** | Unknown | 2026-10-21 | TODO |
 | Unsplash | License text 401/404 | **Do not claim** | Unknown | 2026-10-21 | TODO |
@@ -360,13 +435,13 @@ commercial release. This is honest caution, not a blocker for a portfolio.
 
 | Question | Why it matters | Owner |
 | --- | --- | --- |
-| Can the 1200 px telephone JPEG become a ≤80 KB WebP without visible loss? | The pilot's budget depends on it | Asset pilot (after steps 1–2) |
+| ~~Can the 1200 px telephone JPEG become a ≤80 KB WebP without visible loss?~~ **Answered 2026-11-20: no — 301,104 B at q78, 78,020 B only at 640 px** | The pilot's budget depended on it; it now filters the candidate out | Closed — §5.1 |
 | ~~What is the actual homepage image-transfer target after variants?~~ **Answered 2026-10-22: 543.5 KB @1440 / 187.9 KB @375 measured** | Current 3.15/2.64 MB is indefensible; targets in §7 are not measured | Closed — §13 |
-| Do BHL/LoC/Unsplash licenses permit commercial use? | No claim is allowed without a source | Asset research; do not use until verified |
-| What are the Wellcome/IA scan terms? | OBI terms cover OBI; the underlying scan may have its own terms | Asset pilot |
-| Should `projects.json` `images[]` count in the Observatory complexity score if the files are not rendered? | Deleting three unserved files would change a displayed number | Data/Observatory owner |
-| Should the 16 issuer logos appear in the certifications bento? | Owned asset, no license issue; could be logo soup | Design review; not recommended now |
-| Does the plate improve first-view comprehension? | The pilot's only real justification | Reader test / caption test |
+| Do BHL/LoC/Unsplash licenses permit commercial use? | No claim is allowed without a source | Asset research; do not use until verified — still open |
+| What are the Wellcome/IA scan terms? | OBI terms cover OBI; the underlying scan may have its own terms | Open, but nothing depends on it while no plate ships |
+| ~~Should `projects.json` `images[]` count in the Observatory complexity score if the files are not rendered?~~ **Answered 2026-11-20: yes — it is an evidence register; files stay, the number stays** | Deleting three unserved files would have changed a displayed number for no user benefit | Closed — §2.5 |
+| ~~Should the 16 issuer logos appear in the certifications bento?~~ **Answered 2026-11-20: no — 15 logos, 4 back `badge` fields no surface shows, bento stays text-only** | Owned asset, no license issue, but it would be logo soup | Closed — §2.5 |
+| Does the plate improve first-view comprehension? | The pilot's only real justification | **Not run (2026-11-20)** — no plate shipped; it only matters if the placement criterion ever passes |
 
 ## 11. Sources
 
@@ -386,12 +461,20 @@ commercial release. This is honest caution, not a blocker for a portfolio.
 
 ## 12. Next action
 
-Status 2026-10-31: steps 1–2 of §1 are done (MOTION-01.5 image hygiene, MOTION-05
+Status 2026-11-20: steps 1–2 of §1 are done (MOTION-01.5 image hygiene, MOTION-05
 M5.0 Signal Loom alignment, MOTION-06 M6.0 BootSequence entry). Step 5 — the
-single archival plate pilot — **had no owning sprint** and was never run. It now
-belongs to **MOTION-24 (Asset audit & "cherry on top" pilot)**, which runs after
-the concept (MOTION-20), owned project evidence (MOTION-11), and the colour
-system (MOTION-14). Until then: **do not add an external asset.**
+single archival plate pilot — was evaluated by **MOTION-24** and **declined on
+measured grounds** (§5.1 amendment, §16). The asset question is now closed:
+
+- **Do not add an external asset.** No candidate survived the placement and
+  budget criteria, and every chapter's approved family is already owned or
+  data-derived (§14).
+- **Do not delete a file because a markup scan calls it unserved.** §2.5 records
+  one such file (`profile-400x500.webp`) that is fetched through an SVG
+  `<image href>` the scan cannot see. Confirm with a transfer probe first.
+- If a future sprint still wants a plate, it must first change the **layout**
+  (make room in the chapter) or the **chapter's family** (a D-13 decision) —
+  choosing a prettier picture cannot satisfy a criterion that is geometric.
 
 ## 13. Shipped: image hygiene (MOTION-01.5, 2026-10-22)
 
@@ -590,3 +673,50 @@ system map, whose source, owner, date, and bytes are recorded explicitly.
 The remaining existing NyatetDuwit and Sudoku originals remain in the data
 layer as unserved media inputs, not card images. This sprint does not delete
 those files or rewrite the Observatory's asset metric.
+
+## 16. Sprint record — MOTION-24 asset audit (2026-11-20)
+
+**Verdict: A0 — no new assets.** Both halves of the sprint ran. The audit found
+and removed real dead weight; the pilot was measured against its own kill
+criteria and declined before a caption existed. Nothing a reader sees changed.
+
+### 16.1 What was measured
+
+| Measurement | Method | Result |
+| --- | --- | --- |
+| Homepage chapter geometry | `.opencode/probe-m24-geo2.mjs`, Chromium 1228, reduced motion | **8,511 px @1440** (9.46 screens) / **11,080 px @375** (13.65 screens); first map node **670 / 767 px** into `#systems-in-motion`; fold slack **230 / 45 px**; intro row **302 / 463 px** |
+| Served vs unserved images | `.opencode/probe-served-images.mjs` — markup (`img`/`source`/CSS `url()`) vs `dist/images` | **370 files in `dist`; 53 referenced (2.17 MB); 317 not (15.90 MB)**, of which 302 sequence frames = 11.62 MB |
+| Homepage image transfer | `.opencode/probe-m24-images.mjs` — `transferSize` after a full scroll | **502.3 KB @1440 / 141.2 KB @375**, unchanged by the deletions |
+| Telephone plate compression | `sharp` on the OBI 1200×721 JPEG | WebP **q78 = 301,104 B**; q50 = 249,670 B; AVIF q45 = 202,163 B; 960 px q78 = 192,904 B; 720 px = 101,542 B; **640 px = 78,020 B** |
+| Comet plate | `sharp` metadata + encode | **876 × 1200 portrait**; WebP q78 = 43,712 B |
+| Issuer logo coverage | `data/certifications.json` + the spine's 15-event selection | 15 certifications from **3 issuers**; **4 logos** (`skilvul`, `google`, `cisco`, `efset`) back `badge` fields no surface renders |
+| Profile image truth | `HeroAvatar.tsx` markup + transfer probe | the markup scan misses `<image href>`; the transfer probe fetches **21.9 KB** on `/` at both widths |
+
+### 16.2 What changed
+
+| Removed | Bytes | Why it was dead |
+| --- | ---: | --- |
+| `public/images/placeholder/{avatar,badge,blog,company,issuer,trophy}.svg` | 4,422 | `validate-data.mjs` forbids any `/placeholder/` reference; 0 refs in `src`/`data`/`dist` |
+| `public/images/logos/coursera-standford.jpg` | 3,161 | no certification lists Coursera or Stanford |
+| `src/components/atoms/ProfileImage.astro` | 777 (source) | 0 consumers |
+| `public/images/profile/profile-400x500.jpg` | 43,156 | only the deleted atom referenced it |
+| `public/images/profile/profile-{300x375,200x250}.webp` | 22,054 | only the deleted atom referenced them |
+| **Total** | **72,793 B + 777 B source** | |
+
+`profile-400x500.webp` was **not** removed: `HeroAvatar` renders it through an
+SVG `<image href>`, which the markup scan cannot see.
+
+### 16.3 Deliberately not changed
+
+- `projects.json` `images[]` keeps its files and still counts in
+  `complexityScore` (§2.5, §10). Deleting them would change a displayed
+  `/observatory` number and remove the only owned evidence if a project returns
+  to a surface.
+- The 4 unserved issuer logos stay: they back `badge` fields on 14
+  certifications, and `validate-data` fails if a referenced file is missing.
+- `hero-bg-1920.jpg` (755,619 B) and `ijo-plis.png` (567,020 B) stay as no-WebP
+  fallbacks. They are referenced by markup and never transferred by a
+  WebP-capable browser — a fallback, not waste.
+- No new dependency, no new JS, no new section, no colour or type change, no
+  change to the six-chapter home. The sprint is docs + deletions only.
+

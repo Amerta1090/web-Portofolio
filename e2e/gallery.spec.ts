@@ -1,34 +1,22 @@
-import { type Page, expect, test } from "@playwright/test";
-import { waitForExperimentReady } from "./hydration";
+import { expect, test } from "@playwright/test";
+import { openExperiment, waitForExperimentReady } from "./hydration";
 
 /**
- * Robust card-open helper: scope to the experiments grid, scroll the card into
- * view, click it, then wait for the modal (see sprint detAIministic D4).
+ * The card-open helper is the shared one in `./hydration`.
  *
- * The "is it really open" condition lives in `./hydration` so that this helper and
- * the 13 deep-link `beforeEach` blocks cannot drift apart again; see
- * `waitForExperimentReady` for the measurement that forced the change.
+ * It waits for two independent conditions, and they are not interchangeable:
+ * `GalleryGrid` is `client:load`, so a click landing before React attaches is
+ * dropped silently (hydration), and each experiment is a `React.lazy` chunk
+ * behind a `Suspense` fallback, so the shell exists before its controls do
+ * (`waitForExperimentReady`).
  *
- * KNOWN GAP — this local helper does **not** wait for the island to hydrate, so a
- * click landing before `GalleryGrid` (`client:load`) attaches its handlers is still
- * dropped silently. The doc comment here used to claim it avoided "the hydration
- * race"; it avoided the shell-vs-contents race, not this one. In practice every
- * test in this file does a `goto` plus a heading/card assertion first, which adds
- * enough settling time to hide it; `recommend.spec.ts` went straight from `goto` to
- * `click` and failed once in a 7-minute run for exactly this reason.
- *
- * `openExperiment` in `./hydration` is the converged version (hydration wait +
- * `waitForExperimentReady`) and is what `recommend.spec.ts` now uses. Swapping this
- * file over is left undone on purpose: it would touch 71 currently-green tests in a
- * task about `useGSAP`, and re-proving a working gate is its own cost (see the
- * M0.6.5 lesson). Recorded as a latent race, not silently fixed.
+ * This file used to carry a local copy that only waited for the second one. That
+ * gap was recorded as a latent race — and it fired: the MOTION-24 full run
+ * (`--workers=1`, 23.7 min) failed `gallery.spec.ts:188` with
+ * `waiting for locator('[data-modal-content]')`, i.e. a dead click, and passed in
+ * isolation. The root cause had already been diagnosed and the converged helper
+ * already existed, so the copy was deleted rather than annotated again.
  */
-async function openExperiment(page: Page, name: string) {
-  const grid = page.locator("[aria-label='Experiments']");
-  await grid.getByText(name).first().scrollIntoViewIfNeeded();
-  await grid.getByText(name).first().click();
-  await waitForExperimentReady(page);
-}
 
 test.describe("Gallery page", () => {
   test("loads with experiment cards", async ({ page }) => {

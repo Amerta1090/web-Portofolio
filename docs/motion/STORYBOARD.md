@@ -323,9 +323,11 @@ Rules for this storyboard:
 - **Motion intent:** tiles settle without a uniform cascade; the dominant tile
   lands first.
 - **Current state:** 0 JS bento, `<details open>` per issuer.
-- **Asset intent:** 16 issuer logos already exist and are used by the career
-  spine. Keep the bento text-first; do not add logo soup. If logos are added
-  later, they must be owned, small, and consistent with the spine.
+- **Asset intent:** 15 issuer logos exist (measured 2026-11-20; the former
+  "16" counted a Coursera/Stanford file no certification references, deleted in
+  MOTION-24) and are used by the career spine. Keep the bento text-first; do not
+  add logo soup. If logos are added later, they must be owned, small, and
+  consistent with the spine.
 - **Target:** a short dominant-first entry (MOTION-04/07).
 - **Reduced motion:** static bento.
 - **Status:** structure DONE; choreography PLANNED.

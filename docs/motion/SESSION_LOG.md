@@ -1370,3 +1370,122 @@ stays at all.
 
 **Commit:** `motion: MOTION-14 dark-room palette in both themes` (created after
 verification).
+
+## 2026-11-20 — MOTION-24 Asset audit → A0 (sprint complete)
+
+**Verdict: A0 — no new assets.** Both halves of the sprint ran; one produced
+deletions, the other produced a measured refusal. Nothing a reader sees changed.
+
+**M24.1 — audit, with a verdict per file.** `.opencode/probe-served-images.mjs`
+walks every `dist/**/*.html` and `.css`, collects what a browser actually fetches
+(`img src|srcset`, `source srcset`, CSS `url()`) and diffs it against
+`dist/images`: **370 files in `dist`; 53 referenced (2.17 MB); 317 not (15.90
+MB)**, of which 302 are gallery sequence frames (11.62 MB, out of scope). The
+number is a fact about transfer, not a verdict — `ASSETS.md` §2.5 now gives a
+verdict for every unserved row instead of calling the set "waste".
+
+Removed (VERIFIED 0 references in `src`, `data`, `dist` before deletion):
+
+| Removed | Bytes | Why it was dead |
+| --- | ---: | --- |
+| `public/images/placeholder/{avatar,badge,blog,company,issuer,trophy}.svg` | 4,422 | `validate-data.mjs` rejects any `/placeholder/` reference; none existed |
+| `public/images/logos/coursera-standford.jpg` | 3,161 | no `certifications.json` record names Coursera or Stanford (issuers: Dicoding 23, DeepLearning.AI 19, Skilvul 7, GCSB 6, Cisco 4, Google 2, EF SET 1); the unused `data/licenses_certifications.json` mentions them in an issuer string but references no image and no code imports it |
+| `src/components/atoms/ProfileImage.astro` | 777 source | 0 consumers repo-wide |
+| `public/images/profile/profile-400x500.jpg` | 43,156 | only the deleted atom referenced it |
+| `public/images/profile/profile-{300x375,200x250}.webp` | 22,054 | same |
+
+`profile-400x500.webp` **stayed**: `HeroAvatar.tsx:43` renders it through an SVG
+`<image href>`, which a markup scan cannot see. The transfer probe proves it is
+fetched (21.9 KB on `/` at both widths). **This is the trap the sprint exists to
+avoid** — deleting on the strength of a markup scan would have broken the hero
+avatar with no error anywhere.
+
+**M24.3 — the pilot was declined by its own criteria, before a caption existed.**
+
+1. **Placement fails at 375.** `#systems-in-motion` starts at y=2,647 and its
+   first `[data-signal-node]` at y=3,414 — 767 px into a 2,975 px chapter, with
+   **45 px of the 812 px fold left**. The intro row is 463 px. A plate in the
+   reading column (≈329 px) is 198 px tall at 1200:721, so the first map node
+   lands 140–153 px **below** the fold. No "above the map" placement fits in
+   45 px.
+2. **1440 would fit — which is exactly why the mobile number decides.** Chapter
+   2,003 px, first node 670 px in, 230 px of slack, intro row 302 px; a third
+   column moves the node to ~728 px, still inside the fold. A placement that
+   works on one viewport and breaks the other is not a placement.
+3. **Budget clause unsatisfiable at 1200 px.** The 1200×721 engraving is
+   **301,104 B** at WebP q78 (q50 249,670; AVIF q45 202,163) — 3.8× the 80 KB
+   ceiling, because dense wood engraving is the worst case for a block codec.
+   ≤80 KB is reachable only at ≤640 px (78,020 B), which is 1× in a 600 px
+   column and soft at 2× DPR.
+4. **Family mismatch (non-geometric).** MOTION-20's approved direction gives
+   `#systems-in-motion` data-derived diagrams and reserves the single archival
+   page for projects (§14). A found 1883 engraving is a different family.
+
+**M24.4 — caption test: NOT RUN, and recorded as not run.** There is no image to
+compare; the kill criterion above stops the pilot before a caption exists.
+Inventing a three-person test would be exactly the false record this sprint is
+built to prevent.
+
+**M24.5 — probes.** Image transfer after the deletions: **502.3 KB @1440 /
+141.2 KB @375, unchanged** — every removed file was already never transferred.
+Chapter geometry (`.opencode/probe-m24-geo2.mjs`): page **8,511 px @1440**
+(9.46 screens) / **11,080 px @375**. `taste` has **no installed binary or npm
+package in this repo** (`which taste` → not found), so the QA "taste inspect"
+step is recorded as not runnable here rather than claimed; the screenshot and
+manual geometry evidence stand in.
+
+**Gates (all green).** `bun run validate-data` OK · unit **1,168/1,168 (104
+files)** · `bun run build:fast` **72 pages** · `bun run check:links` **1,477
+links / 73 pages, 0 broken** · `bunx astro check` **89 errors, 0 warnings**
+(baseline) · full Playwright **427 passed / 1 skipped / 0 failed (23.7 min)** at
+`--workers=1`.
+`/` payload **193.4 / 492.7 / 32.2 KB**, 9 islands — flat, as a deletion-only
+sprint should be. Signal Loom invariants untouched: 30 nodes / 31 edges, one
+`measureEdges()` pass, no new scroll listener — the sprint touched no island.
+
+**The full run found the race the file had already written down.** First pass was
+**427 passed / 1 skipped / 1 failed**: `gallery.spec.ts:188` (Interactive Canvas
+toolbar) timed out waiting for `[data-modal-content]`, meaning the modal never
+opened at all — a dead click, not the shell-vs-contents condition. Re-run in
+isolation: **1/1 passed (9.6 s)**, so not a regression. The cause was already
+documented inside `e2e/gallery.spec.ts` as a "known gap": its local
+`openExperiment` waited for the experiment's lazy chunk but not for
+`GalleryGrid` (`client:load`) to hydrate, and the converged helper
+(`e2e/hydration.ts`, hydration wait **and** loader-detach) already existed and
+was already what `recommend.spec.ts` used. The copy was deleted rather than
+annotated a second time, `Page` came out of the import with it, biome stayed
+clean, and the file then ran **72/72**. Harness only — no product file changed.
+
+**Deliberately not changed.** `projects.json` `images[]` keeps its files and
+still counts in `complexityScore` (`observatory/metrics.ts:82,86`): it is an
+evidence register, the files cost 0 transfer, and deleting them would change a
+displayed `/observatory` number for no user benefit. The 4 unserved issuer logos
+(`skilvul`, `google`, `cisco`, `efset`) stay because they back `badge` fields on
+14 certifications and `validate-data` fails on a missing referenced file.
+`hero-bg-1920.jpg` (755,619 B) and `ijo-plis.png` (567,020 B) stay as no-WebP
+`<img>` fallbacks behind WebP `<source>` sets — referenced by markup, never
+transferred by a modern browser.
+
+**DOCUMENTED:** `ASSETS.md` §2.1 inventory, §2.4 measured six-chapter geometry,
+§2.5 per-item verdicts, §4 A0 note, §5 register verdicts, §5.1 amendment, §7
+budget finding, §9 comet dimensions, §10 closed questions, §12 next action, §16
+sprint record. `STATUS.md` closes MOTION-24 and marks **MOTION-12 `READY`**;
+`SPRINT_PLAN.md` ticks M24.1–M24.5 with their honest outcomes; `QA_CHECKLIST.md`
+§8 gets the row.
+
+**Lesson (the one worth carrying).** A markup scan is a proxy, and a proxy that
+misses one rendering path is worse than no scan at all, because it produces a
+confident list of "unused" files that includes a live one. The fix is not a
+better regex — it is to confirm every deletion with the measurement that sees
+the actual transfer (here: `profile-400x500.webp`, 22,168 B, fetched on every
+page load). Second lesson: a placement spec has to be measured at the narrowest
+viewport first. At 1440 the plate fits comfortably; at 375 there are 45 px, and
+the 45 is the answer. Third: a comment that records a known gap is not a fix.
+The gallery helper's own docstring said it did not wait for hydration and named
+the test that had failed for that reason — and then this run failed the same way
+in a different test. When the converged version already exists next to the
+duplicate, delete the duplicate; documentation of a defect is only worth
+anything if it also states why the fix was deferred, and "it would touch 71
+green tests" stops being a reason once the failure lands anyway.
+
+**Commit:** `motion: MOTION-24 asset audit — A0 with measured kill criterion`.

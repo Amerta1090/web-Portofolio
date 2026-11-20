@@ -186,6 +186,27 @@ git diff -- <files>
 
 ## 8. Sprint results log
 
+### MOTION-24 — 2026-11-20 (asset audit, verdict A0)
+
+| Gate | Result |
+| --- | --- |
+| `bun run validate-data` | OK — including the `/placeholder/` rule that made the 6 placeholder SVGs dead weight by construction |
+| `bun run build:fast` | **72 pages** — unchanged; this sprint deleted assets and added no route |
+| `bun run check:links` | **0 broken / 1,477 same-site links / 73 pages** — unchanged (no page markup was edited) |
+| `bunx astro check` | **89** errors, 0 warnings = baseline; 0 in any touched file |
+| Biome, touched files | clean (`docs/` is not linted; `e2e/gallery.spec.ts` re-checked after the helper swap) |
+| Unit suite | **1168 / 1168 (104 files)** |
+| Full e2e `--workers=1` | **427 passed / 1 skipped / 0 failed (23.7 min)** after one gallery test was re-run in isolation: `gallery.spec.ts:188` failed with a dead click (`waiting for locator('[data-modal-content]')`), the latent hydration race the file's own comment had recorded. Fixed at the root by deleting the local `openExperiment` copy and using the converged helper in `e2e/hydration.ts`; `gallery.spec.ts` then **72/72** |
+| `measure:routes` `/` | **193.4 / 492.7 / 32.2 KB, 9 islands (5e/4d)** — unchanged, as expected for a deletion-only sprint |
+| Image transfer, `/` | **502.3 KB @1440 / 141.2 KB @375** — unchanged. Every removed file was already never transferred, which is the whole point: they were cost-free only because nothing asked for them |
+| Inventory after deletions | `public/images` **380 → 369 files / 18,939,355 B**; 53 files (2.17 MB) served by markup, 317 (15.90 MB) unserved of which 302 are gallery sequence frames |
+| Deleted | 10 files / 72,793 B + `src/components/atoms/ProfileImage.astro` (0 consumers) + 777 B of its own references. `profile-400x500.webp` **kept** — `HeroAvatar` fetches it through an SVG `<image href>`, invisible to a markup scan (21.9 KB measured on `/` at both widths) |
+| Plate budget, measured with sharp | 1200×721 WebP q78 = **301,104 B** (q50 249,670; AVIF q45 202,163; 960 px 192,904; 720 px 101,542); the ≤80 KB clause is only reachable at **640 px = 78,020 B**, i.e. below the plate's own legibility |
+| Placement, measured headless | 1440×900: first Signal Loom node 670 px into the chapter, **230 px** of fold slack. 375×812: node 767 px into a 2,975 px chapter, **45 px** of fold slack — a 16:9 plate is ≥185 px, so the node would land ~140 px below the fold |
+| M24.4 caption test | **NOT RUN** — there is no image to compare against. Recorded as not run rather than reconstructed |
+| M24.5 `taste inspect` | **Not runnable** — no `taste` binary or npm package is installed in this repo; geometry and transfer probes stand in as the evidence |
+| Verdict | **A0 — no new assets.** Declined on measurement (placement at 375, budget at 1200) and on family (MOTION-20 approved data-derived diagrams for that chapter; archival plates are assigned to projects), not on taste |
+
 ### MOTION-19 — 2026-11-03
 
 | Gate | Result |
