@@ -50,11 +50,15 @@ const stageViews = buildStageViews(processStagesOf(entry.data) ?? []);
           Case Study Reactor needs room for a sticky stage beside the list. */}
       <article class="mx-auto w-full max-w-[62rem]">
         <header class="work-measure mb-12">
+          {/* The pill keeps the category because the category is data; it stops
+              shouting it (`toUpperCase`) because shouting is the costume, and it
+              stops reading as an eyebrow by carrying the value rather than a
+              label about the value (MOTION-12). */}
           {category && (
-            <span class="inline-flex items-center px-3 py-1 mb-4 text-xs font-medium bg-accent-muted/20 text-accent rounded-full">{category.toUpperCase()}</span>
+            <span class="inline-flex items-center px-3 py-1 mb-4 text-xs font-medium bg-accent-muted/20 text-accent rounded-full">{category}</span>
           )}
 
-          <h1 class="font-display text-text-primary leading-tight mb-4" style="font-size: var(--text-display); line-height: 0.95; letter-spacing: var(--tracking-display);">
+          <h1 class="font-display text-text-primary leading-tight mb-4" style="font-size: var(--text-title); line-height: 0.98; letter-spacing: var(--tracking-display);">
             {title}
           </h1>
 
@@ -143,7 +147,7 @@ const stageViews = buildStageViews(processStagesOf(entry.data) ?? []);
                 {stageViews.map((stage) => (
                   <li id={stage.anchorId} data-reactor-stage={stage.id} class="scroll-mt-24">
                     <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-                      <span class="font-mono text-xs text-brand tabular-nums">{stage.ordinal}</span>
+                      <span class="text-xs text-brand tabular-nums">Stage {stage.position}</span>
                       <h3 class="text-lg font-semibold text-text-primary">{stage.label}</h3>
                       <a
                         href={`#${stage.anchorId}`}
@@ -160,7 +164,7 @@ const stageViews = buildStageViews(processStagesOf(entry.data) ?? []);
                         <dt class="text-xs uppercase tracking-wide text-text-secondary">
                           {stage.metric.label}
                         </dt>
-                        <dd class="font-mono text-sm text-brand tabular-nums">
+                        <dd class="text-sm text-brand tabular-nums">
                           {stage.metric.value}
                         </dd>
                       </dl>

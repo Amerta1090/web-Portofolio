@@ -50,14 +50,11 @@ const unlisted = narrative ? narrative.connectedProjects - listed : 0;
             data-signal-narrative-steps
             class="mt-3 grid list-none grid-cols-1 gap-2.5"
           >
-            {narrative.steps.map((step, index) => (
+            {narrative.steps.map((step) => (
               <li
                 data-signal-narrative-step
                 class="flex items-baseline gap-2.5 border-l border-border/70 pl-3"
               >
-                <span aria-hidden="true" class="section-label shrink-0 text-brand">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
                 <span class="min-w-0">
                   <a
                     href={`#signal-${step.id}`}

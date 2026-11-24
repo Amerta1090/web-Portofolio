@@ -26,9 +26,14 @@ describe("PageTailOverlays (composite: EasterEgg + SectionCounter + CreativeLabP
     const { container } = render(<PageTailOverlays sectionIds={sectionIds} />);
     const counter = container.querySelector("[data-section-counter]");
     expect(counter).not.toBeNull();
-    // One dot per declared section, and a matching total in the readout.
+    // One dot per declared section, and the same total on the readout's own
+    // data attribute. MOTION-12 dropped the `01 / 06` numerals: they restated
+    // what the filled-dot column already shows, so the position lives in
+    // `data-section-current` now instead of in decorative type.
     expect(counter?.querySelectorAll("[data-section-dot]")).toHaveLength(sectionIds.length);
-    expect(counter?.textContent).toContain(`01 / ${String(sectionIds.length).padStart(2, "0")}`);
+    expect(counter?.getAttribute("data-section-total")).toBe(String(sectionIds.length));
+    expect(counter?.getAttribute("data-section-current")).toBe("1");
+    expect(counter?.textContent?.trim()).toBe("");
   });
 
   it("keeps the readout out of the accessibility tree (it duplicates section landmarks)", () => {

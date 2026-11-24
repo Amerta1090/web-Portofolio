@@ -165,12 +165,10 @@ export default function CaseStudyReactor({ stages }: CaseStudyReactorProps) {
                         : "border-border/70 text-text-secondary hover:border-brand hover:text-text-primary"
                     }`}
                   >
-                    {/* The explicit space is load-bearing: the visual gap comes
-                        from `gap-2`, which does not survive name computation, so
-                        without it the accessible name is "01Problem". */}
-                    <span className="font-mono text-xs tabular-nums text-brand">
-                      {stage.ordinal}
-                    </span>{" "}
+                    {/* MOTION-12: the two-digit `01` was removed. The active
+                        step is already announced by `aria-current="step"`, and
+                        the panel prints the position in words ("Stage 2 of 5"),
+                        so the numeral was furniture restating them both. */}
                     {stage.label}
                   </button>
                 </li>
@@ -192,12 +190,15 @@ export default function CaseStudyReactor({ stages }: CaseStudyReactorProps) {
         {/* Stable slots, sized from a real viewport probe (375/768/1024/1440
             on the current stage data) so switching stages never resizes the
             panel and never nudges the reading list underneath it. The frame
-            holds the tallest diagram (19rem below `lg`, 17.25rem from `lg`);
+            holds the tallest diagram (19.5rem below `lg`, 17.5rem from `lg`);
             the text slot holds the tallest stage text. Editing the stage copy
-            means re-probing these. */}
+            or the type scale means re-probing these — MOTION-12's 13px `xs`
+            step pushed the tallest text to 213px / 139px and the tallest
+            diagram at 768 to 305px, 1–3px past the old slots, so they were
+            re-probed at 320–1440 and given a few px of headroom. */}
         <div
           data-reactor-frame=""
-          className="flex min-h-[19rem] w-full max-w-[21rem] mx-auto items-center justify-center lg:min-h-[17.25rem] lg:max-w-[19rem]"
+          className="flex min-h-[19.5rem] w-full max-w-[21rem] mx-auto items-center justify-center lg:min-h-[17.5rem] lg:max-w-[19rem]"
         >
           {geometry ? (
             <svg
@@ -268,10 +269,8 @@ export default function CaseStudyReactor({ stages }: CaseStudyReactorProps) {
           )}
         </div>
 
-        <div className="mt-5 min-h-[13.25rem] lg:min-h-[8.5rem]">
-          <p className="section-label text-brand">
-            {active.ordinal} · {active.positionLabel}
-          </p>
+        <div className="mt-5 min-h-[13.75rem] lg:min-h-[9rem]">
+          <p className="section-label text-brand">{active.positionLabel}</p>
           <p
             data-reactor-stage-label=""
             className="mt-1 font-display text-h3 leading-snug text-text-primary"
@@ -288,7 +287,7 @@ export default function CaseStudyReactor({ stages }: CaseStudyReactorProps) {
               <dt className="text-xs uppercase tracking-wide text-text-secondary">
                 {active.metric.label}
               </dt>
-              <dd className="font-mono text-sm tabular-nums text-brand">{active.metric.value}</dd>
+              <dd className="text-sm tabular-nums text-brand">{active.metric.value}</dd>
             </dl>
           )}
           {/* Below `lg` the panel is the only place the active stage is

@@ -110,7 +110,7 @@ export default function TopReposLeaderboard({ topRepos, repoActivity, builtAt }:
           onMouseLeave={handleFeedMouseLeave}
         >
           <div className="flex items-center gap-2 mb-4">
-            <span className="text-[10px] font-mono text-text-secondary/40 tracking-wider uppercase">
+            <span className="text-xs font-mono text-text-secondary/40 tracking-wider uppercase">
               Recent Activity
             </span>
             <div className="flex gap-1">
@@ -141,7 +141,7 @@ export default function TopReposLeaderboard({ topRepos, repoActivity, builtAt }:
                 <span className="text-xs font-mono text-brand/70 group-hover:text-brand transition-colors">
                   {allCommits[feedIndex].repo_name}
                 </span>
-                <span className="text-xs text-text-secondary/60 mx-2">➜</span>
+                <span aria-hidden="true" className="text-xs text-text-secondary/40 mx-2">·</span>
                 <span className="text-xs text-text-secondary group-hover:text-text-primary transition-colors">
                   {allCommits[feedIndex].message}
                 </span>
@@ -182,7 +182,7 @@ export default function TopReposLeaderboard({ topRepos, repoActivity, builtAt }:
         </a>
 
         {builtAt && (
-          <span className="text-[10px] text-text-secondary/40">
+          <span className="text-xs text-text-secondary/40">
             as of {new Date(builtAt).toLocaleDateString("en-US", {
               year: "numeric",
               month: "short",

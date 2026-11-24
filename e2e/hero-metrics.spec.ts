@@ -191,7 +191,9 @@ test.describe("hero evidence row", () => {
     // comparison for it would be worse than leaving it to the link test above.
     await page.goto("/work");
     await expect(
-      page.getByText(`${projects} projects across ML, IoT, web, CLI, and DevOps.`, { exact: true }),
+      page.getByText(
+        new RegExp(`(^|\\s)${projects} projects across ML, IoT, web, CLI and DevOps[,.]`),
+      ),
     ).toBeVisible();
 
     await page.goto("/about");

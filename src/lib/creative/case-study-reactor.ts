@@ -36,8 +36,8 @@ export interface ProcessStageView {
   label: string;
   summary: string;
   evidence: string;
-  /** Zero-padded position, e.g. `"02"`. */
-  ordinal: string;
+  /** 1-based position in the sequence; rendered as the words "Stage N". */
+  position: number;
   /** Readable position for assistive text, e.g. `"Stage 2 of 5"`. */
   positionLabel: string;
   metric: ProcessStageMetric | null;
@@ -187,7 +187,7 @@ export function normalizeStageDiagram(
 
 /**
  * Turn ordered stages into render-ready props. Pure and deterministic: the same
- * stage list always produces the same ordinals, anchors, and fallbacks.
+ * stage list always produces the same positions, anchors, and fallbacks.
  */
 export function buildStageViews(stages: readonly ProcessStage[]): ProcessStageView[] {
   const total = stages.length;
@@ -200,7 +200,7 @@ export function buildStageViews(stages: readonly ProcessStage[]): ProcessStageVi
       label: stage.label,
       summary: stage.summary,
       evidence: stage.evidence,
-      ordinal: String(position).padStart(2, "0"),
+      position,
       positionLabel: total > 0 ? `Stage ${position} of ${total}` : `Stage ${position}`,
       metric: stage.metric ?? null,
       diagram: normalizeStageDiagram(stage.diagram),

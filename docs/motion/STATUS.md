@@ -1,8 +1,8 @@
 # Motion Programme — Status
 
-**Last updated:** 2026-11-20 (MOTION-24 `DONE`: asset audit → **A0**, no new assets)
-**Branch:** `main` · **HEAD at session start:** `7226178` (MOTION-14)
-**Active sprint:** none — MOTION-24 `DONE` (2026-11-20). **Next: MOTION-12 `READY`** (taste pass).
+**Last updated:** 2026-11-24 (MOTION-12 `DONE`: tells **49 → 22 FAIL** on 4 routes, signature move D-15)
+**Branch:** `main` · **HEAD at session start:** `53fdd2b` (MOTION-25 planned)
+**Active sprint:** none — MOTION-12 `DONE` (2026-11-24). **Next: MOTION-25 `READY`** (typography: apply the D-13 type), then MOTION-21.
 
 ## One-paragraph state
 
@@ -78,6 +78,19 @@ only, and the warmth script now writes a scalar `--glow-warmth` that scales the
 BorderGlow ring instead of overwriting a colour token (it used to drag light-mode
 `text-brand-warm` to 1.57:1). Every text token clears AA on all three surfaces in
 both themes, measured from computed styles.
+**MOTION-12 ran the taste pass** against HEAD in a separate worktree: inspector
+FAILs fell **49 → 22** across `/`, `/work`, `/data` and the Tafsir case study
+(WARN 18 → 18), with no new FAIL id anywhere. The removed devices are the shared
+template furniture — the literal "Section" eyebrow, ordinals that restate list
+position, the mono uppercase label costume, gradient text and washes, rank
+emoji, a hover shadow — and the type floor rose (`xs` 12 → 13 px, running prose
+16 px). Two real defects closed with it: reduced-motion readers no longer see
+the hero and metric cards start transparent, and the hero name's server spans
+are no longer blank during the hydration gap (CSS backstop). Every remaining
+FAIL has a written reason in `SESSION_LOG.md`; D-15 names the one signature
+move (the capability map lights). A gap found the same day: D-13 retired
+Fraunces/JetBrains Mono for Archivo but no sprint owned the type, so MOTION-25
+was added before MOTION-21.
 
 ## Verified baseline (2026-10-21 unless noted)
 

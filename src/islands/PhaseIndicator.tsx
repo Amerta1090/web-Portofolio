@@ -58,7 +58,18 @@ export default function PhaseIndicator() {
               }}
               transition={{ duration: duration.normal }}
             />
-            <span className="absolute right-full mr-3 px-2 py-0.5 rounded text-xs whitespace-nowrap bg-bg-tertiary/80 backdrop-blur-sm text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+            {/*
+              The label duplicates the button's accessible name
+              (`aria-label="Go to … phase"`) and exists only while the pointer is
+              over the dot. Marking it `aria-hidden` says that plainly, and it is
+              also the only reason the reduced-motion audit read five "Boot/DNA/…"
+              text blocks as hidden content: they are hover-only, not an animation
+              waiting to run.
+            */}
+            <span
+              aria-hidden="true"
+              className="absolute right-full mr-3 px-2 py-0.5 rounded text-xs whitespace-nowrap bg-bg-tertiary/80 backdrop-blur-sm text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
+            >
               {phase.label}
             </span>
           </button>

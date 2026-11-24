@@ -106,7 +106,7 @@ export default function ProjectCardGrid({ projects, skillHrefs = {} }: Props) {
                         </span>
                       )}
                       {project.featured && (
-                        <span className="featured-badge text-[10px] text-brand border border-brand/30 px-1.5 py-0.5 rounded">
+                        <span className="featured-badge text-xs text-brand border border-brand/30 px-1.5 py-0.5 rounded">
                           Featured
                         </span>
                       )}
@@ -127,7 +127,7 @@ export default function ProjectCardGrid({ projects, skillHrefs = {} }: Props) {
                       </p>
                     )}
 
-                    <p className="mb-3 text-sm leading-relaxed text-text-secondary line-clamp-2">
+                    <p className="mb-3 text-base leading-relaxed text-text-secondary line-clamp-2">
                       {project.description}
                     </p>
 
@@ -143,13 +143,13 @@ export default function ProjectCardGrid({ projects, skillHrefs = {} }: Props) {
                               <a
                                 key={skill}
                                 href={skillHrefs[skill]}
-                                className="text-[10px] px-1.5 py-0.5 border border-border text-text-secondary rounded"
+                                className="text-xs px-1.5 py-0.5 border border-border text-text-secondary rounded"
                               >
                                 {skill.length > 18 ? `${skill.slice(0, 18)}…` : skill}
                               </a>
                             ))}
                             {project.skills.length > 4 && (
-                              <span className="text-[10px] px-1.5 py-0.5 border border-border text-text-secondary rounded">
+                              <span className="text-xs px-1.5 py-0.5 border border-border text-text-secondary rounded">
                                 +{project.skills.length - 4}
                               </span>
                             )}
@@ -157,7 +157,7 @@ export default function ProjectCardGrid({ projects, skillHrefs = {} }: Props) {
                         ) : (
                           <span
                             data-project-no-skills
-                            className="text-[10px] text-text-secondary/60"
+                            className="text-xs text-text-secondary/60"
                           >
                             No skills listed
                           </span>

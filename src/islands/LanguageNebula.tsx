@@ -71,7 +71,7 @@ export default function LanguageNebula({ languages, allRepos }: Props) {
               }}
             >
               {lang.percentage > 8 && (
-                <span className="text-[10px] font-medium text-white/90 truncate px-1">
+                <span className="text-xs font-medium text-white/90 truncate px-1">
                   {lang.language}
                 </span>
               )}
@@ -82,7 +82,7 @@ export default function LanguageNebula({ languages, allRepos }: Props) {
           {languages.map((lang) => (
             <div
               key={lang.language}
-              className="text-[10px] text-text-secondary truncate text-center px-0.5"
+              className="text-xs text-text-secondary truncate text-center px-0.5"
               style={{ width: `${lang.percentage}%` }}
             >
               {lang.percentage}%
@@ -160,15 +160,12 @@ export default function LanguageNebula({ languages, allRepos }: Props) {
           })}
         </div>
 
-        {/* Aurora glow background */}
-        <div className="absolute inset-0 -top-4 rounded-xl opacity-20 blur-3xl pointer-events-none">
-          <div
-            className="w-full h-20 rounded-full"
-            style={{
-              background: `linear-gradient(90deg, ${languages.map((l, i) => `${COLORS[i % COLORS.length]} ${computeSegmentX(i)}%`).join(", ")})`,
-            }}
-          />
-        </div>
+        {/* MOTION-12 removed the aurora glow layer that sat behind the ribbon:
+            a 20px-tall blurred copy of the same colour stops at 20% opacity. It
+            added no reading of the data (the SVG beneath already draws every
+            segment with its own weight and colour) and it was the last
+            `gradient` tell on /data. Depth comes from the ribbon's own blur.
+        */}
 
         {/* Nebula ribbon */}
         <div
@@ -281,7 +278,7 @@ export default function LanguageNebula({ languages, allRepos }: Props) {
             return (
               <div
                 key={lang.language}
-                className="text-[10px] text-text-secondary truncate text-center px-0.5 transition-colors duration-200"
+                className="text-xs text-text-secondary truncate text-center px-0.5 transition-colors duration-200"
                 style={{
                   width: `${segW}%`,
                   color: hoveredIdx === i ? "var(--text-primary, #fafafa)" : undefined,

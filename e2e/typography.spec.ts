@@ -30,7 +30,13 @@ test.describe("Typography: fluid display scale", () => {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 
-  test("section labels are small mono uppercase with wide tracking", async ({ page }) => {
+  test("section labels read in the body face at a legible size", async ({ page }) => {
+    // MOTION-12 changed this contract. It used to pin "small mono uppercase with
+    // wide tracking" — which was a true description of `.section-label` and also
+    // the exact device the tells registry bans (a tiny tracked uppercase label).
+    // The assertion now pins the reversed decision: the label survives as a
+    // group label, set in the reading face at or above the 13px legibility floor,
+    // with no uppercase costume and no tracking that a reader has to squint at.
     await page.goto("/");
     const label = page.locator(".section-label").first();
     await expect(label).toBeVisible();
@@ -43,10 +49,10 @@ test.describe("Typography: fluid display scale", () => {
         transform: s.textTransform,
       };
     });
-    expect(styles.fontFamily).toContain("JetBrains Mono");
-    expect(styles.fontSize).toBeLessThanOrEqual(12);
-    expect(styles.transform).toBe("uppercase");
-    expect(styles.letterSpacing / styles.fontSize).toBeGreaterThanOrEqual(0.15);
+    expect(styles.fontFamily).not.toContain("JetBrains Mono");
+    expect(styles.fontSize).toBeGreaterThanOrEqual(13);
+    expect(styles.transform).toBe("none");
+    expect(styles.letterSpacing / styles.fontSize).toBeLessThan(0.1);
   });
 
   test("only one giant heading per page; other headings step down gradually", async ({ page }) => {

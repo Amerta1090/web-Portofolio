@@ -47,29 +47,24 @@ function getRelativeTime(dateStr: string): { text: string; color: string } {
   return { text: `${months}mo ago`, color: "text-gray-500" };
 }
 
+/**
+ * Rank, in words rather than medals.
+ *
+ * MOTION-12. The trophy/silver/bronze emoji were a second encoding of the
+ * number already printed beside them — and an emoji is a device the tells
+ * registry bans outright. The token-based tone stays, because the accent on
+ * #1 genuinely separates the leader from the rest of the list.
+ */
 function getRankBadge(rank: number) {
   switch (rank) {
     case 1:
-      return {
-        emoji: "👑",
-        className: "bg-brand/20 text-brand border-brand/30",
-        label: "#1",
-      };
+      return { className: "bg-brand/20 text-brand border-brand/30", label: "#1" };
     case 2:
-      return {
-        emoji: "🥈",
-        className: "bg-slate-300/20 text-slate-300 border-slate-300/30",
-        label: "#2",
-      };
+      return { className: "bg-slate-300/20 text-slate-300 border-slate-300/30", label: "#2" };
     case 3:
-      return {
-        emoji: "🥉",
-        className: "bg-brand-warm/20 text-brand-warm border-brand-warm/30",
-        label: "#3",
-      };
+      return { className: "bg-brand-warm/20 text-brand-warm border-brand-warm/30", label: "#3" };
     default:
       return {
-        emoji: "",
         className: "bg-text-secondary/10 text-text-secondary border-text-secondary/20",
         label: `#${rank}`,
       };
@@ -215,17 +210,15 @@ export default function RepoGlowCard({ repo, rank, index }: RepoGlowCardProps) {
           <div
             className="absolute inset-0 pointer-events-none transition-opacity duration-300"
             style={{
-              background: `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(245, 158, 11, 0.08), transparent 60%)`,
+              background: `radial-gradient(circle at ${glareX}% ${glareY}%, color-mix(in srgb, var(--color-brand) 10%, transparent), transparent 60%)`,
             }}
           />
         )}
 
-        <div className="absolute inset-0 bg-gradient-to-br from-brand/[0.02] to-transparent pointer-events-none" />
-
         {isHovered && !prefersReduced && (
           <div
             className="absolute inset-0 rounded-xl pointer-events-none"
-            style={{ boxShadow: `inset 0 0 0 1px rgba(245, 158, 11, 0.15)` }}
+            style={{ boxShadow: `inset 0 0 0 1px color-mix(in srgb, var(--color-brand) 22%, transparent)` }}
           />
         )}
 
@@ -233,15 +226,14 @@ export default function RepoGlowCard({ repo, rank, index }: RepoGlowCardProps) {
           <div className="flex items-center justify-between mb-3">
             <span
               className={cn(
-                "inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border",
+                "inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full border",
                 badge.className,
               )}
             >
-              {badge.emoji && <span>{badge.emoji}</span>}
               {badge.label}
             </span>
             {lastActive && (
-              <span className={cn("text-[10px] font-mono", lastActive.color)}>
+              <span className={cn("text-xs font-mono", lastActive.color)}>
                 {lastActive.text}
               </span>
             )}
@@ -280,13 +272,13 @@ export default function RepoGlowCard({ repo, rank, index }: RepoGlowCardProps) {
               {repo.topics.slice(0, 3).map((topic) => (
                 <span
                   key={topic}
-                  className="text-[10px] px-1.5 py-0.5 rounded bg-brand/10 text-brand/70"
+                  className="text-xs px-1.5 py-0.5 rounded bg-brand/10 text-brand/70"
                 >
                   {topic}
                 </span>
               ))}
               {repo.topics.length > 3 && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-text-secondary/10 text-text-secondary/50">
+                <span className="text-xs px-1.5 py-0.5 rounded bg-text-secondary/10 text-text-secondary/50">
                   +{repo.topics.length - 3}
                 </span>
               )}

@@ -52,6 +52,11 @@
   --text-h2: clamp(1.625rem, 2vw + 0.75rem, 2.75rem);
   --text-h3: clamp(1.25rem, 1vw + 0.65rem, 1.75rem);
   --text-h4: clamp(1.0625rem, 0.8rem + 0.35vw, 1.25rem);
+  /* MOTION-12: a case-study title is content, not a statement. At the display
+     size a four-word title ("AI Quranic Tafsir Assistant") ran to three lines
+     at 1440px, i.e. a 100px wall inside a 65ch measure. This cap keeps long
+     titles to two lines while staying well above body size at 375px. */
+  --text-title: clamp(2.25rem, 4vw + 1rem, 4.5rem);
   --tracking-display: -0.035em;
   --font-weight-normal: 400;
   --font-weight-medium: 500;
@@ -374,12 +379,22 @@ pre {
   font-size: var(--text-h4);
 }
 
-/* Eyebrow editorial: mono kecil bercermin pada headline raksasa. */
+/* Group label — set in the reading face, not the terminal.
+ *
+ * MOTION-12. This utility used to be JetBrains Mono at 11px with 0.18em
+ * tracking and `text-transform: uppercase` — the exact costume the tells
+ * registry calls out as "tiny tracked uppercase label", and the source of
+ * most of the `micro-label` (28 on `/`) and `mono` findings. The *label* still
+ * carries information (it names the block below it), so it stays; the costume
+ * does not. Now it is ordinary Inter at 13px, which also clears the 13px
+ * legibility floor the audit measures (`small-text`). Ordinals that used this
+ * class were removed, not restyled — see `DECISIONS.md` D-15.
+ */
 .section-label {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  letter-spacing: 0.01em;
+  font-weight: 500;
 }
 
 .text-balance {
@@ -427,18 +442,29 @@ pre {
   display: none !important;
 }
 
-/* ── Noise / grain overlay ── */
-.noise-overlay {
+/* ── Noise / grain overlay ──
+ * Painted by `body::after` (the image is the `--noise-image` custom property set
+ * on `<body>` by BaseLayout) rather than by a `div`. MOTION-12 moved it here for
+ * two reasons: a full-screen `z-index: 9999` element is a hit-testing trap — the
+ * tells audit forces `pointer-events: auto` while sampling and then reads the
+ * grain layer as "text is covered by another element" on every page — and a
+ * decorative layer does not need a DOM node at all. The paint is identical:
+ * fixed, 200×200 tile, 3% opacity, `overlay` blend. The `tier-1` (lightning /
+ * reduced-motion) opt-out still applies.
+ */
+body::after {
+  content: "";
   position: fixed;
   inset: 0;
   z-index: 9999;
   pointer-events: none;
   opacity: 0.03;
   mix-blend-mode: overlay;
+  background-image: var(--noise-image);
   background-repeat: repeat;
+  background-size: 200px 200px;
 }
-[data-experience-tier="tier-1"] .noise-overlay,
-.noise-overlay-hidden {
+[data-experience-tier="tier-1"] body::after {
   display: none;
 }
 

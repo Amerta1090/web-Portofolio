@@ -84,15 +84,8 @@ const gitHubData = await fetchAllGitHubData();
            at opacity 0 and waits for a view() timeline, which after a
            ClientRouter swap left this page's h1 invisible (MOTION-18 e2e). -->
       <header class="mb-14">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/10 border border-brand/20 text-brand text-xs font-medium mb-6">
-          <span class="w-2 h-2 rounded-full bg-brand animate-pulse" />
-          Analytical layer · deterministic insights
-        </div>
         <h1 class="font-display text-[clamp(2.25rem,6vw+0.5rem,5rem)] leading-[0.95] tracking-[-0.035em] text-text-primary mb-4">
-          The portfolio,{" "}
-          <span class="bg-gradient-to-r from-brand to-brand-warm bg-clip-text text-transparent">
-            read as a dataset
-          </span>
+          The portfolio, <span class="text-brand">read as a dataset</span>
         </h1>
         <p class="text-lg text-text-secondary max-w-3xl leading-relaxed">
           This page treats the projects, skills, and GitHub record as structured data —
@@ -103,11 +96,8 @@ const gitHubData = await fetchAllGitHubData();
 
       <!-- Overview -->
       <section class="mb-20" aria-labelledby="obs-overview">
-        <div class="flex items-end justify-between mb-6">
-          <div>
-            <p class="section-label text-text-secondary">01</p>
-            <h2 id="obs-overview" class="font-display text-h2 text-text-primary">Overview</h2>
-          </div>
+        <div class="mb-6">
+          <h2 id="obs-overview" class="font-display text-h2 text-text-primary">Overview</h2>
         </div>
         <ObservatoryOverview client:visible metrics={overviewMetrics} />
       </section>
@@ -115,7 +105,6 @@ const gitHubData = await fetchAllGitHubData();
       <!-- Timeline -->
       <section class="mb-20" aria-labelledby="obs-timeline">
         <div class="mb-6">
-          <p class="section-label text-text-secondary">02</p>
           <h2 id="obs-timeline" class="font-display text-h2 text-text-primary">Timeline</h2>
           <p class="text-text-secondary mt-2 max-w-2xl">
             {timeline.nodes.length} projects placed on a shared time axis, coloured by category.
@@ -223,7 +212,6 @@ const gitHubData = await fetchAllGitHubData();
       <!-- Technology -->
       <section class="mb-20" aria-labelledby="obs-technology">
         <div class="mb-6">
-          <p class="section-label text-text-secondary">03</p>
           <h2 id="obs-technology" class="font-display text-h2 text-text-primary">Technology</h2>
           <p class="text-text-secondary mt-2 max-w-2xl">
             Skill frequency weighted across all projects — the recurring ingredients of the build.
@@ -250,7 +238,7 @@ const gitHubData = await fetchAllGitHubData();
                       style={`width:${Math.max(2, barPct(row.value))}%`}
                     />
                   </div>
-                  <span class="w-8 text-right text-xs font-mono text-text-primary tabular-nums">{row.value}</span>
+                  <span class="w-8 text-right text-xs text-text-primary tabular-nums">{row.value}</span>
                 </div>
               ))}
             </div>
@@ -261,13 +249,13 @@ const gitHubData = await fetchAllGitHubData();
             <div class="flex items-end gap-3 h-40">
               {catBars.map((c) => (
                 <div key={c.label} class="flex-1 flex flex-col items-center justify-end gap-1.5 h-full min-w-0 group">
-                  <span class="text-xs font-mono text-text-primary tabular-nums">{c.count}</span>
+                  <span class="text-xs text-text-primary tabular-nums">{c.count}</span>
                   <div
                     class="w-full rounded-t group-hover:opacity-80 transition-opacity"
                     style={`height:${Math.max(4, c.share * 100)}%;background:${c.color}`}
                     title={`${c.label}: ${c.count} (${formatPercent(c.share)})`}
                   />
-                  <span class="text-[10px] text-text-secondary truncate w-full text-center">{c.label}</span>
+                  <span class="text-xs text-text-secondary truncate w-full text-center">{c.label}</span>
                 </div>
               ))}
             </div>
@@ -278,7 +266,6 @@ const gitHubData = await fetchAllGitHubData();
       <!-- Patterns -->
       <section class="mb-20" aria-labelledby="obs-patterns">
         <div class="mb-6">
-          <p class="section-label text-text-secondary">04</p>
           <h2 id="obs-patterns" class="font-display text-h2 text-text-primary">Patterns</h2>
           <p class="text-text-secondary mt-2 max-w-2xl">
             Recurring technology combinations across projects. Nodes are skills; edges are projects
@@ -353,7 +340,7 @@ const gitHubData = await fetchAllGitHubData();
                     <span class="text-text-secondary">
                       <span class="text-accent">{i + 1}.</span> {pair.a} <span class="text-text-secondary/50">+</span> {pair.b}
                     </span>
-                    <span class="font-mono text-xs text-text-primary tabular-nums">{pair.count} project{pair.count !== 1 ? "s" : ""}</span>
+                    <span class="text-xs text-text-primary tabular-nums">{pair.count} project{pair.count !== 1 ? "s" : ""}</span>
                   </li>
                 ))}
               </ol>
@@ -366,7 +353,7 @@ const gitHubData = await fetchAllGitHubData();
               {catDesc.map((c) => (
                 <div class="flex items-center justify-between">
                   <span class="text-sm text-text-secondary">{c.label}</span>
-                  <span class="font-mono text-xs text-text-primary tabular-nums">
+                  <span class="text-xs text-text-primary tabular-nums">
                     {c.count} · {formatPercent(c.share)}
                   </span>
                 </div>
@@ -379,7 +366,6 @@ const gitHubData = await fetchAllGitHubData();
       <!-- Insights -->
       <section class="mb-8" aria-labelledby="obs-insights">
         <div class="mb-6">
-          <p class="section-label text-text-secondary">05</p>
           <h2 id="obs-insights" class="font-display text-h2 text-text-primary">Derived insights</h2>
           <p class="text-text-secondary mt-2 max-w-2xl">
             Findings computed by fixed rules over the dataset. Each card shows the exact rule used.
@@ -394,7 +380,7 @@ const gitHubData = await fetchAllGitHubData();
             >
               <h3 class="text-text-primary font-semibold mb-2">{ins.title}</h3>
               <p class="text-sm text-text-secondary leading-relaxed mb-4">{ins.body}</p>
-              <p data-observatory="rule" class="text-[11px] font-mono text-text-secondary/60 flex gap-1.5 items-start">
+              <p data-observatory="rule" class="text-xs text-text-secondary/60 flex gap-1.5 items-start">
                 <span class="text-brand/80 shrink-0">rule&gt;</span>
                 <span>{ins.rule}</span>
               </p>

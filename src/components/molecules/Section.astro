@@ -56,19 +56,23 @@ const bodyAttr = chapter ? { "data-chapter-body": "" } : {};
 
 <section id={id} class={cls} aria-label={ariaLabel ?? title} {...chapterAttr}>
   <div class="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8 relative z-10">
+    {/*
+      No eyebrow (MOTION-12). The dot + literal "Section" was the registry's
+      "tiny tracked uppercase label above every heading": it restated the
+      heading, appeared on all six chapters, and gave the reader nothing the
+      h2 did not already say. The head keeps its own motion hooks.
+    */}
     {
       title && (
         <div class="mb-12" {...headAttr}>
-          <div class="flex items-center gap-3 mb-3">
-            <span class="w-1.5 h-1.5 bg-brand rounded-full"></span>
-            <span class="section-label text-text-secondary">Section</span>
-          </div>
           <h2 class="text-h2 font-bold text-text-primary">
             {title}
           </h2>
           {subtitle && (
             <div class="mt-3">
-              <p class="text-text-secondary text-sm">{subtitle}</p>
+              {/* 16px, not 14px: this is running prose under a heading, and the
+                  tells audit measured 14px as the page's dominant body size. */}
+              <p class="text-text-secondary text-base">{subtitle}</p>
             </div>
           )}
         </div>

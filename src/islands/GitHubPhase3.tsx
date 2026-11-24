@@ -36,15 +36,12 @@ function SectionShell({
   return (
     <section aria-label={ariaLabel ?? title} className={cls}>
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* No eyebrow (MOTION-12) — same removal as the Astro Section. */}
         <div className="mb-12">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="w-1.5 h-1.5 bg-brand rounded-full" />
-            <span className="section-label text-text-secondary">Section</span>
-          </div>
           <h2 className="text-h2 font-bold text-text-primary">{title}</h2>
           {subtitle && (
             <div className="mt-3">
-              <p className="text-text-secondary text-sm">{subtitle}</p>
+              <p className="text-text-secondary text-base">{subtitle}</p>
             </div>
           )}
         </div>

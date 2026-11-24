@@ -146,7 +146,12 @@ test.describe("Navigation hierarchy — one primary nav, one position readout", 
     const sectionCount = await page.locator("main > section[id]").count();
     expect(sectionCount).toBe(6);
     await expect(counter.locator("[data-section-dot]")).toHaveCount(sectionCount);
-    await expect(counter).toHaveText(`01 / ${String(sectionCount).padStart(2, "0")}`);
+    // MOTION-12 removed the `01 / 06` numerals above the dots (decorative index
+    // numbers restating the dot column). The position and total are still
+    // asserted — from the component's own data attributes, not from pixels.
+    await expect(counter).toHaveAttribute("data-section-total", String(sectionCount));
+    await expect(counter).toHaveAttribute("data-section-current", "1");
+    await expect(counter).toHaveText("");
 
     // Pins the decision above so it cannot be "fixed" the other way. A nested
     // section with an id is a link target, not a navigation step, and MOTION-19
@@ -171,8 +176,9 @@ test.describe("Navigation hierarchy — one primary nav, one position readout", 
   }) => {
     await page.goto("/");
     const counter = page.locator("[data-section-counter]");
-    const start = await counter.textContent();
-    expect(start?.trim()).toBe("01 / 06");
+    const start = await counter.getAttribute("data-section-current");
+    expect(start).toBe("1");
+    expect(await counter.getAttribute("data-section-total")).toBe("6");
 
     // MOTION-18: the nav's one in-page jump is Contact (Work/About/Lab/Data are
     // pages now).
@@ -183,15 +189,13 @@ test.describe("Navigation hierarchy — one primary nav, one position readout", 
     // (or the page bottoms out first — the last chapter cannot scroll past it).
     expect(top).toBeLessThan(900);
 
-    const after = counter.textContent();
-    expect((await after)?.trim()).not.toBe("01 / 06");
     // contact is the 6th and last declared chapter, but it is shorter than the
     // viewport, so the page bottoms out with an earlier chapter still crossing
     // the observer line: the readout settles on one of the last three. It must
-    // have left 01 and kept the total. The IntersectionObserver path can stall
+    // have left 1 and kept the total. The IntersectionObserver path can stall
     // >5s under memory pressure on this 3 GB machine (Q4.2), hence the larger
     // budget.
-    await expect(counter).toHaveText(/^(04|05|06) \/ 06$/, { timeout: 15000 });
+    await expect(counter).toHaveAttribute("data-section-current", /^(4|5|6)$/, { timeout: 15000 });
   });
 });
 

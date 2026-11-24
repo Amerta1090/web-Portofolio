@@ -1489,3 +1489,108 @@ anything if it also states why the fix was deferred, and "it would touch 71
 green tests" stops being a reason once the failure lands anyway.
 
 **Commit:** `motion: MOTION-24 asset audit — A0 with measured kill criterion`.
+
+## 2026-11-24 — MOTION-12 Taste pass: tells audit and one signature move
+
+**Method.** The tells baseline was re-measured, not taken from the plan: the
+plan's source counts (138 `font-mono`, 38 `.section-label`, …) did not
+reproduce. "Before" = HEAD `53fdd2b` built in a separate worktree and served on
+`[::1]:4323`; "after" = the working tree on `[::1]:4321`. Both runs used the
+taste inspector (`design-taste-frontend/scripts/inspect.mjs --json`, default
+widths 1440/768/390, `CHROME_PATH` = Playwright's chromium-1228) on the four
+measured routes. `/projects` and `/observatory` are retired URLs (MOTION-18), so
+`/work` and `/data` were measured in their place.
+
+**Tells, before → after (inspector FAIL / WARN).**
+
+| Route | Before | After | FAILs cleared |
+| --- | --- | --- | --- |
+| `/` | 14 / 6 | 5 / 4 | body-size, button-fx, covered-text, eyebrow, micro-label, mono, numbering, shadow, small-text |
+| `/work` | 9 / 4 | 4 / 3 | body-size, covered-text, focal-point, shadow, small-text |
+| `/data` | 16 / 5 | 9 / 7 | covered-text, gradient, gradient-text, micro-label, numbering, reduced-hidden, small-text |
+| `/work/ai-quranic-tafsir` | 10 / 3 | 4 / 4 | covered-text, headline-lines (1440), micro-label, mono, numbering, small-text |
+| **Total** | **49 / 18** | **22 / 18** | 27 FAILs removed, 0 new FAIL ids on any route |
+
+Source counts, HEAD → after: `font-mono` 136 → 126, `.section-label` 35 → 25,
+`text-[10px]` 110 → 91, `text-[11px]` 42 → 39, `bg-gradient` 19 → 15, the literal
+"Section" eyebrow 2 emitters → 0 (the one remaining text hit is the comment
+recording its removal), `padStart(2` ordinal emitters 7 → 1 (the kept
+`CapabilityArchitecture` pipeline stage).
+
+**Removed (ornament — each restated something already on screen).**
+- Literal "Section" eyebrow + dot on every chapter (`Section.astro`, `GitHubPhase3.tsx`); "About" eyebrow on `/about`; "Analytical layer" and "Engineering Showcase" pills on `/data` and `/lab`.
+- Ordinals that restate list position: career spine 01–26 (`aria-hidden`, the date is on the same row), Signal Loom narrative 01–03, `/data` 01–05, case-study stage 01–05 (now "Stage N" in words; the stepper names steps by label, `aria-current="step"` marks the active one), the `SectionCounter` "01 / 06" readout (dots stay; position published as `data-section-current/total`).
+- `.section-label` costume: JetBrains Mono 11 px / 0.18em / uppercase → Inter 13 px / 0.01em / 500. The label stays; the costume goes.
+- Gradient text on the `/data` and `/lab` titles; 2–3 % brand gradient washes on `RepoGlowCard` and `MetricCard`; the `LanguageNebula` aurora glow (a blurred copy of the ribbon's own colours).
+- Rank emoji 👑🥈🥉 on `RepoGlowCard` (the `#1/#2/#3` label already says it); `➜` separator in `TopReposLeaderboard` → `aria-hidden` middle dot.
+- `ProjectFilter` card `shadow-lg hover:shadow-xl` (the whole `/work` shadow FAIL); Signal Loom selected-card third encoding `ring-1 ring-brand/40` (border + fill already mark it).
+- Upper-casing of the case-study category pill (the value stays).
+
+**Fixed (defects the audit surfaced, not taste).**
+- Type floor: Tailwind `xs` 12 → 13 px (`1.125rem` line), 10 px chips → `text-xs` on the measured routes, chapter subtitles and card descriptions 14 → 16 px. The inspector's small-text and body-size FAILs are gone on all four routes.
+- Reduced motion: the hero entrance, avatar and `MetricCard` started at motion's `initial` opacity 0, which is applied at hydration, before the preference is known. `initial={prefersReduced ? false : …}` plus a CSS `!important` backstop in `scroll-animations.css` for `[data-hero-entrance]`, `[data-hero-avatar]`, `[data-metric-card]`, `.split-word`, `.split-char`. The `.split-*` rule closes a real no-JS hazard: the server's transparent `RevealText` spans were blank between Astro dropping `ssr` and React committing (measured ~0.5–1.5 s), and permanently blank if hydration failed.
+- `PhaseIndicator` hover-only tooltips set `aria-hidden` (they duplicate the button's name; 5 of the 7 `/data` reduced-hidden findings were these).
+- Covered text: the fixed `div.noise-overlay` (z 9999) moved to `body::after` driven by `--noise-image` on `<body>`; paint identical (fixed, 200 px tile, 3 %, overlay blend), tier-1 opt-out kept. 0 covered-text on all four routes.
+- Mobile header carried two burgers for one job → `GameMenuWrapper`'s is `hidden lg:flex`; the header's `data-mobile-nav-trigger` is the one phone menu. Hero scroll cue → `hidden sm:flex` (measured 56 px overlap with the metric row at 390 px).
+- Case-study and `/work` titles use a new `--text-title` clamp (2.25 → 4.5 rem, lh 0.98) so a four-word title no longer runs to three lines at 1440.
+
+**Kept, with the reason (every remaining FAIL).**
+- *hairline / outlined-box* (all routes) — the 1 px borders are the card and header edges on a single dark field; with no shadow (removed) and no fill step large enough to separate cards, the edge is what makes a card a card. Whether "the room lights" replaces edges with light is MOTION-21's composition call, not a taste deletion.
+- *few-pictures* (all routes) — MOTION-24 froze the asset set at A0 on measurement; `/work`, `/data` and the case study are text and SVG by design (SVG does not count for this rule). More pictures need owner-supplied photography (D-13 consequence).
+- *blank-gap* (`/` 4 stretches, `/data` 1) — present at HEAD in the same places (home ±16–32 px, `/data` one 1,140 px
+  stretch that moved up 136 px because the removed pill and ordinals shortened
+  the page above it); not caused here and not diagnosed in this sprint. Routed to MOTION-13 (ambient/decoration audit), which owns empty-field composition.
+- *headline-lines @390* (`/`) — the h1 is the owner's four-word legal name; it wraps to three lines at 39 px. Shrinking a name to fit a rule is worse than three lines. MOTION-25 (Archivo) re-measures it.
+- *off-centre* (`/work` @390, case study @1440) — the case study is a 62 rem article with a sticky stage column (L3.3), asymmetric by design; `/work` @390 is the 41 px right gutter of the filter row. Both pre-existing.
+- *eyebrow* (`/data` 4, case study 1) — `/data`: detector false positives — `<td>` cells inside the `sr-only` chart tables (M4.7), and the inspector's sr-only walk stops 4 ancestors up; shortening the chain would reintroduce the Sprint 5 sr-only-on-`<table>` phantom-width bug. Case study: the category pill carries the value ("ai-ml"), which is data.
+- *mono* (`/data`) — `BootSequence`'s simulated terminal: code-shaped text, which the rule itself allows; the rest of the mono prose was converted.
+- *shadow* (`/data`) — the same terminal window's frame (fully transparent at rest, `rgba(0,0,0,0)` ×N in the reading).
+- *icon-cards* (`/data`) — the 4 GitHub `MetricCard`s and the 3 phase cards: each icon names a different metric kind; replacing them with words duplicates the label.
+- *emoji ★* (`/data` @768) — the star count glyph beside GitHub star numbers; it is the unit, not decoration.
+
+**Not applicable, measured.** M12.0 "hide 0-count filter chips": `ProjectFilter` renders no counts and every category is non-empty (`web 4, ml 9, cli 5, devops 2, iot 2`), so there is no 0-count chip to hide. `CapabilityArchitecture` stage numbers on `/about` are kept — a real numbered pipeline, and outside the four measured routes.
+
+**Close-out findings (the first full e2e run, 425 / 3 failed / 1 skipped).**
+All three were consequences of this sprint, not flakes:
+- `work.spec.ts:422` (sticky panel height drifts 2.9 px across stages) and
+  `pointer-touch.spec.ts:407` (reading list nudged 1 px by a tap): the
+  Case Study Reactor's reserved slots were sized for the old type. With `xs` at
+  13 px the tallest stage text is **139 px** at `lg` (slot was 136) and
+  **213 px** below `lg` (slot 212); the tallest diagram at 768 is **305 px**
+  (slot 304). Re-probed at 320/375/390/768/1024/1440 and raised to
+  `lg:min-h-[9rem]` / `min-h-[13.75rem]` and `lg:min-h-[17.5rem]` /
+  `min-h-[19.5rem]`. The comment in `CaseStudyReactor.tsx` now says the type
+  scale, not only the copy, forces a re-probe.
+- `hero-metrics.spec.ts:171` pinned the old `/work` subtitle. The new one also
+  rendered **"DevOps , with 2 written case studies"** — the JSX newline before
+  the `&&` clause became a space before the comma, and with zero case studies
+  the sentence would have lost its full stop. It is now one template string;
+  the spec pins only the count-bearing opening.
+
+**Reduced-motion probe (the hydration-gap fix).** `reducedMotion: "reduce"`,
+loads at 1440 and 390, with and without JavaScript, sampled at 200 / 800 /
+1500 / 3000 ms from navigation: the h1, its lowest `.split-word` span, the hero
+CTAs and the metric row read effective opacity **1.00** at every sample once the
+element exists (one cold-start sample at 200 ms was before the document had
+parsed). No-JS is identical, so the CSS backstop alone carries the guarantee.
+
+**Pre-existing flake recorded, not fixed.** `hero-metrics.spec.ts:295`
+("reduced motion keeps the hero static") reads `animationName === ""` in
+isolation: **4 / 5 failed at HEAD**, 3 / 5 on the working tree, and it passed
+in both full runs. A direct probe under emulated reduced motion reads `none`
+every 100 ms for 3 s, three loads in a row. The difference is in the harness,
+not the product; it belongs to whoever next touches MOTION-02's spec.
+
+**Signature move.** D-15: the capability map lighting its edges is the one
+loud moment; all other chapters keep the quiet `view()` entrance. No new motion
+is added here; MOTION-21 builds it out.
+
+**Gates.** See `QA_CHECKLIST.md` §8 MOTION-12.
+
+**Lesson.** A source-guard test that greps CSS for `opacity: 0` counts comments
+too: the first close-out run failed `scroll-animations.guard.test.ts` only
+because two new explanatory comments quoted the literal. The fix was to say
+"transparent" in the comment, not to loosen the guard — the guard is right that
+a hiding rule outside `@supports` would hide content forever.
+
+**Commit:** `motion: MOTION-12 taste pass — 49 → 22 tells, one signature move`.

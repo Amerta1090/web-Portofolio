@@ -186,6 +186,22 @@ git diff -- <files>
 
 ## 8. Sprint results log
 
+### MOTION-12 — 2026-11-24 (taste pass, signature move D-15)
+
+| Gate | Result |
+| --- | --- |
+| `bun run validate-data` | OK (`GitHub cache: non-degenerate`) |
+| `bun run build:fast` | **72 pages** — unchanged; no route added or removed |
+| `bun run check:links` | **0 broken / 1,477 same-site links / 73 pages** |
+| `bunx astro check` | **89** errors, 0 warnings = baseline |
+| Biome, touched files | per-file diagnostics identical to HEAD `53fdd2b` on all 35 source/spec files (HEAD worktree A/B); two format-only diagnostics introduced during close-out fixed with `biome format` |
+| Unit suite | **1168 / 1168 (104 files)**. The first run failed `scroll-animations.guard.test.ts` — two new CSS comments quoted the literal `opacity: 0`, which the guard counts; reworded, guard unchanged |
+| Full e2e `--workers=1` | First run **425 passed / 3 failed / 1 skipped** — all three caused by this sprint (Reactor slots sized for the old type ×2, pinned `/work` subtitle); fixed, then **428 passed / 1 skipped / 0 failed (8.5 min)**. Pre-existing flake `hero-metrics.spec.ts:295` recorded (4/5 fail at HEAD in isolation, passes in full runs) |
+| Taste inspector, 4 routes (HEAD worktree vs working tree) | FAIL **49 → 22**: `/` 14→5, `/work` 9→4, `/data` 16→9, `/work/ai-quranic-tafsir` 10→4; WARN 18→18; 0 new FAIL ids. Every kept FAIL has a reason in `SESSION_LOG.md` |
+| Reduced motion, hero | effective opacity 1.00 for h1, `.split-word`, CTAs, metric row at 200/800/1500/3000 ms, 1440 + 390, with and without JS |
+| `measure:routes` | `/` **193.4 / 492.7 / 32.0 KB**, 9 islands (5e/4d) — flat (html −0.2); `/work/ai-quranic-tafsir` 149.4 / 391.7 / 18.6 (−0.1/−0.1); `/lab` 177.9 / 503.1 / 19.9 (−0.1) |
+| Reactor slots, re-probed 320–1440 | tallest text 139 px `lg` / 213 px below; tallest diagram 276 / 305 px → slots 144 / 220 px and 280 / 312 px |
+
 ### MOTION-24 — 2026-11-20 (asset audit, verdict A0)
 
 | Gate | Result |

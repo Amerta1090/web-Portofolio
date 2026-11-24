@@ -198,6 +198,7 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl, metr
       >
         <div className="flex flex-col items-start gap-6 md:gap-8">
           <motion.div
+            data-hero-entrance
             initial={{ opacity: 0, scale: 0.9 }}
             animate={loaded ? { opacity: 1, scale: 1 } : {}}
             transition={{ ...easing["ease-spring-gentle"], delay: duration.fast }}
@@ -207,6 +208,7 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl, metr
 
           <div className="flex flex-col gap-6">
             <motion.div
+              data-hero-entrance
               initial={{ opacity: 0, y: 8 }}
               animate={loaded ? { opacity: 1, y: 0 } : {}}
               transition={{ ...easing["ease-spring-gentle"], delay: duration.normal }}
@@ -227,6 +229,7 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl, metr
             </div>
 
             <motion.div
+              data-hero-entrance
               initial={{ opacity: 0, x: -8 }}
               animate={loaded ? { opacity: 1, x: 0 } : {}}
               transition={{ ...easing["ease-spring-gentle"], delay: duration.slow }}
@@ -239,6 +242,7 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl, metr
             </motion.div>
 
             <motion.div
+              data-hero-entrance
               className="flex gap-4 flex-wrap pt-2"
               initial={{ opacity: 0, y: 12 }}
               animate={loaded ? { opacity: 1, y: 0 } : {}}
@@ -291,6 +295,7 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl, metr
               ) : (
                 <motion.ul
                   className={ROW_CLASS}
+                  data-hero-entrance
                   data-hero-metric-row={loaded ? "ready" : "pending"}
                   initial={{ opacity: 0, y: 8 }}
                   animate={loaded ? { opacity: 1, y: 0 } : {}}
@@ -303,14 +308,22 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl, metr
         </div>
       </motion.div>
 
+      {/*
+        The cue is an affordance, not a fact, and on a phone it had nowhere to
+        live: at 390px the evidence row occupies the last 118px of the hero, so
+        a bottom-anchored cue (56px tall) could only be drawn on top of it —
+        measured overlap 56px. Keeping it only where there is room (sm and up) is
+        better than either stacking two texts or growing the hero past the fold
+        to make space for a hint everyone already knows.
+      */}
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-20"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-2 z-20"
         initial={{ opacity: 0 }}
         animate={loaded ? { opacity: 1 } : {}}
         transition={{ delay: duration.slow }}
         data-hero-scroll-cue
       >
-        <span className="text-[10px] text-text-secondary/30">Scroll</span>
+        <span className="text-xs text-text-secondary/30">Scroll</span>
         {!prefersReduced && (
           <motion.div
             className="w-px h-8 bg-border"

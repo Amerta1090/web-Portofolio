@@ -124,7 +124,7 @@ export default function ProjectFilter({ projects, baseUrl }: Props) {
             <a
               key={project.title}
               href={project.href}
-              className="block bg-bg-secondary border border-border rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 p-6 group"
+              className="block bg-bg-secondary border border-border rounded-xl hover:-translate-y-0.5 transition-all duration-200 p-6 group"
             >
               <div className="flex items-start justify-between gap-2 mb-2">
                 <h3 className="text-lg font-semibold text-text-primary line-clamp-2">
@@ -136,7 +136,7 @@ export default function ProjectFilter({ projects, baseUrl }: Props) {
                   </span>
                 )}
               </div>
-              <p className="text-text-secondary text-sm line-clamp-3 mb-3">{project.description}</p>
+              <p className="text-text-secondary text-base line-clamp-3 mb-3">{project.description}</p>
               {project.period && (
                 <p className="text-xs text-text-secondary mb-3">{project.period}</p>
               )}

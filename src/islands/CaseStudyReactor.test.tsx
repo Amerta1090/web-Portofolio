@@ -280,16 +280,18 @@ describe("CaseStudyReactor", () => {
   });
 });
 
-describe("CaseStudyReactor accessible names (Q4.2)", () => {
-  it("keeps a word boundary between the ordinal and the stage label", () => {
-    // The visual gap comes from `gap-2`, which name computation does not see:
-    // without an explicit space the name reads "01Problem".
+describe("CaseStudyReactor stepper names (Q4.2, MOTION-12)", () => {
+  it("names each step by its label alone, with no decorative index", () => {
+    // MOTION-12 removed the two-digit ordinal from the stepper. The active step
+    // is carried by `aria-current="step"` and by the panel's "Stage 2 of 5", so
+    // the accessible name must be exactly the visible label — no "01Problem"
+    // glue, and no number that the label does not show.
     const html = renderToStaticMarkup(<CaseStudyReactor stages={STAGES} />);
-    expect(html).not.toContain("01Problem");
+    expect(html).not.toMatch(/>\s*0\d\s*</);
     const { container } = render(<CaseStudyReactor stages={STAGES} />);
     const labels = [...container.querySelectorAll("[data-reactor-step]")].map(
       (el) => el.textContent,
     );
-    expect(labels).toEqual(["01 Problem", "02 Data", "03 Impact"]);
+    expect(labels).toEqual(["Problem", "Data", "Impact"]);
   });
 });

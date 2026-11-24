@@ -408,3 +408,39 @@ one appears.
 brand. A future accent feature must ship per-theme pairs that both pass AA and
 must remove the inline-override gate deliberately. Density remains the only
 legitimate inline write from the customiser.
+
+---
+
+## D-15 — One signature move: the capability map lights; every other chapter stays quiet
+
+**Date:** 2026-11-24 · **Status:** Accepted (MOTION-12 M12.3; MOTION-21 builds it out)
+
+**Context.** Before MOTION-12 the home had nine identical chapter fades and no
+moment a reader could name. The taste inspector also read the shared furniture
+on top of those fades (the literal "Section" eyebrow on every chapter, two-digit
+ordinals, mono micro-labels, gradient washes, a hover shadow) as a template
+signature, not a personal one. The candidates already in the chapter language
+were the hero hand-off (`--hero-handoff`, MOTION-02) and the Signal Loom edge
+signal (`SignalLoom.tsx`: card-to-card edges measured from real geometry, up to
+`SIGNAL_MAX_DOTS` = 3 signal dots travelling the selected edges, paused
+off-screen by `useRafGuard`, none under reduced motion or reduced data).
+
+**Decision.** The signature is the Signal Loom: **selecting a capability lights
+its edges to the projects that prove it.** It is the only motion on the site
+that carries data (edge weight = skill overlap, D-13 rule "light means
+evidence"), and it is what MOTION-20 already briefed as "the map lights". Every
+other chapter keeps the quiet CSS `view()` entrance and nothing louder; the hero
+hand-off stays a hand-off (a cue that fades), not a show. No new motion is added
+in this sprint — MOTION-21 turns the existing edge signal into the full moment
+within its budget (≤ +40 KB reachable, 0 new scroll listeners).
+
+**Alternatives considered.**
+- *The hero hand-off* — it happens to everyone in the first second, carries no
+  data, and making it loud would compete with the name it introduces.
+- *Per-chapter signatures* — that is the nine-fades problem again with more
+  effort per chapter.
+
+**Consequences.** Any later motion proposal for a chapter other than
+`#systems-in-motion` (and, per MOTION-20, the flagship "room lights" second
+beat) has to justify itself against this decision. MOTION-13 can remove ambient
+layers that compete with the map without a new decision.

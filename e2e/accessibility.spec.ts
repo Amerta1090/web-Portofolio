@@ -275,18 +275,18 @@ test.describe("Q4.2 — names, descriptions, selected state, reading order", () 
     await expect(page.getByRole("img", { name: /Problem/ })).toBeVisible();
   });
 
-  test("the reactor stepper names keep a word boundary between ordinal and label", async ({
-    page,
-  }) => {
+  test("the reactor stepper names each step by its label alone", async ({ page }) => {
     await openReactor(page);
     const names = await page
       .locator("[data-reactor-step]")
       .evaluateAll((els) => els.map((el) => el.textContent?.trim() ?? ""));
-    // Regression: the visible gap came from `gap-2`, which name computation does
-    // not see, so the names used to read "01Problem".
-    expect(names).toEqual(["01 Problem", "02 Data", "03 Model", "04 System", "05 Impact"]);
+    // MOTION-12 removed the two-digit ordinal. The old bug was "01Problem"
+    // (the visual gap came from `gap-2`, invisible to name computation); with
+    // the numeral gone the names are the labels, and the position is announced
+    // by `aria-current="step"` plus the panel's "Stage 2 of 5".
+    expect(names).toEqual(["Problem", "Data", "Model", "System", "Impact"]);
     for (const name of names) {
-      expect(name).toMatch(/^\d{2} [A-Z]/);
+      expect(name).toMatch(/^[A-Z][a-z]+$/);
     }
   });
 

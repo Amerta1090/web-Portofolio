@@ -888,7 +888,7 @@ placeholder paths), full 72-page build, image probe 1440/375,
 
 ## MOTION-12 — Taste pass: tells audit and one signature move
 
-**Status:** `READY` (2026-11-20, handed over by MOTION-24's close)
+**Status:** `DONE` (2026-11-24 — tells 49 → 22 FAIL on 4 routes, signature move D-15)
 **Priority:** P2
 **Objective:** Measure the site against the dated "AI tells" registry and keep
 only the devices that carry information; give the homepage one recognisable
@@ -905,22 +905,22 @@ decision is written with evidence; colour belongs to MOTION-14), no new route or
 section.
 
 **Tasks**
-- [ ] M12.1 Run taste `scripts/inspect.mjs` + impeccable `audit` on `/`,
+- [x] M12.1 Run taste `scripts/inspect.mjs` + impeccable `audit` on `/`,
       `/projects`, `/work/ai-quranic-tafsir`, `/observatory`; record findings
       with counts (baseline from source: 138 `font-mono`, 38 `.section-label`,
       249 `border-border`, 57 `backdrop-blur`, 78 `rounded-xl/2xl`, 6 two-digit
       ordinal emitters).
-- [ ] M12.0 Quick wins already measured: replace the literal "Section" eyebrow
+- [x] M12.0 Quick wins already measured: replace the literal "Section" eyebrow
       (`molecules/Section.astro:64`, 9 chapters) with real content or remove
       it; hide/disable 0-count project filter chips; resolve the two burger
       icons in the mobile header; move the hero "Scroll" cue off the metric row.
-- [ ] M12.2 Classify each tell: *carries information* (keep, with reason) vs
+- [x] M12.2 Classify each tell: *carries information* (keep, with reason) vs
       *ornament* (remove). Example: career ordinals are `aria-hidden` duplicates
       of the date — candidate removal; mono on numeric data stays.
-- [ ] M12.3 Pick one signature move from existing chapter language (e.g. the
+- [x] M12.3 Pick one signature move from existing chapter language (e.g. the
       hero hand-off or the Signal Loom edge draw) and let other chapters stay
       quieter; write it as a decision.
-- [ ] M12.4 Re-run the review; record the delta.
+- [x] M12.4 Re-run the review; record the delta.
 
 **Acceptance criteria**
 - Tells report before/after with numbers; every kept tell has a written reason.
@@ -930,11 +930,28 @@ section.
 **Definition of Done / verification:** review outputs in `SESSION_LOG.md`,
 targeted e2e, build, payload.
 
+### Result (2026-11-24)
+
+| Deliverable | Where |
+| --- | --- |
+| Tells before → after: `/` 14→5, `/work` 9→4, `/data` 16→9, case study 10→4 FAIL (49 → 22); WARN 18 → 18 | `SESSION_LOG.md` 2026-11-24 (HEAD worktree vs working tree, same inspector) |
+| Every removed device named; every kept FAIL with its reason | `SESSION_LOG.md` 2026-11-24 |
+| Signature move | D-15 — the capability map lights; other chapters stay quiet |
+| Gates | `QA_CHECKLIST.md` §8 MOTION-12 |
+
+**Deviations.** (1) The plan's source-count baseline did not reproduce; it was
+re-measured against HEAD. (2) `/projects` and `/observatory` are retired URLs;
+`/work` and `/data` were measured. (3) M12.0 "0-count filter chips" does not
+exist in the product (no counts rendered, no empty category) — recorded as
+not applicable. (4) The Tailwind `xs` step moved 12 → 13 px site-wide to clear
+the small-text tell; that is a type-scale change inside the existing families,
+not a rebrand (the family swap is MOTION-25).
+
 ---
 
 ## MOTION-25 — Typography: apply the D-13 type
 
-**Status:** `PLANNED` (added 2026-11-24 — gap found after MOTION-24)
+**Status:** `READY` (2026-11-24, MOTION-12 `DONE`; added the same day — gap found after MOTION-24)
 **Priority:** P1
 **Objective:** Finish the rebrand D-13 already approved. The owner accepted
 "Archivo (one family)" and "Fraunces, JetBrains Mono labels and the sage/clay
@@ -996,7 +1013,7 @@ second family (the one-family rule is part of D-13).
   measured, not estimated.
 - No CLS regression; overflow 0 at 7 widths; contrast specs unchanged.
 
-**Definition of Done / verification:** decision D-15 (type applied, with the
+**Definition of Done / verification:** decision D-16 (type applied, with the
 byte table), frames in `docs/motion/frames/`, `SESSION_LOG.md`, build, unit,
 targeted + full e2e `--workers=1`, payload. Commit `motion: MOTION-25 …`.
 
@@ -1557,7 +1574,7 @@ repositories are recorded in `STORYBOARD.md` §Concept, not fixed here.
 
 ## MOTION-21 — Signature moment
 
-**Status:** `PLANNED` (added 2026-10-31, `RESEARCH.md` §8)
+**Status:** `PLANNED` — MOTION-12 dependency met 2026-11-24 (D-15 names the move); waits only on MOTION-25 (type), which is `READY`
 **Priority:** P1
 **Objective:** Build the one interaction people remember and describe unprompted.
 **Outcome:** One signature moment — "the map lights" in `#systems-in-motion`, with "the room lights" on the flagship exhibits as the second beat (MOTION-20 rev. 2, `STORYBOARD.md` §Concept), progressive: static meaning without JS, full on capable devices, equivalent still under reduced motion.

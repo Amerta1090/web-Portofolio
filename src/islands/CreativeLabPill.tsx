@@ -31,16 +31,16 @@ export default function CreativeLabPill() {
             >
               <div className="flex items-center gap-2 mb-2">
                 <FlaskConical size={12} className="text-brand" />
-                <span className="text-[11px] font-medium text-text-primary">
+                <span className="text-xs font-medium text-text-primary">
                   Creative Lab
                 </span>
               </div>
-              <p className="text-[10px] text-text-secondary leading-relaxed mb-2.5">
+              <p className="text-xs text-text-secondary leading-relaxed mb-2.5">
                 Interactive experiments & visual playgrounds
               </p>
               <a
                 href="/lab"
-                className="flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg bg-brand/10 border border-brand/20 text-brand text-[11px] font-medium hover:bg-brand/20 transition-all"
+                className="flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg bg-brand/10 border border-brand/20 text-brand text-xs font-medium hover:bg-brand/20 transition-all"
               >
                 <span>Enter Lab</span>
                 <ArrowRight size={10} />

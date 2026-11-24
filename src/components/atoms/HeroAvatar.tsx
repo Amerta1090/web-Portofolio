@@ -11,8 +11,9 @@ export default function HeroAvatar({ className = "", animate = true }: HeroAvata
 
   return (
     <motion.div
+      data-hero-avatar
       className={`relative flex-shrink-0 ${className}`}
-      initial={{ opacity: 0, scale: 0.8 }}
+      initial={prefersReduced ? false : { opacity: 0, scale: 0.8 }}
       animate={animate ? { opacity: 1, scale: 1 } : { opacity: 1, scale: 1 }}
       transition={{ ...easing["ease-spring-gentle"], stiffness: 100, damping: 15, delay: duration.slow }}
     >

@@ -333,7 +333,7 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
     // live region below; the selected project's detail panel shows the rest.
     const cardClass = `flex min-h-11 w-full flex-col items-start justify-center gap-0.5 rounded-md border px-3 py-2 text-left transition motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-brand focus-visible:outline-offset-2 md:flex-row md:items-center md:gap-3 ${
       isSelected
-        ? "border-brand bg-brand/10 ring-1 ring-brand/40"
+        ? "border-brand bg-brand/10"
         : "border-border/70 bg-bg-secondary/80 hover:border-brand hover:bg-brand/10 focus-visible:border-brand focus-visible:bg-brand/10"
     }`;
 

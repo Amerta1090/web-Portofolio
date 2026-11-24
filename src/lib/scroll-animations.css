@@ -309,7 +309,24 @@
   [data-project-card-reveal],
   [data-lab-card-reveal],
   [data-reveal] > *,
-  [data-hero-handoff] [data-hero-scroll-cue] {
+  [data-hero-handoff] [data-hero-scroll-cue],
+  /* MOTION-12: the hero entrance and the metric cards start fully transparent
+   * from motion's `initial`, which is applied at hydration — before the
+   * preference is known. Without this the first screen blinks to zero and fades
+   * back over ~3 s, which the tells audit read as three invisible CTAs. Only the
+   * entrance wrappers are named (never `*`), so deliberately dimmed text such as
+   * the "(.pdf)" suffix keeps its own opacity. */
+    [data-hero-entrance],
+  [data-hero-avatar],
+  [data-metric-card],
+  /* MOTION-12: `RevealText` returns whole text when reduced motion is
+   * requested, but that branch only runs *after* hydration. Between Astro
+   * dropping `ssr` (hydration starts) and React committing, the server's
+   * transparent spans are live with no override, so the hero name was blank
+   * for ~700 ms — and permanently blank if hydration failed. A media-query
+   * rule has no such gap. */
+    .split-word,
+  .split-char {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;

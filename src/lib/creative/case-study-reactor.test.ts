@@ -192,20 +192,21 @@ describe("buildStageViews", () => {
     ]);
 
     expect(views).toHaveLength(2);
-    expect(views[0]?.ordinal).toBe("01");
+    expect(views[0]?.position).toBe(1);
     expect(views[0]?.positionLabel).toBe("Stage 1 of 2");
     expect(views[0]?.anchorId).toBe("stage-problem");
     expect(views[0]?.metric).toBeNull();
     expect(views[0]?.diagram).toBeNull();
-    expect(views[1]?.ordinal).toBe("02");
+    expect(views[1]?.position).toBe(2);
     expect(views[1]?.metric).toEqual({ label: "Context Relevance", value: "0.972" });
   });
 
-  it("pads ordinals past nine and stays deterministic", () => {
+  it("keeps positions stable past nine and stays deterministic", () => {
     const stages = Array.from({ length: 10 }, (_, i) => stage({ id: `stage-${i}` }));
     const views = buildStageViews(stages);
-    expect(views[9]?.ordinal).toBe("10");
-    expect(views.map((v) => v.ordinal)).toEqual(views.map((v) => v.ordinal));
+    expect(views[9]?.position).toBe(10);
+    expect(views[9]?.positionLabel).toBe("Stage 10 of 10");
+    expect(views.map((v) => v.position)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
   });
 
   it("returns an empty list for an empty stage list", () => {

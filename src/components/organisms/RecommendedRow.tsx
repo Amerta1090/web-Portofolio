@@ -143,14 +143,14 @@ export function RecommendedRow({
                   {item.tags.slice(0, 3).map((tag) => (
                     <span
                       key={tag}
-                      className="rounded-md border border-border px-1.5 py-0.5 text-[10px] text-text-secondary"
+                      className="rounded-md border border-border px-1.5 py-0.5 text-xs text-text-secondary"
                     >
                       {tag}
                     </span>
                   ))}
                 </span>
               ) : null}
-              <span className="mt-auto text-[10px] tabular-nums text-text-secondary/70">
+              <span className="mt-auto text-xs tabular-nums text-text-secondary/70">
                 kemiripan {Math.round(score * 100)}%
               </span>
             </button>

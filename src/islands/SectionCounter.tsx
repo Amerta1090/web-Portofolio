@@ -16,6 +16,13 @@ interface SectionCounterProps {
  * (header anchor links + `<section>` landmarks) — naming each dot would only
  * duplicate the section headings, and `aria-label` is prohibited on the
  * `role=generic` divs these dots are.
+ *
+ * MOTION-12 removed the `01 / 06` numerals above the dots. They were a
+ * decorated two-digit index restating exactly what the dot column already says
+ * (position = count of filled dots), i.e. furniture, not information — the
+ * tells audit flags that pattern as `numbering`. The current position and total
+ * stay available to tests and to any future readout as `data-section-current` /
+ * `data-section-total`, so nothing had to be inferred from pixels.
  */
 export default function SectionCounter({ sectionIds }: SectionCounterProps) {
   const { currentIndex, sectionCount } = useSectionInView(sectionIds);
@@ -23,13 +30,11 @@ export default function SectionCounter({ sectionIds }: SectionCounterProps) {
   return (
     <div
       data-section-counter
+      data-section-current={currentIndex + 1}
+      data-section-total={sectionCount}
       aria-hidden="true"
       className="fixed right-4 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-center gap-3 pointer-events-none select-none"
     >
-      <span className="text-xs font-medium text-brand tabular-nums">
-        {String(currentIndex + 1).padStart(2, "0")}
-        <span className="text-text-secondary"> / {String(sectionCount).padStart(2, "0")}</span>
-      </span>
       <div className="flex flex-col gap-1.5">
         {sectionIds.map((id, index) => (
           <div
