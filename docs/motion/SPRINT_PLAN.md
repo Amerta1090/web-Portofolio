@@ -932,6 +932,76 @@ targeted e2e, build, payload.
 
 ---
 
+## MOTION-25 — Typography: apply the D-13 type
+
+**Status:** `PLANNED` (added 2026-11-24 — gap found after MOTION-24)
+**Priority:** P1
+**Objective:** Finish the rebrand D-13 already approved. The owner accepted
+"Archivo (one family)" and "Fraunces, JetBrains Mono labels and the sage/clay
+palette retire" on 2026-11-05. MOTION-14 shipped the palette half; no sprint
+owned the type half, and MOTION-12's exclusion ("Fraunces / Inter / JetBrains
+Mono stay") predates D-13 and contradicts it. Measured 2026-11-24:
+`rg -i archivo src` = 0.
+**Outcome:** Archivo 400/600 is the one family on every route; big numbers use
+Archivo `wdth` 125, weight 300 (`STORYBOARD.md` §Concept, data colours);
+Fraunces and its fallback, preload and token retire; mono survives only where
+MOTION-12 classified it as carrying information (numeric data), in a face D-13
+allows.
+
+**Dependencies:** MOTION-12 (it decides which mono labels, eyebrows and
+ordinals are ornament and removes them — swapping the family of a label that
+MOTION-12 is about to delete is wasted work). Runs before MOTION-21 (the lit
+exhibits set big numbers in Archivo `wdth` 125) and MOTION-15 (M15.4 applies
+the final type hierarchy).
+
+**Scope:** `src/styles/global.css` (`@font-face`, `@fontsource` imports,
+`--font-display`, `.font-display`/`.text-*`/`.section-label`),
+`tailwind.config.mjs` `fontFamily`, `BaseLayout.astro` preload,
+`public/fonts/`, OG image renderer if it embeds a face, `DECISIONS.md`.
+Consumers measured 2026-11-24: 55 display/heading-scale uses, 126 `font-mono`,
+25 `.section-label` (re-count after MOTION-12 — these numbers will drop).
+**Exclusions:** no colour, layout or copy changes; no new route or section; no
+second family (the one-family rule is part of D-13).
+
+**Tasks**
+- [ ] M25.1 Choose the source: self-hosted latin subset of Archivo with the
+      `wght` and `wdth` axes (variable) vs two static weights + one `wdth` 125
+      instance. Measure both woff2 sizes; pick the smaller set that covers
+      400 / 600 / 300@`wdth` 125. Record the bytes against Fraunces 2 × ~18 KB.
+- [ ] M25.2 Fallback metrics: a "Archivo Fallback" `@font-face` with
+      `size-adjust`/ascent/descent overrides measured from the real file (the
+      Fraunces fallback pattern), so the swap causes no layout shift. Preload
+      only the weight the hero h1 uses.
+- [ ] M25.3 Replace `--font-display` and Tailwind `sans` with Archivo; retire
+      Inter (`@fontsource/inter` 4 imports) and Fraunces (files, `@font-face`,
+      fallback, preload). Retune the fluid scale (`--text-display/h1–h4`,
+      `--tracking-display`) for a grotesque — Fraunces' negative tracking and
+      0.95 line height were set for a serif.
+- [ ] M25.4 Mono: for every `font-mono` MOTION-12 kept, decide Archivo with
+      `tabular-nums` (default under the one-family rule) or a written exception
+      with a reason. Remove `@fontsource/jetbrains-mono` if nothing is left.
+- [ ] M25.5 Big numbers: one utility for Archivo `wdth` 125 / 300 used by the
+      hero metrics, `ImpactMetrics`, Observatory metric cards; check that
+      `font-stretch` actually resolves (computed style, not the class name).
+- [ ] M25.6 Gates: frames @1440 / 375 in both themes under reduced motion next
+      to `motion-20-target.jpg`; taste inspector on `/`; CLS on first load;
+      `e2e/typography.spec.ts` + `fonts` spec rewritten to the new families
+      (they pin Fraunces today); payload; overflow 0 at 320 (wider `wdth`
+      numerals are the risk).
+
+**Acceptance criteria**
+- `rg -i 'fraunces|jetbrains' src public` = 0, or each remaining hit has a
+  written exception in `DECISIONS.md`.
+- Font transfer on `/` ≤ today's (Inter 4 + JetBrains 2 + Fraunces 1 preload),
+  measured, not estimated.
+- No CLS regression; overflow 0 at 7 widths; contrast specs unchanged.
+
+**Definition of Done / verification:** decision D-15 (type applied, with the
+byte table), frames in `docs/motion/frames/`, `SESSION_LOG.md`, build, unit,
+targeted + full e2e `--workers=1`, payload. Commit `motion: MOTION-25 …`.
+
+---
+
 ## MOTION-13 — Ambient decoration audit
 
 **Status:** `PLANNED` (added 2026-10-31, `RESEARCH.md` §6)
@@ -1127,7 +1197,7 @@ hierarchy from MOTION-12.
 - [ ] M15.3 Split `highlights` into readable structure only where the source
       text already has labelled parts ("Logic & Parsing:", "Efficiency Gain:");
       otherwise keep prose, set at reading measure (65ch).
-- [ ] M15.4 Apply the MOTION-12 type hierarchy (display face for the page
+- [ ] M15.4 Apply the MOTION-12 + MOTION-25 type hierarchy (display face for the page
       title if that is the decision) and verify no-JS and reduced motion.
 
 **Acceptance criteria**
@@ -1492,7 +1562,7 @@ repositories are recorded in `STORYBOARD.md` §Concept, not fixed here.
 **Objective:** Build the one interaction people remember and describe unprompted.
 **Outcome:** One signature moment — "the map lights" in `#systems-in-motion`, with "the room lights" on the flagship exhibits as the second beat (MOTION-20 rev. 2, `STORYBOARD.md` §Concept), progressive: static meaning without JS, full on capable devices, equivalent still under reduced motion.
 
-**Dependencies:** MOTION-20, MOTION-14 (palette).
+**Dependencies:** MOTION-20, MOTION-14 (palette), MOTION-25 (type — the lit exhibits set big numbers in Archivo `wdth` 125).
 
 **Scope:** the chapter chosen in MOTION-20; GSAP/CSS/Canvas as the brief requires (D-02 still applies).
 **Exclusions:** no new full-viewport WebGL in editorial chapters unless MOTION-20 proves the need and the budget; no scroll hijacking.
@@ -1613,15 +1683,16 @@ MOTION-00 (DONE)
                                      └─ MOTION-14  colour system (triadic, OKLCH)
                                           ├─ MOTION-24  asset audit & cherry-on-top pilot (runs before 12)
                                           └─ MOTION-12  taste pass
-                                               └─ MOTION-21  signature moment
-                                                    └─ MOTION-13  ambient decoration audit
-                                                         └─ MOTION-15  evidence-first detail pages
-                                                              └─ MOTION-22  design notes (colophon)
-                                                                   └─ MOTION-09  QA & budget sweep
-                                                                        └─ MOTION-16  rubric gate (≥ 8.5)
-                                                                             └─ MOTION-23  real-people perception gate
-                                                                                  ├─ PASS → MOTION-10 release
-                                                                                  └─ miss → MOTION-L1, L2 … → 16 → 23
+                                               └─ MOTION-25  typography (apply D-13 type)
+                                                    └─ MOTION-21  signature moment
+                                                         └─ MOTION-13  ambient decoration audit
+                                                              └─ MOTION-15  evidence-first detail pages
+                                                                   └─ MOTION-22  design notes (colophon)
+                                                                        └─ MOTION-09  QA & budget sweep
+                                                                             └─ MOTION-16  rubric gate (≥ 8.5)
+                                                                                  └─ MOTION-23  real-people perception gate
+                                                                                       ├─ PASS → MOTION-10 release
+                                                                                       └─ miss → MOTION-L1, L2 … → 16 → 23
 ```
 
 Priority conflicts resolve in favour of the sprint that removes a measured
