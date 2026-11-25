@@ -1,4 +1,3 @@
-import { useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEvent, RefCallback } from "react";
 import type {
@@ -21,6 +20,7 @@ import { gsap } from "../lib/gsap";
 import { duration } from "../lib/motion";
 import { useGSAP } from "../lib/useGSAP";
 import { useRafGuard } from "../lib/useRafGuard";
+import { useHydratedReducedMotion } from "../lib/useHydratedReducedMotion";
 
 interface SignalLoomProps {
   graph: SignalLoomGraph;
@@ -60,7 +60,7 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
   const [hydrated, setHydrated] = useState(false);
   const [lowPower, setLowPower] = useState(false);
   const [edgeCoords, setEdgeCoords] = useState<EdgeCoordMap>({});
-  const prefersReduced = useReducedMotion() ?? false;
+  const prefersReduced = useHydratedReducedMotion();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);

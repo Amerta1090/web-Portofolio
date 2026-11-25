@@ -1,8 +1,9 @@
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { Check, Loader2, X } from "lucide-react";
 import { type ButtonHTMLAttributes, type ReactNode, useCallback, useState } from "react";
 import { cn } from "../../lib/utils";
 import { duration, easing } from "../../lib/motion";
+import { useHydratedReducedMotion } from "../../lib/useHydratedReducedMotion";
 
 type AsyncState = "idle" | "loading" | "success" | "error";
 
@@ -63,7 +64,7 @@ export function InteractionButton({
   ...props
 }: InteractionButtonProps) {
   const [state, setState] = useState<AsyncState>("idle");
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
 
   const setStateWithCallback = useCallback(
     (next: AsyncState) => {

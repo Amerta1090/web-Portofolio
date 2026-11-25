@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { useReducedMotion } from "motion/react";
 import ChartDataTable from "./ChartDataTable";
 import {
   drag,
@@ -16,6 +15,7 @@ import {
   type SimulationLinkDatum,
   type SimulationNodeDatum,
 } from "d3";
+import { useHydratedReducedMotion } from "../../lib/useHydratedReducedMotion";
 
 export interface GraphNode {
   id: string;
@@ -89,7 +89,7 @@ export default function NetworkGraph({
     width: propWidth ?? 600,
     height: propHeight ?? 400,
   });
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
 
   useEffect(() => {
     const container = containerRef.current;

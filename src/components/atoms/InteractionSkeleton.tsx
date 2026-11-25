@@ -1,6 +1,7 @@
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { cn } from "../../lib/utils";
 import { duration, stagger as staggerTokens } from "../../lib/motion";
+import { useHydratedReducedMotion } from "../../lib/useHydratedReducedMotion";
 
 /* ── Variants ── */
 
@@ -55,7 +56,7 @@ function SkeletonBlock({
   noShimmer,
   className,
 }: Omit<InteractionSkeletonProps, "count" | "direction" | "gap" | "stagger">) {
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
   const showShimmer = !prefersReduced && !noShimmer;
 
   return (
@@ -88,7 +89,7 @@ export function InteractionSkeleton({
   className,
   ...props
 }: InteractionSkeletonProps) {
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
   const staggerDelay = stagger ?? staggerTokens.quick;
 
   if (count <= 1) {
@@ -145,7 +146,7 @@ InteractionSkeleton.Text = function SkeletonText({
   width,
   className,
 }: { lines?: number; width?: string | number; className?: string }) {
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
 
   return (
     <div className={cn("flex flex-col gap-2", className)} role="status" aria-label="Loading text">

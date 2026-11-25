@@ -1,4 +1,3 @@
-import { useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
 import type { MeasuredYearGroup } from "../lib/creative/career-spine-select";
@@ -19,6 +18,7 @@ import {
 import { ROVING_KEYS, rovingTargetIndex } from "../lib/creative/roving";
 import type { RovingKey } from "../lib/creative/roving";
 import { ScrollTrigger, gsap } from "../lib/gsap";
+import { useHydratedReducedMotion } from "../lib/useHydratedReducedMotion";
 
 /**
  * Career Spine scrub (`#career`) — the enhancement layer on markup that already
@@ -80,7 +80,7 @@ export default function CareerSpine() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [status, setStatus] = useState("");
   const [lowData, setLowData] = useState(false);
-  const prefersReduced = useReducedMotion() ?? false;
+  const prefersReduced = useHydratedReducedMotion();
 
   const hostRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLElement | null>(null);

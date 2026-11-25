@@ -1,7 +1,8 @@
 import type { LucideIcon } from "lucide-react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { duration, easing, stagger } from "../lib/motion";
 import MetricCounter from "./MetricCounter";
+import { useHydratedReducedMotion } from "../lib/useHydratedReducedMotion";
 
 interface Props {
   icon: LucideIcon;
@@ -23,7 +24,7 @@ export default function MetricCard({ icon: Icon, value, suffix = "", label, inde
    * `scroll-animations.css` is the backstop for the first render, when the hook
    * has not resolved yet.
    */
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
   return (
     <motion.div
       data-metric-card

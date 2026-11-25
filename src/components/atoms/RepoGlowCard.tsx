@@ -1,9 +1,10 @@
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { GitFork, Star } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "../../lib/utils";
 import { duration, easing } from "../../lib/motion";
 import type { GitHubRepo } from "../../types/github";
+import { useHydratedReducedMotion } from "../../lib/useHydratedReducedMotion";
 
 const LANGUAGE_COLORS: Record<string, string> = {
   TypeScript: "#3178c6",
@@ -100,7 +101,7 @@ function AnimatedStarCount({ value, revealed }: { value: number; revealed: boole
 }
 
 export default function RepoGlowCard({ repo, rank, index }: RepoGlowCardProps) {
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
   const cardRef = useRef<HTMLDivElement>(null);
   const [glareX, setGlareX] = useState(50);
   const [glareY, setGlareY] = useState(50);

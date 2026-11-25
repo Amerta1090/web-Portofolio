@@ -1,5 +1,6 @@
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { duration, easing } from "../../lib/motion";
+import { useHydratedReducedMotion } from "../../lib/useHydratedReducedMotion";
 
 interface HeroAvatarProps {
   className?: string;
@@ -7,7 +8,7 @@ interface HeroAvatarProps {
 }
 
 export default function HeroAvatar({ className = "", animate = true }: HeroAvatarProps) {
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
 
   return (
     <motion.div

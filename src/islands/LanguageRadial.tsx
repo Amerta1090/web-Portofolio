@@ -1,8 +1,9 @@
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { useState } from "react";
 import ChartDataTable from "../components/atoms/ChartDataTable";
 import { useInstrumentEntry } from "../lib/useInstrumentEntry";
 import type { GitHubLangStats } from "../types/github";
+import { useHydratedReducedMotion } from "../lib/useHydratedReducedMotion";
 
 interface Props {
   languages: GitHubLangStats[];
@@ -53,7 +54,7 @@ function describeOuterArc(cx: number, cy: number, r: number, startAngle: number,
 }
 
 export default function LanguageRadial({ languages }: Props) {
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
   const { phase, ref } = useInstrumentEntry();
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 

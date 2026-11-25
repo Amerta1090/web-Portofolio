@@ -1,8 +1,9 @@
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { useState } from "react";
 import ChartDataTable from "../components/atoms/ChartDataTable";
 import { useInstrumentEntry } from "../lib/useInstrumentEntry";
 import type { WeeklyPattern } from "../types/github";
+import { useHydratedReducedMotion } from "../lib/useHydratedReducedMotion";
 
 interface Props {
   data: WeeklyPattern;
@@ -27,7 +28,7 @@ const CHART_W = WIDTH - PADDING.left - PADDING.right;
 const CHART_H = HEIGHT - PADDING.top - PADDING.bottom;
 
 export default function ActivityWave({ data }: Props) {
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
   const { phase, ref } = useInstrumentEntry();
   const [hoveredBar, setHoveredBar] = useState<number | null>(null);
 

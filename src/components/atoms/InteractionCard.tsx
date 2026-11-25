@@ -1,7 +1,8 @@
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { type ReactNode } from "react";
 import { cn } from "../../lib/utils";
 import { duration, easing } from "../../lib/motion";
+import { useHydratedReducedMotion } from "../../lib/useHydratedReducedMotion";
 
 export interface InteractionCardProps {
   /** Visual variant */
@@ -53,7 +54,7 @@ export function InteractionCard({
   className,
   onClick,
 }: InteractionCardProps) {
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
 
   const content = (
     <>

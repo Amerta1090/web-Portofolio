@@ -1,6 +1,7 @@
-import { motion, useInView, useReducedMotion } from "motion/react";
+import { motion, useInView } from "motion/react";
 import { useRef } from "react";
 import { distance, duration, easing, stagger } from "../../lib/motion";
+import { useHydratedReducedMotion } from "../../lib/useHydratedReducedMotion";
 
 interface RevealTextProps {
   text: string;
@@ -28,7 +29,7 @@ export default function RevealText({
 }: RevealTextProps) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once, margin: "-64px" });
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
   const parts = splitText(text, byWord);
   const delay = staggerDelay ?? (byWord ? stagger.relaxed : stagger.quick);
 

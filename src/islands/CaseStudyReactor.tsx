@@ -1,4 +1,3 @@
-import { useReducedMotion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, KeyboardEvent } from "react";
 import {
@@ -11,6 +10,7 @@ import {
 import type { ProcessStageView } from "../lib/creative/case-study-reactor";
 import { ROVING_KEYS, rovingTargetIndex } from "../lib/creative/roving";
 import type { RovingKey } from "../lib/creative/roving";
+import { useHydratedReducedMotion } from "../lib/useHydratedReducedMotion";
 
 interface CaseStudyReactorProps {
   stages: ProcessStageView[];
@@ -47,7 +47,7 @@ function orderStyle(order: number): CSSProperties {
 export default function CaseStudyReactor({ stages }: CaseStudyReactorProps) {
   const [activeId, setActiveId] = useState(stages[0]?.id ?? "");
   const [hydrated, setHydrated] = useState(false);
-  const prefersReduced = useReducedMotion() ?? false;
+  const prefersReduced = useHydratedReducedMotion();
   const buttonRefs = useRef(new Map<string, HTMLButtonElement>());
 
   const stageIds = useMemo(() => stages.map((stage) => stage.id), [stages]);

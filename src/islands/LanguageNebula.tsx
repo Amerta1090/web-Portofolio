@@ -1,7 +1,8 @@
-import { motion, useInView, useReducedMotion, AnimatePresence } from "motion/react";
+import { motion, useInView, AnimatePresence } from "motion/react";
 import { useRef, useState, useMemo } from "react";
 import ChartDataTable from "../components/atoms/ChartDataTable";
 import type { GitHubLangStats, GitHubRepo } from "../types/github";
+import { useHydratedReducedMotion } from "../lib/useHydratedReducedMotion";
 
 interface Props {
   languages: GitHubLangStats[];
@@ -24,7 +25,7 @@ const PARTICLE_COUNT = 30;
 export default function LanguageNebula({ languages, allRepos }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-64px" });
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
 

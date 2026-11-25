@@ -1,9 +1,10 @@
 import { Flame } from "lucide-react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { useState } from "react";
 import ChartDataTable from "../components/atoms/ChartDataTable";
 import { useInstrumentEntry } from "../lib/useInstrumentEntry";
 import type { ContributionCalendar } from "../types/github";
+import { useHydratedReducedMotion } from "../lib/useHydratedReducedMotion";
 
 interface Props {
   data: ContributionCalendar;
@@ -15,7 +16,7 @@ const CELL_GAP = 2;
 const DAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
 
 export default function ContributionHeatmap({ data, longestStreak = 0 }: Props) {
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
   const { phase, ref } = useInstrumentEntry();
   const [tooltip, setTooltip] = useState<{
     count: number;

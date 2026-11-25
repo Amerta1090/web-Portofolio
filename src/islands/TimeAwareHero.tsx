@@ -1,5 +1,5 @@
 import { ArrowRight } from "lucide-react";
-import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { motion, useScroll, useTransform } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import HeroAvatar from "../components/atoms/HeroAvatar";
 import RevealText from "../components/atoms/RevealText";
@@ -7,6 +7,7 @@ import { gsap } from "../lib/gsap";
 import type { HeroMetric } from "../lib/hero-metrics";
 import { duration, easing } from "../lib/motion";
 import { useTimeOfDay } from "../lib/useTimeOfDay";
+import { useHydratedReducedMotion } from "../lib/useHydratedReducedMotion";
 
 /** Shared by both branches of the evidence row, so the swap cannot change layout. */
 const ROW_CLASS = "flex flex-wrap gap-x-10 gap-y-4 pt-1";
@@ -40,7 +41,7 @@ function useReturnVisitor(): boolean {
 }
 
 export default function TimeAwareHero({ name, headline, tagline, resumeUrl, metrics = [] }: Props) {
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
   const { scrollY } = useScroll();
   const bgParallax = useTransform(scrollY, (v) => v * 0.15);
   const overlayParallax = useTransform(scrollY, (v) => v * 0.05);

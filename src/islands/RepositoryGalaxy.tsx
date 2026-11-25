@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { useReducedMotion, motion } from "motion/react";
+import { motion } from "motion/react";
 import { Star } from "lucide-react";
 import ErrorBoundary from "../components/atoms/ErrorBoundary";
 import { useCapabilityStore } from "../lib/useCapabilityStore";
@@ -7,6 +7,7 @@ import { useExperienceTier, getEffectiveTier } from "../lib/useExperienceTier";
 import NetworkGraph from "../components/atoms/NetworkGraph";
 import type { GitHubRepo, GitHubData } from "../types/github";
 import type { GraphNode, GraphLink } from "../components/atoms/NetworkGraph";
+import { useHydratedReducedMotion } from "../lib/useHydratedReducedMotion";
 
 interface Props {
   repos: GitHubRepo[];
@@ -126,7 +127,7 @@ export default function RepositoryGalaxy({ repos, gitHubData, className = "" }: 
   const initialized = useCapabilityStore((s) => s.initialized);
   const override = useExperienceTier((s) => s.override);
   const lightningMode = useExperienceTier((s) => s.lightningMode);
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
 
   useEffect(() => {
     setMounted(true);

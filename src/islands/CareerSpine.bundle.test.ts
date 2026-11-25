@@ -63,7 +63,9 @@ describe("CareerSpine island stays off the data layer", () => {
       "../lib/creative/career-spine-select",
       "../lib/creative/roving",
       "../lib/gsap",
-      "motion/react",
+      // Wraps motion's hook so reduced motion cannot break hydration; it
+      // imports only `motion/react` and `react`, so the chunk is unchanged.
+      "../lib/useHydratedReducedMotion",
       "react",
     ]);
   });

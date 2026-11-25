@@ -1,4 +1,4 @@
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import {
   Activity,
   ArrowLeftFromLine,
@@ -34,6 +34,7 @@ import { ExperienceScreen } from "./screens/ExperienceScreen";
 import { HomeScreen } from "./screens/HomeScreen";
 import { ProjectsScreen } from "./screens/ProjectsScreen";
 import { SkillsScreen } from "./screens/SkillsScreen";
+import { useHydratedReducedMotion } from "../../lib/useHydratedReducedMotion";
 
 type MenuState =
   | { type: "main_menu" }
@@ -428,7 +429,7 @@ export const GameMenuEngine: React.FC<{ isOpen: boolean; onClose: () => void }> 
   isOpen,
   onClose,
 }) => {
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
   const [mounted, setMounted] = useState(false);
 
   const [menuState, setMenuState] = useState<MenuState>({ type: "main_menu" });

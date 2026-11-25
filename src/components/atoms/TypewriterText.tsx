@@ -1,5 +1,5 @@
-import { useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useHydratedReducedMotion } from "../../lib/useHydratedReducedMotion";
 
 interface Props {
   text: string;
@@ -18,7 +18,7 @@ export default function TypewriterText({
   start = true,
   onComplete,
 }: Props) {
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
   const [count, setCount] = useState(prefersReduced ? text.length : 0);
   const [done, setDone] = useState(prefersReduced);
   const indexRef = useRef(0);

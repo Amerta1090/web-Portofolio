@@ -1652,7 +1652,7 @@ Decision record: **D-16** (`DECISIONS.md`, with the byte table).
    detached element computes every property as `""` (measured `isConnected:
    false` 8/10 runs). Without reduced motion: 0 page errors. The test now polls
    a fresh `querySelector` and only reads a connected node → 10/10. **Product
-   defect left open** (pre-existing; 26 source files use `useReducedMotion()`,
+   defect** (pre-existing; fixed in the follow-up entry below; 26 source files use `useReducedMotion()`,
    and any island whose markup branches on it mismatches the same way) —
    reduced-motion visitors get that island's server tree thrown away and
    re-rendered.
@@ -1672,3 +1672,47 @@ element — a type swap moved it 9 px. Assert the property itself (a pinned
 column travels with the document), not a frozen coordinate.
 
 **Commit:** `motion: MOTION-25 typography — Archivo one family, 157,956 → 49,452 B fonts`.
+
+---
+
+## 2026-11-25 — MOTION-25 follow-up: reduced-motion hydration mismatch fixed
+
+**Defect (found by MOTION-25's gates, pre-existing).** motion's
+`useReducedMotion()` reads `matchMedia` on the first client render, so under
+reduced motion it answered `true` while the server had rendered `false`. Islands
+whose markup branched on it failed hydration (React #418 → #423, plus one #425)
+and React rebuilt their trees from scratch. Probe, 7 routes × both preferences,
+scrolled through: under `reduce` — `/` **7** errors, `/data` **5**, `/contact`
+(→ home) **7**; every other route and every `no-preference` run **0**.
+
+**Fix.** `src/lib/useHydratedReducedMotion.ts` wraps motion's hook with
+`useSyncExternalStore` whose server snapshot is `false`: React uses that snapshot
+for the hydration pass (matching the server HTML) and re-renders with the real
+preference right after, instead of throwing. Plain client renders get the real
+value at once, and test mocks of `motion/react` keep working. All 26 production
+callers moved onto it (one rule: never branch render on the raw hook). Visible
+content does not wait for the re-render — the existing reduced-motion backstop in
+`src/lib/scroll-animations.css` already holds the hero entrance, metric cards and
+split text at opacity 1.
+
+**Measured (VERIFIED).**
+- Probe after the fix: **0 errors on all 7 routes × both preferences**.
+- `src/lib/useHydratedReducedMotion.test.tsx` (4): hydrate server HTML with no
+  recoverable error and keep the server node. Mutation (return the raw hook
+  value) → **2/2 hydration tests red**; restored, md5 identical.
+- `CareerSpine.bundle.test.ts` allowlist updated deliberately (`motion/react` →
+  `../lib/useHydratedReducedMotion`, which imports only `motion/react` + `react`).
+- Unit **1172 / 1172 (105 files)**; `astro check` 89, sorted diff vs HEAD empty;
+  biome per-file counts on the 26 touched files identical to HEAD; build 72
+  pages; links 0 broken / 1,477; `measure:routes` `/` 193.4 / 492.8 / 32.0 KB
+  (reachable +0.1 KB, the hook), Tafsir 149.4 / 391.8 / 18.6, `/lab`
+  177.9 / 503.2 / 19.9.
+- Full e2e `--workers=1` **430 passed / 1 skipped / 0 failed (7.7 min)**; the
+  hero reduced-motion tests **30/30** with `--repeat-each=10`.
+
+**Lesson.** A preference hook that reads the browser during render is a
+hydration mismatch waiting for the one visitor whose answer differs from the
+server's default — and that visitor is exactly the one an accessibility setting
+was written for. Read browser-only state through a server snapshot.
+
+**Commit:** `motion: reduced-motion hydration mismatch — server-snapshot hook for 26 callers`.

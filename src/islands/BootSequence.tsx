@@ -1,9 +1,10 @@
-import { motion, useInView, useReducedMotion } from "motion/react";
+import { motion, useInView } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import TypewriterText from "../components/atoms/TypewriterText";
 import { gsap } from "../lib/gsap";
 import { duration } from "../lib/motion";
 import type { GitHubData } from "../types/github";
+import { useHydratedReducedMotion } from "../lib/useHydratedReducedMotion";
 
 interface Props {
   gitHubData: GitHubData;
@@ -14,7 +15,7 @@ interface Props {
 const WINDOW_CONTROLS = ["#ff5f56", "#ffbd2e", "#27c93f"] as const;
 
 export default function BootSequence({ gitHubData, profileName, onComplete }: Props) {
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
   const sectionRef = useRef<HTMLDivElement>(null);
   const glitchRef = useRef<HTMLSpanElement>(null);
   const onCompleteRef = useRef(onComplete);

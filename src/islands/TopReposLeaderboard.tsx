@@ -1,11 +1,12 @@
 import { ArrowRight, GitCommit } from "lucide-react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import RepoGlowCard from "../components/atoms/RepoGlowCard";
 import { duration, easing, stagger } from "../lib/motion";
 import { useRafGuard } from "../lib/useRafGuard";
 import type { GitHubData } from "../types/github";
 import MagneticButton from "./MagneticButton";
+import { useHydratedReducedMotion } from "../lib/useHydratedReducedMotion";
 
 interface Props {
   topRepos: GitHubData["top_repos"];
@@ -14,7 +15,7 @@ interface Props {
 }
 
 export default function TopReposLeaderboard({ topRepos, repoActivity, builtAt }: Props) {
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
   const [feedIndex, setFeedIndex] = useState(0);
   const feedRef = useRef<HTMLDivElement>(null);
   const isPaused = useRef(false);

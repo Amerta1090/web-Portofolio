@@ -1,6 +1,6 @@
-import { useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import type { RefObject } from "react";
+import { useHydratedReducedMotion } from "./useHydratedReducedMotion";
 
 export type InstrumentPhase = "settled" | "armed" | "drawing";
 
@@ -21,7 +21,7 @@ interface InstrumentEntry {
  */
 export function useInstrumentEntry({ margin = "-64px" }: Options = {}): InstrumentEntry {
   const ref = useRef<HTMLDivElement>(null);
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
   const [phase, setPhase] = useState<InstrumentPhase>("settled");
 
   useEffect(() => {

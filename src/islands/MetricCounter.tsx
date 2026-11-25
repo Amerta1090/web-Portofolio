@@ -1,6 +1,6 @@
-import { useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { useInstrumentEntry } from "../lib/useInstrumentEntry";
+import { useHydratedReducedMotion } from "../lib/useHydratedReducedMotion";
 
 interface Props {
   value: number;
@@ -9,7 +9,7 @@ interface Props {
 }
 
 export default function MetricCounter({ value, suffix = "", label }: Props) {
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
   const { phase, ref } = useInstrumentEntry();
   // The final value is in SSR HTML and remains visible while the card is off-screen.
   const [display, setDisplay] = useState(value);

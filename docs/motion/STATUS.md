@@ -277,10 +277,10 @@ execution.** Gates: font transfer on `/` 49,452 B (was 157,956), CLS 0.000 @1440
 / 0.001 @375 (HEAD A/B), overflow 0 on 5 routes × 7 widths, taste inspector
 22 → 22 FAIL with 0 new ids, unit 1,168/1,168, `astro check` 89 (sorted diff
 empty), 72 pages, 1,477 links 0 broken, `/` 193.4 / 492.7 / 32.0 KB, full
-Playwright **430 passed / 1 skipped / 0 failed**. Open product defect found on the way (pre-existing,
-not fixed): under reduced motion `useReducedMotion()` differs between server and
-first client render, so React #418 discards the hero's server tree — see
-`SESSION_LOG.md` 2026-11-25.
+Playwright **430 passed / 1 skipped / 0 failed**. The pre-existing reduced-motion hydration mismatch it
+surfaced (React #418/#423 on `/` and `/data`, reduced-motion visitors only) is
+fixed by `useHydratedReducedMotion` — 0 errors on 7 routes × both preferences;
+see `SESSION_LOG.md` 2026-11-25 follow-up.
 
 **Previous (MOTION-24, 2026-11-20):** **MOTION-24 is DONE (2026-11-20) with verdict A0 — no new assets. Next:
 MOTION-12 `READY` (taste pass); do not start it in this execution.** The asset

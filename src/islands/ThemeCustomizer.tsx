@@ -1,16 +1,16 @@
 import { Palette, RotateCcw, X, Zap } from "lucide-react";
-import { useReducedMotion } from "motion/react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { distance, easing } from "../lib/motion";
 import { useExperienceTier } from "../lib/useExperienceTier";
 import { useThemeStore } from "../lib/useThemeStore";
+import { useHydratedReducedMotion } from "../lib/useHydratedReducedMotion";
 
 export default function ThemeCustomizer() {
   const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
   const density = useThemeStore((s) => s.density);
   const setDensity = useThemeStore((s) => s.setDensity);
   const reset = useThemeStore((s) => s.reset);

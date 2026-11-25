@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { FlaskConical, Sparkles, ArrowRight } from "lucide-react";
+import { useHydratedReducedMotion } from "../lib/useHydratedReducedMotion";
 
 export default function CreativeLabPill() {
   const [hovered, setHovered] = useState(false);
   const [isGallery, setIsGallery] = useState(false);
-  const prefersReducedMotion = useReducedMotion() ?? false;
+  const prefersReducedMotion = useHydratedReducedMotion();
 
   useEffect(() => {
     setIsGallery(window.location.pathname === "/lab");

@@ -1,9 +1,9 @@
-import { useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import ErrorBoundary from "../components/atoms/ErrorBoundary";
 import ChartDataTable from "../components/atoms/ChartDataTable";
 import { gsap, ScrollTrigger } from "../lib/gsap";
 import type { GitHubData } from "../types/github";
+import { useHydratedReducedMotion } from "../lib/useHydratedReducedMotion";
 
 interface Props {
   gitHubData: GitHubData;
@@ -56,7 +56,7 @@ function getSignatureLabel(data: GitHubData): string {
 }
 
 export default function CodeDNAHelix({ gitHubData }: Props) {
-  const prefersReduced = useReducedMotion();
+  const prefersReduced = useHydratedReducedMotion();
   const sectionRef = useRef<HTMLDivElement>(null);
   const dotsGroupRef = useRef<SVGGElement>(null);
   const [visible, setVisible] = useState(false);
