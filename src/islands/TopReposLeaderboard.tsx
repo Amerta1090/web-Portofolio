@@ -110,7 +110,7 @@ export default function TopReposLeaderboard({ topRepos, repoActivity, builtAt }:
           onMouseLeave={handleFeedMouseLeave}
         >
           <div className="flex items-center gap-2 mb-4">
-            <span className="text-xs font-mono text-text-secondary/40 tracking-wider uppercase">
+            <span className="text-xs font-medium text-text-secondary/40 tracking-wider uppercase">
               Recent Activity
             </span>
             <div className="flex gap-1">
@@ -138,7 +138,7 @@ export default function TopReposLeaderboard({ topRepos, repoActivity, builtAt }:
             >
               <GitCommit className="w-4 h-4 mt-0.5 shrink-0 text-text-secondary/40 group-hover:text-brand transition-colors" />
               <div className="min-w-0 flex-1">
-                <span className="text-xs font-mono text-brand/70 group-hover:text-brand transition-colors">
+                <span className="text-xs text-brand/70 group-hover:text-brand transition-colors">
                   {allCommits[feedIndex].repo_name}
                 </span>
                 <span aria-hidden="true" className="text-xs text-text-secondary/40 mx-2">·</span>

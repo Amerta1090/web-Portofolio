@@ -84,7 +84,7 @@ const buildTime = buildInfo?.fetched_at || buildInfo?.built_at || new Date().toI
                     <Flame class="h-5 w-5 text-brand" />
                   </div>
                   <div class="min-w-0">
-                    <p class="text-2xl font-bold text-text-primary tabular-nums tracking-tight">{gitHubData.derived_metrics.longest_streak}<span class="text-base font-normal text-text-secondary ml-1">days</span></p>
+                    <p class="text-2xl text-text-primary tracking-tight"><span class="text-numeral">{gitHubData.derived_metrics.longest_streak}</span><span class="text-base font-normal text-text-secondary ml-1">days</span></p>
                     <p class="mt-0.5 text-xs text-text-secondary/60">Longest streak</p>
                   </div>
                 </div>
@@ -96,7 +96,7 @@ const buildTime = buildInfo?.fetched_at || buildInfo?.built_at || new Date().toI
                     <Activity class="h-5 w-5 text-brand" />
                   </div>
                   <div class="min-w-0">
-                    <p class="text-2xl font-bold text-text-primary capitalize tabular-nums tracking-tight">{gitHubData.derived_metrics.most_active_day}</p>
+                    <p class="text-2xl font-bold text-text-primary capitalize tracking-tight"><span class="text-numeral">{gitHubData.derived_metrics.most_active_day}</span></p>
                     <p class="mt-0.5 text-xs text-text-secondary/60">Most active day</p>
                   </div>
                 </div>
@@ -108,7 +108,7 @@ const buildTime = buildInfo?.fetched_at || buildInfo?.built_at || new Date().toI
                     <Calendar class="h-5 w-5 text-brand" />
                   </div>
                   <div class="min-w-0">
-                    <p class="text-2xl font-bold text-text-primary tabular-nums tracking-tight">{gitHubData.derived_metrics.busiest_month}</p>
+                    <p class="text-2xl text-text-primary tracking-tight"><span class="text-numeral">{gitHubData.derived_metrics.busiest_month}</span></p>
                     <p class="mt-0.5 text-xs text-text-secondary/60">Busiest month</p>
                   </div>
                 </div>

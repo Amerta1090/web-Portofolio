@@ -1,8 +1,8 @@
 # Motion Programme — Status
 
-**Last updated:** 2026-11-24 (MOTION-12 `DONE`: tells **49 → 22 FAIL** on 4 routes, signature move D-15)
-**Branch:** `main` · **HEAD at session start:** `53fdd2b` (MOTION-25 planned)
-**Active sprint:** none — MOTION-12 `DONE` (2026-11-24). **Next: MOTION-25 `READY`** (typography: apply the D-13 type), then MOTION-21.
+**Last updated:** 2026-11-25 (MOTION-25 `DONE`: Archivo one family, D-16 — font transfer on `/` **157,956 → 49,452 B**, CLS 0.000, overflow 0 at 7 widths, taste 22 → 22 FAIL)
+**Branch:** `main` · **HEAD at session start:** `2928a49` (MOTION-12 taste pass)
+**MOTION-25 CLOSED (2026-11-25): DONE** — typography: apply the D-13 Archivo type (one family, variable wght + instanced wide-300, system mono), retune the display scale, add the big-number utility, retire Fraunces/JetBrains/Inter. **Next: MOTION-21 `READY`** (owner-approved dark-room palette, map lights, room lights).
 
 ## One-paragraph state
 
@@ -188,11 +188,11 @@ was added before MOTION-21.
 
 ## Active work
 
-**None in progress.** MOTION-00 … MOTION-24 are verified. `MOTION-24` closed as
-**A0 — no new assets** (2026-11-20): the audit removed 10 dead files and one
-consumer-less atom, and the archival-plate pilot was declined by its own
-measured kill criteria rather than by taste. **One sprint completed — do not
-start MOTION-12 in the same execution.**
+**None in progress.** MOTION-00 … MOTION-25 are verified. `MOTION-25` closed
+2026-11-25 (D-16): Archivo is the one family, big numbers use the instanced
+`wdth` 125 / 300 face via `.text-numeral`, Fraunces / Inter / JetBrains Mono are
+gone, font transfer on `/` fell 157,956 → 49,452 B. **One sprint completed — do
+not start MOTION-21 in the same execution.**
 
 **Agent skills (2026-10-31):** 13 review/design skills installed user-level
 (taste, impeccable, Emil ×5, GSAP ×5, web-design-guidelines); usage rules in
@@ -271,7 +271,18 @@ perception thresholds with ≥ 5 recruiters and ≥ 5 developers.
 
 ## Next action
 
-**MOTION-24 is DONE (2026-11-20) with verdict A0 — no new assets. Next:
+**MOTION-25 is DONE (2026-11-25, D-16). Next: MOTION-21 `READY` (signature
+moment — "the map lights", then "the room lights"); do not start it in this
+execution.** Gates: font transfer on `/` 49,452 B (was 157,956), CLS 0.000 @1440
+/ 0.001 @375 (HEAD A/B), overflow 0 on 5 routes × 7 widths, taste inspector
+22 → 22 FAIL with 0 new ids, unit 1,168/1,168, `astro check` 89 (sorted diff
+empty), 72 pages, 1,477 links 0 broken, `/` 193.4 / 492.7 / 32.0 KB, full
+Playwright **430 passed / 1 skipped / 0 failed**. Open product defect found on the way (pre-existing,
+not fixed): under reduced motion `useReducedMotion()` differs between server and
+first client render, so React #418 discards the hero's server tree — see
+`SESSION_LOG.md` 2026-11-25.
+
+**Previous (MOTION-24, 2026-11-20):** **MOTION-24 is DONE (2026-11-20) with verdict A0 — no new assets. Next:
 MOTION-12 `READY` (taste pass); do not start it in this execution.** The asset
 question is closed: `ASSETS.md` now carries a verdict for every file, the
 telephone plate fails its placement criterion at 375 px (45 px of fold left, a

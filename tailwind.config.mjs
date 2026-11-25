@@ -36,8 +36,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
-        mono: ["JetBrains Mono", "monospace"],
+        sans: ['"Archivo"', '"Archivo Fallback"', "system-ui", "sans-serif"],
+        mono: ["ui-monospace", '"SFMono-Regular"', "Menlo", "Consolas", '"Liberation Mono"', "monospace"],
       },
       fontSize: {
         xs: ["0.8125rem", { lineHeight: "1.125rem" }],

@@ -1594,3 +1594,81 @@ because two new explanatory comments quoted the literal. The fix was to say
 a hiding rule outside `@supports` would hide content forever.
 
 **Commit:** `motion: MOTION-12 taste pass — 49 → 22 tells, one signature move`.
+
+---
+
+## 2026-11-25 — MOTION-25 Typography: apply the D-13 type
+
+**Goal.** Finish the type half of D-13: Archivo as the one family, big numbers
+in Archivo `wdth` 125 / 300, Fraunces, Inter and JetBrains Mono retired.
+Decision record: **D-16** (`DECISIONS.md`, with the byte table).
+
+**What changed.**
+- Two self-hosted files replace seven faces: `archivo-latin-wght-normal.woff2`
+  (34,928 B, `wght` 100–900, the only preload) and `archivo-latin-wide300.woff2`
+  (14,524 B, instanced `wdth` 125 / `wght` 300, requested only where
+  `.text-numeral` renders). `@fontsource/inter` and `@fontsource/jetbrains-mono`
+  removed from `package.json`; `public/fonts/fraunces-latin-700-normal.woff2`
+  deleted; `OFL-Archivo.txt` ships with the files.
+- `--font-display` aliases `--font-sans`; `Archivo Fallback` metrics measured
+  from the shipped file (`size-adjust` 98.5 %, ascent 87.8 %, descent 21 %,
+  line-gap 0). Display scale retuned for a grotesque (`--tracking-display`
+  −0.02em, title line-height 0.98 → 1).
+- `.text-numeral` (Archivo, 300, `font-stretch: 125%`, tabular) on the hero
+  metric row, `MetricCounter`, `/about` and the GitHub Universe figures; the unit
+  suffix opts out of the width axis (`[font-stretch:normal]`) so "days" does not
+  read as another numeral. `e2e/typography.spec.ts` verifies `font-stretch` by
+  computed style.
+- `--font-mono` is the platform stack; every UI label, repo name, kbd chip and
+  identifier moved to Archivo. Written exceptions (D-16): code blocks / `<pre>`,
+  GitHub Universe `<code>` chips, the BootSequence terminal, lab readouts, the
+  case-study SVG diagram labels.
+
+**Measured (VERIFIED).**
+
+| Gate | Result |
+| --- | --- |
+| Font transfer on `/` (response bodies, fresh context) | **49,452 B** (34,928 + 14,524) at 1440 and 375, vs **157,956 B** before (Inter 4 + JetBrains 2 + Fraunces 1) — −108,504 B |
+| CLS on first load, HEAD worktree (`:4323`) vs working tree, 5 fresh contexts each | 1440: HEAD **0.113**, 0, 0, 0, 0 → now **0.000 ×5**; 375: **0.001 ×5** both. The HEAD cold shift was the hero block (`DIV.flex flex-col … gap-6`) moving on the font swap; it no longer moves |
+| Overflow, 5 routes × 7 widths (320–2560), real wheel | `/`, `/work`, `/data`, `/about`, `/work/ai-quranic-tafsir`: **`scrollX` 0, gap 0 at all 35 points** |
+| Taste inspector, HEAD vs working tree (`/`, `/work`, `/data`, Tafsir) | FAIL **22 → 22**, WARN **18 → 18**, **0 new FAIL ids**; HEAD reproduced MOTION-12's after-state exactly. `/data`'s kept `mono` FAIL is the BootSequence terminal (a D-16 exception; the face changed from JetBrains Mono to `ui-monospace`) |
+| Frames, reduced motion, both themes | `docs/motion/frames/m25-{dark,light}-{1440,375}.jpg` |
+| `rg -i 'fraunces\|jetbrains' src public` | **0** |
+| `bun run validate-data` | OK |
+| `bun run build:fast` | **72 pages** |
+| `bun run check:links` | **0 broken / 1,477 links / 73 pages** |
+| `bunx astro check` | **89** = baseline; sorted `file\|code` diff vs HEAD worktree **empty** |
+| Biome, 27 touched files | per-file counts identical to HEAD worktree (0 new); the 6 safe fixes in the rewritten `e2e/typography.spec.ts` applied (`Number.parseFloat`) |
+| `bun run test` | **1168 / 1168 (104 files)** |
+| `bun run measure:routes` | `/` **193.4 / 492.7 / 32.0 KB**, 9 islands (5e/4d) — flat; Tafsir 149.4 / 391.7 / 18.6; `/lab` 177.8 / 503.1 / 19.9; all dist JS 660.6 KB / 92 files |
+| Full e2e `--workers=1` | **430 passed / 1 skipped / 0 failed (7.5 min)** — after the two harness fixes below; the first run was 427 / 3 failed / 1 skipped |
+
+**Defects the gates surfaced (test harness, not product).**
+1. `hero-metrics.spec.ts` "reduced motion keeps the hero static" — the
+   pre-existing flake MOTION-12 recorded (4/5 at HEAD) is now root-caused.
+   Under reduced motion `useReducedMotion()` is `true` on the first client
+   render and `false` on the server, so React throws #418, discards the server
+   tree (#423) and re-renders; the locator's handle is then detached and a
+   detached element computes every property as `""` (measured `isConnected:
+   false` 8/10 runs). Without reduced motion: 0 page errors. The test now polls
+   a fresh `querySelector` and only reads a connected node → 10/10. **Product
+   defect left open** (pre-existing; 26 source files use `useReducedMotion()`,
+   and any island whose markup branches on it mismatches the same way) —
+   reduced-motion visitors get that island's server tree thrown away and
+   re-rendered.
+2. `work.spec.ts` "sticky column stays pinned" asserted `|Δtop| < 2` across a
+   320 px wheel. At 1440×900 with Archivo metrics `scrollIntoViewIfNeeded`
+   now lands the column at its natural top 105.3 px — 9.3 px short of the 96 px
+   pin line — so a correct sticky column pins *during* the wheel and read as
+   "moved 9.3 px" (the same trap L3.3 lesson 3 recorded). The assertion is now
+   a document delta (`after.docTop − before.docTop > 250`: a static column
+   gains 0) plus the existing 90–100 px pinned check → 32/32.
+3. `border-glow-contrast.spec.ts:86` failed once in the first full run; 4/4 in
+   isolation — load flake, no change.
+
+**Lesson.** A layout assertion written as "the viewport top did not change"
+encodes where the test *started*, and that depends on every pixel above the
+element — a type swap moved it 9 px. Assert the property itself (a pinned
+column travels with the document), not a frozen coordinate.
+
+**Commit:** `motion: MOTION-25 typography — Archivo one family, 157,956 → 49,452 B fonts`.

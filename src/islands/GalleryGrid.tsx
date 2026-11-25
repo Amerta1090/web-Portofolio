@@ -342,7 +342,7 @@ function ExperimentLoader() {
       data-experiment-loader=""
     >
       <div className="w-10 h-10 rounded-full border-2 border-border border-t-brand animate-spin" />
-      <p className="text-xs text-text-secondary font-mono">memuat eksperimen…</p>
+      <p className="text-xs text-text-secondary">memuat eksperimen…</p>
     </div>
   );
 }
@@ -566,7 +566,7 @@ export default function GalleryGrid() {
                 setActiveCategory(cat);
                 setFocusedIndex(-1);
               }}
-              className={`px-3 py-1.5 rounded-full text-xs font-mono border transition-colors ${
+              className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
                 isActive
                   ? "bg-accent/15 border-accent text-accent"
                   : "border-border/50 text-text-secondary hover:border-accent/50 hover:text-text-primary"
@@ -614,7 +614,7 @@ export default function GalleryGrid() {
               setActiveCategory("All");
               setFocusedIndex(-1);
             }}
-            className="rounded-full border border-border/50 px-4 py-1.5 text-xs font-mono text-text-secondary transition-colors hover:border-accent/50 hover:text-text-primary"
+            className="rounded-full border border-border/50 px-4 py-1.5 text-xs text-text-secondary transition-colors hover:border-accent/50 hover:text-text-primary"
           >
             Tampilkan semua ({experiments.length})
           </button>
@@ -643,7 +643,7 @@ export default function GalleryGrid() {
       )}
 
       <div className="text-center mt-12">
-        <div className="flex justify-center gap-4 text-[11px] text-text-secondary/40 font-mono">
+        <div className="flex justify-center gap-4 text-[11px] text-text-secondary/40">
           <span>← → navigate</span>
           <span className="w-px h-3 bg-border/40" />
           <span>Enter to launch</span>

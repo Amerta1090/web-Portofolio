@@ -42,7 +42,7 @@ export default function MetricCounter({ value, suffix = "", label }: Props) {
 
   return (
     <div ref={ref} className="text-center">
-      <span className="text-3xl md:text-4xl font-bold text-brand tabular-nums block">
+      <span className="text-3xl md:text-4xl text-numeral text-brand block">
         {display}
         {suffix}
       </span>

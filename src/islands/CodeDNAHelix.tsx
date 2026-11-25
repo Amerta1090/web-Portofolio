@@ -223,7 +223,7 @@ export default function CodeDNAHelix({ gitHubData }: Props) {
             <>
               <div className="inline-flex items-center gap-2 mb-6">
                 <span className="w-2 h-2 bg-brand rounded-full" />
-                <span className="text-xs text-text-secondary font-mono tracking-wider">
+                <span className="text-xs text-text-secondary font-medium tracking-wider">
                   CODE DNA
                 </span>
               </div>
@@ -278,7 +278,7 @@ export default function CodeDNAHelix({ gitHubData }: Props) {
       <div className="max-w-[720px] mx-auto px-4">
         {visible && (
           <div className="text-center mb-4">
-            <span className="inline-flex items-center gap-2 text-xs text-text-secondary/40 font-mono tracking-wider">
+            <span className="inline-flex items-center gap-2 text-xs text-text-secondary/40 font-medium tracking-wider">
               <span className="w-2 h-2 bg-brand rounded-full animate-pulse" />
               CODE DNA
             </span>

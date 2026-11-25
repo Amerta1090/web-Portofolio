@@ -409,7 +409,7 @@ export default function CareerSpine() {
                       aria-current={isActive ? "true" : undefined}
                       tabIndex={isActive ? 0 : -1}
                       onClick={() => jumpTo(index)}
-                      className={`w-full rounded px-2 py-1 text-left font-mono text-sm tabular-nums transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary ${
+                      className={`w-full rounded px-2 py-1 text-left text-sm tabular-nums transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary ${
                         isActive
                           ? "text-brand"
                           : "text-text-secondary/70 hover:bg-brand/10 hover:text-brand"

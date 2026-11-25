@@ -109,7 +109,7 @@ export function RecommendedRow({
         <p className="section-label text-text-secondary">
           Karena kamu jelajahi <span className="text-text-primary">{currentLabel}</span>, coba juga:
         </p>
-        <span className="rounded-full border border-border px-2 py-0.5 text-[11px] font-mono text-text-secondary">
+        <span className="rounded-full border border-border px-2 py-0.5 text-[11px] text-text-secondary">
           content-based · no LLM
         </span>
       </div>
@@ -131,7 +131,7 @@ export function RecommendedRow({
                 "hover:border-brand/60 hover:bg-surface-primary focus-visible:outline-2 focus-visible:outline-brand",
               )}
             >
-              <span className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-text-secondary">
+              <span className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-text-secondary">
                 {icons?.[item.id] ? <span aria-hidden="true">{icons[item.id]}</span> : null}
                 {item.id}
               </span>

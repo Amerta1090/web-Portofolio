@@ -233,7 +233,7 @@ export default function RepoGlowCard({ repo, rank, index }: RepoGlowCardProps) {
               {badge.label}
             </span>
             {lastActive && (
-              <span className={cn("text-xs font-mono", lastActive.color)}>
+              <span className={cn("text-xs", lastActive.color)}>
                 {lastActive.text}
               </span>
             )}

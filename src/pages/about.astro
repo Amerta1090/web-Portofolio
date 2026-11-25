@@ -93,19 +93,19 @@ const grouped = certifications.reduce((acc: Record<string, Certification[]>, cer
     <Container size="xl">
       <dl class="grid grid-cols-2 gap-x-6 gap-y-8 border-y border-border py-8 sm:grid-cols-4">
         <div>
-          <dd class="font-display text-h2 text-text-primary tabular-nums">{architecture.totalSkills}</dd>
+          <dd class="text-numeral text-h2 text-text-primary">{architecture.totalSkills}</dd>
           <dt class="section-label text-text-secondary mt-2">Skills</dt>
         </div>
         <div>
-          <dd class="font-display text-h2 text-text-primary tabular-nums">{architecture.stages.length}</dd>
+          <dd class="text-numeral text-h2 text-text-primary">{architecture.stages.length}</dd>
           <dt class="section-label text-text-secondary mt-2">Stages</dt>
         </div>
         <div>
-          <dd class="font-display text-h2 text-text-primary tabular-nums">{areaCount}</dd>
+          <dd class="text-numeral text-h2 text-text-primary">{areaCount}</dd>
           <dt class="section-label text-text-secondary mt-2">Capability areas</dt>
         </div>
         <div>
-          <dd class="font-display text-h2 text-text-primary tabular-nums">
+          <dd class="text-numeral text-h2 text-text-primary">
             {architecture.coveredProjects}<span class="text-text-secondary/50 text-h4">/{architecture.totalProjects}</span>
           </dd>
           <dt class="section-label text-text-secondary mt-2">Projects covered</dt>

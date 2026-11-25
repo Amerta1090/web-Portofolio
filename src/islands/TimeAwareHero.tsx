@@ -139,9 +139,13 @@ export default function TimeAwareHero({ name, headline, tagline, resumeUrl, metr
           text under AA needs 4.5:1, so the dimmed version failed in light mode
           while looking "styled".
         */}
-        <span className="font-display text-h4 text-text-primary tabular-nums transition-colors group-hover:text-brand">
+        <span className="text-h4 text-numeral text-text-primary transition-colors group-hover:text-brand">
           {m.value}
-          {m.suffix && <span className="text-text-secondary">{` ${m.suffix}`}</span>}
+          {/* The unit rides with the number but not its width axis: `font-stretch`
+              inherits, and a 125%-wide "days" reads as another numeral. */}
+          {m.suffix && (
+            <span className="text-text-secondary [font-stretch:normal]">{` ${m.suffix}`}</span>
+          )}
         </span>
         <span className="section-label text-text-secondary">{m.label}</span>
       </a>

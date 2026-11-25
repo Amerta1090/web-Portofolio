@@ -301,7 +301,7 @@ export function renderEvidenceSvg(
     COLORS.background
   }"/><text x="${metrics.sideMargin}" y="32" fill="${COLORS.eyebrow}" font-size="${
     metrics.eyebrowFont
-  }" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace" letter-spacing="2">${escapeXml(
+  }" font-family="var(--font-mono)" letter-spacing="2">${escapeXml(
     options.eyebrow,
   )}</text><text x="${metrics.sideMargin}" y="${
     geometry.height - 18

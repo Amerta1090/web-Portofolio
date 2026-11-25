@@ -132,7 +132,16 @@ const pageTurn: TransitionDirectionalAnimations = {
 
     <script is:inline type="application/ld+json" set:html={JSON.stringify(faqLd)} />
 
-    <link rel="preload" href="/fonts/fraunces-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin />
+    {/* MOTION-25 / D-13: one family on every route. Only the weight the hero
+        actually sets is preloaded — the rest swap in, guarded by the measured
+        `Archivo Fallback` so the swap costs no layout shift. */}
+    <link
+      rel="preload"
+      href="/fonts/archivo-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
 
     <script is:inline>
       (function () {

@@ -58,7 +58,7 @@ const stageViews = buildStageViews(processStagesOf(entry.data) ?? []);
             <span class="inline-flex items-center px-3 py-1 mb-4 text-xs font-medium bg-accent-muted/20 text-accent rounded-full">{category}</span>
           )}
 
-          <h1 class="font-display text-text-primary leading-tight mb-4" style="font-size: var(--text-title); line-height: 0.98; letter-spacing: var(--tracking-display);">
+          <h1 class="font-display text-text-primary leading-tight mb-4" style="font-size: var(--text-title); line-height: 1; letter-spacing: var(--tracking-display);">
             {title}
           </h1>
 
@@ -258,7 +258,7 @@ const stageViews = buildStageViews(processStagesOf(entry.data) ?? []);
   }
 
   .case-study-content code {
-    font-family: "JetBrains Mono", monospace;
+    font-family: var(--font-mono);
     font-size: 0.875rem;
     background: var(--bg-tertiary);
     padding: 0.15em 0.4em;

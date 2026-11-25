@@ -186,6 +186,25 @@ git diff -- <files>
 
 ## 8. Sprint results log
 
+### MOTION-25 — 2026-11-25 (typography, D-16)
+
+| Gate | Result |
+| --- | --- |
+| Font transfer on `/` | **157,956 → 49,452 B** (Archivo `wght` 34,928 + wide-300 14,524), measured from response bodies at 1440 and 375 |
+| CLS first load (HEAD worktree A/B, 5 fresh contexts) | 1440 HEAD 0.113 cold then 0 → now **0.000 ×5**; 375 **0.001** both — no regression |
+| Overflow | **0** at 320/375/768/1024/1440/1920/2560 on `/`, `/work`, `/data`, `/about`, Tafsir (real wheel) |
+| Taste inspector (4 routes, HEAD vs now) | FAIL 22 → 22, WARN 18 → 18, 0 new FAIL ids |
+| `rg -i 'fraunces\|jetbrains' src public` | 0 |
+| `bun run validate-data` / `build:fast` / `check:links` | OK / **72 pages** / **0 broken, 1,477 links, 73 pages** |
+| `bunx astro check` | **89** = baseline, sorted diff vs HEAD empty |
+| Biome, touched files | per-file counts = HEAD (0 new) |
+| Unit | **1168 / 1168 (104 files)** |
+| `measure:routes` | `/` 193.4 / 492.7 / 32.0 KB, 9 islands — flat |
+| Full e2e `--workers=1` | **430 passed / 1 skipped / 0 failed (7.5 min)** — after the two harness fixes below; the first run was 427 / 3 failed / 1 skipped |
+| Frames | `docs/motion/frames/m25-{dark,light}-{1440,375}.jpg` (reduced motion) |
+
+Two harness defects fixed (reduced-motion hydration remount read as `animationName ""`; sticky test pinned to a start coordinate) — see `SESSION_LOG.md`. The taste inspector **is** runnable: `node ~/.claude/skills/design-taste-frontend/scripts/inspect.mjs <url> --json` with `CHROME_PATH` set (MOTION-24's "not runnable" referred to a repo-local binary).
+
 ### MOTION-12 — 2026-11-24 (taste pass, signature move D-15)
 
 | Gate | Result |

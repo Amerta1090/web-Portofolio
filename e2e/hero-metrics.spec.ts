@@ -308,7 +308,21 @@ test.describe("MOTION-02 hero handoff", () => {
     );
     await expect(page.locator("#hero [data-hero-content] h1")).toBeVisible();
     const cue = page.locator("#hero [data-hero-scroll-cue]");
-    expect(await cue.evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
+    await expect(cue).toBeVisible();
+    // Read the live node, fresh each poll. Under reduced motion React can
+    // discard the server tree after hydration (#418 → #423, useReducedMotion is
+    // true on the first client render but false on the server) and the handle a
+    // locator resolved may be detached by the time it is read — a detached
+    // element computes every property as "" (measured 8/10 runs), which is the
+    // harness reading a corpse, not the cue animating.
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const el = document.querySelector("#hero [data-hero-scroll-cue]");
+          return el?.isConnected ? getComputedStyle(el).animationName : null;
+        }),
+      )
+      .toBe("none");
     expect(lenisRequests).toEqual([]);
   });
 });

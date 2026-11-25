@@ -951,7 +951,7 @@ not a rebrand (the family swap is MOTION-25).
 
 ## MOTION-25 — Typography: apply the D-13 type
 
-**Status:** `READY` (2026-11-24, MOTION-12 `DONE`; added the same day — gap found after MOTION-24)
+**Status:** `DONE` (2026-11-25) — D-16; completion notes below. (Was `READY` 2026-11-24, added after MOTION-24.)
 **Priority:** P1
 **Objective:** Finish the rebrand D-13 already approved. The owner accepted
 "Archivo (one family)" and "Fraunces, JetBrains Mono labels and the sage/clay
@@ -981,26 +981,26 @@ Consumers measured 2026-11-24: 55 display/heading-scale uses, 126 `font-mono`,
 second family (the one-family rule is part of D-13).
 
 **Tasks**
-- [ ] M25.1 Choose the source: self-hosted latin subset of Archivo with the
+- [x] M25.1 Choose the source: self-hosted latin subset of Archivo with the
       `wght` and `wdth` axes (variable) vs two static weights + one `wdth` 125
       instance. Measure both woff2 sizes; pick the smaller set that covers
       400 / 600 / 300@`wdth` 125. Record the bytes against Fraunces 2 × ~18 KB.
-- [ ] M25.2 Fallback metrics: a "Archivo Fallback" `@font-face` with
+- [x] M25.2 Fallback metrics: a "Archivo Fallback" `@font-face` with
       `size-adjust`/ascent/descent overrides measured from the real file (the
       Fraunces fallback pattern), so the swap causes no layout shift. Preload
       only the weight the hero h1 uses.
-- [ ] M25.3 Replace `--font-display` and Tailwind `sans` with Archivo; retire
+- [x] M25.3 Replace `--font-display` and Tailwind `sans` with Archivo; retire
       Inter (`@fontsource/inter` 4 imports) and Fraunces (files, `@font-face`,
       fallback, preload). Retune the fluid scale (`--text-display/h1–h4`,
       `--tracking-display`) for a grotesque — Fraunces' negative tracking and
       0.95 line height were set for a serif.
-- [ ] M25.4 Mono: for every `font-mono` MOTION-12 kept, decide Archivo with
+- [x] M25.4 Mono: for every `font-mono` MOTION-12 kept, decide Archivo with
       `tabular-nums` (default under the one-family rule) or a written exception
       with a reason. Remove `@fontsource/jetbrains-mono` if nothing is left.
-- [ ] M25.5 Big numbers: one utility for Archivo `wdth` 125 / 300 used by the
+- [x] M25.5 Big numbers: one utility for Archivo `wdth` 125 / 300 used by the
       hero metrics, `ImpactMetrics`, Observatory metric cards; check that
       `font-stretch` actually resolves (computed style, not the class name).
-- [ ] M25.6 Gates: frames @1440 / 375 in both themes under reduced motion next
+- [x] M25.6 Gates: frames @1440 / 375 in both themes under reduced motion next
       to `motion-20-target.jpg`; taste inspector on `/`; CLS on first load;
       `e2e/typography.spec.ts` + `fonts` spec rewritten to the new families
       (they pin Fraunces today); payload; overflow 0 at 320 (wider `wdth`
@@ -1574,7 +1574,7 @@ repositories are recorded in `STORYBOARD.md` §Concept, not fixed here.
 
 ## MOTION-21 — Signature moment
 
-**Status:** `PLANNED` — MOTION-12 dependency met 2026-11-24 (D-15 names the move); waits only on MOTION-25 (type), which is `READY`
+**Status:** `READY` (2026-11-25) — MOTION-12 (D-15) and MOTION-25 (D-16 type) both `DONE`
 **Priority:** P1
 **Objective:** Build the one interaction people remember and describe unprompted.
 **Outcome:** One signature moment — "the map lights" in `#systems-in-motion`, with "the room lights" on the flagship exhibits as the second beat (MOTION-20 rev. 2, `STORYBOARD.md` §Concept), progressive: static meaning without JS, full on capable devices, equivalent still under reduced motion.

@@ -1,15 +1,32 @@
-@import "@fontsource/inter/latin-400.css";
-@import "@fontsource/inter/latin-500.css";
-@import "@fontsource/inter/latin-600.css";
-@import "@fontsource/inter/latin-700.css";
-@import "@fontsource/jetbrains-mono/latin-400.css";
-@import "@fontsource/jetbrains-mono/latin-500.css";
-
-/* ── Display font: Fraunces (self-hosted, latin subset) ── */
+/* ── Type: Archivo, one family (D-13, applied by MOTION-25) ──────────────
+   Self-hosted latin subsets, measured 2026-11-25 (see DECISIONS.md D-16):
+   - wght variable, 100–900, wdth pinned at 100 → 34,928 B
+   - wdth 125 / weight 300 static instance (big numerals) → 14,524 B
+   Together 49,452 B, replacing the retired display serif (18,212 B) + four
+   static sans faces (96,744 B) + two mono faces (43,000 B) = 157,956 B.
+   The variable file is declared with `format("woff2")`: variation support
+   comes from the fvar table, not the format hint, and the plain token is
+   accepted by every browser that can render woff2 at all. */
 @font-face {
-  font-family: "Fraunces";
-  src: url("/fonts/fraunces-latin-700-normal.woff2") format("woff2");
-  font-weight: 700;
+  font-family: "Archivo";
+  src: url("/fonts/archivo-latin-wght-normal.woff2") format("woff2");
+  font-weight: 100 900;
+  font-stretch: 100%;
+  font-style: normal;
+  font-display: swap;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Big numerals only — `.text-numeral` asks for `font-stretch: 125%` and this
+   face answers. It is a real instance (axes frozen with fontTools), so the
+   computed `font-stretch` reports the value the reader sees, not a synthesised
+   wide transform. Weights outside 300 at 125% intentionally have no face. */
+@font-face {
+  font-family: "Archivo";
+  src: url("/fonts/archivo-latin-wide300.woff2") format("woff2");
+  font-weight: 300;
+  font-stretch: 125%;
   font-style: normal;
   font-display: swap;
   unicode-range:
@@ -17,19 +34,29 @@
 }
 
 /* Metric-compatible fallback — prevents layout shift during swap.
-   Overrides mirror Fraunces vertical metrics (asc 1956/2000, desc 510/2000, gap 0);
-   size-adjust compensates Georgia's wider average character width. */
+   Overrides mirror Archivo's vertical metrics (asc 878/1000, desc 210/1000,
+   gap 0). size-adjust was measured against the real fallback face in Chromium
+   (Liberation Sans here, Arial elsewhere): Archivo runs ~1.7% wider in prose,
+   so the fallback is shrunk by ~1.5% rather than grown. */
 @font-face {
-  font-family: "Fraunces Fallback";
-  src: local("Georgia"), local("Times New Roman");
-  ascent-override: 97.8%;
-  descent-override: 25.5%;
+  font-family: "Archivo Fallback";
+  src: local("Arial"), local("Liberation Sans"), local("Helvetica Neue"), local("Helvetica");
+  ascent-override: 87.8%;
+  descent-override: 21%;
   line-gap-override: 0%;
-  size-adjust: 97%;
+  size-adjust: 98.5%;
   font-display: swap;
   unicode-range:
     U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+
+/* Mono survives where it carries information — code blocks, `<pre>`, lab
+   readouts — and nowhere else (written exception, DECISIONS.md D-16). It is
+   the platform's monospace, not a webfont: shipping 21,168 B so a reader can
+   see aligned code is not a trade the byte budget should make when every
+   desktop and mobile OS already has a monospace face. Production UI sets
+   numerals in Archivo with `tabular-nums`; MOTION-12 already removed the mono
+   label costume. */
 
 :root {
   /* ── Spacing ── */
@@ -41,9 +68,13 @@
   --space-2xl: 96px;
 
   /* ── Typography ── */
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
-  --font-display: "Fraunces", "Fraunces Fallback", Georgia, "Times New Roman", serif;
+  /* D-13 / MOTION-25: one family. Archivo carries body, labels and display;
+     `--font-display` stays as the semantic hook every `.font-display` use
+     reads, but it points at the same face. Mono is a written exception
+     (code + lab readouts), not a second text family. */
+  --font-sans: "Archivo", "Archivo Fallback", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+  --font-display: var(--font-sans);
 
   /* Fluid type scale — display untuk 1 headline raksasa per halaman,
      heading lain turun bertahap. Min diuji bebas overflow mulai 375px. */
@@ -57,7 +88,7 @@
      at 1440px, i.e. a 100px wall inside a 65ch measure. This cap keeps long
      titles to two lines while staying well above body size at 375px. */
   --text-title: clamp(2.25rem, 4vw + 1rem, 4.5rem);
-  --tracking-display: -0.035em;
+  --tracking-display: -0.02em;
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
@@ -357,10 +388,14 @@ pre {
   font-family: var(--font-display);
 }
 
-/* Display scale — satu headline raksasa per halaman (hero/page-title). */
+/* Display scale — satu headline raksasa per halaman (hero/page-title).
+   MOTION-25: line height moved 0.95 → 1.0 and tracking -0.035em → -0.02em
+   for the grotesque. Those values were tuned for the old serif's short
+   ascenders; at 0.95 Archivo's taller ascenders clip against the line above
+   when a long name wraps. */
 .text-display {
   font-size: var(--text-display);
-  line-height: 0.95;
+  line-height: 1;
   letter-spacing: var(--tracking-display);
   text-wrap: balance;
 }
@@ -379,14 +414,29 @@ pre {
   font-size: var(--text-h4);
 }
 
+/* Big numerals — Archivo wdth 125 / weight 300 (D-13, STORYBOARD §Concept).
+ *
+ * MOTION-25. One utility for every figure the reader is meant to weigh rather
+ * than read: hero metrics, the About capability stats and the Observatory
+ * metric cards. The wide face is a real static instance, so `font-stretch`
+ * selects it and the computed style reports 125% (verified in
+ * `e2e/typography.spec.ts`, not trusted from the class name). Tabular figures
+ * keep counters from jittering while they animate. */
+.text-numeral {
+  font-family: var(--font-sans);
+  font-weight: 300;
+  font-stretch: 125%;
+  font-variant-numeric: tabular-nums;
+}
+
 /* Group label — set in the reading face, not the terminal.
  *
- * MOTION-12. This utility used to be JetBrains Mono at 11px with 0.18em
+ * MOTION-12. This utility used to be the mono face at 11px with 0.18em
  * tracking and `text-transform: uppercase` — the exact costume the tells
  * registry calls out as "tiny tracked uppercase label", and the source of
  * most of the `micro-label` (28 on `/`) and `mono` findings. The *label* still
  * carries information (it names the block below it), so it stays; the costume
- * does not. Now it is ordinary Inter at 13px, which also clears the 13px
+ * does not. Now it is ordinary Archivo at 13px, which also clears the 13px
  * legibility floor the audit measures (`small-text`). Ordinals that used this
  * class were removed, not restyled — see `DECISIONS.md` D-15.
  */

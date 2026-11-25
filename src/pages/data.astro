@@ -84,7 +84,7 @@ const gitHubData = await fetchAllGitHubData();
            at opacity 0 and waits for a view() timeline, which after a
            ClientRouter swap left this page's h1 invisible (MOTION-18 e2e). -->
       <header class="mb-14">
-        <h1 class="font-display text-[clamp(2.25rem,6vw+0.5rem,5rem)] leading-[0.95] tracking-[-0.035em] text-text-primary mb-4">
+        <h1 class="font-display text-[clamp(2.25rem,6vw+0.5rem,5rem)] leading-none tracking-[-0.02em] text-text-primary mb-4">
           The portfolio, <span class="text-brand">read as a dataset</span>
         </h1>
         <p class="text-lg text-text-secondary max-w-3xl leading-relaxed">
@@ -131,7 +131,7 @@ const gitHubData = await fetchAllGitHubData();
             {timeline.yearTicks.map((tick) => (
               <>
                 <line x1={tick.x} y1={150} x2={tick.x} y2={162} stroke="var(--color-border)" stroke-width="1" />
-                <text x={tick.x} y={178} text-anchor="middle" fill="var(--color-text-secondary)" font-size="11" font-family="JetBrains Mono, monospace">
+                <text x={tick.x} y={178} text-anchor="middle" fill="var(--color-text-secondary)" font-size="11" font-family="var(--font-mono)">
                   {tick.label}
                 </text>
               </>
@@ -165,7 +165,7 @@ const gitHubData = await fetchAllGitHubData();
                 >
                   <title>{`${n.title}\n${n.label}`}</title>
                 </circle>
-                <text x={n.x} y={n.labelY} text-anchor="middle" fill="var(--color-text-secondary)" font-size="9.5" font-family="JetBrains Mono, monospace">
+                <text x={n.x} y={n.labelY} text-anchor="middle" fill="var(--color-text-secondary)" font-size="9.5" font-family="var(--font-mono)">
                   {n.title.length > 22 ? n.title.slice(0, 22) + "…" : n.title}
                 </text>
               </g>
@@ -297,7 +297,7 @@ const gitHubData = await fetchAllGitHubData();
                 <circle cx={n.cx} cy={n.cy} r={Math.max(8, Math.min(20, 6 + n.count * 3))} fill="rgba(122,140,111,0.18)" stroke="var(--color-brand)" stroke-width="1.5">
                   <title>{`${n.id}: ${n.count} projects`}</title>
                 </circle>
-                <text x={n.cx} y={n.cy + 3.5} text-anchor="middle" fill="var(--color-text-primary)" font-size="9" font-family="JetBrains Mono, monospace">
+                <text x={n.cx} y={n.cy + 3.5} text-anchor="middle" fill="var(--color-text-primary)" font-size="9" font-family="var(--font-mono)">
                   {n.id.length > 14 ? n.id.slice(0, 13) + "…" : n.id}
                 </text>
               </g>

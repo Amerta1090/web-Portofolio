@@ -444,3 +444,32 @@ within its budget (≤ +40 KB reachable, 0 new scroll listeners).
 `#systems-in-motion` (and, per MOTION-20, the flagship "room lights" second
 beat) has to justify itself against this decision. MOTION-13 can remove ambient
 layers that compete with the map without a new decision.
+
+## D-16 — One family: Archivo, with system mono (MOTION-25)
+
+**Date:** 2026-11-25 · **Status:** Accepted (implements D-13)
+
+**Context.** D-13 retired Fraunces and JetBrains Mono labels and named Archivo as the one family, but no sprint had owned the type until MOTION-25. The site still self-hosted four Inter faces (400/500/600/700) plus a JetBrains Mono face and a Fraunces display face, and `--font-display` pointed at the serif. The transfer cost on `/` was 157,956 B across seven preloaded or first-screen faces (Inter 400/500/600/700 = 96,744 B, JetBrains 400/500 = 43,000 B, Fraunces 700 = 18,212 B).
+
+**Decision.** Ship Archivo as the only webfont family, in two files:
+
+| file | bytes | role |
+| --- | ---: | --- |
+| `archivo-latin-wght-normal.woff2` | 34,928 | variable weight 100–900, body and display |
+| `archivo-latin-wide300.woff2` | 14,524 | instanced 125% width, weight 300, for `.text-numeral` |
+| **total** | **49,452** | |
+
+Both live under family `Archivo`; the wide face is `font-weight: 300; font-stretch: 125%`. `--font-display` aliases `--font-sans`. Fallback `Archivo Fallback` uses `size-adjust: 98.5%` with metrics measured from the shipped wght file (`ascent-override: 87.8%`, `descent-override: 21%`, `line-gap-override: 0%`). The only preload is the wght file; the wide face loads when `.text-numeral` first appears.
+
+**Mono.** JetBrains Mono retires entirely (0 bytes). `--font-mono` becomes the platform stack (`ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace`). It survives only where a monospace face carries information that proportionally spaced type cannot: `<pre>`/code blocks, the `GitHubUniverse` inline `<code>` chips, the BootSequence terminal, the lab experiment readouts, and the case-study SVG diagram labels (`case-study-evidence.ts`, `data.astro` ticks). Every production UI label, repo name, kbd chip and identifier was converted to Archivo (`CareerSpine`, `CodeDNAHelix`, `GalleryGrid`, `RecommendedRow`, `RepoGlowCard`, `RepositoryGalaxy3D`, `TopReposLeaderboard`, `Header`, `CreativeLabTeaser`, `CapabilityArchitecture`). The `CapabilityArchitecture` 10–11 px mono costume became Archivo with `tabular-nums` and 0.08em tracking.
+
+**Big numbers.** `.text-numeral` is the single utility for figures that should read as instruments: it sets `font-family: var(--font-sans)`, `font-weight: 300`, `font-stretch: 125%`, `font-variant-numeric: tabular-nums`, and inherits size. The wide instanced face is only requested when a page uses it. The `font-stretch` property is verified in `e2e/typography.spec.ts` via computed style, not by class name.
+
+**Out of scope.** `public/images/blog/*.svg` still declare `font-family="Inter, …"` in their text nodes; they are static image assets with no webfont request and are not served as HTML. No runtime path depends on a font name.
+
+**Alternatives considered.**
+- *Static 400 + 600 + 700 plus wide* — 57,552 B, more bytes for three weights where the variable file covers all of them.
+- *Full two-axis variable* — 90,104 B; `wdth` is only needed by numerals and the instanced wide face already provides it at 14,524 B.
+- *Keep JetBrains Mono* — 43,000 B for a face whose remaining jobs (code, terminal) the platform mono already covers.
+
+**Consequences.** Font transfer on `/` falls from 157,956 B to 49,452 B (a wide face may add 14,524 B on pages that show `.text-numeral`). Any future second family must reopen this decision with a measured byte budget and a route that needs it.

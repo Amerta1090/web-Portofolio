@@ -264,9 +264,9 @@ function path(stages: StageId[]): string {
     display: flex;
     align-items: baseline;
     gap: 0.625rem;
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 11px;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
@@ -298,16 +298,16 @@ function path(stages: StageId[]): string {
   }
 
   .cap-figure-key {
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 10px;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--color-text-secondary);
   }
 
   .cap-figure-val {
     margin-top: 0.125rem;
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 1.25rem;
     line-height: 1.1;
     font-variant-numeric: tabular-nums;
@@ -338,7 +338,7 @@ function path(stages: StageId[]): string {
 
   .cap-depth-key {
     margin-top: 0.5rem;
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 10px;
     letter-spacing: 0.06em;
     color: var(--color-text-secondary);
@@ -388,9 +388,10 @@ function path(stages: StageId[]): string {
      utilities by specificity, swallowing the keyboard ring (Rule 10). */
 
   .cap-area-count {
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 10px;
     font-weight: 400;
+    font-variant-numeric: tabular-nums;
     color: var(--color-text-secondary);
   }
 
@@ -414,9 +415,9 @@ function path(stages: StageId[]): string {
   }
 
   .cap-area-deepest-key {
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 10px;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--color-text-secondary);
     margin-right: 0.5rem;
@@ -445,8 +446,9 @@ function path(stages: StageId[]): string {
   }
 
   .cap-skill-projects {
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 10px;
+    font-variant-numeric: tabular-nums;
     color: var(--color-text-secondary);
     white-space: nowrap;
   }
@@ -527,7 +529,8 @@ function path(stages: StageId[]): string {
 
   .cap-crossing-path {
     margin-left: auto;
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
+    font-variant-numeric: tabular-nums;
     font-size: 11px;
     letter-spacing: 0.04em;
     color: var(--color-brand);

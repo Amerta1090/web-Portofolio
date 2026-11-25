@@ -260,7 +260,7 @@ export default function RepositoryGalaxy3D({ planets, repos, gitHubData }: Props
       </AnimatePresence>
 
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 pointer-events-none">
-        <p className="text-[10px] text-white/20 text-center font-mono">
+        <p className="text-[10px] text-white/20 text-center">
           {selected
             ? "Click outside to close"
             : "Click any planet to explore · Scroll to zoom · Drag to orbit"}

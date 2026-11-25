@@ -401,10 +401,16 @@ test.describe("Case Study Reactor responsive composition", () => {
 
       // The list scrolled 320px up…
       expect(after.stageList.top).toBeLessThan(before.stageList.top - 250);
-      // …while the stage column stayed exactly where it was, pinned at
-      // `top-24` (96px) and clear of the fixed h-16 header. A static column
-      // would have moved with the list.
-      expect(Math.abs(after.host.top - before.host.top)).toBeLessThan(2);
+      // …while the stage column travelled down the document with the viewport.
+      // A static column keeps its document position; a pinned one gains it.
+      // Measured as a document delta rather than "the viewport top did not
+      // change", because where `scrollIntoViewIfNeeded` lands is a function of
+      // everything above #process: at 1440×900 with the Archivo metrics the
+      // column starts 9.3px short of its 96px pin line (natural top 105.3) and
+      // only pins on the way down — a correct sticky column that the old
+      // `|Δtop| < 2` read as moving.
+      expect(after.host.docTop - before.host.docTop).toBeGreaterThan(250);
+      // Pinned at `top-24` (96px), clear of the fixed h-16 header.
       expect(Math.round(after.host.top)).toBeGreaterThanOrEqual(90);
       expect(Math.round(after.host.top)).toBeLessThanOrEqual(100);
       // The column is shorter than the list it annotates, so the pin range is
