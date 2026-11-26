@@ -90,3 +90,11 @@ A reader on a mid-range phone should be able to scroll the homepage with motion
 enabled and feel pacing, not turbulence; with reduced motion enabled they should
 get the same information with no scroll-linked movement at all; with JavaScript
 disabled they should still read every section in order.
+
+**2026-11-26 re-plan.** The owner chose to build the approved MOTION-20 design
+before any further audit or polish: MOTION-26/27/28 build it chapter by chapter
+(port of the round-9 mock in `.motion-mock/`), and each deletes what the target
+does not have. MOTION-13, 15, 22, 09, 16, 23 and 10 then run on the final page,
+so nothing is measured or polished twice. New order: 26 → 27 → 28 → 13 → 15 →
+22 → 09 → 16 → 23 → 10.
+

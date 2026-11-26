@@ -1021,7 +1021,7 @@ targeted + full e2e `--workers=1`, payload. Commit `motion: MOTION-25 …`.
 
 ## MOTION-13 — Ambient decoration audit
 
-**Status:** `READY` (2026-11-26 — MOTION-21 `DONE`; the signature now decides which ambient layers stay)
+**Status:** `PLANNED` (2026-11-26 re-plan — runs after MOTION-28, on the final page; auditing ambient layers on a page about to be replaced would be redone)
 **Priority:** P2
 **Objective:** Every always-on decorative effect must justify its cost or go.
 **Outcome:** A measured keep/remove decision for each ambient effect.
@@ -1574,7 +1574,7 @@ repositories are recorded in `STORYBOARD.md` §Concept, not fixed here.
 
 ## MOTION-21 — Signature moment
 
-**Status:** `DONE` (2026-11-26) — "the map lights" + "the room lights" shipped; next MOTION-13 `READY`
+**Status:** `DONE` (2026-11-26) — "the map lights" + "the room lights" shipped; next MOTION-26 `READY` (re-plan)
 **Priority:** P1
 **Objective:** Build the one interaction people remember and describe unprompted.
 **Outcome:** One signature moment — "the map lights" in `#systems-in-motion`, with "the room lights" on the flagship exhibits as the second beat (MOTION-20 rev. 2, `STORYBOARD.md` §Concept), progressive: static meaning without JS, full on capable devices, equivalent still under reduced motion.
@@ -1596,6 +1596,67 @@ repositories are recorded in `STORYBOARD.md` §Concept, not fixed here.
 - Reduced-motion and no-JS paths verified with controls.
 
 **Definition of Done / verification:** e2e, runtime probe, MotionScore, review outputs, docs.
+
+---
+
+## MOTION-26 — Build the approved design I: page shell (hero + flagship stage)
+
+**Status:** `READY` (2026-11-26, owner re-plan: build the approved MOTION-20 design before auditing or polishing anything else)
+**Priority:** P0
+**Objective:** Replace today's home structure with the approved target (`frames/motion-20-target.jpg`, rev. 2 "The dark room", D-13) chapter by chapter, starting with the first screen and the flagship stage.
+**Outcome:** Full-bleed graded portrait hero (name across the top, lede + one lime action at the foot; phone overlaid); flagship chapter as a sticky 34/66 stage — left: project name, one big `.text-numeral` figure with its caption, case study / source links, "Shipped systems" index with a lime marker; right: the exhibit for the current project (static still in this sprint).
+
+**Rule for every redesign sprint (26–28):** anything on today's home that the target does not have is **deleted with its last consumer**, not restyled (Rule 3). Before building a chapter, list what it replaces and what dies; record it in `SESSION_LOG.md`. This is what keeps the programme from polishing parts that will not exist.
+
+**Source:** the round-9 mock in `.motion-mock/` (gitignored, local): `index.html`, `tpl.html`, `gen.py`, `assets/`, `stills/`. Port from it; numbers still come from the data layer (Rule 8), never from the mock's literals.
+
+**Scope:** `index.astro` hero + `#projects`; `TimeAwareHero`/`ProjectCardGrid` replaced or reduced to what the target keeps; assets with an `ASSETS.md` row.
+**Exclusions:** operable exhibits (MOTION-27); journey/lab/contact (MOTION-28); no new full-viewport canvas; the sticky stage uses CSS sticky + one IntersectionObserver or `view()`, **0 new scroll listeners** (the mock's window scroll listener must not ship).
+
+**Tasks**
+- [ ] M26.1 Inventory: today's hero + flagship parts → keep / replace / delete, written before code.
+- [ ] M26.2 Hero to target (1440 and 375 from the mock's measured constraints: name ≤ 5.2 rem max, CTA `nowrap`, photo band 30 svh on phone).
+- [ ] M26.3 Flagship sticky stage with static exhibits; project index drives which exhibit is current (IO), keyboard/deep-link reachable.
+- [ ] M26.4 Delete what the target dropped (components, CSS hooks, tests) in the same commit.
+
+**Acceptance criteria:** first screen matches the target at 1440 and 375 (frames captured); 0 new scroll listeners; overflow 0 at 7 widths; reduced motion and no-JS read every flagship; payload delta recorded.
+**DoD:** touched unit + e2e specs only (owner policy), build, links, payload, frames, docs, commit.
+
+---
+
+## MOTION-27 — Build the approved design II: the operable exhibits
+
+**Status:** `PLANNED` (2026-11-26)
+**Priority:** P0
+**Objective:** Make the three flagship exhibits run the owner's own artefacts in the browser, as the panel scored them.
+**Outcome:** Red Devil — minute/shots/xG/ground drive the six-coefficient Poisson GLM, curve + next-ten-minutes chance, caveat printed (ground p = 0.32); IJO PLIS — the saved Prophet models, market × horizon, 80 % band, trading days only; Tafsir — BM25 retrieval over the 1,896 passages for four questions, the unrun dense half named.
+
+**Known defects to close here (MOTION-20 findings):** Prophet emits negative weekend prices → trading days only, stated rule; Tafsir query encoder (1024-d) ≠ passage index (384-d) → BM25-only, said so in the caption; both "Live" demos 404 → label by what is true; outlier gaps drawn by a series-relative rule; caption claims computed by the same rule the chart draws.
+
+**Budget:** model/data files load only when the exhibit is visible or used (not in initial payload); reachable `/` increase recorded per exhibit; no main-thread work while off-screen.
+
+**Tasks**
+- [ ] M27.1 Data pipeline: model coefficients / saved forecasts / passage index produced by a build script from the repositories' artefacts (sources recorded), not hand-copied.
+- [ ] M27.2 Three exhibits as islands (`client:visible`), deterministic, reduced-motion still, no-JS still image + numbers.
+- [ ] M27.3 Defects above closed with tests that compute the caption from the drawn data.
+
+**DoD:** touched unit + e2e specs, payload per exhibit, docs, commit.
+
+---
+
+## MOTION-28 — Build the approved design III: journey, lab, contact + panel
+
+**Status:** `PLANNED` (2026-11-26)
+**Priority:** P0
+**Objective:** Finish the home to the target and score it.
+**Outcome:** Journey as *side facts, wide paragraph* with a labelled time-axis bar chart (data triad, keyed); "How it connects" keeps the MOTION-21 map; lab as a draggable row of all 27 real stills with ← → controls; contact as the dark visit card on the dusk photograph with the lime "Email me".
+
+**Tasks**
+- [ ] M28.1 Journey, lab row, contact to target; delete what they replace.
+- [ ] M28.2 Taste inspector on `/` (target mock had 0 FAIL) and three blind juror sub-agents vs the mock's 8.5.
+- [ ] M28.3 Home length, payload, scroll listeners, MotionScore recorded as the new baseline that MOTION-13 onward measure against.
+
+**DoD:** touched specs, measurements, docs, commit. Then MOTION-13 `READY`.
 
 ---
 
@@ -1701,7 +1762,8 @@ MOTION-00 (DONE)
                                           ├─ MOTION-24  asset audit & cherry-on-top pilot (runs before 12)
                                           └─ MOTION-12  taste pass
                                                └─ MOTION-25  typography (apply D-13 type)
-                                                    └─ MOTION-21  signature moment
+                                                    └─ MOTION-21  signature moment (DONE)
+                                                         └─ MOTION-26 → 27 → 28  build the approved MOTION-20 design (re-plan 2026-11-26)
                                                          └─ MOTION-13  ambient decoration audit
                                                               └─ MOTION-15  evidence-first detail pages
                                                                    └─ MOTION-22  design notes (colophon)
@@ -1719,7 +1781,8 @@ visual/asset/motion audit (`RESEARCH.md` §6) and run after the QA sweep so thei
 deltas are measured against its numbers. MOTION-14/15/16 were added the same day
 after the rubric projection (`RESEARCH.md` §7.3) showed 11–13 alone land near
 8.4 (pessimistic 7.75), under the 8.5 bar. Sprint numbers are not the execution
-order — the tree above is.
+order — the tree above is. **2026-11-26:** MOTION-26/27/28 run before MOTION-13
+(see `ROADMAP.md` re-plan).
 
 **2026-10-31 re-plan.** The owner approved restructuring first: MOTION-17–23
 were added, MOTION-09 moved to the end (one QA sweep on the final shape), and

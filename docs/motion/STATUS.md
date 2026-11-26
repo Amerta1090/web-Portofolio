@@ -1,6 +1,6 @@
 # Motion Programme — Status
 
-**Last updated:** 2026-11-26 (MOTION-21 `DONE`: "the map lights" + "the room lights" — reachable `/` +0.4 KB, 0 new scroll listeners, MotionScore `/` B 54–60 vs HEAD B 55, jurors 7.0 vs 3.7)
+**Last updated:** 2026-11-26 (MOTION-21 `DONE`; re-plan — MOTION-26/27/28 build the approved MOTION-20 design before MOTION-13)
 **Branch:** `main` · **HEAD at session start:** `2928a49` (MOTION-12 taste pass)
 **MOTION-25 CLOSED (2026-11-25): DONE** — typography: apply the D-13 Archivo type (one family, variable wght + instanced wide-300, system mono), retune the display scale, add the big-number utility, retire Fraunces/JetBrains/Inter. **Next: MOTION-21 `READY`** (owner-approved dark-room palette, map lights, room lights).
 
@@ -189,7 +189,7 @@ was added before MOTION-21.
 ## Active work
 
 **None in progress.** MOTION-21 closed 2026-11-26 (signature moment, D-15
-addendum). Next: **MOTION-13 `READY`** (ambient decoration audit). Earlier: `MOTION-25` closed
+addendum). Next: **MOTION-26 `READY`** (build the approved MOTION-20 design, part I — owner re-plan 2026-11-26; MOTION-13 now runs after MOTION-28). Earlier: `MOTION-25` closed
 2026-11-25 (D-16): Archivo is the one family, big numbers use the instanced
 `wdth` 125 / 300 face via `.text-numeral`, Fraunces / Inter / JetBrains Mono are
 gone, font transfer on `/` fell 157,956 → 49,452 B. **One sprint completed — do
@@ -272,8 +272,11 @@ perception thresholds with ≥ 5 recruiters and ≥ 5 developers.
 
 ## Next action
 
-**MOTION-21 is DONE (2026-11-26). Next: MOTION-13 `READY` (ambient decoration
-audit); do not start it in this execution.** Shipped: entry draw (WAAPI
+**MOTION-21 is DONE (2026-11-26). Next: MOTION-26 `READY` — build the approved
+MOTION-20 design, part I (hero + flagship stage), porting the round-9 mock in
+`.motion-mock/`. Owner re-plan 2026-11-26: 26 → 27 → 28 build the target and
+delete what it does not have; 13 → 15 → 22 → 09 → 16 → 23 → 10 then run on the
+final page.** Shipped: entry draw (WAAPI
 `scale`), uncapped light runs strongest-tie first, neighbour cards lit by an
 opacity glow on the run's arrival (`transition-delay` from `lightRunSchedule`),
 server render lit for no-JS; flagship exhibits lit from a dark wash on a named
