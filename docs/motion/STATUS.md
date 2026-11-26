@@ -1,6 +1,6 @@
 # Motion Programme — Status
 
-**Last updated:** 2026-11-26 (MOTION-21 `DONE`; re-plan — MOTION-26/27/28 build the approved MOTION-20 design before MOTION-13)
+**Last updated:** 2026-11-26 (MOTION-26 `DONE` — hero + flagship stage built to the target; next MOTION-27 `READY`)
 **Branch:** `main` · **HEAD at session start:** `2928a49` (MOTION-12 taste pass)
 **MOTION-25 CLOSED (2026-11-25): DONE** — typography: apply the D-13 Archivo type (one family, variable wght + instanced wide-300, system mono), retune the display scale, add the big-number utility, retire Fraunces/JetBrains/Inter. **Next: MOTION-21 `READY`** (owner-approved dark-room palette, map lights, room lights).
 
@@ -188,8 +188,10 @@ was added before MOTION-21.
 
 ## Active work
 
-**None in progress.** MOTION-21 closed 2026-11-26 (signature moment, D-15
-addendum). Next: **MOTION-26 `READY`** (build the approved MOTION-20 design, part I — owner re-plan 2026-11-26; MOTION-13 now runs after MOTION-28). Earlier: `MOTION-25` closed
+**None in progress.** MOTION-26 closed 2026-11-26 (hero + sticky flagship
+stage, static exhibits). Next: **MOTION-27 `READY`** (operable exhibits).
+Before that: MOTION-21 closed 2026-11-26 (signature moment, D-15
+addendum); MOTION-26 was (build the approved MOTION-20 design, part I — owner re-plan 2026-11-26; MOTION-13 now runs after MOTION-28). Earlier: `MOTION-25` closed
 2026-11-25 (D-16): Archivo is the one family, big numbers use the instanced
 `wdth` 125 / 300 face via `.text-numeral`, Fraunces / Inter / JetBrains Mono are
 gone, font transfer on `/` fell 157,956 → 49,452 B. **One sprint completed — do
@@ -272,7 +274,25 @@ perception thresholds with ≥ 5 recruiters and ≥ 5 developers.
 
 ## Next action
 
-**MOTION-21 is DONE (2026-11-26). Next: MOTION-26 `READY` — build the approved
+**MOTION-26 is DONE (2026-11-26). Next: MOTION-27 `READY` — the three flagship
+exhibits become operable (Poisson GLM, saved Prophet models, BM25 over 1,896
+passages), replacing the static stills in `FlagshipStage.astro`.** Shipped:
+zero-JS full-bleed portrait hero (`Hero.astro`) and a sticky 34/66 flagship
+stage (`FlagshipStage.astro`: one IntersectionObserver on three sentinels, 0
+scroll listeners; stacked list under 1100 px and without JS). Figures come from
+`projects.json` `flagship_figure` / `discipline`, gated by `validate-data`
+(every number must be stated by the description). Deleted with their last
+consumer: `CreativeLabPill` (owner call), `TimeAwareHero`, `ProjectCardGrid`, `TiltCard`, `HeroAvatar`,
+`RevealText`, `ProjectThumbnail`, `hero-metrics`, `useTimeOfDay`, the
+BorderGlow ring, `buildSkillHrefs` / `capabilityNodeIdForSkill` /
+`projectHref`, the room-lights wash CSS, 2 e2e specs and 1 deep-link test.
+Gates: unit **1,115/1,115**; `astro check` 89; 72 pages; links 1,475 / 0
+broken; `/` **189.8 / 479.5 / 30.0 KB** (was 193.4 / 493.1 / 32.5), islands 9 →
+7; scroll listeners after scroll **9–10** (was 12); touched e2e **93 passed / 1
+skipped** + `project-cards` 5/5 after the last edit. Frames:
+`frames/m26-{hero,flagship}-{1440,375}.jpg`.
+
+**Previously — MOTION-21 is DONE (2026-11-26). Next: MOTION-26 `READY` — build the approved
 MOTION-20 design, part I (hero + flagship stage), porting the round-9 mock in
 `.motion-mock/`. Owner re-plan 2026-11-26: 26 → 27 → 28 build the target and
 delete what it does not have; 13 → 15 → 22 → 09 → 16 → 23 → 10 then run on the

@@ -3,21 +3,15 @@ import projectsData from "../../../data/projects.json";
 import skillsData from "../../../data/skills.json";
 import type { Project } from "../../types/projects";
 import type { SkillsData } from "../../types/skills";
+import { workHref } from "../routes";
 import {
   buildSignalLoomGraph,
-  buildSkillHrefs,
-  capabilityNodeIdForSkill,
   defaultNarrative,
   defaultPathEdgeIds,
   edgeStrokeWidth,
   mostConnectedNodeId,
-  projectHref,
 } from "./signal-loom";
-import type {
-  SignalEdgeEmphasis,
-  SignalLoomGraph,
-  SignalLoomProjectDetail,
-} from "./signal-loom";
+import type { SignalEdgeEmphasis, SignalLoomGraph, SignalLoomProjectDetail } from "./signal-loom";
 
 const skills: SkillsData = {
   categories: [
@@ -253,72 +247,6 @@ describe("mostConnectedNodeId", () => {
 });
 
 /**
- * M2.4 — the skill chip → Capability Map bridge. This is the single normaliser
- * (M3.1.3): the project-card chip and the Sprint 3 graph both resolve skills
- * through `capabilityNodeIdForSkill`, so a chip can never point at a capability
- * the graph does not draw.
- */
-describe("Task 2.4 — skill → Capability Map bridge", () => {
-  const sample: Project = {
-    title: "Forecasting System",
-    category: "ml",
-    period: "2026",
-    description: "Forecasts demand.",
-    links: [],
-    skills: ["Machine Learning", "IndexedDB"],
-  };
-
-  it("derives the project detail href from the title with a stable slug", () => {
-    // M2.4.2: the id is derived from the content, not a list index, so the same
-    // title always yields the same route and the value is reproducible.
-    expect(projectHref(sample)).toBe("/work/forecasting-system");
-    expect(projectHref(sample)).toBe(projectHref({ ...sample }));
-  });
-
-  it("resolves a skill to the capability node that declares it", () => {
-    expect(capabilityNodeIdForSkill("Machine Learning", skills.categories)).toBe(
-      "capability-machine-learning-ai",
-    );
-    expect(capabilityNodeIdForSkill("React.js", skills.categories)).toBe(
-      "capability-web-development",
-    );
-  });
-
-  it("returns null for a skill no capability declares (never invents a node id)", () => {
-    expect(capabilityNodeIdForSkill("IndexedDB", skills.categories)).toBeNull();
-  });
-
-  it("maps every project skill to a node link or the honest section fallback", () => {
-    const hrefs = buildSkillHrefs(projects, skills.categories);
-    expect(hrefs["Machine Learning"]).toBe("#signal-capability-machine-learning-ai");
-    expect(hrefs["React.js"]).toBe("#signal-capability-web-development");
-    // Every skill of every supplied project is covered, so a chip always has an
-    // href and the island never has to guess.
-    for (const project of projects) {
-      for (const skill of project.skills) expect(hrefs[skill]).toBeTruthy();
-    }
-  });
-
-  it("falls back to the section anchor for a skill the map cannot place (M2.4.3)", () => {
-    const hrefs = buildSkillHrefs([sample], skills.categories);
-    expect(hrefs["Machine Learning"]).toBe("#signal-capability-machine-learning-ai");
-    expect(hrefs.IndexedDB).toBe("#systems-in-motion");
-  });
-
-  it("keeps node ids stable when categories are reordered (M2.4.2)", () => {
-    // The id is derived from the capability's name, not its position, so
-    // reordering the source array cannot move a skill's anchor.
-    const reversed: SkillsData = { categories: [...skills.categories].reverse() };
-    expect(capabilityNodeIdForSkill("Machine Learning", reversed.categories)).toBe(
-      "capability-machine-learning-ai",
-    );
-    expect(capabilityNodeIdForSkill("React.js", reversed.categories)).toBe(
-      "capability-web-development",
-    );
-  });
-});
-
-/**
  * M3.1.5 — pin the real, measured numbers against the live data layer.
  *
  * These are not targets, they are readings: the graph built from the 22
@@ -487,7 +415,11 @@ describe("Task 3.3 — real portfolio detail", () => {
 describe("MOTION-05 — default narrative path", () => {
   const fixtureSkills: SkillsData = {
     categories: [
-      { name: "Machine Learning & AI", icon: "brain", skills: [{ name: "Machine Learning", proficiency: 5 }] },
+      {
+        name: "Machine Learning & AI",
+        icon: "brain",
+        skills: [{ name: "Machine Learning", proficiency: 5 }],
+      },
       { name: "Web Development", icon: "code", skills: [{ name: "React.js", proficiency: 3 }] },
     ],
   };
@@ -563,7 +495,7 @@ describe("MOTION-05 — default narrative path", () => {
     // The href is the real project page, resolved by the same rule the cards use.
     const first = fixtureProjects.find((project) => project.title === "Heaviest Overlap");
     expect(narrative?.steps[0].id).toBe(`project-${"heaviest-overlap"}`);
-    expect(narrative?.steps[0].href).toBe(first ? projectHref(first) : "");
+    expect(narrative?.steps[0].href).toBe(first ? workHref(first) : "");
   });
 
   it("caps the named steps without shrinking the connected count", () => {
@@ -584,9 +516,7 @@ describe("MOTION-05 — default narrative path", () => {
       defaultNodeId: "project-light-overlap",
     };
 
-    expect(defaultNarrative(projectDefault)?.capabilityId).toBe(
-      "capability-machine-learning-ai",
-    );
+    expect(defaultNarrative(projectDefault)?.capabilityId).toBe("capability-machine-learning-ai");
   });
 
   it("returns null when there is no story to tell", () => {
@@ -656,9 +586,7 @@ describe("MOTION-05 — real portfolio narrative", () => {
   it("orders the whole default path by weight, not by edge list order", () => {
     const pathIds = defaultPathEdgeIds(graph);
     expect(pathIds).toHaveLength(9);
-    const weights = pathIds.map(
-      (id) => graph.edges.find((edge) => edge.id === id)?.weight ?? 0,
-    );
+    const weights = pathIds.map((id) => graph.edges.find((edge) => edge.id === id)?.weight ?? 0);
     expect([...weights].sort((a, b) => b - a)).toEqual(weights);
     // The first three are exactly the steps the narrative names.
     expect(pathIds.slice(0, 3)).toEqual(

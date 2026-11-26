@@ -1776,3 +1776,75 @@ reduced motion = no animation at all, same lit state.
 unprompted — jurors said "maybe"; real people are MOTION-23.
 
 **Commit:** `motion: MOTION-21 signature moment — the map lights, the room lights`.
+
+---
+
+## 2026-11-26 — MOTION-26 build the approved design I: hero + flagship stage
+
+**Context.** Started in another tool (Antigravity) whose budget ran out before
+verification or docs; this session audited the uncommitted tree, fixed what the
+gates found, and closed the sprint.
+
+**Inventory (M26.1) — what the target does not have, deleted.** Hero:
+`TimeAwareHero` (+ `HeroAvatar`, `RevealText`, `hero-metrics`, `useTimeOfDay`)
+→ zero-JS `Hero.astro`. Flagships: `ProjectCardGrid` (+ `TiltCard`,
+`ProjectThumbnail`, BorderGlow ring, skill chips) → `FlagshipStage.astro`. The
+chips were the last consumer of `buildSkillHrefs`, `capabilityNodeIdForSkill`
+and `projectHref` (deleted, with their unit tests and e2e M3.4.2). Also gone:
+`border-glow.guard`, `hero-metrics.spec`, `border-glow-contrast.spec`, the
+room-lights wash (`[data-exhibit]::after`) and dead layout-query hooks.
+
+**Built.** Hero: full-bleed graded portrait, name ≤ 5.2 rem, lede + one lime
+action (`nowrap`), CSS-only entrance removed under reduced motion/data; CTA
+says the flagship count in words (derived). Stage: sticky 34/66 at > 1100 px,
+three sentinel bands + one IntersectionObserver drive the current project
+(reading, exhibit clip reveal, lime index marker); index entries are real
+anchors; stacked list under 1100 px and without JS (`html.js` gate).
+
+**Rule 8 fix.** The first port typed `7/30/90`, `5.93s`, `10 min`, captions
+and disciplines into `flagship-stage.ts`. Moved to `projects.json`
+(`discipline`, `flagship_figure {value, caption}`) with a `validate-data` gate:
+every number in the figure/caption must appear in the project's description.
+Negative test: `0.972 → 0.981` → `flagship_figure claims 0.981, which its
+description never states`, exit 1; restored, md5 identical.
+
+**Defects found by the gates (fixed).**
+1. `signal-loom-deeplink` M3.4.1 timed out: ClientRouter copies the incoming
+   document's `<html>` attributes and the server HTML has no `js` class, so
+   after any client navigation the home dropped to its no-JS stack; the hash
+   scroll then stopped 2,084 px short while lazy stacked images grew. Fix:
+   `astro:before-swap` adds `js` to the new document (probe: class `dark js`,
+   target at 80 px, map hydrated).
+2. Stacked exhibit `<img>` had no reserved box → `aspect-ratio: 16/10` +
+   `object-fit: contain` (data stores no dimensions).
+3. Stacked-list styles only existed inside `@media (max-width: 1100px)`, so
+   no-JS desktop was unstyled → moved out of the query.
+4. At 375 the fixed lab pill covered the CTA's right edge on the first screen.
+   Owner asked mid-session whether to split the two corner buttons or drop
+   the pill: **dropped** (`CreativeLabPill` + test deleted) — the header nav
+   and the home's lab chapter already link to `/lab`, one floating button per
+   page is the norm, and the target has no pill. The assistant button alone
+   still covered the CTA's end at 320 px → phone foot padding 5.5 rem; probe:
+   4/4 CTA corners hit the CTA at 320 / 375 / 768 / 1440.
+5. `aria-live` on the stage readings would announce on scroll (Task 1.3 rule:
+   announce on jump only) → removed.
+
+**Measured (VERIFIED).** `validate-data` OK; unit **1,115/1,115** (99 files);
+`astro check` **89** (0 in touched files); biome 0 in touched files; build **72
+pages**; links **1,475 / 73 pages, 0 broken**; payload `/` **191.0 / 480.7 /
+30.4 KB** (MOTION-21: 193.4 / 493.1 / 32.5), islands **9 → 7**; runtime scroll
+listeners after scroll **9** (was 12; 0 new); overflow 0 at 7 widths (spec);
+home length 11.50 screens @1440×900 (sticky stage is 3.2 svh), 13.63 @375×812.
+E2E touched only (owner policy): accessibility, project-cards, signal-loom-
+lights, signal-loom-deeplink, navigation, page-continuity, responsive,
+motion-chapters, fonts, typography, palette → **93 passed / 1 skipped / 0**;
+after the pill removal: project-cards, navigation, responsive, accessibility,
+motion-chapters, palette, signal-loom-deeplink → **71 passed / 1 skipped / 0**.
+Frames: `frames/m26-hero-{1440,375}.jpg`, `frames/m26-flagship-{1440,375}.jpg`
+(reduced motion, so no mid-reveal still).
+
+**Not done / honest limits.** Exhibits are static stills (MOTION-27 makes them
+operable). The phone hero keeps round 9's full-bleed photograph rather than a
+30 svh band. MotionScore not re-run (next baseline is MOTION-28 M28.3).
+
+**Commit:** `motion: MOTION-26 hero + flagship stage — build the approved design I`.

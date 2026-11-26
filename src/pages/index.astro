@@ -1,26 +1,24 @@
 ---
 /**
- * The home (MOTION-19): six chapters from the owner-approved storyboard
- * (`docs/motion/STORYBOARD.md`) — who and what, three flagship systems, how the
- * capabilities connect to evidence, the journey, a lab teaser, and contact.
- * Everything cut from here lives on its canonical route (`src/lib/routes.ts`):
- * the full career spine, skills and certifications on `/about`, every project on
- * `/work`, every experiment on `/lab`, GitHub statistics on `/data`.
+ * The home (MOTION-19 / MOTION-26): six chapters from the owner-approved
+ * storyboard (`docs/motion/STORYBOARD.md`) and rev. 2 "The dark room" (D-13) —
+ * full-bleed portrait hero, sticky 34/66 flagship stage, how I work, journey,
+ * lab teaser, and contact.
  */
 import Section from "../components/molecules/Section.astro";
 import CareerSpine from "../components/organisms/CareerSpine.astro";
 import Contact from "../components/organisms/Contact.astro";
 import CreativeLabTeaser from "../components/organisms/CreativeLabTeaser.astro";
+import FlagshipStage from "../components/organisms/FlagshipStage.astro";
+import Hero from "../components/organisms/Hero.astro";
 import SignalLoom from "../components/organisms/SignalLoom.astro";
 import PageTailOverlays from "../islands/PageTailOverlays";
-import ProjectCardGrid from "../islands/ProjectCardGrid";
-import TimeAwareHero from "../islands/TimeAwareHero";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { buildCareerHighlights } from "../lib/creative/career-spine";
-import { buildSignalLoomGraph, buildSkillHrefs, projectHref } from "../lib/creative/signal-loom";
+import { buildSignalLoomGraph } from "../lib/creative/signal-loom";
 import { getFlagshipProjects, getProfile, getProjects, getSkills } from "../lib/data";
 import { buildSiteFacts } from "../lib/facts";
-import { buildHeroMetrics } from "../lib/hero-metrics";
+import { buildFlagshipStageItems } from "../lib/flagship-stage";
 import { buildLabTeaser } from "../lib/lab-teaser";
 import { ABOUT_ANCHORS, ROUTES } from "../lib/routes";
 
@@ -28,59 +26,22 @@ const profile = getProfile();
 const skills = getSkills();
 const signalLoom = buildSignalLoomGraph(getProjects(), skills);
 const flagships = getFlagshipProjects();
-// M2.4: project-card skill chips link to the Capability Map node that declares
-// the skill (or to the section itself when the map cannot place it). The map is
-// built here, on the server, so it never ships to the client (a value imported
-// into the island would drag the whole data layer with it).
-const skillHrefs = buildSkillHrefs(flagships, skills.categories);
-// The project detail URL is resolved here too, so the card island never carries
-// the slug rule (same reason as `skillHrefs`).
-const cardProjects = flagships.map((project) => ({
-  ...project,
-  href: projectHref(project),
-}));
+const flagshipItems = buildFlagshipStageItems(flagships);
 const journey = buildCareerHighlights();
 const labPicks = buildLabTeaser();
-// Every figure printed below comes from the same `SiteFacts` the rest of the site
-// cites, so the home cannot print a number another page would contradict.
 const facts = buildSiteFacts();
-const heroMetrics = buildHeroMetrics({
-  projects: facts.projects.count,
-  certifications: facts.certifications.count,
-  yearsExperience: facts.profile.yearsExperience,
-});
 
 /**
  * Section ids in document order, owned here because the page owns the markup,
  * so the page-tail position readout counts what is actually on screen.
  */
 const sectionIds = ["hero", "projects", "systems-in-motion", "journey", "creative-lab", "contact"];
-
-const linkClass =
-  "inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand/10 border border-brand/20 text-brand text-sm font-medium hover:bg-brand/20 transition-all duration-300 group";
 ---
 
 <BaseLayout ogSlug="index">
-  <section id="hero" aria-label="Hero">
-    <TimeAwareHero
-      client:idle
-      name={profile.name}
-      headline={profile.headline}
-      tagline={profile.tagline}
-      resumeUrl={profile.resume_url}
-      metrics={heroMetrics}
-    />
-  </section>
+  <Hero profile={profile} flagshipCount={flagships.length} />
 
-  <Section chapter id="projects" title="Flagship Work" subtitle="Shipped systems with a case study, a live deployment or a demo behind each one" ariaLabel="Flagship work">
-    <ProjectCardGrid client:load projects={cardProjects} skillHrefs={skillHrefs} />
-    <div class="mt-10 flex justify-center">
-      <a href={ROUTES.work} class={linkClass}>
-        All {facts.projects.count} projects
-        <span aria-hidden="true" class="group-hover:translate-x-1 transition-transform">→</span>
-      </a>
-    </div>
-  </Section>
+  <FlagshipStage items={flagshipItems} />
 
   <Section chapter id="systems-in-motion" title="How I Work" subtitle="Capabilities, and the projects that put them to work" variant="alt" ariaLabel="How I work">
     <SignalLoom graph={signalLoom} />

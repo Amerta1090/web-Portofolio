@@ -1,21 +1,8 @@
 import { expect, test } from "@playwright/test";
-import { waitForIslandHydration } from "./hydration";
 
 /**
- * Evidence Surface (Task 2.2): the home project card must be a surface that
- * only renders what `data/projects.json` actually holds — real links, honest
- * fallbacks, and nothing that looks like evidence it cannot open. The server
- * HTML must be fully usable on its own (no dead controls), because the card is
- * an island (`client:load`): its markup exists before React has attached.
- *
- * MOTION-19: the home shows the three flagship systems, lead first — the
- * ranking is data (`projects.json` → `flagship`), so a reorder in the data moves
- * the cards without touching this file. The full list of 22 lives at `/work`.
- *
- * The slugs below are the deterministic output of the shared slug rule
- * (`case_study` id when a project has one, else the legacy slug) used by
- * `/work/[slug]` (`src/lib/routes.ts`). If the rule changes, both this spec and
- * the unit suite have to move together.
+ * MOTION-26 (M26.2 + M26.3): Full-bleed portrait hero + sticky 34/66 flagship
+ * stage with static exhibits.
  */
 const SLUGS = [
   "ai-quranic-tafsir",
@@ -23,508 +10,110 @@ const SLUGS = [
   "ijo-plis-ihsg-usd-idr-forecasting-platform",
 ];
 
-const CARDS = "#projects [data-project-card]";
+test.describe("MOTION-26 — hero + flagship stage", () => {
+  test("hero meets target constraints at 1440 and 375", async ({ page }) => {
+    for (const viewport of [
+      { width: 1440, height: 900 },
+      { width: 375, height: 812 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.goto("/", { waitUntil: "load" });
 
-test("home renders exactly the three flagship project cards", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.locator(CARDS)).toHaveCount(3);
+      const metrics = await page.evaluate(() => {
+        const h1 = document.querySelector("#hero h1");
+        const cta = document.querySelector("#hero .hero-cta");
+        return {
+          h1FontSize: h1 ? Number.parseFloat(getComputedStyle(h1).fontSize) : 0,
+          ctaWhiteSpace: cta ? getComputedStyle(cta).whiteSpace : "",
+          ctaHref: cta?.getAttribute("href") ?? "",
+          overflowX: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        };
+      });
+
+      expect(metrics.h1FontSize).toBeGreaterThan(32);
+      expect(metrics.h1FontSize).toBeLessThanOrEqual(83.2 + 0.5);
+      expect(metrics.ctaWhiteSpace).toBe("nowrap");
+      expect(metrics.ctaHref).toBe("#projects");
+      expect(metrics.overflowX).toBeLessThanOrEqual(0);
+    }
+  });
+
+  test("renders three flagship systems with real links and sticky stage controls", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/", { waitUntil: "load" });
+
+    await expect(page.locator("#projects [data-flagship-row]")).toHaveCount(3);
+    await expect(page.locator("#projects [data-flagship-reading]")).toHaveCount(3);
+    await expect(page.locator("#projects [data-flagship-exhibit]")).toHaveCount(3);
+
+    for (const slug of SLUGS) {
+      await expect(page.locator(`#projects .flagship-stage a[href="/work/${slug}"]`)).toHaveCount(
+        1,
+      );
+    }
+
+    const external = page.locator('#projects .flagship-stage a[target="_blank"]');
+    await expect(external).toHaveCount(3);
+    const rels = await external.evaluateAll((anchors) => anchors.map((a) => a.getAttribute("rel")));
+    expect(rels.every((rel) => rel === "noopener noreferrer")).toBe(true);
+
+    // Clicking row 1 switches active reading and exhibit.
+    await page.locator('#projects [data-flagship-trigger="1"]').click();
+    await expect(page.locator('#projects [data-flagship-row="1"]')).toHaveClass(/is-on/);
+    await expect(page.locator('#projects [data-flagship-reading="1"]')).toHaveClass(/is-on/);
+    await expect(page.locator('#projects [data-flagship-exhibit="1"]')).toHaveClass(/is-on/);
+  });
+
+  test("has zero horizontal overflow at all 7 matrix widths", async ({ page }) => {
+    for (const width of [320, 375, 768, 1024, 1440, 1920, 2560]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/", { waitUntil: "load" });
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      );
+      expect(overflow, `overflow at ${width}px`).toBeLessThanOrEqual(0);
+    }
+  });
+
+  test("reduced motion disables hero and flagship transitions", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/", { waitUntil: "load" });
+    expect(await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches)).toBe(
+      true,
+    );
+
+    const state = await page.evaluate(() => {
+      const photo = document.querySelector("#hero .hero-photo");
+      const lede = document.querySelector("#hero .hero-lede");
+      const exhibit = document.querySelector("#projects .flagship-exhibit");
+      return {
+        photoAnim: photo ? getComputedStyle(photo).animationName : "",
+        ledeOpacity: lede ? getComputedStyle(lede).opacity : "",
+        exhibitTransition: exhibit ? getComputedStyle(exhibit).transitionDuration : "",
+      };
+    });
+
+    expect(state.photoAnim).toBe("none");
+    expect(state.ledeOpacity).toBe("1");
+    expect(state.exhibitTransition).toBe("0s");
+  });
 });
 
-test("each title is a real link to its /work/<slug> page", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.locator(CARDS)).toHaveCount(3);
-  for (const slug of SLUGS) {
-    await expect(page.locator(`#projects a[href="/work/${slug}"]`)).toHaveCount(1);
-  }
-});
-
-test("external links are real anchors with target and the full rel guard", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.locator(CARDS)).toHaveCount(3);
-  // The three flagship projects carry 1 + 2 + 2 link rows (5 total).
-  const external = page.locator('#projects a[target="_blank"]');
-  await expect(external).toHaveCount(5);
-  const rels = await external.evaluateAll((anchors) => anchors.map((a) => a.getAttribute("rel")));
-  expect(rels.every((rel) => rel === "noopener noreferrer")).toBe(true);
-});
-
-test("media labels are never rendered (they are not openable evidence)", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.locator(CARDS)).toHaveCount(3);
-  // `media` on IJO PLIS holds labels ("IHSG Predictor", "IDR Predictor"), not
-  // URLs; the card must not present them as things you can open.
-  await expect(page.locator("#projects")).not.toContainText("IHSG Predictor");
-  await expect(page.locator("#projects")).not.toContainText("IDR Predictor");
-});
-
-// The card island ships zero controls: every actionable element is an anchor,
-// so there is no dead control before hydration either. Asserted against the
-// server HTML with JavaScript off.
 test.describe("server HTML (JavaScript disabled)", () => {
   test.use({ javaScriptEnabled: false });
 
-  test("the card area has no dead controls", async ({ page }) => {
-    await page.goto("/");
-    await expect(page.locator(CARDS)).toHaveCount(3);
-    // No button and no reset — the server ships zero buttons in this section.
+  test("all three flagship systems are readable in stack order without JS", async ({ page }) => {
+    await page.goto("/", { waitUntil: "load" });
+
+    await expect(page.locator("#projects [data-flagship-card]")).toHaveCount(3);
+    await expect(page.locator("#projects [data-flagship-card]").first()).toBeVisible();
+    for (const slug of SLUGS) {
+      await expect(page.locator(`#projects .flagship-stack a[href="/work/${slug}"]`)).toHaveCount(
+        1,
+      );
+    }
     await expect(page.locator("#projects button")).toHaveCount(0);
-    // Inline onevent* attributes would be inert-until-hydration controls.
-    const withInlineHandlers = await page
-      .locator("#projects [onclick], #projects [onmouseover], #projects [onmousemove]")
-      .count();
-    expect(withInlineHandlers).toBe(0);
   });
-
-  test("skill chips are already real anchors before hydration", async ({ page }) => {
-    await page.goto("/");
-    await expect(page.locator(CARDS)).toHaveCount(3);
-    // Without JS the chip is still a working link into the Capability Map —
-    // the server resolved every href, so nothing here needs React (P5).
-    await expect(
-      page.locator('#projects a[href="#signal-capability-programming-languages"]').first(),
-    ).toBeVisible();
-    await expect(page.locator("#projects [data-project-card] a[href^='#']")).toHaveCount(6);
-  });
-});
-
-test("clicking a card's title navigates to the real project page", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.locator(CARDS)).toHaveCount(3);
-  // The lead card is rank 1 in `projects.json`, so it is the first title on the page.
-  const title = page.locator(`#projects a[href="/work/${SLUGS[0]}"]`);
-  await Promise.all([page.waitForURL(`**/work/${SLUGS[0]}`), title.click()]);
-  await expect(page).toHaveURL(new RegExp(`/work/${SLUGS[0]}$`));
-});
-
-test("cursor spotlight is on when the grid is visible after hydration", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.locator(CARDS)).toHaveCount(3);
-  await page.locator("#projects").scrollIntoViewIfNeeded();
-  // The grid pauses its spotlight while off-screen (useRafGuard); once it is
-  // visible and hydrated the attribute must be present on all three cards.
-  await waitForIslandHydration(page, "[data-project-card]");
-  await expect(page.locator('#projects [data-tilt-spotlight="on"]')).toHaveCount(3);
-  // Hydration adds no control at all: every actionable element is still an
-  // anchor, so nothing in the card area is a button.
-  await expect(page.locator("#projects button")).toHaveCount(0);
-});
-
-// Task 4.1 (M4.1.1): the BorderGlow ring is pure CSS — `TiltCard` writes only
-// two custom properties (`--glow-x`, `--glow-y`) in its coalesced rAF, and
-// `.border-glow::before` turns them into a mesh ring with no JavaScript of its
-// own. Two kinds of evidence are pinned below, because each computed style
-// hides one side of the contract: var() references resolve at computed time,
-// and Chromium normalizes the legacy `-webkit-` composite keywords to the
-// standard ones. So the live ring proves the *painted* result (opacity while
-// the spotlight guard is live, 8 mesh layers, `mask-composite` cycling across
-// the 3-layer mask), and the served stylesheet text proves the *shipped*
-// declarations (the -webkit- pair kept for older WebKit, the standard pair
-// that wins the cascade, and the cursor cone reading the two custom properties
-// with safe `50%` fallbacks).
-test("BorderGlow ring is a pure-CSS conic-masked ::before reading --glow-x/--glow-y", async ({
-  page,
-}) => {
-  await page.goto("/");
-  await expect(page.locator(CARDS)).toHaveCount(3);
-  // Same setup as the spotlight test above: the grid pauses its spotlight
-  // while off-screen (useRafGuard), so the ring's reveal rule can only hold
-  // once the guard is live and hydrated.
-  await page.locator("#projects").scrollIntoViewIfNeeded();
-  await waitForIslandHydration(page, "[data-project-card]");
-  await expect(page.locator('#projects [data-tilt-spotlight="on"]')).toHaveCount(3);
-
-  const ring = await page
-    .locator(CARDS)
-    .first()
-    .evaluate((el) => {
-      const cs = getComputedStyle(el, "::before");
-      return {
-        opacity: cs.opacity,
-        display: cs.display,
-        maskComposite: cs.maskComposite,
-        backgroundImage: cs.backgroundImage,
-        maskImage: cs.maskImage,
-      };
-    });
-
-  // The ring is real and revealed only while the spotlight guard is live
-  // (the base rule is `opacity: 0`).
-  expect(ring.opacity).toBe("1");
-  expect(ring.display).not.toBe("none");
-  // Eight background layers: seven brand radial stops + one linear fill.
-  expect(ring.backgroundImage.match(/radial-gradient\(/g) ?? []).toHaveLength(7);
-  expect(ring.backgroundImage.match(/linear-gradient\(/g) ?? []).toHaveLength(1);
-  // mask-composite: intersect, subtract — computed cycles to the layer count
-  // of the 3-layer mask ([cone, full, content-box]): "intersect, subtract,
-  // intersect".
-  expect(ring.maskComposite).toBe("intersect, subtract, intersect");
-  expect(ring.maskImage.startsWith("conic-gradient(")).toBe(true);
-  expect(ring.maskImage.match(/linear-gradient\(/g) ?? []).toHaveLength(2);
-
-  // Shipped-stylesheet contract: the served CSS must still carry the -webkit-
-  // pair (older WebKit), the standard `intersect, subtract` that wins the
-  // cascade, and the conic centred on `--glow-x`/`--glow-y`. Whitespace is
-  // normalized because LightningCSS minifies the declarations. The -webkit-
-  // assertion is deliberately semicolon-terminated: LightningCSS *also* emits
-  // a padded `-webkit-mask-composite:source-in,source-out,xor` auto-prefix of
-  // the standard pair, whose third layer (`xor` = exclude) is the wrong legacy
-  // alias — the explicit two-value pair cycles to `source-in,source-out,
-  // source-in` and must win the cascade for older WebKit. Requiring the exact
-  // `source-in,source-out;` (semicolon) form is what keeps that pair from
-  // being silently removed.
-  const shipped = await page.evaluate(async () => {
-    const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map(
-      (l) => (l as HTMLLinkElement).href,
-    );
-    const texts = await Promise.all(links.map(async (href) => await (await fetch(href)).text()));
-    return texts.join("\n").replace(/\s+/g, "");
-  });
-  expect(shipped).toContain("-webkit-mask-composite:source-in,source-out;");
-  expect(shipped).toContain("mask-composite:intersect,subtract");
-  expect(shipped).toContain("var(--glow-x,50%)var(--glow-y,50%)");
-
-  // H-1 (MOTION-05): the ring fails closed. Without mask compositing every mask
-  // layer unions (`add`), the 1 px ring becomes a full opaque rectangle and the
-  // mesh floods the card — the defect the user reported, reproduced by forcing
-  // `mask-composite: add`. The painting rule must therefore live exactly one
-  // brace level inside an `@supports` for both features, never at top level.
-  const ruleAt = shipped.indexOf(".border-glow:before{content");
-  expect(ruleAt, "the ring rule must ship at least once").toBeGreaterThan(-1);
-  const beforeRule = shipped.slice(0, ruleAt);
-  const supportsAt = beforeRule.lastIndexOf("@supports");
-  expect(supportsAt, "the ring rule must sit inside an @supports block").toBeGreaterThan(-1);
-  const preludeEnd = beforeRule.indexOf("{", supportsAt);
-  expect(preludeEnd).toBeGreaterThan(-1);
-  const prelude = beforeRule.slice(supportsAt, preludeEnd);
-  expect(prelude).toContain("mask-composite:intersect");
-  expect(prelude).toContain("mask-image:linear-gradient(");
-  // Depth 1 = the prelude's own `{` is the only unclosed brace at the rule, so
-  // the rule is a direct child of the query. A hoisted rule reads as depth 0;
-  // one buried in a nested block reads higher.
-  const body = beforeRule.slice(preludeEnd);
-  const depth = (body.match(/\{/g) ?? []).length - (body.match(/\}/g) ?? []).length;
-  expect(depth, "the ring rule must be a direct child of the @supports block").toBe(1);
-});
-
-// Task 2.4 (M6a): each skill chip is a cross-link into the Capability Map. The
-// server (`buildSkillHrefs`) resolves every skill, so the chip is always a real
-// anchor — a declared capability yields `#signal-<nodeId>`, one the map cannot
-// place yields the section anchor (M2.4.3). Skill → node resolution is asserted
-// against the live page; the unit suite pins the resolution table itself.
-//
-// MOTION-19: the three flagships declare six skills between them, all of which a
-// capability describes, so the honest section fallback has no home chip to run
-// against here. Its rule stays pinned in `ProjectCardGrid.test.tsx` — deleting
-// the e2e variant keeps the suite honest instead of asserting an unreachable state.
-test("skill chips are real cross-links into the Capability Map", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.locator(CARDS)).toHaveCount(3);
-  // Resolved skills point at their capability node (server-resolved hrefs):
-  // Python (all three cards), NLP + Machine Learning, and FastAPI.
-  await expect(
-    page.locator('#projects a[href="#signal-capability-programming-languages"]'),
-  ).toHaveCount(3);
-  await expect(
-    page.locator('#projects a[href="#signal-capability-machine-learning-ai"]'),
-  ).toHaveCount(2);
-  await expect(page.locator('#projects a[href="#signal-capability-web-development"]')).toHaveCount(
-    1,
-  );
-  // Every chip is a link (no inert `<span>` left behind): 6 chips, all anchors.
-  await expect(page.locator("#projects [data-project-card] a[href^='#']")).toHaveCount(6);
-});
-
-test("clicking a resolved skill chip scrolls to its Capability Map node", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.locator(CARDS)).toHaveCount(3);
-  // FastAPI on the Red Devil card resolves to Web Development.
-  const chip = page.locator('#projects a[href="#signal-capability-web-development"]').first();
-  await chip.scrollIntoViewIfNeeded();
-  await chip.click();
-
-  const node = page.locator("#signal-capability-web-development");
-  await expect(node).toBeVisible();
-  await expect(page).toHaveURL(/#signal-capability-web-development$/);
-  // Wait for the smooth scroll to *arrive*, not merely to be stable (Task 1.4):
-  // the node settles just below the fixed header via scroll-padding-top: 5rem.
-  await expect
-    .poll(
-      async () => {
-        const top = await node.evaluate((el) => Math.round(el.getBoundingClientRect().top));
-        return Math.abs(top - 80) <= 2 ? "settled" : top;
-      },
-      { timeout: 8000 },
-    )
-    .toBe("settled");
-});
-
-/**
- * MOTION-01.5: image hygiene. The card thumbnails used to ship one full-size
- * PNG/JPEG each (3.1 MB of homepage image transfer). They now ship generated
- * 16:9 WebP variants chosen by `srcset`/`sizes`, with explicit dimensions. The
- * assertions below are the externally visible half of that contract: a real
- * `srcset` with two or more widths, a `sizes` that came from measured card
- * boxes, and — the point of the whole exercise — no original bitmap download.
- */
-const THUMBS = `${CARDS} img`;
-
-type Candidate = { src: string; width: number };
-type ThumbContract = {
-  src: string | null;
-  currentSrc: string;
-  candidates: Candidate[];
-  sizes: string | null;
-  width: number | null;
-  height: number | null;
-  naturalWidth: number;
-};
-
-async function readThumbs(page: import("@playwright/test").Page): Promise<ThumbContract[]> {
-  return page.locator(THUMBS).evaluateAll((nodes) =>
-    nodes.map((node) => {
-      const img = node as HTMLImageElement;
-      const candidates = (img.getAttribute("srcset") ?? "")
-        .split(",")
-        .map((entry) => entry.trim())
-        .filter(Boolean)
-        .map((entry) => {
-          const [src = "", descriptor = ""] = entry.split(/\s+/);
-          return { src, width: Number.parseInt(descriptor.replace("w", ""), 10) };
-        });
-      return {
-        src: img.getAttribute("src"),
-        currentSrc: img.currentSrc,
-        candidates,
-        sizes: img.getAttribute("sizes"),
-        width: img.getAttribute("width") ? Number(img.getAttribute("width")) : null,
-        height: img.getAttribute("height") ? Number(img.getAttribute("height")) : null,
-        naturalWidth: img.naturalWidth,
-      };
-    }),
-  );
-}
-
-test.describe("project card evidence imagery (MOTION-01.5, MOTION-11)", () => {
-  test("raster thumbnails ship a WebP srcset; the vector map ships a single SVG", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    await expect(page.locator(CARDS)).toHaveCount(3);
-    const thumbs = await readThumbs(page);
-    // Three flagship cards, one image each. MOTION-11 removed the generic
-    // placeholder together with the fourth image it used to add.
-    expect(thumbs).toHaveLength(3);
-
-    const rasters = thumbs.filter((thumb) => thumb.src && !thumb.src.endsWith(".svg"));
-    const vectors = thumbs.filter((thumb) => thumb.src?.endsWith(".svg"));
-
-    // Owned screenshots keep the MOTION-01.5 contract: generated WebP
-    // candidates, ascending widths, and a measured `sizes`.
-    expect(rasters.length).toBeGreaterThanOrEqual(2);
-    for (const thumb of rasters) {
-      expect(
-        thumb.candidates.length,
-        `${thumb.src} needs at least two candidates`,
-      ).toBeGreaterThanOrEqual(2);
-      // Every candidate is a generated WebP, never the original bitmap.
-      for (const candidate of thumb.candidates) {
-        expect(candidate.src).toMatch(/\.webp$/);
-        expect(candidate.width).toBeGreaterThan(0);
-      }
-      // Ascending order is what makes the browser's selection deterministic.
-      const widths = thumb.candidates.map((candidate) => candidate.width);
-      expect(widths).toEqual([...widths].sort((a, b) => a - b));
-      // `sizes` must exist, because without it the browser assumes 100vw.
-      expect(thumb.sizes).toBeTruthy();
-      expect(thumb.sizes).toContain("px");
-    }
-
-    // The Tafsir card has no screenshot, so its evidence is a build-time SVG
-    // derived from the case study's model stage: one vector file, no raster
-    // candidates, and no placeholder.
-    expect(vectors).toHaveLength(1);
-    expect(vectors[0].src).toBe("/images/evidence/tafsir-system-map.svg");
-    expect(vectors[0].candidates).toEqual([]);
-    expect(vectors[0].sizes).toBeNull();
-    for (const thumb of thumbs) {
-      expect(thumb.src).not.toContain("/placeholder/");
-    }
-  });
-
-  test("every raster thumbnail declares the largest variant's 16:9 intrinsic size", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    await expect(page.locator(CARDS)).toHaveCount(3);
-    const thumbs = await readThumbs(page);
-
-    for (const thumb of thumbs.filter((item) => item.src && !item.src.endsWith(".svg"))) {
-      const largest = Math.max(...thumb.candidates.map((candidate) => candidate.width));
-      expect(thumb.width, `${thumb.src} width`).toBe(largest);
-      expect(thumb.height, `${thumb.src} height`).toBe(Math.round((largest * 9) / 16));
-    }
-  });
-
-  test("no featured card downloads its original PNG/JPEG", async ({ page }) => {
-    const originals: string[] = [];
-    page.on("request", (request) => {
-      // Deliberately narrow: only project bitmaps, and only the raster
-      // originals the variants are generated from.
-      if (/\/images\/projects\/[^/]+\.(png|jpe?g)$/i.test(request.url()))
-        originals.push(request.url());
-    });
-
-    await page.goto("/");
-    await expect(page.locator(CARDS)).toHaveCount(3);
-    // Lazy loading means the cards only fetch once the section is in view.
-    await page.locator("#projects").scrollIntoViewIfNeeded();
-    await expect
-      .poll(async () => (await readThumbs(page)).every((thumb) => thumb.naturalWidth > 0), {
-        timeout: 15000,
-      })
-      .toBe(true);
-
-    const thumbs = await readThumbs(page);
-    for (const thumb of thumbs.filter((item) => item.src && !item.src.endsWith(".svg"))) {
-      // The browser actually picked a variant, not the `src` fallback.
-      expect(thumb.currentSrc).toMatch(/\.webp$/);
-    }
-    expect(originals).toEqual([]);
-  });
-});
-
-// MOTION-04 — evidence card hierarchy.
-//
-// `#projects` is three pieces of evidence, not one rectangle. The chapter body
-// used to fade all cards in as a single block; now each card owns a
-// `view()` beat, and the *order* comes from the data (`--project-card-order`,
-// lead card = 0), never from a `:nth-child` wall that would go stale on a
-// reorder. Two defects are pinned here at the same time, because they share one
-// cause: `Section.astro` used to ship `overflow-hidden`, which made every
-// section a scroll container and degenerated nested `view()` timelines to
-// `progress: 1` — so no card (and no chapter body) ever animated. `overflow:
-// clip` clips the same pixels without a scrollport.
-const WRAPPERS = "#projects [data-project-card-reveal]";
-
-/** Scroll offset at which a card wrapper first reads as fully opaque. */
-async function settleOffsets(page: import("@playwright/test").Page, indices: number[]) {
-  return page.evaluate(async (wanted) => {
-    const wrappers = Array.from(
-      document.querySelectorAll<HTMLElement>("#projects [data-project-card-reveal]"),
-    );
-
-    const frame = () =>
-      new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    const settleOffset = async (el: HTMLElement) => {
-      const opacityAt = async (y: number) => {
-        window.scrollTo({ top: y, behavior: "instant" });
-        await frame();
-        return Number.parseFloat(getComputedStyle(el).opacity);
-      };
-
-      // Document offsets are constant while the page scrolls, so one read is
-      // enough; `entry 0%` starts with the wrapper's top at the viewport bottom.
-      const rect = el.getBoundingClientRect();
-      const top = rect.top + window.scrollY;
-      let low = Math.floor(top - window.innerHeight);
-      let high = Math.ceil(low + rect.height + 80);
-      if ((await opacityAt(high)) < 0.99) return null;
-
-      // Opacity is monotonic in scroll offset for a linear view() timeline, so
-      // a bisection finds the crossing in ~9 samples instead of ~120 stepped
-      // ones (a stepped scan measured 0.99 at the same offsets but took 14s).
-      while (high - low > 2) {
-        const mid = Math.floor((low + high) / 2);
-        if ((await opacityAt(mid)) >= 0.99) high = mid;
-        else low = mid;
-      }
-      return high;
-    };
-
-    // Both offsets come from one atomic pass: hydrating the filter chips inserts
-    // a fieldset above the grid (~45px), and measuring one card before that
-    // reflow and the next after it would read as a fake 80px gap.
-    const offsets: (number | null)[] = [];
-    for (const index of wanted) {
-      const el = wrappers[index];
-      offsets.push(el ? await settleOffset(el) : null);
-    }
-    return offsets;
-  }, indices);
-}
-
-test("clipped chapters clip without becoming scroll containers", async ({ page }) => {
-  await page.goto("/");
-  const overflow = await page.evaluate(() =>
-    ["#projects", "#systems-in-motion", "#journey", "#creative-lab", "#contact"].map((selector) => {
-      const el = document.querySelector(selector);
-      if (!el) return { selector, overflow: "missing" };
-      return { selector, overflow: getComputedStyle(el).overflow };
-    }),
-  );
-
-  for (const chapter of overflow) {
-    expect(chapter.overflow, `${chapter.selector} overflow`).toBe("clip");
-  }
-});
-
-test("the project chapter body is not faded as one block", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.locator(CARDS)).toHaveCount(3);
-  await expect(page.locator(WRAPPERS)).toHaveCount(3);
-
-  const body = await page.locator("#projects [data-chapter-body]").evaluate((el) => {
-    const cs = getComputedStyle(el);
-    return { animationName: cs.animationName, opacity: cs.opacity };
-  });
-  expect(body.animationName).toBe("none");
-  expect(body.opacity).toBe("1");
-
-  // Order is data, published as a custom property by the island.
-  const wrappers = await page.locator(WRAPPERS).evaluateAll((nodes) =>
-    nodes.map((node) => ({
-      order: getComputedStyle(node).getPropertyValue("--project-card-order").trim(),
-      primary: node.hasAttribute("data-project-primary"),
-      animation: getComputedStyle(node).animationName,
-    })),
-  );
-  expect(wrappers.map((wrapper) => wrapper.order)).toEqual(["0", "1", "2"]);
-  expect(wrappers.filter((wrapper) => wrapper.primary)).toHaveLength(1);
-  expect(wrappers[0].primary).toBe(true);
-  for (const wrapper of wrappers) expect(wrapper.animation).toBe("reveal-fade-up");
-});
-
-test("the lead card settles before its row neighbour", async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 720 });
-  await page.goto("/");
-  await expect(page.locator(WRAPPERS)).toHaveCount(3);
-  // Measure only once React has attached: before that the reveal order custom
-  // property is not written, so a measurement straddling hydration would read a
-  // gap that is layout, not choreography.
-  await waitForIslandHydration(page, "[data-project-card]");
-
-  // Cards 0–2 share a row, so their view() timelines start together; the order
-  // token (8% of the beat ≙ ~37px here) is the only thing sequencing them.
-  const [lead, neighbour] = await settleOffsets(page, [0, 1]);
-  if (lead === null || neighbour === null || neighbour === undefined) {
-    throw new Error(`no settle offset: lead=${lead} neighbour=${neighbour}`);
-  }
-
-  expect(lead).toBeLessThan(neighbour);
-  expect(neighbour - lead).toBeGreaterThanOrEqual(24);
-  expect(neighbour - lead).toBeLessThanOrEqual(52);
-
-  // Mid-flight proof that the pair is not a single beat: 12px before the
-  // neighbour settles, the lead is already fully opaque.
-  const mid = await page.evaluate(async (y) => {
-    const wrappers = Array.from(
-      document.querySelectorAll<HTMLElement>("#projects [data-project-card-reveal]"),
-    );
-    window.scrollTo({ top: y, behavior: "instant" });
-    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    return wrappers.slice(0, 2).map((el) => Number.parseFloat(getComputedStyle(el).opacity));
-  }, neighbour - 12);
-
-  expect(mid[0]).toBe(1);
-  expect(mid[1]).toBeLessThan(1);
 });

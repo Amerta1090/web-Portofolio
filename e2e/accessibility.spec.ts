@@ -436,7 +436,9 @@ test.describe("Q4.2 — no JavaScript and no animation enhancement", () => {
         links3: nodes
           .filter((n) => n.tagName === "A")
           .map((n) => {
-            const spans = [...n.querySelectorAll("span")];
+            const spans = [...n.querySelectorAll("span")].filter(
+              (s) => !s.hasAttribute("data-signal-glow"),
+            );
             return {
               name: n.getAttribute("aria-label") ?? "",
               kind: spans[0]?.textContent ?? "",
@@ -647,10 +649,8 @@ test.describe("Sprint 5 — evidence surfaces without JavaScript", () => {
     const page = await context.newPage();
     await page.goto(HOME);
 
-    // Featured evidence: the three flagship cards, and skill chips are anchors
-    // the server resolved, not buttons that need React (Task 2.2 / 2.4).
-    await expect(page.locator("#projects [data-project-card]")).toHaveCount(3);
-    await expect(page.locator("#projects [data-project-card] a[href^='#']")).toHaveCount(6);
+    // Featured evidence: the three flagship stacked cards are readable without JS.
+    await expect(page.locator("#projects [data-flagship-card]")).toHaveCount(3);
     // Journey highlights: the six experience records, each with real <time>
     // dates — 11 elements for 6 starts plus 5 ends (ferswit is ongoing).
     await expect(page.locator("#journey li[data-career-kind]")).toHaveCount(6);
@@ -700,44 +700,6 @@ test.describe("Sprint 5 — evidence surfaces without JavaScript", () => {
     await expect(
       page.locator("#career button, #career input, #career select, #career textarea"),
     ).toHaveCount(0);
-
-    await context.close();
-  });
-
-  // Sprint 5 (M5.2.4) — accessible names are pinned by their *shape*, never a
-  // word count (Q4.2 #8): each hero metric link announces `Kind: value`, where
-  // both parts are the strings already visible in the card.
-  test("hero metric links announce their kind and value without JavaScript", async ({
-    browser,
-  }) => {
-    const context = await browser.newContext({
-      viewport: { width: 1440, height: 900 },
-      javaScriptEnabled: false,
-    });
-    const page = await context.newPage();
-    await page.goto(HOME);
-
-    const links = page.locator("[data-hero-metric]");
-    await expect(links).toHaveCount(3);
-    const names = await links.evaluateAll((nodes) =>
-      nodes.map((n) => {
-        const spans = [...n.querySelectorAll("span")];
-        return {
-          label: n.getAttribute("aria-label") ?? "",
-          kind: spans.find((s) => s.classList.contains("section-label"))?.textContent?.trim() ?? "",
-          value: (n.querySelector("span")?.textContent ?? "").replace(/\s+/g, " ").trim(),
-          href: n.getAttribute("href") ?? "",
-        };
-      }),
-    );
-    for (const { label, kind, value, href } of names) {
-      expect(kind.length).toBeGreaterThan(0);
-      expect(value.length).toBeGreaterThan(0);
-      expect(label).toBe(`${kind}: ${value}`);
-      // MOTION-19: the row points at the pages that list what it counts, never
-      // at a home anchor (the old `#github-metrics`).
-      expect(href).toMatch(/^\/(work|about)/);
-    }
 
     await context.close();
   });

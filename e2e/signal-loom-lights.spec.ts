@@ -202,46 +202,19 @@ test.describe("MOTION-21 — the still without JavaScript", () => {
 test.describe("MOTION-21 — the room lights", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
-  async function washOf(page: Page) {
-    return page.evaluate(() =>
-      Array.from(document.querySelectorAll("#projects [data-exhibit]")).map((exhibit) => {
-        const style = getComputedStyle(exhibit, "::after");
-        return {
-          display: style.display,
-          name: style.animationName,
-          opacity: Number.parseFloat(style.opacity),
-        };
-      }),
-    );
-  }
-
-  test("each flagship exhibit is lit from the dark room as its card settles", async ({ page }) => {
+  test("the active flagship exhibit is lit on entry and reduced motion removes transition", async ({
+    page,
+  }) => {
     await page.goto(HOME);
-    const wash = await washOf(page);
-    expect(wash.length).toBeGreaterThan(0);
-    expect(wash.every((entry) => entry.name === "exhibit-light")).toBe(true);
-    // Scroll the exhibits to the middle of the viewport: the wash is gone.
-    await page.evaluate(() => {
-      const grid = document.querySelector("#projects [data-project-grid]");
-      if (!grid) throw new Error("project grid missing");
-      const top = grid.getBoundingClientRect().top + window.scrollY - 160;
-      window.scrollTo({ top, behavior: "instant" });
-    });
-    await expect
-      .poll(async () => (await washOf(page)).every((entry) => entry.opacity < 0.05), {
-        timeout: 5_000,
-      })
-      .toBe(true);
-  });
+    const first = page.locator("#projects [data-flagship-exhibit='0']");
+    await expect(first).toHaveClass(/is-on/);
 
-  test("reduced motion removes the wash outright", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto(HOME);
     expect(await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches)).toBe(
       true,
     );
-    const wash = await washOf(page);
-    expect(wash.length).toBeGreaterThan(0);
-    expect(wash.every((entry) => entry.display === "none")).toBe(true);
+    const transition = await first.evaluate((el) => getComputedStyle(el).transitionDuration);
+    expect(transition).toBe("0s");
   });
 });

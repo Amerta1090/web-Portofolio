@@ -26,6 +26,14 @@ export interface Project {
    * `validate-data` keeps the ranks contiguous from 1 and only on featured projects.
    */
   flagship?: number;
+  /** Short discipline label shown beside a flagship in the home's index. */
+  discipline?: string;
+  /**
+   * The one figure the home's flagship stage prints (MOTION-26). `validate-data`
+   * requires every number in it to appear in `description`, so the stage cannot
+   * print a figure the project's own write-up does not state.
+   */
+  flagship_figure?: { value: string; caption: string };
   category?: "ml" | "iot" | "web" | "cli" | "devops";
   screenshots?: string[];
   readme_summary?: string;

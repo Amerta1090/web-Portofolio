@@ -1601,7 +1601,7 @@ repositories are recorded in `STORYBOARD.md` §Concept, not fixed here.
 
 ## MOTION-26 — Build the approved design I: page shell (hero + flagship stage)
 
-**Status:** `READY` (2026-11-26, owner re-plan: build the approved MOTION-20 design before auditing or polishing anything else)
+**Status:** `DONE` (2026-11-26) — hero + sticky flagship stage built to the target; next MOTION-27 `READY`
 **Priority:** P0
 **Objective:** Replace today's home structure with the approved target (`frames/motion-20-target.jpg`, rev. 2 "The dark room", D-13) chapter by chapter, starting with the first screen and the flagship stage.
 **Outcome:** Full-bleed graded portrait hero (name across the top, lede + one lime action at the foot; phone overlaid); flagship chapter as a sticky 34/66 stage — left: project name, one big `.text-numeral` figure with its caption, case study / source links, "Shipped systems" index with a lime marker; right: the exhibit for the current project (static still in this sprint).
@@ -1614,10 +1614,12 @@ repositories are recorded in `STORYBOARD.md` §Concept, not fixed here.
 **Exclusions:** operable exhibits (MOTION-27); journey/lab/contact (MOTION-28); no new full-viewport canvas; the sticky stage uses CSS sticky + one IntersectionObserver or `view()`, **0 new scroll listeners** (the mock's window scroll listener must not ship).
 
 **Tasks**
-- [ ] M26.1 Inventory: today's hero + flagship parts → keep / replace / delete, written before code.
-- [ ] M26.2 Hero to target (1440 and 375 from the mock's measured constraints: name ≤ 5.2 rem max, CTA `nowrap`, photo band 30 svh on phone).
-- [ ] M26.3 Flagship sticky stage with static exhibits; project index drives which exhibit is current (IO), keyboard/deep-link reachable.
-- [ ] M26.4 Delete what the target dropped (components, CSS hooks, tests) in the same commit.
+- [x] M26.1 Inventory (`SESSION_LOG.md` 2026-11-26 MOTION-26): hero = `TimeAwareHero` + `HeroAvatar` + `RevealText` + `hero-metrics` + `useTimeOfDay` → replaced by zero-JS `Hero.astro`; flagships = `ProjectCardGrid` + `TiltCard` + `ProjectThumbnail` + BorderGlow + skill chips → replaced by `FlagshipStage.astro`; the chips' `buildSkillHrefs` path dies with them.
+- [x] M26.2 Hero to target: name `clamp(…, 5.2rem)`, CTA `nowrap`, CSS-only entrance off under reduced motion/data; CTA count derived from the flagship count. **Deviation:** the phone keeps the full-bleed photograph of round 9 (not a 30 svh band) and pads the foot 5.5 rem so the fixed assistant button never covers the one action; the floating lab pill was deleted (owner, mid-session: nav + lab chapter already link `/lab`; target has none). Probe: 4/4 CTA corners hit the CTA at 320 / 375 / 768 / 1440.
+- [x] M26.3 Sticky 34/66 stage, static exhibits; one IntersectionObserver on three sentinels drives the current project, index links are real `#flagship-stop-*` anchors (keyboard + deep link), 0 scroll listeners; stacked list under 1100 px and without JS. Figures from `projects.json` `flagship_figure` / `discipline`, `validate-data` rejects a number the description does not state (negative test: 0.972 → 0.981 fails).
+- [x] M26.4 Deleted in the same commit: the components above, `CreativeLabPill`, their unit tests, `border-glow.guard`, `hero-metrics`/`border-glow-contrast` e2e specs, M3.4.2 chip deep-link test, `buildSkillHrefs` / `capabilityNodeIdForSkill` / `projectHref`, room-lights wash + layout-query hooks.
+
+**Defects found by the gates (fixed):** ClientRouter copies the incoming `<html>` attributes, so the `js` class vanished on every client navigation and the home fell back to its no-JS stack (`/about` → `/#signal-…` landed 2,084 px short) → `astro:before-swap` marks the new document; stacked exhibit images had no reserved box (lazy load moved hash targets) → `aspect-ratio: 16/10` frame; stacked-list styles only existed under 1100 px, so no-JS desktop was unstyled → moved out of the media query.
 
 **Acceptance criteria:** first screen matches the target at 1440 and 375 (frames captured); 0 new scroll listeners; overflow 0 at 7 widths; reduced motion and no-JS read every flagship; payload delta recorded.
 **DoD:** touched unit + e2e specs only (owner policy), build, links, payload, frames, docs, commit.
@@ -1626,7 +1628,7 @@ repositories are recorded in `STORYBOARD.md` §Concept, not fixed here.
 
 ## MOTION-27 — Build the approved design II: the operable exhibits
 
-**Status:** `PLANNED` (2026-11-26)
+**Status:** `READY` (2026-11-26, after MOTION-26)
 **Priority:** P0
 **Objective:** Make the three flagship exhibits run the owner's own artefacts in the browser, as the panel scored them.
 **Outcome:** Red Devil — minute/shots/xG/ground drive the six-coefficient Poisson GLM, curve + next-ten-minutes chance, caveat printed (ground p = 0.32); IJO PLIS — the saved Prophet models, market × horizon, 80 % band, trading days only; Tafsir — BM25 retrieval over the 1,896 passages for four questions, the unrun dense half named.

@@ -1,4 +1,3 @@
-import CreativeLabPill from "./CreativeLabPill";
 import EasterEgg from "./EasterEgg";
 import SectionCounter from "./SectionCounter";
 
@@ -13,8 +12,10 @@ interface PageTailOverlaysProps {
 }
 
 /**
- * Composite island: page-tail floating UI (section readout, easter eggs,
- * creative-lab pill) mounted as ONE React root. Each `astro-island` is its own
+ * Composite island: page-tail floating UI (section readout, easter eggs)
+ * mounted as ONE React root. The creative-lab pill was retired in MOTION-26:
+ * the header nav and the home's lab chapter already link to /lab, and a second
+ * floating button shared the corner with the assistant. Each `astro-island` is its own
  * React root in React 19 (per-root non-delegated scroll/wheel/touch wiring) —
  * consolidating cuts that tax.
  */
@@ -23,7 +24,6 @@ export default function PageTailOverlays({ sectionIds }: PageTailOverlaysProps) 
     <>
       <EasterEgg />
       <SectionCounter sectionIds={sectionIds} />
-      <CreativeLabPill />
     </>
   );
 }

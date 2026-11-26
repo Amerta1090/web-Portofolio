@@ -1,0 +1,514 @@
+---
+/**
+ * MOTION-26 (M26.3): Flagship sticky 34/66 stage with static exhibits.
+ *
+ * Desktop (> 1100px, JS enabled): sticky 34fr / 66fr stage inside a 320svh
+ * section. Three invisible sentinel bands drive the active project via a single
+ * IntersectionObserver (0 scroll listeners). Clicking or activating an item in
+ * the "Shipped systems" index scrolls to its sentinel and activates it.
+ *
+ * Narrow viewports (<= 1100px) and no-JS: render the stacked `.flagship-stack`
+ * list so every flagship system and its static exhibit are readable in order.
+ */
+import type { FlagshipStageItem } from "../../lib/flagship-stage";
+import type { Project } from "../../types/projects";
+
+export interface Props {
+  items: FlagshipStageItem[];
+}
+
+const { items } = Astro.props;
+
+function buildSrcSet(variants?: Project["image_variants"]): string | undefined {
+  if (!variants || variants.length === 0) return undefined;
+  return [...variants]
+    .sort((a, b) => a.width - b.width)
+    .map((v) => `${v.src} ${v.width}w`)
+    .join(", ");
+}
+---
+
+<section
+  id="projects"
+  class="flagship-work"
+  data-chapter=""
+  data-flagship-stage=""
+  aria-labelledby="work-title"
+>
+  <div class="flagship-sentinels" aria-hidden="true">
+    {items.map((item, i) => (
+      <div class="flagship-sentinel" data-flagship-sentinel={i} id={`flagship-stop-${item.id}`} />
+    ))}
+  </div>
+
+  <div data-chapter-head="" class="sr-only" aria-hidden="true"></div>
+
+  <div class="flagship-stage" data-chapter-body="">
+    <div class="flagship-left">
+      <div class="flagship-readings">
+        {items.map((item, i) => (
+          <div class={`flagship-reading${i === 0 ? " is-on" : ""}`} data-flagship-reading={i}>
+            <h3>{item.name}</h3>
+            <p class="flagship-big text-numeral">{item.figure}</p>
+            <p class="flagship-caption">{item.figureCaption}</p>
+            <p class="flagship-links">
+              <a href={item.href}>{item.linkLabel}</a>
+              {item.sourceUrl && (
+                <>
+                  {" · "}
+                  <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer">
+                    Source<span class="sr-only"> (opens in a new tab)</span>
+                  </a>
+                </>
+              )}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <div class="flagship-index">
+        <h2 id="work-title">Shipped systems</h2>
+        <ol>
+          {items.map((item, i) => (
+            <li class={i === 0 ? "is-on" : undefined} data-flagship-row={i}>
+              <a href={`#flagship-stop-${item.id}`} data-flagship-trigger={i}>
+                <span class="flagship-pn">{item.name}</span>
+                <span class="flagship-pd">{item.discipline}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+
+    <div class="flagship-right">
+      {items.map((item, i) => {
+        const srcSet = buildSrcSet(item.imageVariants);
+        return (
+          <figure
+            class={`flagship-exhibit${i === 0 ? " is-on" : ""}`}
+            data-flagship-exhibit={i}
+            data-exhibit=""
+          >
+            {item.image && (
+              <img
+                src={item.image}
+                srcset={srcSet}
+                sizes={srcSet ? "(min-width: 1101px) 58vw, 100vw" : undefined}
+                alt={item.imageAlt}
+                loading="eager"
+                decoding="async"
+              />
+            )}
+            <figcaption>{item.exhibitCaption}</figcaption>
+          </figure>
+        );
+      })}
+    </div>
+  </div>
+
+  <div class="flagship-stack">
+    <h2>Shipped systems</h2>
+    {items.map((item) => {
+      const srcSet = buildSrcSet(item.imageVariants);
+      return (
+        <article class="flagship-stack-item" data-flagship-card="">
+          <h3>{item.name}</h3>
+          <p class="flagship-big text-numeral">{item.figure}</p>
+          <p class="flagship-caption">{item.figureCaption}</p>
+          {item.image && (
+            <img
+              src={item.image}
+              srcset={srcSet}
+              sizes={srcSet ? "calc(100vw - 36px)" : undefined}
+              alt={item.imageAlt}
+              loading="lazy"
+              decoding="async"
+            />
+          )}
+          <p class="flagship-stack-note">{item.exhibitCaption}</p>
+          <p class="flagship-links">
+            <a href={item.href}>{item.linkLabel}</a>
+            {item.sourceUrl && (
+              <>
+                {" · "}
+                <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer">
+                  Source<span class="sr-only"> (opens in a new tab)</span>
+                </a>
+              </>
+            )}
+          </p>
+        </article>
+      );
+    })}
+  </div>
+</section>
+
+<script>
+  function initFlagshipStage() {
+    const root = document.querySelector<HTMLElement>("[data-flagship-stage]");
+    if (!root || root.dataset.bound === "true") return;
+    root.dataset.bound = "true";
+
+    const readings = Array.from(root.querySelectorAll<HTMLElement>("[data-flagship-reading]"));
+    const rows = Array.from(root.querySelectorAll<HTMLElement>("[data-flagship-row]"));
+    const exhibits = Array.from(root.querySelectorAll<HTMLElement>("[data-flagship-exhibit]"));
+    const sentinels = Array.from(root.querySelectorAll<HTMLElement>("[data-flagship-sentinel]"));
+    const triggers = Array.from(root.querySelectorAll<HTMLAnchorElement>("[data-flagship-trigger]"));
+
+    let active = 0;
+
+    function setActive(index: number) {
+      if (index < 0 || index >= exhibits.length || index === active) return;
+      active = index;
+      exhibits.forEach((el, k) => {
+        el.classList.toggle("is-on", k <= index);
+        el.classList.toggle("is-past", k < index);
+      });
+      readings.forEach((el, k) => el.classList.toggle("is-on", k === index));
+      rows.forEach((el, k) => el.classList.toggle("is-on", k === index));
+    }
+
+    triggers.forEach((trigger, i) => {
+      trigger.addEventListener("click", (event) => {
+        event.preventDefault();
+        setActive(i);
+        const sentinel = sentinels[i];
+        if (sentinel) {
+          const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          sentinel.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+        }
+      });
+    });
+
+    if ("IntersectionObserver" in window && sentinels.length > 0) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            const idx = Number((entry.target as HTMLElement).dataset.flagshipSentinel ?? -1);
+            if (!Number.isNaN(idx) && idx >= 0) {
+              setActive(idx);
+            }
+          }
+        },
+        { rootMargin: "-35% 0px -45% 0px", threshold: 0 },
+      );
+      sentinels.forEach((sentinel) => observer.observe(sentinel));
+    }
+  }
+
+  initFlagshipStage();
+  document.addEventListener("astro:page-load", initFlagshipStage);
+</script>
+
+<style>
+  .flagship-work {
+    position: relative;
+    height: calc(100svh * 3.2);
+    overflow: clip;
+    background: var(--color-surface-primary);
+    color: var(--color-text-primary);
+  }
+
+  .flagship-sentinels {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 1px;
+    pointer-events: none;
+    display: grid;
+    grid-template-rows: repeat(3, 1fr);
+  }
+
+  .flagship-sentinel {
+    width: 1px;
+    height: 100%;
+  }
+
+  .flagship-stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    display: grid;
+    grid-template-columns: 34fr 66fr;
+  }
+
+  .flagship-left {
+    padding: 5.5rem max(32px, env(safe-area-inset-left)) 2.5rem;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    align-content: center;
+    gap: 2rem;
+    min-width: 0;
+  }
+
+  .flagship-readings {
+    position: relative;
+    align-self: center;
+    min-height: 19rem;
+  }
+
+  .flagship-reading {
+    position: absolute;
+    inset: 0 0 auto 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(14px);
+    transition:
+      opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+      visibility 0.5s;
+  }
+
+  .flagship-reading.is-on {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+
+  .flagship-reading h3 {
+    font-weight: 400;
+    font-size: clamp(2rem, 1.2rem + 2.2vw, 3.25rem);
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    margin-bottom: 1.5rem;
+    text-wrap: balance;
+  }
+
+  .flagship-big {
+    white-space: nowrap;
+    font-weight: 300;
+    letter-spacing: -0.04em;
+    line-height: 0.92;
+    font-size: clamp(2.6rem, 1.6rem + 3.2vw, 4.75rem);
+  }
+
+  .flagship-caption {
+    max-width: 32ch;
+    margin-top: 0.75rem;
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .flagship-links {
+    margin-top: 0.875rem;
+    font-size: 1rem;
+  }
+
+  .flagship-links a {
+    color: var(--color-text-primary);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.22em;
+    padding: 0.25rem 0;
+    display: inline-block;
+  }
+
+  .flagship-links a:hover {
+    color: var(--color-brand);
+    text-decoration-thickness: 2px;
+  }
+
+  .flagship-index h2 {
+    font-weight: 400;
+    font-size: clamp(1.25rem, 1.05rem + 0.7vw, 1.75rem);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.625rem;
+  }
+
+  .flagship-index ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .flagship-index li a {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.625rem 0 0.625rem 1rem;
+    text-decoration: none;
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+    transition: color 0.3s ease;
+  }
+
+  .flagship-index li a::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 3px;
+    height: 0;
+    background: var(--color-brand);
+    transform: translateY(-50%);
+    transition: height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .flagship-index li.is-on a::before {
+    height: 24px;
+  }
+
+  .flagship-index li.is-on a,
+  .flagship-index li a:hover,
+  .flagship-index li a:focus-visible {
+    color: var(--color-text-primary);
+  }
+
+  .flagship-pd {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+  }
+
+  .flagship-right {
+    position: relative;
+    background: var(--color-surface-secondary);
+    overflow: clip;
+  }
+
+  .flagship-exhibit {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+    padding: 5.5rem 4vw 3rem;
+    background: var(--color-surface-secondary);
+    clip-path: inset(100% 0 0 0);
+    transition: clip-path 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .flagship-exhibit.is-on {
+    clip-path: inset(0);
+  }
+
+  .flagship-exhibit img {
+    width: 100%;
+    max-height: 70svh;
+    object-fit: contain;
+    object-position: left center;
+    background: var(--color-surface-tertiary);
+    filter: brightness(0.24);
+    transition: filter 1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
+  }
+
+  .flagship-exhibit.is-on img {
+    filter: brightness(1);
+  }
+
+  .flagship-exhibit.is-past img {
+    filter: brightness(0.32);
+    transition-delay: 0s;
+  }
+
+  .flagship-exhibit figcaption {
+    color: var(--color-text-secondary);
+    max-width: 58ch;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .flagship-stack {
+    display: none;
+  }
+
+  /* No-JS: show the stacked list so all 3 flagships are readable without JavaScript */
+  :global(html:not(.js)) .flagship-work {
+    height: auto;
+  }
+
+  :global(html:not(.js)) .flagship-stage,
+  :global(html:not(.js)) .flagship-sentinels {
+    display: none;
+  }
+
+  :global(html:not(.js)) .flagship-stack {
+    display: grid;
+    gap: 4.5rem;
+    padding: 5rem max(24px, env(safe-area-inset-left)) 2.5rem;
+  }
+
+  @media (max-width: 1100px) {
+    .flagship-work {
+      height: auto;
+    }
+
+    .flagship-stage,
+    .flagship-sentinels {
+      display: none;
+    }
+
+    .flagship-stack {
+      display: grid;
+      gap: 4.5rem;
+      padding: 5rem max(18px, env(safe-area-inset-left)) 2rem;
+    }
+  }
+
+  /* The stacked list (narrow viewports and no-JS at any width). */
+  .flagship-stack h2 {
+    font-weight: 400;
+    font-size: clamp(2rem, 1.4rem + 3vw, 3.25rem);
+    letter-spacing: -0.025em;
+    margin-bottom: -1.5rem;
+  }
+
+  .flagship-stack-item {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .flagship-stack-item h3 {
+    font-weight: 400;
+    font-size: clamp(1.5rem, 1.1rem + 1.5vw, 2.25rem);
+    line-height: 1.1;
+  }
+
+  .flagship-stack-item .flagship-big {
+    font-size: clamp(2.5rem, 1.8rem + 3.5vw, 4.25rem);
+  }
+
+  /* The three exhibits have different shapes and the data layer stores no
+     dimensions, so the frame is reserved up front: a lazy image that grows on
+     load would move everything below it (and any hash target with it). */
+  .flagship-stack-item img {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: contain;
+    background: var(--color-surface-tertiary);
+  }
+
+  .flagship-stack-note {
+    color: var(--color-text-secondary);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  @media (prefers-reduced-motion: reduce), (prefers-reduced-data: reduce) {
+    .flagship-reading,
+    .flagship-exhibit,
+    .flagship-exhibit img,
+    .flagship-index li a,
+    .flagship-index li a::before {
+      transition: none !important;
+    }
+
+    .flagship-exhibit {
+      clip-path: none;
+      visibility: hidden;
+    }
+
+    .flagship-exhibit.is-on {
+      visibility: visible;
+    }
+
+    .flagship-exhibit img {
+      filter: none;
+    }
+  }
+</style>

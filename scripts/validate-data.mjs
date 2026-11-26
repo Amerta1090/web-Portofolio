@@ -170,6 +170,31 @@ for (const [file, schema] of Object.entries(schemas)) {
         errors++;
       }
       ranks.push(rank);
+
+      // MOTION-26: the flagship stage prints `flagship_figure`, so every number
+      // in it must already be stated by the project's own description.
+      const figure = items[i].flagship_figure;
+      if (!figure || typeof figure.value !== "string" || typeof figure.caption !== "string") {
+        console.error(
+          `ERROR: projects.json[${i}] flagship ${rank} needs flagship_figure { value, caption }`,
+        );
+        errors++;
+      } else {
+        const stated = new Set(String(items[i].description).match(/\d+(?:\.\d+)?/g) ?? []);
+        const claimed = `${figure.value} ${figure.caption}`.match(/\d+(?:\.\d+)?/g) ?? [];
+        for (const n of claimed) {
+          if (!stated.has(n)) {
+            console.error(
+              `ERROR: projects.json[${i}] flagship_figure claims ${n}, which its description never states`,
+            );
+            errors++;
+          }
+        }
+      }
+      if (typeof items[i].discipline !== "string" || items[i].discipline.length === 0) {
+        console.error(`ERROR: projects.json[${i}] flagship ${rank} needs a discipline label`);
+        errors++;
+      }
     }
     const sorted = [...ranks].sort((a, b) => a - b);
     if (sorted.some((rank, index) => rank !== index + 1)) {

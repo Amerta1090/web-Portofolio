@@ -6,7 +6,7 @@ import { projectNodeId, requireLinkedProject } from "./project-data";
 // Capability Map with a node already selected, and every way back out.
 //
 //   M3.4.1  From the Capability Stack (/skills) to the map with its node selected.
-//   M3.4.2  From a project-card skill chip (Task 2.4) to the map with its node selected.
+//   M3.4.2  (retired in MOTION-26 with the project-card skill chips it tested.)
 //   M3.4.3  From the map to `/projects/<slug>` and back; hash, selection and scroll restore.
 //   M3.4.4  ClientRouter swallows `hashchange` for same-page anchors, so the island
 //           resolves in-page anchors through one delegated click listener, and
@@ -121,46 +121,6 @@ test.describe("Task 3.4 — deep links into the Capability Map (M6b)", () => {
     expect(ring.outlineStyle).toBe("solid");
     expect(ring.outlineWidth).toBe("2px");
     expect(ring.outlineColor).not.toBe("rgba(0, 0, 0, 0)");
-  });
-
-  test("a project-card skill chip selects the map node it points at (M3.4.2)", async ({ page }) => {
-    await page.goto(HOME);
-    // The map is below the fold on a plain home load; hydrate it first.
-    await page.locator("#systems-in-motion").scrollIntoViewIfNeeded();
-    await mapReady(page);
-
-    // Chips render as relative `#signal-capability-*` anchors (Task 2.4). The
-    // fallback skills resolve to `#systems-in-motion` and do not match — which is
-    // fine, this microtask is about the ones that land on a capability node.
-    const chips = page.locator("a[href^='#signal-capability-']");
-    const chipCount = await chips.count();
-    expect(chipCount).toBeGreaterThan(0);
-
-    // The plain load selects the graph's default hub. Pick a chip whose node is
-    // a genuine *change*, so the assertion cannot pass vacuously.
-    const defaultNode = await selectedNode(page);
-    let href = "";
-    for (let i = 0; i < chipCount; i++) {
-      const candidate = (await chips.nth(i).getAttribute("href")) as string;
-      if (candidate.slice("#signal-".length) !== defaultNode) {
-        href = candidate;
-        break;
-      }
-    }
-    expect(href, "a chip must point at a node other than the default hub").not.toBe("");
-    const nodeId = href.slice("#signal-".length);
-
-    const chip = page.locator(`a[href="${href}"]`).first();
-    await chip.scrollIntoViewIfNeeded();
-    await chip.click();
-
-    // Same-page anchor: ClientRouter owns the URL (pushState, no hashchange) and
-    // the island's delegated click listener owns the selection. Both must agree.
-    await expect(page.locator("[data-signal-node][aria-current='true']")).toHaveAttribute(
-      "data-signal-node",
-      nodeId,
-    );
-    await expect(page).toHaveURL(new RegExp(`#signal-${nodeId}$`));
   });
 
   test("map → project page → back: hash, selection and scroll restore (M3.4.3)", async ({

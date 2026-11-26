@@ -26,7 +26,8 @@ const css = read("src/lib/scroll-animations.css");
 const section = read("src/components/molecules/Section.astro");
 const index = read("src/pages/index.astro");
 const layout = read("src/layouts/BaseLayout.astro");
-const hero = read("src/islands/TimeAwareHero.tsx");
+const hero = read("src/components/organisms/Hero.astro");
+const flagship = read("src/components/organisms/FlagshipStage.astro");
 const career = read("src/components/organisms/CareerSpine.astro");
 const creativeLab = read("src/components/organisms/CreativeLabTeaser.astro");
 
@@ -82,24 +83,11 @@ describe("scroll-animations.css reveal contract", () => {
     expect(body).toMatch(/entry var\(--chapter-body-end\)/);
   });
 
-  it("ties the hero cue exit to its view timeline with compositor-only motion", () => {
-    const view = blockAfter(css, "@supports (animation-timeline: view())").body;
-    const hero = blockAfter(view, "[data-hero-handoff]").body;
-    const cue = blockAfter(view, "[data-hero-handoff] [data-hero-scroll-cue]").body;
-    const keyframes = blockAfter(view, "@keyframes hero-cue-exit").body;
-
-    expect(hero).toMatch(/view-timeline-name:\s*--hero-handoff/);
-    expect(hero).toMatch(/view-timeline-axis:\s*block/);
-    expect(cue).toMatch(/animation-timeline:\s*--hero-handoff/);
-    expect(cue).toMatch(/animation-range:\s*exit 0% exit 45%/);
-    expect(keyframes).toMatch(/opacity:\s*0/);
-    expect(keyframes).toMatch(/transform:\s*translate\(/);
-    expect(keyframes).not.toMatch(/(^|[;{\s])(width|height|top|left)\s*:/);
-  });
-
-  it("only forces server-rendered hero content visible before Astro hydrates", () => {
-    expect(css).toMatch(/#hero astro-island\[ssr\] \[data-hero-content\]/);
-    expect(css).not.toContain("component-hydrated");
+  it("keeps Hero.astro static under reduced motion and reduced data", () => {
+    expect(hero).toMatch(
+      /@media \(prefers-reduced-motion: reduce\), \(prefers-reduced-data: reduce\)/,
+    );
+    expect(hero).toMatch(/animation:\s*none\s*!important/);
   });
 
   it("keeps the legacy reveal path for non-chapter containers", () => {
@@ -124,41 +112,22 @@ describe("scroll-animations.css reveal contract", () => {
       expect(media).toMatch(/animation:\s*none\s*!important/);
       expect(media).toMatch(/opacity:\s*1\s*!important/);
       expect(media).toMatch(/transform:\s*none\s*!important/);
-      expect(media).toContain("[data-hero-handoff] [data-hero-scroll-cue]");
       expect(media, `${preference} overrides the career headings`).toContain(
         "[data-career-year] > h3",
       );
       expect(media, `${preference} overrides the career records`).toContain("[data-career-kind]");
-      expect(media, `${preference} overrides the project evidence cards`).toContain(
-        "[data-project-card-reveal]",
-      );
       expect(media, `${preference} overrides the Creative Lab thumbnails`).toContain(
         "[data-lab-card-reveal]",
       );
     }
   });
 
-  it("lights the flagship exhibits on the card's own timeline, compositor-only (MOTION-21)", () => {
-    const view = blockAfter(css, "@supports (animation-timeline: view())").body;
-    expect(view).toMatch(/\[data-project-card-reveal\]\s*\{\s*view-timeline-name:\s*--exhibit/);
-    const wash = blockAfter(view, "[data-project-grid] [data-exhibit]::after").body;
-    expect(wash).toMatch(/animation-timeline:\s*--exhibit/);
-    // Sequenced by the data order token, never by :nth-child.
-    expect(wash).toContain("var(--project-card-order, 0)");
-    expect(wash).not.toContain("nth-child");
-    const keyframes = blockAfter(view, "@keyframes exhibit-light").body;
-    expect(keyframes).toMatch(/opacity:/);
-    expect(keyframes).not.toMatch(/filter|transform|width|height/);
-    // Outside the support block there is no wash at all: unsupported engines see
-    // the picture lit.
-    const outside = css.slice(0, css.indexOf("@supports (animation-timeline: view())"));
-    expect(outside).not.toContain("[data-exhibit]");
-    for (const preference of ["prefers-reduced-motion", "prefers-reduced-data"]) {
-      const media = blockAfter(css, `@media (${preference}: reduce)`).body;
-      expect(media, `${preference} removes the dark-room wash`).toMatch(
-        /\[data-exhibit\]::after\s*\{\s*display:\s*none\s*!important/,
-      );
-    }
+  it("keeps FlagshipStage exhibits static under reduced motion and reduced data", () => {
+    expect(flagship).toMatch(
+      /@media \(prefers-reduced-motion: reduce\), \(prefers-reduced-data: reduce\)/,
+    );
+    expect(flagship).toMatch(/transition:\s*none\s*!important/);
+    expect(flagship).toMatch(/clip-path:\s*none/);
   });
 
   it("removes the dead JS progress fallback", () => {
@@ -247,7 +216,9 @@ describe("chapter authoring hooks", () => {
 
   it("opts exactly five homepage sections into the chapter model", () => {
     const chapterProps = index.match(/\bchapter\b/g) ?? [];
-    expect(chapterProps).toHaveLength(5);
+    expect(chapterProps).toHaveLength(4);
+    expect(index).toContain("<FlagshipStage");
+    expect(flagship).toMatch(/data-chapter=""/);
     expect(index).not.toContain("data-reveal");
     // `overflow: clip` keeps sticky rails and view() timelines alive, so the
     // per-section escape hatch MOTION-03 added has no reason to exist (Rule 6).
@@ -265,53 +236,21 @@ describe("chapter authoring hooks", () => {
   });
 });
 
-describe("evidence card hierarchy (MOTION-04)", () => {
+describe("flagship sticky stage (MOTION-26)", () => {
   const view = () => blockAfter(css, "@supports (animation-timeline: view())").body;
-  const island = read("src/islands/ProjectCardGrid.tsx");
 
-  it("takes the project grid's chapter body out of the single-beat reveal", () => {
-    // Four evidence cards are four pieces of evidence, not one rectangle.
-    const body = blockAfter(view(), "[data-chapter-body]:has([data-project-grid])").body;
+  it("takes the flagship stage body out of the reveal transform so sticky pins", () => {
+    const body = blockAfter(view(), "[data-flagship-stage] [data-chapter-body]").body;
 
     expect(body).toMatch(/animation:\s*none/);
     expect(body).toMatch(/opacity:\s*1/);
     expect(body).toMatch(/transform:\s*none/);
   });
 
-  it("gives every card a beat ordered by data instead of child index", () => {
-    const grid = view();
-
-    expect(grid).toMatch(/--card-beat-start:\s*0%/);
-    expect(grid).toMatch(/--card-beat-span:\s*30%/);
-    expect(grid).toMatch(/--card-order-step:\s*8%/);
-
-    const wrapper = blockAfter(grid, "[data-project-card-reveal]").body;
-    expect(wrapper).toMatch(/animation-timeline:\s*view\(\)/);
-    expect(wrapper).toMatch(/--project-card-order/);
-    expect(wrapper).toMatch(/entry\s+calc\(/);
-    // A `:nth-child` wall would encode today's data order in CSS and go stale
-    // the first time `data/projects.json` reorders (the MOTION-03 trap).
-    expect(wrapper).not.toMatch(/nth-child/);
-  });
-
-  it("publishes the order token from the island, with no filter state left", () => {
-    expect(island).toMatch(/data-project-grid=""/);
-    expect(island).toMatch(/data-project-card-reveal=""/);
-    expect(island).toMatch(/data-project-primary=\{order === 0 \? "" : undefined\}/);
-    expect(island).toMatch(/style=\{\{ "--project-card-order": order \}/);
-    // MOTION-19: the filter and its settle rule left with their last use.
-    expect(island).not.toMatch(/data-project-revealed/);
-    expect(view()).not.toMatch(/data-project-revealed/);
-  });
-
-  it("keeps the scroll beat and the tilt on different elements", () => {
-    // The reveal wrapper is an ancestor of the `<article>` the tilt transforms,
-    // so the two never write `transform` on one node.
-    const wrapper = island.slice(island.indexOf('data-project-card-reveal=""'));
-    const article = wrapper.indexOf('data-project-card=""');
-
-    expect(article).toBeGreaterThan(0);
-    expect(wrapper.slice(0, article)).toMatch(/<TiltCard/);
+  it("publishes the stage hooks and clips without overflow-hidden", () => {
+    expect(flagship).toMatch(/data-flagship-stage=""/);
+    expect(flagship).toMatch(/overflow:\s*clip/);
+    expect(flagship).not.toMatch(/overflow:\s*hidden/);
   });
 });
 
@@ -383,9 +322,4 @@ describe("progress bar semantics", () => {
   });
 });
 
-describe("hero entrance settles", () => {
-  it("does not loop the scroll cue entrance", () => {
-    expect(hero).toMatch(/data-hero-scroll-cue/);
-    expect(hero).not.toMatch(/\brepeat\s*:/);
-  });
-});
+// (hero entrance is pure CSS in Hero.astro, guarded above)

@@ -11,8 +11,8 @@ vi.mock("motion/react", async (importOriginal) => {
 
 const sectionIds = ["hero", "about", "experience", "contact"];
 
-describe("PageTailOverlays (composite: EasterEgg + SectionCounter + CreativeLabPill)", () => {
-  it("mounts without throwing (EasterEgg renders null, pill naik tanpa error)", () => {
+describe("PageTailOverlays (composite: EasterEgg + SectionCounter)", () => {
+  it("mounts without throwing (EasterEgg renders null)", () => {
     expect(() => render(<PageTailOverlays sectionIds={sectionIds} />)).not.toThrow();
   });
 
@@ -44,8 +44,8 @@ describe("PageTailOverlays (composite: EasterEgg + SectionCounter + CreativeLabP
     expect(counter?.querySelectorAll("[aria-label]")).toHaveLength(0);
   });
 
-  it("renders creative-lab pill linking to /lab on non-lab paths", () => {
+  it("renders no floating lab link — the header nav and lab chapter own that route", () => {
     const { container } = render(<PageTailOverlays sectionIds={sectionIds} />);
-    expect(container.querySelector("a[href='/lab']")).not.toBeNull();
+    expect(container.querySelector("a[href='/lab']")).toBeNull();
   });
 });

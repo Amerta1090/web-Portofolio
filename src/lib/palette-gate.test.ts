@@ -4,7 +4,7 @@
  * Rule 3 / Rule 11: DOM paths read colour only through token CSS vars
  * (`--color-brand`, `--color-danger`, …), never hardcoded Tailwind palette
  * utilities. Sprint 4 M4.6 converted every documented UI file (RepoGlowCard,
- * EasterEgg, GalleryGrid, CreativeLabPill, CommandPalette, resume/gallery/
+ * EasterEgg, GalleryGrid, CommandPalette, resume/gallery/
  * observatory pages, timeline) — this gate keeps it at zero.
  *
  * DOCUMENTED EXCEPTIONS (keputusan user 2026-10-17):

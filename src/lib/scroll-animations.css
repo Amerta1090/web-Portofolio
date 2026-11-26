@@ -39,32 +39,6 @@
 }
 
 @supports (animation-timeline: view()) {
-  /* The hero cue exits on the hero's own view timeline. The hero's evidence and
-   * copy stay still; the following chapter starts its independent entry reveal
-   * as the hero leaves the viewport. */
-  [data-hero-handoff] {
-    view-timeline-name: --hero-handoff;
-    view-timeline-axis: block;
-  }
-
-  [data-hero-handoff] [data-hero-scroll-cue] {
-    animation: hero-cue-exit linear both;
-    animation-timeline: --hero-handoff;
-    animation-range: exit 0% exit 45%;
-  }
-
-  @keyframes hero-cue-exit {
-    from {
-      opacity: 1;
-      transform: translate(-50%, 0);
-    }
-
-    to {
-      opacity: 0;
-      transform: translate(-50%, 12px);
-    }
-  }
-
   /* ── Chapter reveal ──
    * Tokens are exposed on the chapter so a future section can retune its
    * rhythm without copying selectors. The body starts later in its own entry
@@ -141,81 +115,14 @@
     animation-range: entry 10% entry 60%;
   }
 
-  /* ── Evidence card hierarchy (MOTION-04) ──
-   * `#projects` is a grid of four evidence cards. The chapter-body beat faded
-   * all four in as one rectangle, which said "one block of content" about four
-   * separate pieces of evidence. The body opts out with the same structural
-   * rule the career spine uses, and every card owns a beat on its own view
-   * timeline.
-   *
-   * Order comes from the island as `--project-card-order` (0 = the lead card),
-   * never from `:nth-child`: a child-index wall would encode the data order in
-   * CSS and go stale the first time `data/projects.json` reorders (the trap
-   * MOTION-03 documented). Cards share a row, so their own `view()` timelines
-   * start together; the order token is what makes the lead card settle first.
+  /* ── Flagship sticky stage (MOTION-26) ──
+   * `.flagship-stage` uses `position: sticky`, which breaks if any ancestor has
+   * a non-none `transform`. Opt the chapter body out of the fade-up beat.
    */
-  [data-chapter-body]:has([data-project-grid]) {
+  [data-flagship-stage] [data-chapter-body] {
     animation: none;
     opacity: 1;
     transform: none;
-  }
-
-  [data-project-grid] {
-    --card-beat-start: 0%;
-    --card-beat-span: 30%;
-    --card-order-step: 8%;
-  }
-
-  [data-project-card-reveal] {
-    opacity: 0;
-    transform: translateY(16px);
-    animation: reveal-fade-up linear forwards;
-    animation-timeline: view();
-    animation-range: entry
-      calc(var(--card-beat-start) + var(--project-card-order, 0) * var(--card-order-step)) entry
-      calc(var(--card-beat-span) + var(--project-card-order, 0) * var(--card-order-step));
-  }
-
-  /* ── The room lights (MOTION-21, second beat of D-15) ──
-   * Each flagship exhibit starts in the dark room and is lit as its card
-   * settles: a wash of the page surface over the picture fades out on the
-   * card's own named view timeline, after the card's reveal and in the same
-   * `--project-card-order` sequence, so the lead exhibit lights first. Opacity
-   * on a pseudo-element only — the picture itself is never filtered or
-   * repainted. The wash exists only inside this support block, so an engine
-   * without view timelines (and a reader with scripts off on one) sees the
-   * picture lit; reduced motion and reduced data remove it below.
-   */
-  [data-project-card-reveal] {
-    view-timeline-name: --exhibit;
-    view-timeline-axis: block;
-  }
-
-  [data-project-grid] [data-exhibit]::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgb(var(--bg-primary-rgb));
-    pointer-events: none;
-    animation: exhibit-light linear both;
-    animation-timeline: --exhibit;
-    animation-range: entry
-      calc(var(--exhibit-light-start) + var(--project-card-order, 0) * var(--card-order-step))
-      cover calc(var(--exhibit-light-end) + var(--project-card-order, 0) * var(--card-order-step));
-  }
-
-  [data-project-grid] {
-    --exhibit-light-start: 20%;
-    --exhibit-light-end: 40%;
-  }
-
-  @keyframes exhibit-light {
-    from {
-      opacity: 0.72;
-    }
-    to {
-      opacity: 0;
-    }
   }
 
   /* ── Creative Lab teaser (MOTION-07, cut to six in MOTION-19) ──
@@ -344,37 +251,13 @@
  * blocks set the final state explicitly, before any scrolling.
  */
 @media (prefers-reduced-motion: reduce) {
-  /* MOTION-21: the dark-room wash is decoration over a picture, so the off
-   * switch removes it outright — the exhibit is lit from the first frame. */
-  [data-project-grid] [data-exhibit]::after {
-    display: none !important;
-  }
-
   [data-chapter-head],
   [data-chapter-body],
   [data-career-year] > h3,
   [data-career-kind],
-  [data-project-card-reveal],
   [data-lab-card-reveal],
   [data-reveal] > *,
-  [data-hero-handoff] [data-hero-scroll-cue],
-  /* MOTION-12: the hero entrance and the metric cards start fully transparent
-   * from motion's `initial`, which is applied at hydration — before the
-   * preference is known. Without this the first screen blinks to zero and fades
-   * back over ~3 s, which the tells audit read as three invisible CTAs. Only the
-   * entrance wrappers are named (never `*`), so deliberately dimmed text such as
-   * the "(.pdf)" suffix keeps its own opacity. */
-    [data-hero-entrance],
-  [data-hero-avatar],
-  [data-metric-card],
-  /* MOTION-12: `RevealText` returns whole text when reduced motion is
-   * requested, but that branch only runs *after* hydration. Between Astro
-   * dropping `ssr` (hydration starts) and React committing, the server's
-   * transparent spans are live with no override, so the hero name was blank
-   * for ~700 ms — and permanently blank if hydration failed. A media-query
-   * rule has no such gap. */
-    .split-word,
-  .split-char {
+  [data-metric-card] {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
@@ -386,20 +269,12 @@
 }
 
 @media (prefers-reduced-data: reduce) {
-  /* MOTION-21: the dark-room wash is decoration over a picture, so the off
-   * switch removes it outright — the exhibit is lit from the first frame. */
-  [data-project-grid] [data-exhibit]::after {
-    display: none !important;
-  }
-
   [data-chapter-head],
   [data-chapter-body],
   [data-career-year] > h3,
   [data-career-kind],
-  [data-project-card-reveal],
   [data-lab-card-reveal],
-  [data-reveal] > *,
-  [data-hero-handoff] [data-hero-scroll-cue] {
+  [data-reveal] > * {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
@@ -408,14 +283,4 @@
   .scroll-progress-css {
     animation: none !important;
   }
-}
-
-/* Server-rendered hero text must remain available when the island never runs.
- * Motion's SSR styles describe its entrance start state, so remove those inline
- * presentation values only while the island is still unhydrated. */
-#hero astro-island[ssr] [data-hero-content],
-#hero astro-island[ssr] [data-hero-content] *,
-#hero astro-island[ssr] [data-hero-scroll-cue] {
-  opacity: 1 !important;
-  transform: none !important;
 }
