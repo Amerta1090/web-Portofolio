@@ -63,6 +63,7 @@ export default function ProjectThumbnail({
 
   return (
     <div
+      data-exhibit=""
       className={`relative overflow-hidden aspect-video bg-surface-tertiary rounded-t-lg ${className}`}
     >
       <img

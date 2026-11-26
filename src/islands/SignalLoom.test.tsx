@@ -15,28 +15,12 @@ vi.mock("motion/react", async (importOriginal) => {
   };
 });
 
-// GSAP choreography is a visual enhancement: in jsdom we assert the DOM
-// contract (dots rendered/capped/remounted, immediate reduced state), not tween
-// frames. Registering ScrollTrigger needs window.matchMedia, which jsdom lacks,
-// so both modules are stubbed here instead of changing shared test infra.
-vi.mock("../lib/useGSAP", () => ({
-  useGSAP: () => {},
-}));
-
-vi.mock("../lib/gsap", () => ({
-  gsap: {
-    registerPlugin: () => {},
-    defaults: () => {},
-    timeline: () => {
-      const tl = { fromTo: () => tl, to: () => tl, play: () => {}, pause: () => {} };
-      return tl;
-    },
-    fromTo: () => {},
-    to: () => {},
-    set: () => {},
-  },
-  ScrollTrigger: class ScrollTrigger {},
-}));
+// The choreography runs on WAAPI, which jsdom does not implement: the island
+// detects that and skips straight to the settled state (entry done, cards lit),
+// exactly as an engine without `Element.animate` would. These tests assert that
+// DOM contract — runs rendered/remounted, cards lit, arrival delays, immediate
+// reduced state — not animation frames (`SignalLoom.entry.test.tsx` stubs
+// `animate` to observe the entry order).
 
 const GRAPH: SignalLoomGraph = {
   nodes: [
@@ -151,9 +135,15 @@ function detailPanel(container: HTMLElement): HTMLElement | null {
   return container.querySelector<HTMLElement>("[data-signal-detail]");
 }
 
-function dotIds(container: HTMLElement): string[] {
-  return Array.from(container.querySelectorAll("[data-signal-dot]"))
-    .map((dot) => dot.getAttribute("data-signal-dot"))
+function runIds(container: HTMLElement): string[] {
+  return Array.from(container.querySelectorAll("[data-signal-run]"))
+    .map((run) => run.getAttribute("data-signal-run"))
+    .filter((id): id is string => id !== null);
+}
+
+function litIds(container: HTMLElement): string[] {
+  return Array.from(container.querySelectorAll('[data-signal-lit="true"]'))
+    .map((node) => node.getAttribute("data-signal-node"))
     .filter((id): id is string => id !== null);
 }
 
@@ -324,7 +314,7 @@ describe("SignalLoom selection states (L2.1)", () => {
     await user.click(web); // active edge is now capability-web->project-a only
 
     const mlEdge = container.querySelector('[data-edge="capability-ml->project-a"]');
-    expect(mlEdge).toHaveAttribute("stroke", "rgb(var(--color-border-rgb) / 0.8)");
+    expect(mlEdge).toHaveAttribute("stroke", "rgb(var(--color-border-rgb) / 0.5)");
 
     fireEvent.pointerEnter(ml);
     expect(mlEdge).toHaveAttribute("stroke", "rgb(var(--color-brand-rgb) / 0.95)");
@@ -332,7 +322,7 @@ describe("SignalLoom selection states (L2.1)", () => {
     expect(statusText(container)).toBe("Web capability summary");
 
     fireEvent.pointerLeave(ml);
-    expect(mlEdge).toHaveAttribute("stroke", "rgb(var(--color-border-rgb) / 0.8)");
+    expect(mlEdge).toHaveAttribute("stroke", "rgb(var(--color-border-rgb) / 0.5)");
   });
 
   it("clears hover emphasis when a focused node loses focus", async () => {
@@ -347,13 +337,13 @@ describe("SignalLoom selection states (L2.1)", () => {
     const ml = container.querySelector('[data-signal-node="capability-ml"]');
     const mlEdge = container.querySelector('[data-edge="capability-ml->project-a"]');
     if (!ml || !mlEdge) throw new Error("ml node or edge missing");
-    expect(mlEdge).toHaveAttribute("stroke", "rgb(var(--color-border-rgb) / 0.8)");
+    expect(mlEdge).toHaveAttribute("stroke", "rgb(var(--color-border-rgb) / 0.5)");
 
     fireEvent.focus(ml);
     expect(mlEdge).toHaveAttribute("stroke", "rgb(var(--color-brand-rgb) / 0.95)");
 
     fireEvent.blur(ml);
-    expect(mlEdge).toHaveAttribute("stroke", "rgb(var(--color-border-rgb) / 0.8)");
+    expect(mlEdge).toHaveAttribute("stroke", "rgb(var(--color-border-rgb) / 0.5)");
   });
 
   it("lays capability and project cards out as the two graph zones", () => {
@@ -378,10 +368,9 @@ describe("SignalLoom selection states (L2.1)", () => {
 
     await user.click(web);
 
-    // The trace is carried by the brand-coloured measured edges and the
-    // travelling dots, not by a per-card marker: with zero isolated nodes a
-    // `data-connected` flag would imply unmarked-but-connected cards are
-    // stranded. Selected emphasis stays on the card itself.
+    // The trace is the brand edges, the light runs and the lit neighbour cards
+    // (MOTION-21), not the retired `data-connected` marker. Selected emphasis
+    // stays on the card itself.
     expect(web).toHaveAttribute("aria-current", "true");
     expect(container.querySelector("[data-connected]")).toBeNull();
   });
@@ -495,17 +484,39 @@ describe("SignalLoom deep-link project page (M3.4.3)", () => {
 });
 
 describe("SignalLoom bounded SVG choreography (L2.2)", () => {
-  it("renders travelling dots for the capped active edges once hydrated", async () => {
+  it("runs light along every selected edge, strongest tie first, once the entry ends", async () => {
     const { container } = render(<SignalLoom graph={GRAPH} />);
 
-    await waitFor(() => expect(dotIds(container)).toHaveLength(2));
-    expect(dotIds(container)).toEqual(["capability-ml->project-a", "capability-web->project-a"]);
+    // project-a is selected; its weight-2 tie (web) runs before the weight-1 (ml).
+    await waitFor(() =>
+      expect(runIds(container)).toEqual(["capability-web->project-a", "capability-ml->project-a"]),
+    );
+    const run = container.querySelector<SVGLineElement>(
+      '[data-signal-run="capability-web->project-a"]',
+    );
+    expect(run).toHaveAttribute("stroke", "rgb(var(--color-brand-rgb) / 0.95)");
+    // No WAAPI here (jsdom), so the run is drawn outright — never left
+    // collapsed at scale(0) by an animation that cannot play.
+    expect(run?.style.transform).toBe("");
+  });
 
-    // Dots ride the measured card-to-card edges. jsdom has no layout, so the
-    // coordinates are zeros here — assert the DOM contract (presence, ids,
-    // fill), not pixel positions (real geometry is covered by E2E).
-    const dot = container.querySelector('[data-signal-dot="capability-ml->project-a"]');
-    expect(dot).toHaveAttribute("fill", "rgb(var(--color-brand-rgb) / 0.9)");
+  it("lights each neighbour card on its run's arrival, not before", async () => {
+    const { container } = render(<SignalLoom graph={WIDE_GRAPH} />);
+
+    await waitFor(() => expect(runIds(container)).toHaveLength(5));
+    expect(litIds(container).sort()).toEqual(
+      ["capability-a", "capability-b", "capability-c", "capability-d", "capability-e"].sort(),
+    );
+    // The delay is the schedule's arrival: the first run lands at the run time,
+    // each later one a stagger after the one before.
+    const delays = ["capability-a", "capability-b", "capability-c"].map(
+      (id) =>
+        container.querySelector<HTMLElement>(`[data-signal-node="${id}"] [data-signal-glow]`)?.style
+          .transitionDelay,
+    );
+    expect(delays).toEqual(["0.45s", "0.52s", "0.59s"]);
+    // The selected card itself is not "lit" — it carries the selected look.
+    expect(litIds(container)).not.toContain(WIDE_GRAPH.defaultNodeId);
   });
 
   it("draws connector edges with measured coordinates once the layout is read", async () => {
@@ -540,21 +551,29 @@ describe("SignalLoom bounded SVG choreography (L2.2)", () => {
     expect(web).toHaveAttribute("stroke-width", "2.7");
   });
 
-  it("caps simultaneous animated paths at SIGNAL_MAX_DOTS", async () => {
+  it("does not cap the runs: every neighbour of the selection is evidence", async () => {
     const { container } = render(<SignalLoom graph={WIDE_GRAPH} />);
 
-    await waitFor(() => expect(dotIds(container)).toHaveLength(3));
-    expect(dotIds(container)).toEqual(["e1", "e2", "e3"]);
+    await waitFor(() => expect(runIds(container)).toHaveLength(5));
+    expect(runIds(container)).toEqual(["e1", "e2", "e3", "e4", "e5"]);
   });
 
-  it("shows reduced motion an immediate stable state without dots", async () => {
+  it("shows reduced motion an immediate stable state: same lit cards, no runs, no delay", async () => {
     reducedMotion = true;
     const { container } = render(<SignalLoom graph={GRAPH} />);
 
     await waitFor(() =>
       expect(container.querySelector('[data-signal-node="project-a"]')).toBeTruthy(),
     );
-    expect(container.querySelectorAll("[data-signal-dot]")).toHaveLength(0);
+    expect(container.querySelectorAll("[data-signal-run]")).toHaveLength(0);
+    expect(litIds(container).sort()).toEqual(["capability-ml", "capability-web"]);
+    for (const id of litIds(container)) {
+      const glow = container.querySelector<HTMLElement>(
+        `[data-signal-node="${id}"] [data-signal-glow]`,
+      );
+      expect(glow?.style.transitionDelay).toBe("");
+      expect(glow?.style.opacity).toBe("1");
+    }
 
     // Active edges are immediately emphasized (brand stroke), no draw trail.
     // Measured edges land one frame after hydration by design (the island keeps
@@ -577,35 +596,39 @@ describe("SignalLoom bounded SVG choreography (L2.2)", () => {
     await user.click(ml);
 
     await waitFor(() => expect(statusText(container)).toBe("ML capability summary"));
-    expect(container.querySelectorAll("[data-signal-dot]")).toHaveLength(0);
+    expect(container.querySelectorAll("[data-signal-run]")).toHaveLength(0);
+    expect(litIds(container)).toEqual(["project-a"]);
   });
 
-  it("replaces old travel dots when the selection changes", async () => {
+  it("replaces the runs and the lit set when the selection changes", async () => {
     const user = userEvent.setup();
     const { container } = render(<SignalLoom graph={GRAPH} />);
 
-    await waitFor(() => expect(dotIds(container)).toHaveLength(2));
+    await waitFor(() => expect(runIds(container)).toHaveLength(2));
 
     const ml = container.querySelector<HTMLButtonElement>('[data-signal-node="capability-ml"]');
     if (!ml) throw new Error("ml node button missing");
     await user.click(ml);
 
     await waitFor(() => {
-      expect(dotIds(container)).toEqual(["capability-ml->project-a"]);
+      expect(runIds(container)).toEqual(["capability-ml->project-a"]);
     });
+    // The previous selection's neighbour dims; the new one's lights.
+    expect(litIds(container)).toEqual(["project-a"]);
     expect(
-      container.querySelectorAll('[data-signal-dot="capability-web->project-a"]'),
+      container.querySelectorAll('[data-signal-run="capability-web->project-a"]'),
     ).toHaveLength(0);
   });
 
-  it("renders no travelling dots in low-power mode but keeps emphasis", async () => {
+  it("renders no light runs in low-power mode but keeps emphasis and lit cards", async () => {
     const restore = mockReducedData(true);
     const { container } = render(<SignalLoom graph={GRAPH} />);
 
     await waitFor(() =>
       expect(container.querySelector('[data-signal-node="project-a"]')).toBeTruthy(),
     );
-    expect(container.querySelectorAll("[data-signal-dot]")).toHaveLength(0);
+    expect(container.querySelectorAll("[data-signal-run]")).toHaveLength(0);
+    expect(litIds(container).sort()).toEqual(["capability-ml", "capability-web"]);
 
     const activeEdge = await waitFor(() => {
       const edge = container.querySelector('[data-edge="capability-ml->project-a"]');
@@ -712,9 +735,11 @@ describe("SignalLoom fallback without hydration (Q4.2)", () => {
     const html = serverHtml();
     // defaultNodeId is project-a, so it is the current item.
     expect(html).toMatch(/data-signal-node="project-a"[^>]*aria-current="true"/);
-    // M3.2.4 retired the per-card marker: the trace is brand edges + dots now.
+    // M3.2.4 retired the per-card marker; MOTION-21 lights the selection's
+    // neighbours instead, and the server render already carries that still.
     expect(html).not.toContain("data-connected");
-    expect(html).not.toContain("border-brand/40");
+    expect(html).toMatch(/data-signal-node="capability-ml"[^>]*data-signal-lit="true"/);
+    expect(html).toMatch(/data-signal-node="capability-web"[^>]*data-signal-lit="true"/);
   });
 
   it("turns the cards into selectable controls once hydrated", () => {

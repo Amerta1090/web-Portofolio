@@ -176,6 +176,48 @@
       calc(var(--card-beat-span) + var(--project-card-order, 0) * var(--card-order-step));
   }
 
+  /* ── The room lights (MOTION-21, second beat of D-15) ──
+   * Each flagship exhibit starts in the dark room and is lit as its card
+   * settles: a wash of the page surface over the picture fades out on the
+   * card's own named view timeline, after the card's reveal and in the same
+   * `--project-card-order` sequence, so the lead exhibit lights first. Opacity
+   * on a pseudo-element only — the picture itself is never filtered or
+   * repainted. The wash exists only inside this support block, so an engine
+   * without view timelines (and a reader with scripts off on one) sees the
+   * picture lit; reduced motion and reduced data remove it below.
+   */
+  [data-project-card-reveal] {
+    view-timeline-name: --exhibit;
+    view-timeline-axis: block;
+  }
+
+  [data-project-grid] [data-exhibit]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgb(var(--bg-primary-rgb));
+    pointer-events: none;
+    animation: exhibit-light linear both;
+    animation-timeline: --exhibit;
+    animation-range: entry
+      calc(var(--exhibit-light-start) + var(--project-card-order, 0) * var(--card-order-step))
+      cover calc(var(--exhibit-light-end) + var(--project-card-order, 0) * var(--card-order-step));
+  }
+
+  [data-project-grid] {
+    --exhibit-light-start: 20%;
+    --exhibit-light-end: 40%;
+  }
+
+  @keyframes exhibit-light {
+    from {
+      opacity: 0.72;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
   /* ── Creative Lab teaser (MOTION-07, cut to six in MOTION-19) ──
    * The chapter-body beat would fade the sheet as one rectangle, so the body
    * opts out with the same structural rule the career spine and the project
@@ -302,6 +344,12 @@
  * blocks set the final state explicitly, before any scrolling.
  */
 @media (prefers-reduced-motion: reduce) {
+  /* MOTION-21: the dark-room wash is decoration over a picture, so the off
+   * switch removes it outright — the exhibit is lit from the first frame. */
+  [data-project-grid] [data-exhibit]::after {
+    display: none !important;
+  }
+
   [data-chapter-head],
   [data-chapter-body],
   [data-career-year] > h3,
@@ -338,6 +386,12 @@
 }
 
 @media (prefers-reduced-data: reduce) {
+  /* MOTION-21: the dark-room wash is decoration over a picture, so the off
+   * switch removes it outright — the exhibit is lit from the first frame. */
+  [data-project-grid] [data-exhibit]::after {
+    display: none !important;
+  }
+
   [data-chapter-head],
   [data-chapter-body],
   [data-career-year] > h3,

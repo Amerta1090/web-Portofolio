@@ -6,8 +6,13 @@ import type {
   SignalLoomNode,
 } from "../lib/creative/signal-loom";
 import { defaultPathEdgeIds, edgeStrokeWidth } from "../lib/creative/signal-loom";
-import { choreographyMode, signalDotEdges } from "../lib/creative/signal-loom-choreo";
-import { SIGNAL_LOOPS, SIGNAL_TRAVEL_SECONDS } from "../lib/creative/signal-loom-choreo";
+import {
+  ENTRY_DRAW_SECONDS,
+  ENTRY_STAGGER_SECONDS,
+  LIGHT_RUN_SECONDS,
+  choreographyMode,
+  lightRunSchedule,
+} from "../lib/creative/signal-loom-choreo";
 import {
   ROVING_KEYS,
   SIGNAL_HASH_PREFIX,
@@ -16,19 +21,17 @@ import {
   rovingTargetIndex,
 } from "../lib/creative/signal-loom-select";
 import type { RovingKey } from "../lib/creative/signal-loom-select";
-import { gsap } from "../lib/gsap";
-import { duration } from "../lib/motion";
-import { useGSAP } from "../lib/useGSAP";
-import { useRafGuard } from "../lib/useRafGuard";
 import { useHydratedReducedMotion } from "../lib/useHydratedReducedMotion";
+import { useRafGuard } from "../lib/useRafGuard";
 
 interface SignalLoomProps {
   graph: SignalLoomGraph;
 }
 
 const BRAND_STROKE = "rgb(var(--color-brand-rgb) / 0.95)";
-const MUTED_STROKE = "rgb(var(--color-border-rgb) / 0.8)";
-const BRAND_FILL = "rgb(var(--color-brand-rgb) / 0.9)";
+// MOTION-21 juror round: the rest mesh read as noise behind the lit fan, so
+// at rest the edges sit quieter (decorative, like `--color-border`).
+const MUTED_STROKE = "rgb(var(--color-border-rgb) / 0.5)";
 
 interface EdgeCoords {
   x1: number;
@@ -48,23 +51,45 @@ type EdgeCoordMap = Partial<Record<string, EdgeCoords>>;
  * abstract node dots — the graph the user sees is exactly the card grid.
  *
  * L2.1 owns the deterministic selected-node state (pointer, touch, keyboard,
- * deep link). L2.2 layers a bounded motion pass on top: a one-shot GSAP entry
- * fade for the connector edges and travelling signal dots that pulse along a
- * selected card-to-card edge (capped by `SIGNAL_MAX_DOTS`). All animation is
- * finite, cancellable, viewport/visibility guarded, and reduced-motion safe —
- * no React state is written inside any loop.
+ * deep link). MOTION-21 ("the map lights", D-15) is the motion on top: on entry
+ * every edge draws from its capability end at rest; then light runs out along
+ * each edge of the selection, strongest tie first, and every neighbour card
+ * lights as its run lands. Every moving part is a compositor property: the
+ * edges and runs grow with WAAPI `transform: scale(0 → 1)` from their origin
+ * end (the stroke is non-scaling, so the width never changes), and a card
+ * lights by fading in one glow layer whose CSS `transition-delay` is the run's
+ * arrival from `lightRunSchedule` — no per-card callback, no colour
+ * transition, and one React state write ends the entry. Reduced motion and
+ * reduced data light the same cards at once; before hydration (and with
+ * scripts off) the default selection's neighbours are already lit in the
+ * server markup, so the still carries the same meaning.
  */
+const EASE_OUT = "cubic-bezier(0.33, 1, 0.68, 1)";
+const GROW: Keyframe[] = [{ transform: "scale(0)" }, { transform: "scale(1)" }];
+
+/** WAAPI is the engine; where it is missing (jsdom, very old engines) the
+ *  lines are simply drawn, never left hidden. */
+function canAnimate(): boolean {
+  return typeof Element !== "undefined" && typeof Element.prototype.animate === "function";
+}
+
+/** Scale origin at one end of the measured edge, in SVG user units (px). */
+function growFrom(x: number, y: number) {
+  return { transformOrigin: `${x}px ${y}px`, transform: "scale(0)" };
+}
+
 export default function SignalLoom({ graph }: SignalLoomProps) {
   const [selectedId, setSelectedId] = useState(graph.defaultNodeId);
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [lowPower, setLowPower] = useState(false);
   const [edgeCoords, setEdgeCoords] = useState<EdgeCoordMap>({});
+  const [entered, setEntered] = useState(false);
   const prefersReduced = useHydratedReducedMotion();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
-  const timelineRef = useRef<gsap.core.Timeline | null>(null);
+  const animationsRef = useRef<Animation[]>([]);
   const buttonRefs = useRef(new Map<string, HTMLButtonElement>());
 
   const guard = useRafGuard(containerRef);
@@ -94,10 +119,17 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
 
   const choreoMode = choreographyMode(prefersReduced, lowPower, activeEdges.size);
   const animated = hydrated && choreoMode === "full";
-  const dottedEdges = useMemo(
-    () => (animated ? signalDotEdges(graph, selectedId) : []),
-    [animated, graph, selectedId],
-  );
+  const hasCoords = Object.keys(edgeCoords).length > 0;
+  // Armed = the entry is about to draw: every edge is at rest and no card is
+  // lit yet, so the light has somewhere to arrive. Only on capable devices, and
+  // only once there is geometry to draw (otherwise the cards would stay dark).
+  // The draw does not depend on the selection having edges: it is the map
+  // taking its weight, whatever is selected.
+  const entryAllowed = hydrated && !prefersReduced && !lowPower;
+  const armed = entryAllowed && hasCoords && !entered;
+  const showRuns = animated && entered;
+  const runs = useMemo(() => lightRunSchedule(graph, selectedId), [graph, selectedId]);
+  const arriveById = useMemo(() => new Map(runs.map((run) => [run.targetId, run.arrive])), [runs]);
   // M5.2: the entry draws the default reading path first. The order is derived
   // from the graph (heaviest overlap first), not from DOM order, so the sequence
   // matches the sentence the server renders above the map.
@@ -214,12 +246,18 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
     };
   }, [hydrated, measureEdges]);
 
-  // One-shot entry: connector edges fade in, default path first. Skipped
-  // entirely for reduced motion, before hydration, or while off-screen.
-  useGSAP(() => {
-    if (!hydrated || prefersReduced || guard.paused) return;
+  // One-shot entry: every edge grows from its capability end, default reading
+  // path first, while nothing is lit. Its single state write (`setEntered`) is
+  // what lights the selection. Skipped for reduced motion/data and before
+  // hydration; it waits while off-screen and restarts if it was cut short.
+  useEffect(() => {
+    if (!armed || guard.paused) return;
     const svg = svgRef.current;
-    if (!svg || Object.keys(edgeCoords).length === 0) return;
+    if (!svg) return;
+    if (!canAnimate()) {
+      setEntered(true);
+      return;
+    }
     // Stable sort: the default path's edges lead in reading order, everything
     // else keeps the DOM order the graph produced.
     const priority = new Map(entryEdgeIds.map((id, index) => [id, index]));
@@ -231,66 +269,63 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
       if (bIndex !== undefined) return 1;
       return 0;
     });
-    const tl = gsap.timeline({ delay: 0.06 });
-    tl.fromTo(
-      lines,
-      { opacity: 0.3 },
-      { opacity: 1, duration: duration.slow, stagger: 0.04, ease: "power1.out" },
+    const animations = lines.map((line, index) =>
+      line.animate(GROW, {
+        duration: ENTRY_DRAW_SECONDS * 1000,
+        delay: 60 + index * ENTRY_STAGGER_SECONDS * 1000,
+        easing: EASE_OUT,
+        fill: "both",
+      }),
     );
-    timelineRef.current = tl;
-  }, [hydrated, prefersReduced, guard.paused, edgeCoords, entryEdgeIds]);
+    animationsRef.current = animations;
+    let live = true;
+    Promise.all(animations.map((animation) => animation.finished))
+      .then(() => {
+        if (live) setEntered(true);
+      })
+      // A cancelled entry (cleanup) rejects; it simply restarts next time.
+      .catch(() => {});
+    return () => {
+      live = false;
+      for (const animation of animations) animation.cancel();
+    };
+  }, [armed, guard.paused, entryEdgeIds]);
 
-  // Selection choreography: pulse a finite signal dot from the selected card
-  // to each capped connected target, travelling along the measured edge.
-  useGSAP(() => {
-    if (choreoMode !== "full") return;
+  // The light runs: one line per selected edge grows from the selection to the
+  // neighbour on the schedule's delay. The neighbour card's glow fades in on
+  // its own CSS transition-delay (`arrive`), so the two meet without a
+  // per-card callback.
+  useEffect(() => {
+    if (!showRuns || !canAnimate()) return;
     const svg = svgRef.current;
     if (!svg) return;
-    const tl = gsap.timeline();
+    const animations: Animation[] = [];
+    for (const run of runs) {
+      const line = svg.querySelector<SVGLineElement>(`[data-signal-run="${run.edge.id}"]`);
+      if (!line) continue;
+      animations.push(
+        line.animate(GROW, {
+          duration: LIGHT_RUN_SECONDS * 1000,
+          delay: run.delay * 1000,
+          easing: EASE_OUT,
+          fill: "both",
+        }),
+      );
+    }
+    animationsRef.current = animations;
+    return () => {
+      for (const animation of animations) animation.cancel();
+    };
+  }, [showRuns, runs]);
 
-    dottedEdges.forEach((edge, index) => {
-      const coords = edgeCoords[edge.id];
-      if (!coords) return;
-      const dot = svg.querySelector<SVGCircleElement>(`[data-signal-dot="${edge.id}"]`);
-      if (!dot) return;
-      const start = index * 0.08;
-      const lapDuration = SIGNAL_TRAVEL_SECONDS + 0.35;
-      for (let lap = 0; lap < SIGNAL_LOOPS; lap += 1) {
-        const at = start + lap * lapDuration;
-        tl.fromTo(
-          dot,
-          { attr: { cx: coords.x1, cy: coords.y1 }, opacity: lap === 0 ? 0 : 0.75 },
-          { attr: { cx: coords.x1, cy: coords.y1 }, opacity: 1, duration: 0.05 },
-          at,
-        )
-          .to(
-            dot,
-            {
-              attr: { cx: coords.x2, cy: coords.y2 },
-              duration: SIGNAL_TRAVEL_SECONDS,
-              ease: "power1.inOut",
-            },
-            at + 0.06,
-          )
-          .to(
-            dot,
-            { opacity: 0.25, duration: 0.18, yoyo: true, repeat: 1 },
-            at + SIGNAL_TRAVEL_SECONDS + 0.12,
-          );
-      }
-    });
-
-    timelineRef.current = tl;
-  }, [choreoMode, dottedEdges, edgeCoords]);
-
-  // Pause/resume the current choreography when the section leaves the viewport
-  // or the tab hides (useRafGuard already observes both). Tweens are killed by
-  // useGSAP revert on selection replacement and unmount.
+  // Pause/resume the running animations when the section leaves the viewport
+  // or the tab hides (useRafGuard observes both).
   useEffect(() => {
-    const tl = timelineRef.current;
-    if (!tl) return;
-    if (guard.paused) tl.pause();
-    else tl.play();
+    for (const animation of animationsRef.current) {
+      if (animation.playState === "finished") continue;
+      if (guard.paused) animation.pause();
+      else animation.play();
+    }
   }, [guard.paused]);
 
   const handleSelect = (id: string) => {
@@ -325,13 +360,21 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
 
   const renderNode = (node: SignalLoomNode) => {
     const isSelected = node.id === selectedId;
+    // Lit = a neighbour of the selection: the evidence the selection points at.
+    // Dark while the entry is armed; lit on its run's arrival when runs play.
+    const isLit = !isSelected && arriveById.has(node.id) && !armed;
+    const arrive = isLit && showRuns ? arriveById.get(node.id) : undefined;
+    const glowStyle = {
+      opacity: isLit ? 1 : 0,
+      transitionDelay: arrive === undefined ? undefined : `${arrive}s`,
+    };
     const isCapability = node.kind === "capability";
     const kindLabel = isCapability ? "Capability" : "Evidence";
     // MOTION-19: one compact row per node (kind + title) for both columns, so the
     // map reads in about two screens instead of four. The summary stays in the
     // subtree (`sr-only`) for browse mode and is announced on selection by the
     // live region below; the selected project's detail panel shows the rest.
-    const cardClass = `flex min-h-11 w-full flex-col items-start justify-center gap-0.5 rounded-md border px-3 py-2 text-left transition motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-brand focus-visible:outline-offset-2 md:flex-row md:items-center md:gap-3 ${
+    const cardClass = `relative flex min-h-11 w-full flex-col items-start justify-center gap-0.5 rounded-md border px-3 py-2 text-left transition motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-brand focus-visible:outline-offset-2 md:flex-row md:items-center md:gap-3 ${
       isSelected
         ? "border-brand bg-brand/10"
         : "border-border/70 bg-bg-secondary/80 hover:border-brand hover:bg-brand/10 focus-visible:border-brand focus-visible:bg-brand/10"
@@ -339,8 +382,23 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
 
     const content = (
       <>
-        <span className="section-label shrink-0 text-brand">{kindLabel}</span>
-        <span className="line-clamp-1 min-w-0 font-display text-base leading-snug text-text-primary">
+        {/* The lit state is one layer whose opacity fades in when the light
+            arrives: compositor-only, where tinting the card itself would run
+            six colour transitions per card. */}
+        <span
+          aria-hidden="true"
+          data-signal-glow
+          className="pointer-events-none absolute -inset-px rounded-md border border-brand/70 bg-brand/[0.07] transition-opacity duration-300 motion-reduce:transition-none"
+          style={glowStyle}
+        />
+        <span
+          className={`relative section-label shrink-0 ${
+            isSelected || isLit ? "text-brand" : "text-text-secondary"
+          }`}
+        >
+          {kindLabel}
+        </span>
+        <span className="relative line-clamp-1 min-w-0 font-display text-base leading-snug text-text-primary">
           {node.label}
         </span>
         <span className="sr-only" data-node-summary>
@@ -370,6 +428,7 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
               href={node.href}
               data-signal-node={node.id}
               data-node-kind={node.kind}
+              data-signal-lit={isLit ? "true" : undefined}
               aria-current={isSelected ? "true" : undefined}
               // Same concise name as the hydrated control below, so activating
               // the fallback link and then the upgraded button announce the
@@ -384,6 +443,7 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
             <div
               data-signal-node={node.id}
               data-node-kind={node.kind}
+              data-signal-lit={isLit ? "true" : undefined}
               aria-current={isSelected ? "true" : undefined}
               className={cardClass}
             >
@@ -396,6 +456,7 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
             type="button"
             data-signal-node={node.id}
             data-node-kind={node.kind}
+            data-signal-lit={isLit ? "true" : undefined}
             // The name stays short: the project summaries run to 30+ words, and a
             // roving arrow keypress already re-announces the node. The summary is
             // still in the subtree for browsing, and the live region below announces
@@ -421,6 +482,9 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
   return (
     <div
       ref={containerRef}
+      // Test/audit hook: "ready" once the map is drawn and its selection is lit
+      // (after the entry, or at once when there is no entry to play).
+      data-signal-ready={hydrated && hasCoords && !armed ? "true" : undefined}
       className="relative mt-8 overflow-clip rounded-lg border border-border/70 bg-bg-primary/40"
     >
       {/* Connector plane (md+): edges run from each capability card's right
@@ -437,8 +501,10 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
           {graph.edges.map((edge) => {
             const coords = edgeCoords[edge.id];
             if (!coords) return null;
-            const isActive = activeEdges.has(edge.id);
-            const isHoverShadow = hoverEdges.has(edge.id) && hoverId !== null;
+            // While the entry is armed every edge draws at rest; the selection
+            // lights once the draw ends.
+            const isActive = !armed && activeEdges.has(edge.id);
+            const isHoverShadow = !armed && hoverEdges.has(edge.id) && hoverId !== null;
             const emphasis: SignalEdgeEmphasis = isActive
               ? "active"
               : isHoverShadow
@@ -459,25 +525,40 @@ export default function SignalLoom({ graph }: SignalLoomProps) {
                 strokeWidth={edgeStrokeWidth(edge.weight, emphasis)}
                 strokeLinecap="round"
                 vectorEffect="non-scaling-stroke"
+                // Armed: collapsed at its capability end so the first paint
+                // before the entry starts cannot flash the finished map.
+                style={armed && canAnimate() ? growFrom(coords.x1, coords.y1) : undefined}
               />
             );
           })}
         </g>
         <g>
-          {dottedEdges.map((edge) => {
-            const coords = edgeCoords[edge.id];
-            if (!coords) return null;
-            return (
-              <circle
-                key={`${selectedId}:${edge.id}`}
-                data-signal-dot={edge.id}
-                cx={coords.x1}
-                cy={coords.y1}
-                r={1.6}
-                fill={BRAND_FILL}
-              />
-            );
-          })}
+          {showRuns &&
+            runs.map((run) => {
+              const coords = edgeCoords[run.edge.id];
+              if (!coords) return null;
+              return (
+                <line
+                  key={`${selectedId}:${run.edge.id}`}
+                  data-signal-run={run.edge.id}
+                  x1={coords.x1}
+                  y1={coords.y1}
+                  x2={coords.x2}
+                  y2={coords.y2}
+                  stroke={BRAND_STROKE}
+                  strokeWidth={edgeStrokeWidth(run.edge.weight, "active")}
+                  strokeLinecap="round"
+                  vectorEffect="non-scaling-stroke"
+                  style={
+                    canAnimate()
+                      ? run.reversed
+                        ? growFrom(coords.x2, coords.y2)
+                        : growFrom(coords.x1, coords.y1)
+                      : undefined
+                  }
+                />
+              );
+            })}
         </g>
       </svg>
 

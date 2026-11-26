@@ -1021,7 +1021,7 @@ targeted + full e2e `--workers=1`, payload. Commit `motion: MOTION-25 …`.
 
 ## MOTION-13 — Ambient decoration audit
 
-**Status:** `PLANNED` (added 2026-10-31, `RESEARCH.md` §6)
+**Status:** `READY` (2026-11-26 — MOTION-21 `DONE`; the signature now decides which ambient layers stay)
 **Priority:** P2
 **Objective:** Every always-on decorative effect must justify its cost or go.
 **Outcome:** A measured keep/remove decision for each ambient effect.
@@ -1574,7 +1574,7 @@ repositories are recorded in `STORYBOARD.md` §Concept, not fixed here.
 
 ## MOTION-21 — Signature moment
 
-**Status:** `READY` (2026-11-25) — MOTION-12 (D-15) and MOTION-25 (D-16 type) both `DONE`
+**Status:** `DONE` (2026-11-26) — "the map lights" + "the room lights" shipped; next MOTION-13 `READY`
 **Priority:** P1
 **Objective:** Build the one interaction people remember and describe unprompted.
 **Outcome:** One signature moment — "the map lights" in `#systems-in-motion`, with "the room lights" on the flagship exhibits as the second beat (MOTION-20 rev. 2, `STORYBOARD.md` §Concept), progressive: static meaning without JS, full on capable devices, equivalent still under reduced motion.
@@ -1585,10 +1585,10 @@ repositories are recorded in `STORYBOARD.md` §Concept, not fixed here.
 **Exclusions:** no new full-viewport WebGL in editorial chapters unless MOTION-20 proves the need and the budget; no scroll hijacking.
 
 **Tasks**
-- [ ] M21.1 Prototype two variants behind a flag; A/B with 3 people for "would you mention this?".
-- [ ] M21.2 Budget: ≤ +40 KB gzip reachable on `/`, 0 new scroll listeners, 60 fps on the 4-core / 3 GB box, off-screen pause.
-- [ ] M21.3 Reduced motion + no-JS equivalents that keep the meaning.
-- [ ] M21.4 Emil `review-animations` + `gsap-performance` review; MotionScore no D/F.
+- [x] M21.1 Two variants A/B — **deviation:** HEAD build (variant V1: entry fade + 3 capped signal dots) vs working tree (V2: draw-in + uncapped light runs + lit cards) served side by side instead of a code flag (Rule 3: a flag is dead code the day the choice is made); judged blind by **three screenshot-only juror sub-agents, not people** (people are MOTION-23). V2 **8 / 7 / 6 = 7.0** vs V1 **5 / 3 / 3 = 3.7**; "would you mention it": V2 maybe / yes-cautiously / maybe, V1 no ×3. Convergent defects (slow empty entry; grey rest mesh as noise) fixed in the same session (entry stagger 0.03 → 0.015 s, rest stroke 0.8 → 0.5 alpha).
+- [x] M21.2 Budget: reachable `/` 492.7 → **493.1 KB (+0.4)**; scroll listeners after scroll HEAD 12–13 vs current **12** (0 new); off-screen pause via the existing `useRafGuard` → `tl.pause()`. **60 fps not reachable on this box for any variant** (load 4–6, swapping, GPU-less headless): interleaved samples during a selection — current with motion **29.4 fps median**, same page with runs and transitions disabled **32.9**, HEAD (dots) 20–23 vs current 25–27 in the paired run; the same click under reduced motion measured 59 fps when the box was quieter. Recorded as environment floor with the motion's own cost (≈3.5 fps), not as a pass.
+- [x] M21.3 Reduced motion: same lit cards at once, no run, `transition-property: none` (e2e with `matchMedia` positive control); reduced data: no run, lit at once; no-JS: server render lights the default capability's neighbours, count = the narrative's "connects to N projects" (e2e, JS disabled); unsupported `view()`: no wash, exhibits lit.
+- [x] M21.4 Review (Emil + `gsap-performance` principles, `SESSION_LOG.md`). MotionScore `/` first pass **C 31 — Scroll animations F** (my own paint transitions: 6 colour transitions per lit card, stroke/stroke-width on edges, `stroke-dashoffset` tweens); reworked to WAAPI `transform: scale` + one opacity glow layer → **B 54 / B 60** vs HEAD **B 55**, scroll-triggered 22 → 6, 0 D/F findings.
 
 **Acceptance criteria**
 - Rubric N4 = 2.

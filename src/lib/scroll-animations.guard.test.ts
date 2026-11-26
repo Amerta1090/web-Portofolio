@@ -138,6 +138,29 @@ describe("scroll-animations.css reveal contract", () => {
     }
   });
 
+  it("lights the flagship exhibits on the card's own timeline, compositor-only (MOTION-21)", () => {
+    const view = blockAfter(css, "@supports (animation-timeline: view())").body;
+    expect(view).toMatch(/\[data-project-card-reveal\]\s*\{\s*view-timeline-name:\s*--exhibit/);
+    const wash = blockAfter(view, "[data-project-grid] [data-exhibit]::after").body;
+    expect(wash).toMatch(/animation-timeline:\s*--exhibit/);
+    // Sequenced by the data order token, never by :nth-child.
+    expect(wash).toContain("var(--project-card-order, 0)");
+    expect(wash).not.toContain("nth-child");
+    const keyframes = blockAfter(view, "@keyframes exhibit-light").body;
+    expect(keyframes).toMatch(/opacity:/);
+    expect(keyframes).not.toMatch(/filter|transform|width|height/);
+    // Outside the support block there is no wash at all: unsupported engines see
+    // the picture lit.
+    const outside = css.slice(0, css.indexOf("@supports (animation-timeline: view())"));
+    expect(outside).not.toContain("[data-exhibit]");
+    for (const preference of ["prefers-reduced-motion", "prefers-reduced-data"]) {
+      const media = blockAfter(css, `@media (${preference}: reduce)`).body;
+      expect(media, `${preference} removes the dark-room wash`).toMatch(
+        /\[data-exhibit\]::after\s*\{\s*display:\s*none\s*!important/,
+      );
+    }
+  });
+
   it("removes the dead JS progress fallback", () => {
     // There is no markup with this class; leaving the rules implied a fallback
     // that never ran (Rule 6).

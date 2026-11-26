@@ -223,7 +223,7 @@ test.describe("MOTION-05 — the narrative matches the drawn map", () => {
     await expect(page.locator("[data-signal-narrative-step]")).toHaveCount(3);
 
     // Static map, same selection: the narrative's capability is the selected
-    // card, and no signal dot animates.
+    // card, and no light run animates.
     const capability = (
       await page.locator("[data-signal-narrative-capability]").innerText()
     ).trim();
@@ -232,7 +232,7 @@ test.describe("MOTION-05 — the narrative matches the drawn map", () => {
       "data-signal-node",
       map.defaultId,
     );
-    await expect(page.locator("[data-signal-dot]")).toHaveCount(0);
+    await expect(page.locator("[data-signal-run]")).toHaveCount(0);
     // Connectors are still drawn at rest — reduced motion removes motion, not map.
     expect(map.incident.length).toBeGreaterThan(0);
   });

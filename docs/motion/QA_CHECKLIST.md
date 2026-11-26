@@ -398,3 +398,11 @@ Two harness defects fixed (reduced-motion hydration remount read as `animationNa
 | `measure:routes` `/` | initial **202.6** / reachable **556.9** / HTML **75.2** KB — flat vs MOTION-02; `/work` 150.8/393.2/18.5; `/gallery` 179.2/504.5/20.0; islands 16 (7e/9d); all dist JS 671.0 KB |
 | Listener / RAF | No new listener or RAF; career reveal is pure CSS |
 | Full e2e suite | not required by MOTION-03 DoD (targeted runs only) |
+
+## E2E policy (owner, 2026-11-26)
+
+Run only the specs a change touches (`bunx playwright test e2e/<spec> --workers=1`);
+the full suite runs only when the owner asks. Record in `SESSION_LOG.md` which
+specs ran. MOTION-21 added `e2e/signal-loom-lights.spec.ts` (map lights, new
+selection, reduced motion, no-JS still, room lights, reduced-motion wash).
+

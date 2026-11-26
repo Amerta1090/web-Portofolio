@@ -1716,3 +1716,63 @@ server's default — and that visitor is exactly the one an accessibility settin
 was written for. Read browser-only state through a server snapshot.
 
 **Commit:** `motion: reduced-motion hydration mismatch — server-snapshot hook for 26 callers`.
+
+---
+
+## 2026-11-26 — MOTION-21 signature moment: "the map lights" + "the room lights"
+
+**Built.**
+- `SignalLoom.tsx`: on entry every edge grows from its capability end (WAAPI
+  `transform: scale(0→1)`, non-scaling stroke, default path first, 15 ms
+  stagger); one state write (`entered`) then lights the selection. A light run
+  crosses **every** edge of the selection, strongest tie first
+  (`lightRunSchedule` in `signal-loom-choreo.ts`, uncapped), and each neighbour
+  card's glow layer (`[data-signal-glow]`, opacity only) fades in with
+  `transition-delay` = the run's arrival. `data-signal-lit` marks neighbours;
+  the server render lights the default capability's neighbours (no-JS still).
+  `data-signal-ready` is the test/audit hook. Retired with their last consumer:
+  signal dots, `signalDotEdges`, `SIGNAL_MAX_DOTS/LOOPS/TRAVEL_SECONDS`,
+  `edgeLength`, the island's GSAP use.
+- "The room lights": `[data-exhibit]::after` page-surface wash over each
+  flagship picture fades out on the card's named view timeline `--exhibit`,
+  ordered by `--project-card-order`; removed under reduced motion/data, absent
+  without `view()`.
+
+**A/B (M21.1).** HEAD build (:4323, own `bun install` — a symlinked
+`node_modules` breaks Astro's compile metadata) vs working tree, 8 frames each,
+three blind screenshot-only juror sub-agents (not people): current **8/7/6 =
+7.0**, HEAD **5/3/3 = 3.7**; "would you mention it": maybe / yes-cautiously /
+maybe vs no ×3. Convergent defects fixed: slow empty entry (stagger 0.03 →
+0.015 s), grey rest mesh (rest stroke alpha 0.8 → 0.5).
+
+**Defect found by the gate (mine).** First MotionScore pass on `/`: **C 31,
+Scroll animations F** (HEAD B 55). `document.getAnimations()` probe: each lit
+card ran background + 4 border-colour + label-colour transitions, edges ran
+stroke/stroke-width transitions, and entry/runs tweened `stroke-dashoffset`
+(MotionScore prices paint properties ×paint area). Rework: WAAPI transform +
+one opacity glow → **B 54 / B 60**, scroll-triggered **22 → 6**, 0 D/F.
+Lesson: "lit" as a colour change on N cards is N×6 paint transitions; a layer
+whose opacity changes is one compositor transition per card.
+
+**Measured (VERIFIED).** Payload `/` 193.4 / 493.1 / 32.5 KB (reachable +0.4).
+Runtime after scroll: scroll listeners HEAD 12–13, current 12. FPS during a
+selection (interleaved, load 4–6, swapping, GPU-less headless): current
+29.4 median vs same page with motion disabled 32.9; HEAD 20–23 vs current
+25–27 in a paired run — 60 fps is not reachable here for any variant
+(environment floor), the moment costs ≈3.5 fps. Unit 1,175/1,175 before the
+rework, 185/185 touched after; `astro check` 89; biome 0 in touched files
+(HEAD's `organizeImports` in `SignalLoom.tsx` fixed); 72 pages; links 0 broken.
+E2E: full suite 436 / 1 skipped / 0 on the pre-rework build; after the rework
+only `signal-loom-lights.spec.ts` 6/6 (owner: touched specs only).
+
+**Review (M21.4, Emil + gsap-performance principles).** Compositor-only
+properties now; no layout read in any animation (origins from measured
+coordinates); per-element 450–500 ms ease-out; selection feedback is instant
+(selected card + label), only the evidence glow waits for its run (≤ ~1 s for
+9 neighbours); off-screen pause via `useRafGuard` → `Animation.pause()`;
+reduced motion = no animation at all, same lit state.
+
+**Not done / honest limits.** Rubric N4 = 2 needs people describing it
+unprompted — jurors said "maybe"; real people are MOTION-23.
+
+**Commit:** `motion: MOTION-21 signature moment — the map lights, the room lights`.

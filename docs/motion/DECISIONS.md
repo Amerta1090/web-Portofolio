@@ -445,6 +445,24 @@ within its budget (≤ +40 KB reachable, 0 new scroll listeners).
 beat) has to justify itself against this decision. MOTION-13 can remove ambient
 layers that compete with the map without a new decision.
 
+**Addendum (MOTION-21, 2026-11-26).** The edge signal became the moment, and
+its form changed: the capped signal dots (`SIGNAL_MAX_DOTS` = 3, two loops)
+retired with their constants, because lighting three of nine neighbours
+misstated the evidence. In their place: on entry every edge draws at rest from
+its capability end (dash = the measured length, no `getTotalLength()`); then a
+light run crosses **every** edge of the selection, strongest tie first
+(`lightRunSchedule`), and each neighbour card lights when its run lands through
+a CSS `transition-delay` equal to the run's arrival — no per-card callback, one
+React state write per entry. The neighbours carry `data-signal-lit`; this is
+not the retired `data-connected` marker (M3.2.4 removed a "connected vs
+stranded" signal that had no meaning with 0 isolated nodes), it is the D-15
+meaning itself, "these projects prove the selection", and the server render
+lights the default capability's neighbours so the still exists with scripts
+off. The second beat, "the room lights", is CSS only: a page-surface wash over
+each flagship picture fades out on the card's own named view timeline
+(`--exhibit`), ordered by `--project-card-order`, removed under reduced
+motion/data and absent where `view()` is unsupported.
+
 ## D-16 — One family: Archivo, with system mono (MOTION-25)
 
 **Date:** 2026-11-25 · **Status:** Accepted (implements D-13)

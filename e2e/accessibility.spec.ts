@@ -22,6 +22,8 @@ async function openSignalLoom(page: Page) {
   await page.locator("#systems-in-motion").scrollIntoViewIfNeeded();
   // Hydration turns the fallback cards into buttons with a roving tabindex.
   await page.locator('[data-signal-node][tabindex="0"]').waitFor({ timeout: 20_000 });
+  // MOTION-21: emphasis is held back while the entry draws; read the lit map.
+  await page.locator("[data-signal-ready='true']").waitFor({ timeout: 20_000 });
 }
 
 async function openReactor(page: Page) {
@@ -368,14 +370,16 @@ test.describe("Q4.2 — reduced motion", () => {
   // `test.use({ reducedMotion })` is silently ignored in this Playwright
   // version — verified by reading `matchMedia` back in the page — so the
   // preference is emulated per test, before the island hydrates.
-  test("Signal Loom drops the travelling signals but keeps the graph and keyboard control", async ({
+  test("Signal Loom drops the light runs but keeps the graph, the lit cards and keyboard control", async ({
     page,
   }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await openSignalLoom(page);
     await page.waitForTimeout(1200); // let any timeline that should not exist run
-    // No animated dots…
-    await expect(page.locator("[data-signal-dot]")).toHaveCount(0);
+    // No light runs…
+    await expect(page.locator("[data-signal-run]")).toHaveCount(0);
+    // …the selection's neighbours are lit at once (MOTION-21's still)…
+    expect(await page.locator("[data-signal-lit='true']").count()).toBeGreaterThan(0);
     // …but the connector plane, the emphasis, and selection all survive.
     expect(await page.locator("[data-edge]").count()).toBeGreaterThan(0);
     expect(await page.locator("[data-edge][stroke*='brand']").count()).toBeGreaterThan(0);

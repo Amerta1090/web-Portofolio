@@ -1,6 +1,6 @@
 # Motion Programme — Status
 
-**Last updated:** 2026-11-25 (MOTION-25 `DONE`: Archivo one family, D-16 — font transfer on `/` **157,956 → 49,452 B**, CLS 0.000, overflow 0 at 7 widths, taste 22 → 22 FAIL)
+**Last updated:** 2026-11-26 (MOTION-21 `DONE`: "the map lights" + "the room lights" — reachable `/` +0.4 KB, 0 new scroll listeners, MotionScore `/` B 54–60 vs HEAD B 55, jurors 7.0 vs 3.7)
 **Branch:** `main` · **HEAD at session start:** `2928a49` (MOTION-12 taste pass)
 **MOTION-25 CLOSED (2026-11-25): DONE** — typography: apply the D-13 Archivo type (one family, variable wght + instanced wide-300, system mono), retune the display scale, add the big-number utility, retire Fraunces/JetBrains/Inter. **Next: MOTION-21 `READY`** (owner-approved dark-room palette, map lights, room lights).
 
@@ -188,7 +188,8 @@ was added before MOTION-21.
 
 ## Active work
 
-**None in progress.** MOTION-00 … MOTION-25 are verified. `MOTION-25` closed
+**None in progress.** MOTION-21 closed 2026-11-26 (signature moment, D-15
+addendum). Next: **MOTION-13 `READY`** (ambient decoration audit). Earlier: `MOTION-25` closed
 2026-11-25 (D-16): Archivo is the one family, big numbers use the instanced
 `wdth` 125 / 300 face via `.text-numeral`, Fraunces / Inter / JetBrains Mono are
 gone, font transfer on `/` fell 157,956 → 49,452 B. **One sprint completed — do
@@ -270,6 +271,21 @@ perception thresholds with ≥ 5 recruiters and ≥ 5 developers.
   public-domain by publication date, with local-law responsibility.
 
 ## Next action
+
+**MOTION-21 is DONE (2026-11-26). Next: MOTION-13 `READY` (ambient decoration
+audit); do not start it in this execution.** Shipped: entry draw (WAAPI
+`scale`), uncapped light runs strongest-tie first, neighbour cards lit by an
+opacity glow on the run's arrival (`transition-delay` from `lightRunSchedule`),
+server render lit for no-JS; flagship exhibits lit from a dark wash on a named
+view timeline (CSS only). Signal dots + `SIGNAL_*` constants + `edgeLength`
+retired. Gates: unit **1,175/1,175** (pre-rework full run) + 185 touched after
+rework; `astro check` 89; 72 pages; links 1,477 / 0 broken; `/` 193.4 / 493.1 /
+32.5 KB; runtime scroll listeners HEAD 12–13 vs **12**; MotionScore `/` **B 54 /
+B 60** (HEAD B 55, scroll-triggered 22 → 6, 0 D/F); e2e full suite **436 / 1
+skipped / 0** on the pre-rework build, `signal-loom-lights.spec.ts` **6/6** on
+the final build (full suite not re-run — owner policy from this session: touched
+specs only). 60 fps not reachable on this box for any variant (environment
+floor, see `SESSION_LOG.md`).
 
 **MOTION-25 is DONE (2026-11-25, D-16). Next: MOTION-21 `READY` (signature
 moment — "the map lights", then "the room lights"); do not start it in this

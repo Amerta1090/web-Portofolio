@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { SignalLoomGraph } from "./signal-loom";
 import {
-  SIGNAL_MAX_DOTS,
+  LIGHT_RUN_SECONDS,
+  LIGHT_RUN_STAGGER_SECONDS,
   choreographyMode,
-  edgeLength,
-  signalDotEdges,
+  lightRunSchedule,
 } from "./signal-loom-choreo";
 
 const GRAPH: SignalLoomGraph = {
@@ -39,9 +39,9 @@ describe("choreographyMode", () => {
   });
 });
 
-describe("signalDotEdges", () => {
-  it("returns only edges connected to the selected node in graph order", () => {
-    expect(signalDotEdges(GRAPH, "z", 10).map((edge) => edge.id)).toEqual([
+describe("lightRunSchedule (MOTION-21)", () => {
+  it("runs along every edge of the selection, uncapped", () => {
+    expect(lightRunSchedule(GRAPH, "z").map((run) => run.edge.id)).toEqual([
       "e1",
       "e2",
       "e3",
@@ -50,29 +50,42 @@ describe("signalDotEdges", () => {
     ]);
   });
 
-  it("caps simultaneous animated paths at SIGNAL_MAX_DOTS", () => {
-    const dots = signalDotEdges(GRAPH, "z");
-    expect(dots).toHaveLength(SIGNAL_MAX_DOTS);
-    expect(dots.map((edge) => edge.id)).toEqual(["e1", "e2", "e3"]);
+  it("puts the strongest tie first, then node order", () => {
+    const graph: SignalLoomGraph = {
+      nodes: [
+        { id: "cap", label: "Cap", kind: "capability", summary: "" },
+        { id: "p1", label: "P1", kind: "project", summary: "" },
+        { id: "p2", label: "P2", kind: "project", summary: "" },
+        { id: "p3", label: "P3", kind: "project", summary: "" },
+      ],
+      edges: [
+        { id: "c-p3", from: "cap", to: "p3", label: "", weight: 1 },
+        { id: "c-p1", from: "cap", to: "p1", label: "", weight: 1 },
+        { id: "c-p2", from: "cap", to: "p2", label: "", weight: 2 },
+      ],
+      defaultNodeId: "cap",
+    };
+    const runs = lightRunSchedule(graph, "cap");
+    expect(runs.map((run) => run.targetId)).toEqual(["p2", "p1", "p3"]);
+    expect(runs.every((run) => !run.reversed)).toBe(true);
   });
 
-  it("respects an explicit smaller cap", () => {
-    expect(signalDotEdges(GRAPH, "z", 2)).toHaveLength(2);
+  it("reverses the run when the selection is the edge's `to` end", () => {
+    const runs = lightRunSchedule(GRAPH, "z");
+    expect(runs.map((run) => run.targetId)).toEqual(["a", "b", "c", "d", "e"]);
+    expect(runs.every((run) => run.reversed)).toBe(true);
   });
 
-  it("returns an empty list for an unknown or empty selection", () => {
-    expect(signalDotEdges(GRAPH, "missing")).toEqual([]);
-    expect(signalDotEdges(GRAPH, "", 10)).toEqual([]);
-  });
-});
-
-describe("edgeLength", () => {
-  it("computes the euclidean distance between two points", () => {
-    expect(edgeLength(0, 0, 3, 4)).toBe(5);
-    expect(edgeLength(10, 22, 22, 78)).toBeCloseTo(Math.hypot(12, 56), 10);
+  it("schedules arrival as delay + run time, a stagger apart", () => {
+    const runs = lightRunSchedule(GRAPH, "z");
+    runs.forEach((run, index) => {
+      expect(run.delay).toBeCloseTo(index * LIGHT_RUN_STAGGER_SECONDS, 3);
+      expect(run.arrive).toBeCloseTo(run.delay + LIGHT_RUN_SECONDS, 3);
+    });
   });
 
-  it("is zero for a degenerate edge", () => {
-    expect(edgeLength(50, 50, 50, 50)).toBe(0);
+  it("returns an empty schedule for an unknown or empty selection", () => {
+    expect(lightRunSchedule(GRAPH, "missing")).toEqual([]);
+    expect(lightRunSchedule(GRAPH, "")).toEqual([]);
   });
 });

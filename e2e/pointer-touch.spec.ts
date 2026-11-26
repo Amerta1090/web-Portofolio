@@ -42,6 +42,11 @@ async function openSignalLoom(page: Page) {
     undefined,
     { timeout: 20_000 },
   );
+  // MOTION-21: the entry draws every edge at rest before the selection lights,
+  // and hover/selection emphasis is held back until then. "Drawn" is not yet
+  // "lit"; wait for the island's own ready hook so emphasis assertions read the
+  // settled map.
+  await page.locator("[data-signal-ready='true']").waitFor({ timeout: 20_000 });
 }
 
 async function openReactor(page: Page) {
