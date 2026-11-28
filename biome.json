@@ -35,6 +35,11 @@
     }
   ],
   "files": {
-    "ignore": [".astro", ".cache", "dist", "node_modules", "public/github"]
+    "ignore": [".astro", ".cache", "dist", "node_modules", "public/github", ".motion-mock"]
+  },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
   }
 }

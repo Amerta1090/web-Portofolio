@@ -5,6 +5,18 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { SignalLoomGraph } from "../lib/creative/signal-loom";
 import SignalLoom from "./SignalLoom";
 
+/**
+ * Edges render one frame after mount (layout is read in a rAF, Q4.1), so a
+ * synchronous query races the frame on a loaded machine. Wait for the edge.
+ */
+function findEdge(container: HTMLElement, id: string): Promise<Element> {
+  return waitFor(() => {
+    const edge = container.querySelector(`[data-edge="${id}"]`);
+    if (!edge) throw new Error(`edge ${id} not rendered yet`);
+    return edge;
+  });
+}
+
 let reducedMotion = false;
 
 vi.mock("motion/react", async (importOriginal) => {
@@ -233,7 +245,7 @@ describe("SignalLoom selection states (L2.1)", () => {
     expect(project).not.toHaveAttribute("aria-current");
     expect(window.location.hash).toBe("#signal-capability-web");
 
-    const activeEdge = container.querySelector('[data-edge="capability-web->project-a"]');
+    const activeEdge = await findEdge(container, "capability-web->project-a");
     expect(activeEdge).toHaveAttribute("stroke", "rgb(var(--color-brand-rgb) / 0.95)");
   });
 
@@ -313,7 +325,7 @@ describe("SignalLoom selection states (L2.1)", () => {
     if (!web || !ml) throw new Error("nodes missing");
     await user.click(web); // active edge is now capability-web->project-a only
 
-    const mlEdge = container.querySelector('[data-edge="capability-ml->project-a"]');
+    const mlEdge = await findEdge(container, "capability-ml->project-a");
     expect(mlEdge).toHaveAttribute("stroke", "rgb(var(--color-border-rgb) / 0.5)");
 
     fireEvent.pointerEnter(ml);
@@ -335,8 +347,8 @@ describe("SignalLoom selection states (L2.1)", () => {
     await user.click(web);
 
     const ml = container.querySelector('[data-signal-node="capability-ml"]');
-    const mlEdge = container.querySelector('[data-edge="capability-ml->project-a"]');
-    if (!ml || !mlEdge) throw new Error("ml node or edge missing");
+    if (!ml) throw new Error("ml node missing");
+    const mlEdge = await findEdge(container, "capability-ml->project-a");
     expect(mlEdge).toHaveAttribute("stroke", "rgb(var(--color-border-rgb) / 0.5)");
 
     fireEvent.focus(ml);

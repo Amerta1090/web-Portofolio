@@ -7,7 +7,7 @@ Stack: Astro 6 + React 18 islands + Tailwind + `motion` + GSAP + D3 + Three/R3F 
 
 ## Current state
 - Active programme: **Motion Programme** (`docs/motion/`). Last done: **MOTION-26** (2026-11-26, hero + flagship stage). Next: **MOTION-27** (operable exhibits), then 28 → 13 → 15 → 22 → 09 → 16 → 23 → 10.
-- Baselines today: unit ~1,115 tests · `check:types` 89 errors / 71 warnings · build 72 pages · `/` payload 189.8 / 479.5 / 30.0 KB (initial / reachable / html gz) · islands on `/` 7 · scroll listeners on `/` 9.
+- Baselines today: unit ~1,115 tests · `check:types` 89 errors / 66 warnings · `biome check .` 180 errors (tracked files only, deterministic — no A/B needed) · build 72 pages · `/` payload 189.8 / 479.5 / 30.0 KB (initial / reachable / html gz) · islands on `/` 7 · scroll listeners on `/` 9.
 
 ## Verification contract
 - **Batch 3–5 tasks per pass**, then `bun run gate:fast` (~2 min: `vitest --changed` + `check:types`). A red gate stops the batch.
