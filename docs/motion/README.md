@@ -14,15 +14,16 @@ sprint, verify it, and update these documents.
 | File | Question it answers | Update cadence |
 | --- | --- | --- |
 | `README.md` | How do I use this directory? What are the rules? | When the process changes |
-| `STATUS.md` | Where are we right now? What is verified? What blocks us? | Every session |
+| `STATUS.md` | Where are we right now? What is verified? What blocks us? (one page, replaced not appended) | Every session |
 | `ROADMAP.md` | What are the phases and the intended arc? | When a phase ends/changes |
-| `SPRINT_PLAN.md` | What is the backlog, and what exactly is each sprint? | Every sprint |
+| `SPRINT_PLAN.md` | Open sprints only; read just the active section | Every sprint |
 | `DECISIONS.md` | Why was a technique/library/choreography chosen or rejected? | When a decision changes |
 | `RESEARCH.md` | What did we measure or read, and what is still an assumption? | During discovery research |
 | `STORYBOARD.md` | What does each section say, and how should motion serve it? | When narrative changes |
 | `ASSETS.md` | Which visual assets earn a place, what is licensed, and what is rejected? | When an asset decision changes |
 | `QA_CHECKLIST.md` | What must be run before a sprint can be marked `DONE`? | When a gate changes |
 | `SESSION_LOG.md` | What happened, in order, with evidence? | Every session |
+| `archive/` | Completed sprint sections, old STATUS, per-sprint QA results. Never read at resume. | At sprint close (move, don't copy) |
 
 `docs/motion-score-baseline.md` (outside this folder) stays the canonical
 performance record. Do not archive it and do not duplicate its tables here.

@@ -12,7 +12,7 @@ Stack: Astro 6 + React 18 islands + Tailwind + `motion` + GSAP + D3 + Three/R3F 
 ## Verification contract
 - **Batch 3–5 tasks per pass**, then `bun run gate:fast` (~2 min: `vitest --changed` + `check:types`). A red gate stops the batch.
 - `bun run gate:full` once before committing (`--changed` selects nothing after a commit).
-- E2E: run **only the specs the change touches** (owner policy): `bunx playwright test e2e/<spec> --workers=1`, with `bun run serve &` already on `[::1]:4321` (Playwright's own `webServer` rebuild exceeds its timeout here).
+- E2E: run **only the specs the change touches** (owner policy): `bunx playwright test e2e/<spec> --workers=1`, with `bun run serve &` on `[::1]:4321` (otherwise Playwright rebuilds first: `build:fast` ≈ 35 s).
 - `bun run gate:sprint` (build + `check:links` + full e2e) runs **once at sprint close or in CI** (`.github/workflows/gate.yml`), never per task.
 - Mutation proof: `bun scripts/mutate.mjs --file <f> --from <a> --to <b> --run "<cmd>"` (backup → patch → run → restore → md5 check, one command). Expect red; a green mutation means the guard is dead.
 - `check:types` = `astro check` vs `scripts/astro-baseline.json` (multiset `file|kind|ts-code`). `bun run check:types:update` only when a change legitimately moves diagnostics.
@@ -38,7 +38,13 @@ Stack: Astro 6 + React 18 islands + Tailwind + `motion` + GSAP + D3 + Three/R3F 
 9. **Assert shapes derived from the page/data, not layout literals** (counts, heights, word limits). Poll distance-to-target for scroll arrival, not stability.
 10. **Measure the narrowest viewport first** (320/375); overflow is proven with a real wheel (`page.mouse.wheel`), not `scrollLeft`. `sr-only` goes on a wrapper `<div>`, never on `<table>`.
 11. **Theme**: defaults are never written as inline style on `<html>` (it overrides both palettes); contrast tests read computed styles, never constants.
-12. Before mutating a file, back it up; never restore an uncommitted file with `git checkout --`.
+12. Before mutating a file, back it up (or use `scripts/mutate.mjs`); never restore an uncommitted file with `git checkout --`.
+
+## Working economically
+- **One fresh session per sprint**; resume from `docs/motion/STATUS.md` + the active `SPRINT_PLAN.md` section only. Open other docs by section (grep the heading), never whole.
+- **Sub-agents only for wide read-only sweeps**; each starts cold. Findings go to a file under `.opencode/`, ≤ 15 lines back.
+- **Juror/taste loops: ≤ 3 rounds per sprint**, stop when the mean moves < 0.3.
+- **Refactor only files the task already edits** (pure logic → `src/lib/**` + test).
 
 ## Docs layout
 - `docs/motion/` — active programme (STATUS, SPRINT_PLAN, QA_CHECKLIST, DECISIONS, SESSION_LOG). `docs/motion-score-baseline.md` — audit record.

@@ -4,12 +4,9 @@
  *
  * Why this is a script and not a one-line npm script:
  *
- *  1. Playwright's `webServer` runs `bun run build:fast` when nothing is
- *     listening on :4321. Measured on this box that build takes 3m16s, past the
- *     config's 180s `webServer.timeout`, so a cold `playwright test` dies before
- *     the first test. This script builds once, starts `astro preview` from that
- *     dist, and lets Playwright reuse it (`reuseExistingServer`).
- *  2. `check:links` needs the same dist, so building once saves a second build.
+ *  1. One build serves both `check:links` and the e2e run: this script builds
+ *     once, starts `astro preview` from that dist, and lets Playwright reuse it
+ *     (`reuseExistingServer`) instead of rebuilding (~35 s on this box).
  *
  * Order matters: gate:full → build:fast → check:links → e2e. A red gate stops
  * before the next (expensive) step.

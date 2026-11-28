@@ -20,10 +20,10 @@ export default defineConfig({
     command: "bun run build:fast && bunx astro preview --port 4321",
     port: 4321,
     reuseExistingServer: !process.env.CI,
-    // Measured `build:fast` on this 4-core/3 GB box: 3m16s. The old 180s budget
-    // made a cold local run fail before the first test. CI keeps 180s (faster
-    // runner); locally prefer `bun run serve &` or `gate:sprint` so this build
-    // is skipped entirely.
-    timeout: process.env.CI ? 180000 : 420000,
+    // `build:fast` measured 32–37 s on this 4-core/3 GB box (72 pages,
+    // 2026-11-28; the 3m16s recorded in 2026-10 was the 49-page era under a
+    // GitHub rate limit). 180 s covers both; `bun run serve &` still saves the
+    // ~35 s rebuild on every local run.
+    timeout: 180000,
   },
 });
