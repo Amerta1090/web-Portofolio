@@ -1,623 +1,324 @@
-import { expect, test } from "@playwright/test";
+import { type Page, expect, test } from "@playwright/test";
+import { LAB_EXPERIMENTS } from "../src/lib/lab-registry";
 import { openExperiment, waitForExperimentReady } from "./hydration";
 
 /**
- * The card-open helper is the shared one in `./hydration`.
+ * Lab gallery + per-experiment smoke tests.
  *
- * It waits for two independent conditions, and they are not interchangeable:
- * `GalleryGrid` is `client:load`, so a click landing before React attaches is
- * dropped silently (hydration), and each experiment is a `React.lazy` chunk
- * behind a `Suspense` fallback, so the shell exists before its controls do
- * (`waitForExperimentReady`).
+ * Every experiment row is ONE test: a cold deep link (`/lab#<id>`, which also
+ * proves hash launch), then its controls, then its interactions, all in the same
+ * page. The previous layout paid one page load per assertion (102 tests across
+ * gallery/game-theory/astrophysics specs) for the same coverage.
  *
- * This file used to carry a local copy that only waited for the second one. That
- * gap was recorded as a latent race — and it fired: the MOTION-24 full run
- * (`--workers=1`, 23.7 min) failed `gallery.spec.ts:188` with
- * `waiting for locator('[data-modal-content]')`, i.e. a dead click, and passed in
- * isolation. The root cause had already been diagnosed and the converged helper
- * already existed, so the copy was deleted rather than annotated again.
+ * The card-open helper is the shared one in `./hydration`: `GalleryGrid` is
+ * `client:load` (a click before React attaches is dropped) and each experiment is
+ * a `React.lazy` chunk behind `Suspense` (`waitForExperimentReady`). Cold deep
+ * links measured 4.5–5.7 s on this box, so the readiness budget is 15 s.
  */
 
+const modal = (page: Page) => page.locator("[data-modal-content]");
+const button = (page: Page, name: string | RegExp) => page.getByRole("button", { name });
+const slider = (page: Page, label: string) =>
+  modal(page).locator(`label:has-text("${label}") input[type="range"]`);
+
+async function visible(page: Page, ...buttons: Array<string | RegExp>) {
+  for (const name of buttons) await expect(button(page, name)).toBeVisible();
+}
+
+interface Row {
+  id: string;
+  check: (page: Page) => Promise<void>;
+}
+
+const EXPERIMENTS: Row[] = [
+  {
+    id: "interactive-canvas",
+    check: async (page) => {
+      for (const title of ["Pen (P)", "Eraser (E)", "Node (N)", "Pan (V)"]) {
+        await expect(page.getByTitle(title)).toBeVisible();
+      }
+      await visible(page, "PNG", "SVG", "↶ Undo", "↷ Redo", "🗑 Clear");
+      await page.getByTitle("Eraser (E)").click();
+      await page.getByTitle("Node (N)").click();
+      await expect(page.getByTitle("Node (N)")).toBeVisible();
+    },
+  },
+  {
+    id: "strange-attractor",
+    check: async (page) => {
+      await visible(page, "Lorenz", "Rössler", "Reset", "Chaos Mode");
+      await button(page, "Rössler").click();
+      await expect(button(page, "Rössler")).toBeVisible();
+    },
+  },
+  {
+    id: "logistic-map",
+    check: async (page) => {
+      await visible(page, "Cobweb", "Auto Sweep");
+      await button(page, "Cobweb").click();
+      const r = page.locator('label:has-text("r") input[type="range"]');
+      await r.fill("3.8");
+      expect(Number(await r.inputValue())).toBe(3.8);
+    },
+  },
+  {
+    id: "noise-topography",
+    check: async (page) => {
+      await visible(page, "Export STL", "Auto");
+      for (const label of ["Oct", "Pers", "Lac"]) await expect(slider(page, label)).toBeVisible();
+      await page.getByText("✦ Auto").click();
+      await expect(page.getByText("◉ Manual")).toBeVisible();
+      const seed = slider(page, "Seed");
+      await seed.fill("42");
+      expect(Number(await seed.inputValue())).toBe(42);
+    },
+  },
+  {
+    id: "fourier-epicycles",
+    check: async (page) => {
+      await expect(page.getByText("Draw a closed shape")).toBeVisible();
+      await page.getByText("Epicycles →").click();
+      await expect(page.getByText("← Draw")).toBeVisible();
+    },
+  },
+  {
+    id: "svd-compression",
+    check: async (page) => {
+      await expect(page.getByText("Upload Image")).toBeVisible();
+      await visible(page, "Reset");
+    },
+  },
+  {
+    id: "tesseract-projection",
+    check: async (page) => {
+      await expect(page.getByText("Auto", { exact: true })).toBeVisible();
+      await visible(page, "Wireframe", "Faces");
+    },
+  },
+  {
+    id: "pca-tsne-viz",
+    check: async (page) => {
+      await expect(page.getByText("Generate New Data")).toBeVisible();
+      await expect(page.getByText("Perplexity:")).toBeVisible();
+    },
+  },
+  {
+    id: "spring-physics",
+    check: (page) => visible(page, "Cloth", "Chain", "Jelly", "Ragdoll"),
+  },
+  {
+    id: "ulam-spiral",
+    check: async (page) => {
+      await expect(slider(page, "Zoom")).toBeVisible();
+      await button(page, "Spiral").click();
+      await button(page, "Rectangular").click();
+      await expect(button(page, "Spiral")).toBeVisible();
+    },
+  },
+  {
+    id: "hyperbolic-gol",
+    check: async (page) => {
+      await visible(page, /Play|Pause/, "Step", /Conway|Rule/);
+      await button(page, /Play|Pause/).click();
+      const rule = button(page, /Conway|Seeds|HighLife|Rule/);
+      await rule.click();
+      await expect(rule).toBeVisible();
+    },
+  },
+  {
+    id: "conformal-mapping",
+    check: async (page) => {
+      await visible(page, "z²", "1/z", "eˣ", "sin(z)", "Reset");
+      await expect(page.getByText("f(z) = z²")).toBeVisible();
+      await button(page, "z³").click();
+      await expect(page.getByText("f(z) = z³")).toBeVisible();
+    },
+  },
+  {
+    id: "bezier-playground",
+    check: async (page) => {
+      await visible(
+        page,
+        "Bézier",
+        "B-Spline",
+        "Catmull-Rom",
+        /Construction/i,
+        "S-Curve",
+        "Loop",
+        "Clear",
+      );
+      await button(page, "Star").click();
+      await expect(page.getByText("points, Degree")).toBeVisible();
+    },
+  },
+  {
+    id: "nn-art",
+    check: async (page) => {
+      await expect(modal(page).locator("canvas")).toBeVisible();
+      await visible(page, /Pause|Resume/, /Reset/, "XOR", "CIRCLE", "SPIRAL");
+    },
+  },
+  {
+    id: "fractal-flame-sync",
+    check: async (page) => {
+      await expect(modal(page).locator("canvas")).toBeVisible();
+      await visible(page, "Static", "Mic", "File", /Reset/, "heat", "cool", "rainbow");
+    },
+  },
+  {
+    id: "gradient-descent",
+    check: async (page) => {
+      await visible(page, "SGD", "Momentum", "Adam", "Reset", /Chaos/);
+      await expect(modal(page).locator('input[type="range"]')).toBeVisible();
+      await button(page, "Adam").click();
+      await button(page, "Momentum").click();
+      await expect(button(page, "Momentum")).toBeVisible();
+    },
+  },
+  {
+    id: "prisoners-dilemma",
+    check: async (page) => {
+      await visible(page, /Run|Pause/, "Reset", "Step");
+      await expect(
+        modal(page)
+          .locator("button")
+          .filter({ hasText: /Tit-fo|Grim|Always|Random|Pavlov/i })
+          .first(),
+      ).toBeVisible();
+      await expect(slider(page, "Speed")).toBeVisible();
+      await button(page, "Step").click();
+      await expect(button(page, "Step")).toBeVisible();
+    },
+  },
+  {
+    id: "simulated-annealing-tsp",
+    check: async (page) => {
+      await visible(page, /Run|Pause/, "Step", "Reset", "10 Cities", "20 Cities", "Grid", "Circle");
+      await expect(slider(page, "T₀")).toBeVisible();
+      await expect(slider(page, "Cooling")).toBeVisible();
+      await button(page, "20 Cities").click();
+      await expect(button(page, "20 Cities")).toBeVisible();
+    },
+  },
+  {
+    id: "three-body-problem",
+    check: async (page) => {
+      const select = modal(page).locator("select");
+      await expect(select).toHaveValue("figure8");
+      const options = await select.locator("option").allTextContents();
+      expect(options).toEqual(
+        expect.arrayContaining(["Figure-8", "Lagrange L4/L5", "Broucke Orbit"]),
+      );
+      await visible(page, /Pause|Play/, /Reset/);
+      await expect(modal(page).locator('input[type="range"]')).toBeVisible();
+      for (const text of [/KE/, /PE/, /steps/])
+        await expect(modal(page).getByText(text)).toBeVisible();
+      await select.selectOption("broucke");
+      await expect(select).toHaveValue("broucke");
+      await select.selectOption("lagrange");
+      await expect(select).toHaveValue("lagrange");
+    },
+  },
+  {
+    id: "relativistic-orbits",
+    check: async (page) => {
+      await visible(page, /Pause|Play/, /Reset/);
+      await expect(slider(page, "Speed")).toBeVisible();
+      for (const text of [/Rs/, /Rph/, /Δφ/])
+        await expect(modal(page).getByText(text)).toBeVisible();
+      await slider(page, "Mass").fill("100");
+      await expect(modal(page).getByText("100")).toBeVisible();
+    },
+  },
+  {
+    id: "galaxy-formation",
+    check: async (page) => {
+      await visible(page, "Pause", "Reset");
+      for (const label of ["Angular momentum", "Speed"])
+        await expect(slider(page, label)).toBeVisible();
+      for (const text of [/Particles:/, /Baryonic:/, /Age:/]) {
+        await expect(modal(page).getByText(text)).toBeVisible();
+      }
+      await expect(
+        modal(page)
+          .getByText(/Dark matter:/)
+          .last(),
+      ).toBeVisible();
+      await slider(page, "Dark matter").fill("0.8");
+      await expect(modal(page).locator(".text-amber-400").first()).toContainText("80%");
+    },
+  },
+];
+
 test.describe("Gallery page", () => {
-  test("loads with experiment cards", async ({ page }) => {
+  test("renders one card per registry experiment, with its tags", async ({ page }) => {
     await page.goto("/lab");
     await expect(page.getByRole("heading", { name: "Creative Lab" })).toBeVisible();
-    const cards = page.locator('[role="list"] > [role="listitem"]');
-    await expect(cards).toHaveCount(27);
+    await expect(page.locator('[role="list"] > [role="listitem"]')).toHaveCount(
+      LAB_EXPERIMENTS.length,
+    );
+    for (const exp of LAB_EXPERIMENTS) {
+      const card = page.locator('[role="listitem"]').filter({ hasText: exp.title }).first();
+      await expect(card, exp.id).toBeVisible();
+      for (const tag of exp.tags)
+        await expect(card.getByText(tag, { exact: true }).first()).toBeVisible();
+    }
   });
 
-  test("Fractal Explorer card is present", async ({ page }) => {
-    await page.goto("/lab");
-    await expect(page.getByText("Fractal Explorer").first()).toBeVisible();
-    const card = page.locator('[role="listitem"]').filter({ hasText: "Fractal Explorer" }).first();
-    await expect(card).toBeVisible();
-    await expect(card.getByText("WebGL", { exact: true })).toBeVisible();
-    await expect(card.getByText("Fractal", { exact: true })).toBeVisible();
-  });
-
-  test("clicking Fractal Explorer opens modal with controls", async ({ page }) => {
+  test("clicking Fractal Explorer opens it; modes, palette, sliders and Escape work", async ({
+    page,
+  }) => {
     await page.goto("/lab");
     await openExperiment(page, "Fractal Explorer");
-    await expect(page.getByRole("button", { name: "Mandelbrot" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Julia" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Amber" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Bookmark" })).toBeVisible();
+    await visible(page, "Mandelbrot", "Julia", "Amber", "Bookmark", "Pan", "Zoom");
+    const iter = page.locator('label:has-text("Iter") input[type="range"]');
+    expect(Number(await iter.inputValue())).toBe(256);
+    const shift = page.locator('label:has-text("Shift") input[type="range"]');
+    await shift.fill("50");
+    expect(Number(await shift.inputValue())).toBe(50);
+    await button(page, "Fire").click();
+    await button(page, "Julia").click();
+    await expect(modal(page).getByText("Cx")).toBeVisible();
+    await expect(modal(page).getByText("Cy", { exact: true })).toBeVisible();
+    await button(page, "Morph").click();
+    await expect(button(page, "Morph On")).toBeVisible();
+    await expect(page.getByText("Speed")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(button(page, "Mandelbrot")).not.toBeVisible();
   });
 
-  test("modal focus trap: fokus awal tombol tutup dan Tab berputar di dalam dialog", async ({
+  test("modal focus trap: initial focus on close, Tab cycles inside, Escape closes", async ({
     page,
   }) => {
     await page.goto("/lab");
     await openExperiment(page, "Fractal Explorer");
     const dialog = page.getByRole("dialog", { name: "Fractal Explorer" });
     await expect(dialog).toBeVisible();
-    // Initial focus → tombol tutup pertama (ChevronLeft) via useFocusTrap.
     const firstClose = dialog.locator("button").first();
     await expect(firstClose).toBeFocused();
-    // Setelah sebanyak focusables kali Tab, fokus kembali ke tombol pertama.
     const focusableCount = await dialog
       .locator(
         'button:not([disabled]):not([tabindex="-1"]), input:not([disabled]), [href]:not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])',
       )
       .count();
-    for (let i = 0; i < focusableCount; i++) {
-      await page.keyboard.press("Tab");
-    }
+    for (let i = 0; i < focusableCount; i++) await page.keyboard.press("Tab");
     await expect(firstClose).toBeFocused();
-    // Esc tetap menutup modal.
     await page.keyboard.press("Escape");
-    await expect(page.locator("[data-modal-content]")).toHaveCount(0);
+    await expect(modal(page)).toHaveCount(0);
   });
 
-  test("Julia toggle shows Cx/Cy controls in modal", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "Fractal Explorer");
-    await page.getByRole("button", { name: "Julia" }).click();
-    const modal = page.locator("[data-modal-content]");
-    await expect(modal.getByText("Cx")).toBeVisible();
-    await expect(modal.getByText("Cy", { exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Morph" })).toBeVisible();
-  });
-
-  test("morph toggle works in Julia mode", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "Fractal Explorer");
-    await page.getByRole("button", { name: "Julia" }).click();
-    await page.getByRole("button", { name: "Morph" }).click();
-    await expect(page.getByRole("button", { name: "Morph On" })).toBeVisible();
-    await expect(page.getByText("Speed")).toBeVisible();
-  });
-
-  test("palette buttons switch active state", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "Fractal Explorer");
-    await expect(page.getByRole("button", { name: "Amber" })).toBeVisible();
-    await page.getByRole("button", { name: "Fire" }).click();
-    await expect(page.getByRole("button", { name: "Fire" })).toBeVisible();
-  });
-
-  test("Pan and Zoom mode toggle exist", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "Fractal Explorer");
-    await expect(page.getByRole("button", { name: "Pan" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Zoom" })).toBeVisible();
-  });
-
-  test("Bookmark button is present in modal", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "Fractal Explorer");
-    await expect(page.getByRole("button", { name: "Bookmark" })).toBeVisible();
-  });
-
-  test("closes modal with Escape", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "Fractal Explorer");
-    await expect(page.getByRole("button", { name: "Mandelbrot" })).toBeVisible();
-    await page.keyboard.press("Escape");
-    await expect(page.getByRole("button", { name: "Mandelbrot" })).not.toBeVisible();
-  });
-
-  // Cold-load arrival budget is 15s, not 5s: a hash deep-link pays full page
-  // load + a React.lazy experiment chunk + experiment init, measured at
-  // 4.5–5.7s on this 4-core box — right at the old edge, so it flaked by load.
-  test("deep link via URL hash opens experiment", async ({ page }) => {
+  test("deep link via URL hash opens Fractal Explorer", async ({ page }) => {
     await page.goto("/lab#fractal-explorer");
-    await expect(page.getByRole("button", { name: "Mandelbrot" })).toBeVisible({ timeout: 15000 });
+    await expect(button(page, "Mandelbrot")).toBeVisible({ timeout: 15000 });
   });
 
-  test("Iter slider is adjustable", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "Fractal Explorer");
-    const slider = page.locator('label:has-text("Iter") input[type="range"]');
-    await expect(slider).toBeVisible();
-    expect(Number(await slider.inputValue())).toBe(256);
-  });
-
-  test("Shift slider is adjustable", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "Fractal Explorer");
-    const slider = page.locator('label:has-text("Shift") input[type="range"]');
-    await expect(slider).toBeVisible();
-    await slider.fill("50");
-    expect(Number(await slider.inputValue())).toBe(50);
-  });
-
-  test("Interactive Canvas card is present", async ({ page }) => {
-    await page.goto("/lab");
-    await expect(page.getByText("Interactive Canvas").first()).toBeVisible();
-    const card = page
-      .locator('[role="listitem"]')
-      .filter({ hasText: "Interactive Canvas" })
-      .first();
-    await expect(card).toBeVisible();
-    await expect(card.getByText("Canvas", { exact: true })).toBeVisible();
-    await expect(card.getByText("Whiteboard", { exact: true })).toBeVisible();
-  });
-
-  test("Interactive Canvas modal shows toolbar with drawing tools", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "Interactive Canvas");
-    await expect(page.getByTitle("Pen (P)")).toBeVisible();
-    await expect(page.getByTitle("Eraser (E)")).toBeVisible();
-    await expect(page.getByTitle("Node (N)")).toBeVisible();
-    await expect(page.getByTitle("Pan (V)")).toBeVisible();
-  });
-
-  test("Interactive Canvas shows export and undo/redo buttons", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "Interactive Canvas");
-    await expect(page.getByRole("button", { name: "PNG" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "SVG" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "↶ Undo" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "↷ Redo" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "🗑 Clear" })).toBeVisible();
-  });
-
-  test("Interactive Canvas switches tool by clicking toolbar buttons", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "Interactive Canvas");
-    await page.getByTitle("Eraser (E)").click();
-    const eraserBtn = page.getByTitle("Eraser (E)");
-    await expect(eraserBtn).toBeVisible();
-    await page.getByTitle("Node (N)").click();
-    await expect(page.getByTitle("Node (N)")).toBeVisible();
-  });
-
-  // Deep-link budget: a cold `/gallery#<id>` load lazy-resolves the experiment
-  // chunk (React.lazy, Sprint B-4) and measured 4.5–5.7s under load — the old
-  // 5s sat exactly on the edge (Sprint 1 DoD raised 3 of these; this finishes
-  // the class-level fix). 15s is the floor for a cold browser, not a retry.
-  test("Interactive Canvas deep link opens via URL hash", async ({ page }) => {
-    await page.goto("/lab#interactive-canvas");
-    await expect(page.getByTitle("Pen (P)")).toBeVisible({ timeout: 15000 });
-  });
-
-  test("Strange Attractor Zoo card is present", async ({ page }) => {
-    await page.goto("/lab");
-    const card = page.locator('[role="listitem"]').filter({ hasText: "Strange Attractor Zoo" });
-    await expect(card).toBeVisible();
-    await expect(card.getByText("Chaos", { exact: true })).toBeVisible();
-  });
-
-  test("Strange Attractor Zoo modal shows attractor toggles", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "Strange Attractor Zoo");
-    await expect(page.getByRole("button", { name: "Lorenz" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Rössler" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Chaos Mode" })).toBeVisible();
-  });
-
-  test("Strange Attractor switches attractor on click", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "Strange Attractor Zoo");
-    await page.getByRole("button", { name: "Rössler" }).click();
-    await expect(page.getByRole("button", { name: "Rössler" })).toBeVisible();
-  });
-
-  test("Logistic Map card is present", async ({ page }) => {
-    await page.goto("/lab");
-    await expect(page.getByText("Logistic Map")).toBeVisible();
-    const card = page.locator('[role="listitem"]').filter({ hasText: "Logistic Map" });
-    await expect(card).toBeVisible();
-  });
-
-  test("Logistic Map modal shows controls", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "Logistic Map");
-    await expect(page.getByRole("button", { name: "Cobweb" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Auto Sweep" })).toBeVisible();
-  });
-
-  test("Logistic Map cobweb toggle works", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "Logistic Map");
-    await page.getByRole("button", { name: "Cobweb" }).click();
-    await expect(page.getByRole("button", { name: "Cobweb" })).toBeVisible();
-  });
-
-  test("Logistic Map r slider is adjustable", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "Logistic Map");
-    const slider = page.locator('label:has-text("r") input[type="range"]');
-    await expect(slider).toBeVisible();
-    await slider.fill("3.8");
-    expect(Number(await slider.inputValue())).toBe(3.8);
-  });
-
-  test("deep link for strange-attractor opens via URL hash", async ({ page }) => {
-    await page.goto("/lab#strange-attractor");
-    await expect(page.getByRole("button", { name: "Lorenz" })).toBeVisible({ timeout: 15000 });
-  });
-
-  test("deep link for logistic-map opens via URL hash", async ({ page }) => {
-    await page.goto("/lab#logistic-map");
-    await expect(page.getByRole("button", { name: "Cobweb" })).toBeVisible({ timeout: 15000 });
-  });
-
-  test("Noise Topography card is present", async ({ page }) => {
-    await page.goto("/lab");
-    await expect(page.getByText("Noise Topography")).toBeVisible();
-    const card = page.locator('[role="listitem"]').filter({ hasText: "Noise Topography" });
-    await expect(card).toBeVisible();
-    await expect(card.getByText("Noise", { exact: true })).toBeVisible();
-    await expect(card.getByText("Terrain", { exact: true })).toBeVisible();
-  });
-
-  test("Noise Topography modal shows terrain controls", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "Noise Topography");
-    await expect(page.getByRole("button", { name: "Export STL" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Auto" })).toBeVisible();
-    await expect(page.locator('label:has-text("Oct") input[type="range"]')).toBeVisible();
-    await expect(page.locator('label:has-text("Pers") input[type="range"]')).toBeVisible();
-    await expect(page.locator('label:has-text("Lac") input[type="range"]')).toBeVisible();
-  });
-
-  test("Noise Topography Auto toggle works", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "Noise Topography");
-    await expect(page.getByText("✦ Auto")).toBeVisible();
-    await page.getByText("✦ Auto").click();
-    await expect(page.getByText("◉ Manual")).toBeVisible();
-  });
-
-  test("Noise Topography Seed slider is adjustable", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "Noise Topography");
-    const slider = page.locator('label:has-text("Seed") input[type="range"]');
-    await expect(slider).toBeVisible();
-    await slider.fill("42");
-    expect(Number(await slider.inputValue())).toBe(42);
-  });
-
-  test("Noise Topography deep link opens via URL hash", async ({ page }) => {
-    await page.goto("/lab#noise-topography");
-    await expect(page.getByRole("button", { name: "Export STL" })).toBeVisible({ timeout: 15000 });
-  });
-
-  test("Fourier Epicycles card is present", async ({ page }) => {
-    await page.goto("/lab");
-    await expect(page.getByText("Fourier Epicycles")).toBeVisible();
-    const card = page.locator('[role="listitem"]').filter({ hasText: "Fourier Epicycles" });
-    await expect(card).toBeVisible();
-    await expect(card.getByText("Canvas", { exact: true })).toBeVisible();
-    await expect(card.getByText("Fourier", { exact: true })).toBeVisible();
-  });
-
-  test("Fourier Epicycles modal shows mode toggle and draw hint", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "Fourier Epicycles");
-    await expect(page.getByText("Epicycles →")).toBeVisible();
-    await expect(page.getByText("Draw a closed shape")).toBeVisible();
-  });
-
-  test("Fourier Epicycles toggles between draw and epicycles mode", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "Fourier Epicycles");
-    await expect(page.getByText("Epicycles →")).toBeVisible();
-    await page.getByText("Epicycles →").click();
-    await expect(page.getByText("← Draw")).toBeVisible();
-  });
-
-  test("Fourier Epicycles deep link opens via URL hash", async ({ page }) => {
-    await page.goto("/lab#fourier-epicycles");
-    await expect(page.getByText("Epicycles →")).toBeVisible({ timeout: 15000 });
-  });
-
-  // ═══════════════════════════════════════════
-  // Sprint 9 — Linear Algebra & Dimensionality
-  // ═══════════════════════════════════════════
-
-  test("SVD Image Compression card is present", async ({ page }) => {
-    await page.goto("/lab");
-    await expect(page.getByText("SVD Image Compression")).toBeVisible();
-    const card = page.locator('[role="listitem"]').filter({ hasText: "SVD Image Compression" });
-    await expect(card).toBeVisible();
-    await expect(card.getByText("SVD", { exact: true })).toBeVisible();
-    await expect(card.getByText("Compression", { exact: true })).toBeVisible();
-  });
-
-  test("SVD Image Compression modal shows rank slider and file upload", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "SVD Image Compression");
-    await expect(page.getByText("Upload Image")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
-  });
-
-  test("Tesseract Projection card is present", async ({ page }) => {
-    await page.goto("/lab");
-    await expect(page.getByText("Tesseract Hypercube Projection")).toBeVisible();
-    const card = page
-      .locator('[role="listitem"]')
-      .filter({ hasText: "Tesseract Hypercube Projection" });
-    await expect(card).toBeVisible();
-    await expect(card.getByText("4D", { exact: true })).toBeVisible();
-    await expect(card.getByText("Geometry", { exact: true })).toBeVisible();
-  });
-
-  test("Tesseract Projection modal shows rotation plane controls", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "Tesseract Hypercube Projection");
-    await expect(page.getByText("Auto", { exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Wireframe" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Faces" })).toBeVisible();
-  });
-
-  test("PCA / t-SNE card is present", async ({ page }) => {
-    await page.goto("/lab");
-    await expect(page.getByText("PCA / t-SNE Visualization")).toBeVisible();
-    const card = page.locator('[role="listitem"]').filter({ hasText: "PCA / t-SNE Visualization" });
-    await expect(card).toBeVisible();
-    await expect(card.getByText("PCA", { exact: true })).toBeVisible();
-    await expect(card.getByText("Dimensionality Reduction", { exact: true })).toBeVisible();
-  });
-
-  test("PCA / t-SNE modal shows projection controls", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "PCA / t-SNE Visualization");
-    await expect(page.getByText("Generate New Data")).toBeVisible();
-    await expect(page.getByText("Perplexity:")).toBeVisible();
-  });
-
-  test("deep link for svd-compression opens via URL hash", async ({ page }) => {
-    await page.goto("/lab#svd-compression");
-    await expect(page.getByText("Upload Image")).toBeVisible({ timeout: 15000 });
-  });
-
-  test("deep link for tesseract-projection opens via URL hash", async ({ page }) => {
-    await page.goto("/lab#tesseract-projection");
-    await expect(page.getByText("Auto", { exact: true })).toBeVisible({ timeout: 15000 });
-  });
-
-  test("deep link for pca-tsne-viz opens via URL hash", async ({ page }) => {
-    await page.goto("/lab#pca-tsne-viz");
-    await expect(page.getByText("Generate New Data")).toBeVisible({ timeout: 15000 });
-  });
-
-  // ═══════════════════════════════════════════
-  // Sprint 10 — PDEs, Physics & Emergence
-  // ═══════════════════════════════════════════
-
-  test("Spring Physics Sandbox card is present", async ({ page }) => {
-    await page.goto("/lab");
-    await expect(page.getByText("Spring Physics Sandbox")).toBeVisible();
-    const card = page.locator('[role="listitem"]').filter({ hasText: "Spring Physics Sandbox" });
-    await expect(card).toBeVisible();
-    await expect(card.getByText("Verlet", { exact: true })).toBeVisible();
-  });
-
-  test("Spring Physics Sandbox modal shows preset buttons", async ({ page }) => {
-    await page.goto("/lab");
-    await openExperiment(page, "Spring Physics Sandbox");
-    await expect(page.getByRole("button", { name: "Cloth" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Chain" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Jelly" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Ragdoll" })).toBeVisible();
-  });
-
-  test("Spring Physics Sandbox deep link opens via URL hash", async ({ page }) => {
-    await page.goto("/lab#spring-physics");
-    await expect(page.getByRole("button", { name: "Cloth" })).toBeVisible({ timeout: 15000 });
-  });
-
-  // ═══════════════════════════════════════════
-  // Sprint 11 — Number Theory & Cellular Automata
-  // ═══════════════════════════════════════════
-
-  test.describe("Ulam Spiral", () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto("/lab#ulam-spiral");
+  for (const row of EXPERIMENTS) {
+    test(`${row.id}: deep link, controls and interactions`, async ({ page }) => {
+      await page.goto(`/lab#${row.id}`);
       await waitForExperimentReady(page);
-    });
-
-    test.afterEach(async ({ page }) => {
+      await row.check(page);
       await page.keyboard.press("Escape");
+      await expect(modal(page)).not.toBeVisible();
     });
-
-    test("deep link opens modal with zoom slider and mode buttons", async ({ page }) => {
-      const modal = page.locator("[data-modal-content]");
-      await expect(modal.locator('label:has-text("Zoom") input[type="range"]')).toBeVisible();
-      await expect(page.getByRole("button", { name: "Spiral" })).toBeVisible();
-    });
-
-    test("layout toggle switches between Spiral and Rectangular", async ({ page }) => {
-      await page.getByRole("button", { name: "Spiral" }).click();
-      await expect(page.getByRole("button", { name: "Rectangular" })).toBeVisible();
-      await page.getByRole("button", { name: "Rectangular" }).click();
-      await expect(page.getByRole("button", { name: "Spiral" })).toBeVisible();
-    });
-  });
-
-  test.describe("Hyperbolic Game of Life", () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto("/lab#hyperbolic-gol");
-      await waitForExperimentReady(page);
-    });
-
-    test.afterEach(async ({ page }) => {
-      await page.keyboard.press("Escape");
-    });
-
-    test("deep link opens modal with Play/Pause, Step, and rule button", async ({ page }) => {
-      await expect(page.getByRole("button", { name: /Play|Pause/ })).toBeVisible();
-      await expect(page.getByRole("button", { name: "Step" })).toBeVisible();
-      await expect(page.getByRole("button", { name: /Conway|Rule/ })).toBeVisible();
-    });
-
-    test("Play/Pause toggle changes text", async ({ page }) => {
-      const playPause = page.getByRole("button", { name: /Play|Pause/ });
-      await playPause.click();
-      await expect(playPause).toBeVisible();
-    });
-
-    test("rule button cycles through Conway/Seeds/HighLife", async ({ page }) => {
-      const ruleBtn = page.getByRole("button", { name: /Conway|Seeds|HighLife|Rule/ });
-      await expect(ruleBtn).toBeVisible();
-      await ruleBtn.click();
-      await expect(ruleBtn).toBeVisible();
-    });
-  });
-
-  test.describe("Conformal Mapping", () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto("/lab#conformal-mapping");
-      await waitForExperimentReady(page);
-    });
-
-    test.afterEach(async ({ page }) => {
-      await page.keyboard.press("Escape");
-    });
-
-    test("deep link opens modal with function buttons", async ({ page }) => {
-      await expect(page.getByRole("button", { name: "z²" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "1/z" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "eˣ" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "sin(z)" })).toBeVisible();
-    });
-
-    test("shows formula display", async ({ page }) => {
-      await expect(page.getByText("f(z) = z²")).toBeVisible();
-    });
-
-    test("shows Reset and zoom controls", async ({ page }) => {
-      await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
-    });
-
-    test("switches function on click", async ({ page }) => {
-      await page.getByRole("button", { name: "z³" }).click();
-      await expect(page.getByText("f(z) = z³")).toBeVisible();
-    });
-  });
-
-  test.describe("Bézier Playground", () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto("/lab#bezier-playground");
-      await waitForExperimentReady(page);
-    });
-
-    test.afterEach(async ({ page }) => {
-      await page.keyboard.press("Escape");
-    });
-
-    test("deep link opens modal with curve type buttons", async ({ page }) => {
-      await expect(page.getByRole("button", { name: "Bézier" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "B-Spline" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "Catmull-Rom" })).toBeVisible();
-    });
-
-    test("shows Construction toggle", async ({ page }) => {
-      await expect(page.getByRole("button", { name: /Construction/i })).toBeVisible();
-    });
-
-    test("shows preset buttons", async ({ page }) => {
-      await expect(page.getByRole("button", { name: "S-Curve" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "Loop" })).toBeVisible();
-    });
-
-    test("shows Clear button", async ({ page }) => {
-      await expect(page.getByRole("button", { name: "Clear" })).toBeVisible();
-    });
-
-    test("loads preset on click", async ({ page }) => {
-      await page.getByRole("button", { name: "Star" }).click();
-      await expect(page.getByText("points, Degree")).toBeVisible();
-    });
-  });
-
-  // ═══════════════════════════════════════════
-  // Sprint 13 — New Experiments
-  // ═══════════════════════════════════════════
-
-  test.describe("Neural Network Art", () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto("/lab#nn-art");
-      await waitForExperimentReady(page);
-    });
-
-    test.afterEach(async ({ page }) => {
-      await page.keyboard.press("Escape");
-    });
-
-    test("deep link opens modal", async ({ page }) => {
-      const modal = page.locator("[data-modal-content]");
-      await expect(modal.locator("canvas")).toBeVisible();
-    });
-
-    test("shows Pause/Resume button", async ({ page }) => {
-      await expect(page.getByRole("button", { name: /Pause|Resume/ })).toBeVisible();
-    });
-
-    test("shows Reset button", async ({ page }) => {
-      await expect(page.getByRole("button", { name: /Reset/ })).toBeVisible();
-    });
-
-    test("shows XOR, CIRCLE, SPIRAL task buttons", async ({ page }) => {
-      await expect(page.getByRole("button", { name: "XOR" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "CIRCLE" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "SPIRAL" })).toBeVisible();
-    });
-
-    test("escape closes modal", async ({ page }) => {
-      await page.keyboard.press("Escape");
-      await expect(page.locator("[data-modal-content]")).not.toBeVisible();
-    });
-  });
-
-  test.describe("Fractal Flame Sync", () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto("/lab#fractal-flame-sync");
-      await waitForExperimentReady(page);
-    });
-
-    test.afterEach(async ({ page }) => {
-      await page.keyboard.press("Escape");
-    });
-
-    test("deep link opens modal", async ({ page }) => {
-      const modal = page.locator("[data-modal-content]");
-      await expect(modal.locator("canvas")).toBeVisible();
-    });
-
-    test("shows Static, Mic, File mode buttons", async ({ page }) => {
-      await expect(page.getByRole("button", { name: "Static" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "Mic" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "File" })).toBeVisible();
-    });
-
-    test("shows Reset button", async ({ page }) => {
-      await expect(page.getByRole("button", { name: /Reset/ })).toBeVisible();
-    });
-
-    test("shows color mode buttons", async ({ page }) => {
-      await expect(page.getByRole("button", { name: "heat" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "cool" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "rainbow" })).toBeVisible();
-    });
-
-    test("escape closes modal", async ({ page }) => {
-      await page.keyboard.press("Escape");
-      await expect(page.locator("[data-modal-content]")).not.toBeVisible();
-    });
-  });
+  }
 });

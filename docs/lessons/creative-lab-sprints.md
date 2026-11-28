@@ -1,0 +1,308 @@
+# Creative Lab, Epics 5–8, Sprints 1–16, detAIministic
+
+> Moved verbatim from `AGENTS.md` on 2026-11-28 (commit before: `18c14a6`). History, not instructions: read only when the topic is in play. Paths and counts reflect the date of each entry; verify against the tree before acting.
+
+## Sprint Naik Level (in progress)
+- ITERASI 1 ✅ (L1.1–L1.5): Tipografi editorial & craft foundation.
+  - L1.1: Display font **Fraunces** self-hosted (`public/fonts/fraunces-latin-{400,700}-normal.woff2`, ~18KB/weight), token `--font-display` + fallback size-adjust 97%. Diperbaiki: preload `/fonts/inter-*.woff2` 404 (file tak pernah ada — font aslinya dari @fontsource bundle) dan preconnect `fonts.bunny.net` dead → dihapus.
+  - L1.2: Fluid type scale `--text-display/h1–h4` (clamp) + util `.text-display`/`.text-h1..h4`/`.section-label`. Hero h1 pakai display scale (lh 0.95, tracking -0.035em). Section h2 diturunkan ke `--text-h2`. Min display 2.25rem agar nama panjang tak overflow @375px.
+  - L1.3: Scrollbar 8px thumb `--color-border`→hover brand (+Firefox props); tabular-nums di star/fork RepoGlowCard. `::selection`+focus ring sudah token adaptif (light accent #5d6b54 lebih gelap utk kontras).
+  - L1.4: Script unpkg dotLottie dihapus (tidak dipakai).
+  - Token baru global.css: `--font-display`, `--text-display/h1–h4`, `--tracking-display`; util `.font-display/.text-display/.text-h1..h4/.section-label`.
+- ITERASI 2 ✅ (L2.1–L2.5): Gallery pruning + restraint pass.
+  - L2.1: Audit penuh 53 eksperimen → **20 KEEP · 5 UPGRADE · 28 CUT** (tersisa 25). Constraint: `CreativeLabTeaser.tsx` (index) meng-import ImageSequenceScroll/ParticleGalaxy/TextScramble (CUT) + VideoSequenceScroll (KEEP) → teaser dirework bersamaan commit cut showcase. (Dokumen audit `docs/lab-audit.md` sudah dihapus saat cleanup docs iterasi ini.) Temuan sistemik lintas eksperimen: RAF 60fps tanpa henti meski scene statis; setState di dalam loop RAF (HUD); fitur diiklankan tapi tak berfungsi (FractalExplorer pan/zoom handler yatim — prioritas UPGRADE); wheel React synthetic + preventDefault melanggar konvensi native-listener repo.
+  - L2.2: Pruning tuntas — 28 CUT dihapus via 6 commit: A `2639a79` (showcase + rework CreativeLabTeaser & `src/lib/experiments.ts` → 4 entri), B `96b163b`, C `f9e25c6`, D `2fd49b7`, E `3dac272`. Tiap cut = komponen + test unit (dua lokasi: `src/islands/experiments/*.test.tsx` DAN `src/islands/experiments/__tests__/`) + thumbnail + referensi GalleryGrid (import/registry/LivePreview/modal/cursor) + blok test e2e + update `toHaveCount` (53→25). Verifikasi: build 45 hal ✓; unit 397/397 (29 file); e2e hijau terisolasi.
+  - L2.3 (`9c46da8`): Arsitektur & copy pasca-pruning rapi — `EXP_HARMONY: Record<string,string>` menggantikan chain ternary mati; `EXPERIMENT_CATEGORIES` + filter tablist di atas grid (All/Physics 6/Mathematics 8/ML 6/Generative & Audio 3/Interaction & Tools 2); keyboard nav + grid map + footer pakai `visibleExperiments` (default All → `toHaveCount(25)` e2e tetap valid); 25 deskripsi kartu ditulis ulang engineering-focused; lead-in `gallery.astro` diframing "Engineering Showcase"; chip "coming soon" usang dihapus. **BUG FIX**: branch `bezier-playground` di modal component chain terhapus saat surgery L2.2 → modal merender kosong TANPA error console (4 test Bézier gagal "element not found"); direstore. Verifikasi: build ✓, unit 397/397 ✓, e2e gallery **71/71 dalam 2,7 menit**.
+  - L2.4: Restraint pass efek dekoratif global — **FloatingElements DIHAPUS** (mount tanpa directive hydrasi di BaseLayout = dekorasi beku: parallax framer-motion tak pernah jalan, hanya 5 titik statis; pelajaran: island React tanpa `client:*` tidak akan pernah hydrate — jangan pakai utk animasi); **AmbientScene diredam** (canvas opacity 0.4→0.25, Float speed −35–40%); **CustomCursor + guard `prefers-reduced-motion`** (satu-satunya efek global tanpa guard sebelumnya — catatan test: framer-motion `useReducedMotion` membaca state modul global yang di-cache sekali → utk test deterministik mock hook-nya via `vi.mock("framer-motion")`, bukan mock `matchMedia`); CreativeLabPill 2 loop Infinity di-skip saat reduced-motion; dead import ScrollEntropy (index.astro) dihapus (komponen tetap hidup via MicroInteractionsDemo). +9 unit test (CustomCursor 5, CreativeLabPill 4). Verifikasi: build 45 ✓, unit 406/406 ✓ (31 file), e2e craft+typo+micro 17 ✓, gallery 71 total (69 paralel + 2 flake WebGL hijau terisolasi).
+- E2E speed-up (`7a6aea5`): webServer Playwright lokal kini `build:fast` (skip fetch-data GitHub; CI tetap full build) + script baru `serve` (preview persisten :4321), `build:fast`, `test:e2e:changed` (--only-changed). Workflow efisien: start `bun run serve` sekali per sesi → semua run playwright reuse server = TANPA build (~1 menit hemat per run). Per task cukup unit test + spec targeted (`bunx playwright test e2e/gallery.spec.ts -g "Nama"`); full e2e cukup 1× di akhir iterasi.
+- Catatan lingkungan: Vitest exclude `.opencode/**` (test bawaan zod di skills node_modules mem-pollute suite). Playwright browser perlu `bunx playwright install chromium` bila hilang setelah update. WebGL-heavy specs masih bisa timeout saat paralel penuh dengan mesin under load — re-run terisolasi untuk konfirmasi; dengan server reuse run gallery penuh stabil ~2,7 menit. **`webServer` timeout jadi penghalang (2026-10-07)**: `build:fast` terukur **3m16s** untuk 49 page (sambil mencetak `REST 403 Forbidden` rate-limit GitHub untuk star-history — korelasi, bukan penyebab yang sudah pasti) → melebihi `webServer.timeout` Playwright **180000 ms** sehingga run penuh gagal sebelum 1 test pun jalan (`Timed out waiting 180000ms from config.webServer`). Maka pre-build + `bun run serve` **wajib**, bukan lagi sekadar penghematan: `bun run build:fast` → start `serve` (:4321) → `bunx playwright test --workers=1` (`reuseExistingServer` lokal = Playwright melewati build). **Lint juga punya dua wajah**: `biome check .` tetap meng-scan `test-results/` meski sudah di `.gitignore` → tepat setelah run e2e ia baca **669**, tanpa artefak **668** (baseline sumber = 668; selisih 1 = `.last-run.json`). Bila angka beda dari catatan gate, cek dulu apakah `test-results/` ada — jangan langsung cari regresi di kode.
+
+
+## Sprint Plan
+
+### Epic 5 (Repository Galaxy) ✅
+- `src/islands/RepositoryGalaxy.tsx` — wrapper island with tier detection (tier-1: static grid, tier-2: D3 force graph, tier-3: R3F 3D galaxy)
+- `src/islands/RepositoryGalaxy3D.tsx` — R3F scene with spiral layout, orbit animation, star dust, connection lines, camera fly-through
+- `src/components/atoms/RepoPlanet.tsx` — individual 3D repo planet with hover/click, glow ring, sprite aura
+- Tier system: `NetworkGraph.tsx` reused for tier-2 D3 fallback; tier-1 renders accessible static card grid
+
+### Epic 6 (Language Nebula) ✅
+- `src/islands/LanguageNebula.tsx` — flowing aurora ribbon with particles, animated SVG, tooltip, responsive fallback
+
+### Epic 7 (Top Repos) ✅
+- `src/components/atoms/RepoGlowCard.tsx` — premium interactive card with tilt, glow, rank badges, last active, animated star counter
+- `src/islands/TopReposLeaderboard.tsx` — leaderboard grid wrapping RepoGlowCards + animated commits feed + CTA
+
+### Epic 8 (Integration) ✅
+- `src/components/organisms/GitHubUniverse.astro` — orchestrator wrapping all phases with scroll narrative
+- `src/islands/PhaseIndicator.tsx` — scroll progress dots for phase navigation
+- `src/pages/index.astro` — GitHub section now uses GitHubUniverse (full phased experience)
+- `src/pages/github.astro` — redesigned as expanded full-page GitHub Universe
+- Deleted removal candidates: `GitHubShowcase.astro`, `LanguageDonut.tsx`, `CommitHeatmap.tsx`, `ContributionGraph.tsx`
+
+### Sprint 1 (Creative Lab Foundation) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md` — 10 epics, ~60 stories (Liquid Distortion, Audio Viz, Fractal Explorer, etc.)
+- **Epic 1 (Foundation Shell)**: ✅ COMPLETE
+  - Keyboard navigation: Arrow keys browse cards, Enter/Space launches, 1-4 number shortcuts
+  - Deep linking: `/gallery#experiment-id` auto-launches experiment on page load
+  - Mouse-reactive cursor: Per-experiment cursor morphing (crosshair, grab, text, zoom-in)
+  - Ambient sound: `src/components/atoms/AmbientSound.tsx` — Web Audio API ambient drone with harmony shifting per experiment (LFO breathing, auto-start on first interaction)
+- **Epic 2 (Image Sequence Scroll Engine)**: ✅ COMPLETE
+  - Reverse playback: Direction toggle button with RotateCcw/Cw icon
+  - Scroll momentum: Velocity-based decay after wheel release
+  - Frame bookmarking: B key to bookmark, amber markers on scrub bar, expandable contact sheet grid, clear all
+  - Export frame: E key or download button → PNG export via canvas.toDataURL
+  - Frame interpolation: Smooth tweening between non-adjacent frames (120ms ease-out curve)
+  - Audio-reactive mode: ⏳ deferred (complex — needs mic permission flow)
+- **Gallery page**: `src/pages/gallery.astro` — experimental UI playground at `/gallery`
+- **GalleryGrid**: `src/islands/GalleryGrid.tsx` — tilt-card grid + full-screen modal orchestrator + keyboard nav + deep links + cursor morphing
+- **ImageSequenceScroll**: `src/islands/experiments/ImageSequenceScroll.tsx` — procedural canvas frames, wheel-driven, scrub bar, reverse toggle, bookmarks, export, interpolation
+- **ParticleGalaxy**: `src/islands/experiments/ParticleGalaxy.tsx` — 180-particle system with mouse gravity, constellation lines
+- **TextScramble**: `src/islands/experiments/TextScramble.tsx` — kinetic typography, multi-phrase scramble/glitch
+- **VideoSequenceScroll**: `src/islands/experiments/VideoSequenceScroll.tsx` — real image sequence (296 frames from Samsung 4K demo), wheel-driven scrub
+- **Frames**: `public/images/sequence/samsung-demo/` — 296 JPEG frames (5.2MB, 854×480)
+- **All experiments use native wheel events** (not synthetic React events) with `{ passive: false }` for reliable scrolling inside modals
+- **Build verified**: `bun run build` succeeds (45 pages)
+
+### Sprint 2 (Visual Depth) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 5 (Liquid Distortion)**: ✅ COMPLETE
+  - `src/islands/experiments/LiquidDistortion.tsx` — real-time Canvas 2D fluid simulation
+  - Grid-based velocity field with bilinear advection, explicit diffusion
+  - Mouse-driven fluid distortion (move mouse to push fluid)
+  - Click to spawn vortices that swirl and fade
+  - Color dye injection (click-drag to inject dye)
+  - Performance: lightweight grid (80×50), no pressure solve needed
+  - Compact preview mode for gallery cards
+- **Epic 6 (3D Parallax Depth Playground)**: ✅ COMPLETE
+  - `src/islands/experiments/DepthPlayground.tsx` — multi-layer parallax depth scene
+  - 4 parallax layers rendered as radial gradients (replaces expensive canvas `filter=blur()`)
+  - Mouse-driven parallax with independent speed per layer
+  - Depth-of-field toggle: blur via radial gradient spread (no GPU blur)
+  - Per-layer focus button to bring any layer into sharp focus
+  - Auto-idle drift animation when mouse is static
+  - Performance: no `ctx.filter`, no grid overlay, simpler shapes
+- **Epic 3 (Particle Galaxy)**: Upgraded from Sprint 1 baseline (180 particles) with full Epic 3 features deferred
+- **New experiments registered**: GalleryGrid.tsx now has 6 experiments total
+- **Build verified**: `bun run build` succeeds (45 pages)
+- **"Coming soon" tags** updated — Liquid Distortion and 3D Parallax removed from upcoming list
+- **New**: Epic 11 (Mathematical Deep Dive) added — 21 experiments spanning strange attractors, Fourier transforms, Bayesian inference, PDE solvers, stochastic processes, conformal mapping, spherical harmonics, and more
+
+### Sprint 3 (Audio) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Delivery roadmap**: Sprint 3 | Audio | Audio Visualizer + Audio-reactive variants
+- **Epic 7 (Audio Visualizer)**: ✅ COMPLETE
+  - `src/islands/experiments/AudioVisualizer.tsx` — real-time FFT audio visualizer
+  - 5 visualization modes: bar, ring, wave, particle, hex grid — switchable via mode buttons
+  - Microphone input: `getUserMedia` → `MediaStreamSource` → live FFT analysis
+  - Audio file upload: drag/file pick MP3/WAV → `decodeAudioData` → looped playback
+  - Frequency-reactive particles: 120 particles burst from center based on frequency band energy, with damping and respawn
+  - Export recording: `canvas.captureStream(30)` + `MediaRecorder` → WebM video download
+  - Controls overlay: mode switcher, mic/file/stop buttons, record button with recording indicator
+  - Compact preview mode for gallery card hover
+- **Registered in**: GalleryGrid.tsx — 7th experiment with green/emerald gradient and Music icon
+- **Thumbnail**: `public/images/experiments/audio-visualizer.svg`
+- **"Audio Visualizer" removed from "Coming soon" tags**
+- **Build verified**: `bun run build` succeeds (46 pages)
+
+### Sprint 4 (Fractal Explorer) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 8 (Fractal Explorer)**: ✅ COMPLETE
+  - **File**: `src/islands/experiments/FractalExplorer.tsx` — WebGL 2.0 GLSL shader-based Mandelbrot/Julia renderer
+  - **Mandelbrot/Julia renderer**: Full-screen quad WebGL2 fragment shader with smooth iteration counting, configurable max iterations (32–1024)
+  - **Drag-to-zoom**: Mouse mode toggle (Pan/Zoom). In Zoom mode, click-drag to select region → smooth cubic ease-out interpolation to new view
+  - **Color palette editor**: 6 preset palettes (Amber, Fire, Ice, Plasma, Forest, Ocean) via Inigo Quilez cos palette, plus hue shift slider
+  - **Julia set morphing**: Toggle morph mode — Julia c parameter follows circular path (radius 0.6) at configurable speed; real-time parameter display
+  - **Bookmark locations**: Encode full state (center, zoom, iter, type, Julia c, palette) as base64 URL param; "Bookmark" button copies shareable URL
+  - **Resolution scaling**: During zoom animation, iter count reduced by up to 40% (min 32), restored on animation completion
+  - **Thumbnail**: `public/images/experiments/fractal-explorer.svg`
+  - **Registered in**: GalleryGrid.tsx — 8th experiment with amber/yellow gradient and Hexagon icon
+  - **"Fractal Explorer" removed from "Coming soon" tags**
+  - **Build verified**: `bun run build` succeeds (45 pages)
+
+
+### Sprint 5 (Interactive Canvas) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 9 (Interactive Canvas / Infinite Whiteboard)**: ✅ COMPLETE
+  - **File**: `src/islands/experiments/InteractiveCanvas.tsx` — Canvas 2D infinite whiteboard with transform matrix, scroll-wheel zoom, pan
+  - **Infinite pan/zoom canvas**: DOMMatrix-based transform, clamp 0.1x–10x zoom, scroll-wheel zoom centers on cursor
+  - **Node graph editor**: Click to create nodes, drag output port → input port to connect edges, drag nodes to reposition, mini-map in corner
+  - **Hand-drawing tools**: Pen (pressure-sensitive via Pointer Events), marker (3x size), spray (random dots in radius), eraser (destination-out composite)
+  - **Particle brush**: Emits settling particles on mouse move, continuous RAF update with gravity/viscosity damping
+  - **Undo/redo timeline**: Snapshot-based history (max 50), Ctrl+Z/Y shortcuts, visual timeline scrubber bar with clickable snapshots
+  - **Export as PNG/SVG**: Canvas.toDataURL for PNG, path-to-SVG conversion for SVG, both trigger download
+  - **Toolbar**: 7 tool buttons with emoji icons, 8-color palette, size/opacity sliders, keyboard shortcuts (V/P/M/S/E/B/N)
+  - **Thumbnail**: `public/images/experiments/interactive-canvas.svg`
+  - **Registered in**: GalleryGrid.tsx — 9th experiment with purple/cyan gradient and Paintbrush icon
+  - **Build verified**: `bun run build` succeeds (45 pages)
+  - **Tests**: 13 unit tests, 5 E2E tests (16 total for this component)
+
+### Sprint 6 (Micro-interactions) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 10 (UI/UX Micro-interactions Library)**: ✅ COMPLETE
+  - **MagneticButtons** (`src/components/atoms/MagneticButtons.tsx`): Enhanced magnetic buttons with configurable attraction radius (default 150px), snap distance (default 40px), strength, spring-scale on hover. 11 unit tests, 1 E2E test
+  - **MorphingNavigation** (`src/islands/MorphingNavigation.tsx`): Navigation morphs from dots → text labels → hamburger menu based on scroll thresholds (default 100/300/600px). Framer Motion animated phase transitions, active section detection via IntersectionObserver. 11 unit tests, 1 E2E test
+  - **OrganicLoader** (`src/components/atoms/OrganicLoader.tsx`): Three loading variants — breathing (sine-wave scale/opacity), pulsing (glow pulse), growing (indeterminate roaming bar or determinate progress). ARIA progressbar role. 13 unit tests, 2 E2E tests
+  - **ContextTooltip** (`src/components/atoms/ContextTooltip.tsx`): Smart tooltips with viewport-aware position auto-adjustment, configurable side/delay, icon/shortcut/description support, Framer Motion AnimatePresence. 10 unit tests, 1 E2E test
+  - **ScrollEntropy** (`src/islands/ScrollEntropy.tsx`): Scroll-triggered component degradation with configurable zones (start/end threshold, intensity). Applies CSS glitch transforms (skew, clip, hue-rotate, opacity) reversibly. Uses passive scroll listener. 10 unit tests, 1 E2E test
+  - **EasterEgg** (`src/islands/EasterEgg.tsx`): Konami code detection (↑↑↓↓←→←→BA), hidden click zones, console command secrets (`opencode`, `portfolio()`, `help`, `konami`, `version`, `secret`). Generates toast notifications. 11 unit tests, 2 E2E tests
+  - **MicroInteractionsDemo** (`src/islands/MicroInteractionsDemo.tsx`): Demo showcase island mounting all 6 components on the index page. 7 unit tests
+  - **Mounting**: All components registered on index.astro (`#micro-interactions` section)
+  - **Tests**: 73 new unit tests (total 104 across 9 files), 9 new E2E tests (total 26 across 2 files)
+  - **Build verified**: `bun run build` succeeds (45 pages)
+  - **Unit tests**: `bun run test` — 104 passed
+  - **E2E tests**: `bun run test:e2e` — 26 passed
+  - **⚠️ REMOVED 2026-09-26** (lihat entri "Home narrative trim" di bawah): `MagneticButtons`, `OrganicLoader`, `ContextTooltip`, `ScrollEntropy`, `MicroInteractionsDemo`, section `#micro-interactions`, `e2e/micro-interactions.spec.ts`, dan seluruh unit test-nya **dihapus** — section ini satu-satunya consumer keempat komponen, jadi tidak ada yang tersisa. `MorphingNavigation` (masuk `PageTailOverlays`) & `EasterEgg` **tetap hidup**. `MagneticButton.tsx` (tunggal, berbeda) tetap dipakai `TopReposLeaderboard`.
+
+### Sprint 7 (Chaos & Attractors) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 11 (Chaos & Dynamical Systems)**: ✅ COMPLETE
+  - Strange Attractor Zoo (Lorenz/Rössler/Aizawa/Thomas/Chen) — 3D particle trails, 4 attractors, parameter sliders, compact mode
+  - Double Pendulum Chaos — side-by-side pendulums, phase-space portrait, Lyapunov exponent, compact mode
+  - Logistic Map / Bifurcation Diagram — cobweb plot, auto-sweep, r/x₀ sliders, compact mode
+  - Butterfly Effect Sandbox — multi-trajectory divergence, Lorenz/Rössler toggle, Lyapunov gauge, compact mode
+
+### Sprint 8 (Fourier, Series & Transforms) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 12 (Fourier, Series & Transforms)**: ✅ COMPLETE
+  - **FourierEpicycles** (`src/islands/experiments/FourierEpicycles.tsx`): Draw a closed shape → DFT decomposes into N rotating epicycles. Mode toggle (Draw/Epicycles), N slider (1-100), Speed slider, Show/Hide Circles, Clear, formula overlay with reconstruction error. 12 unit tests, 3 E2E tests
+  - **TaylorSeries** (`src/islands/experiments/TaylorSeries.tsx`): Approximate eˣ, sin(x), cos(x), ln(1+x) by N terms (0-20). Each term as colored curve, residual error graph, auto-animate N, formula overlay. 11 unit tests, 5 E2E tests
+  - **RiemannSum** (`src/islands/experiments/RiemannSum.tsx`): Riemann sum → definite integral. 4 methods (Left/Right/Midpoint/Trapezoidal), 3 presets (x²/sin/1/x), custom draw, animate N from 2→100, Σ→∫ notation morph. 12 unit tests, 5 E2E tests
+  - **NoiseTopography** (`src/islands/experiments/NoiseTopography.tsx`): Layered Perlin noise → pseudo-3D terrain. Octaves/Persistence/Lacunarity/Seed/Height sliders, auto-rotate, mouse drag pan, STL export, noise profile overlay. 9 unit tests, 5 E2E tests
+  - **GalleryGrid registration**: 17 experiments total (4 new), with cursor/harmony mappings
+  - **Thumbnails**: `public/images/experiments/fourier-epicycles.svg`, `taylor-series.svg`, `riemann-sum.svg`
+  - **Build verified**: `bun run build` succeeds (45 pages)
+  - **Unit tests**: `bun run test` — 198 passed (17 files, +44 new tests)
+  - **E2E tests**: `bun run test:e2e` — 61 passed (+16 new tests)
+
+### Sprint 9 (Linear Algebra & Dimensionality) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 13 (Linear Algebra & Dimensionality)**: ✅ COMPLETE
+  - **EigenvectorFlowField** (`src/islands/experiments/EigenvectorFlowField.tsx`): 2D vector field where eigenvectors define flow lines. Drag a point to trace along eigenvector directions. PCA animation on random clusters with rotating principal components. Covariance ellipse with eigenvalue axis lengths. 15 unit tests
+  - **MatrixMultiplication** (`src/islands/experiments/MatrixMultiplication.tsx`): Animated dot product row×column with pulsing glow. Result matrix builds cell-by-cell with scale-in animation. Grid transformation view with basis vectors î/ĵ. Matrix presets (Identity, Rotation, Shear, Reflection, Scale). Play/Pause/Step controls. 18 unit tests
+  - **SVDImageCompression** (`src/islands/experiments/SVDImageCompression.tsx`): Image upload → SVD decomposition UΣVᵀ. Rank-k reconstruction slider (1→100). Σ diagonal display with kept/discarded highlighting. Compression ratio real-time display. Side-by-side original vs reconstructed. Built-in test pattern. 20 unit tests
+  - **TesseractProjection** (`src/islands/experiments/TesseractProjection.tsx`): 4D hypercube (16 vertices, 32 edges) projected to 3D→2D. 6 independent 4D rotation planes (XY, XZ, XW, YZ, YW, ZW). Perspective projection with adjustable 4D camera distance. Wireframe + semi-transparent faces. Drag to rotate 4D view. 15 unit tests
+  - **PCATSNEViz** (`src/islands/experiments/PCATSNEViz.tsx`): Generate high-dimensional clusters → PCA projection to 2D with explained variance. t-SNE with adjustable perplexity. Side-by-side PCA vs t-SNE on same data. Interactive data generation.
+  - **GalleryGrid registration**: 26 experiments total (was 22; 4 new in Sprint 10), with cursor/harmony mappings
+  - **Thumbnails**: `public/images/experiments/eigenvector-flow.svg`, `matrix-multiplication.svg`, `svd-compression.svg`, `tesseract-projection.svg`, `pca-tsne-viz.svg`
+  - **Build verified**: `bun run build` succeeds (45 pages)
+  - **Unit tests**: `bun run test` — 347 passed (26 files, +62 new tests in Sprint 10)
+  - **E2E tests**: `bun run test:e2e` — 87 passed (+12 new tests in Sprint 10)
+
+### Sprint 10 (PDEs, Physics & Emergence) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 14 (PDEs, Physics & Emergence)**: ✅ COMPLETE
+  - **VonKarmannVortex** (`src/islands/experiments/VonKarmannVortex.tsx`): Lightweight grid-based fluid flow simulation past a circular cylinder. Semi-Lagrangian advection, explicit diffusion, periodic vorticity injection at Strouhal frequency. Velocity/vorticity color modes, 500 streamline particles. Reynolds number / flow speed / cylinder radius sliders. Pause/Resume. 14 unit tests
+  - **SpringPhysics** (`src/islands/experiments/SpringPhysics.tsx`): Interactive Verlet integration mass-spring sandbox. Click to create nodes, drag to connect springs, double-click to pin. Tension-colored springs (blue=compressed, white=neutral, red=stretched). 4 presets (Cloth, Chain, Jelly, Ragdoll). Gravity/damping/stiffness sliders. Clear All / Pause. 16 unit tests
+  - **SandpileModel** (`src/islands/experiments/SandpileModel.tsx`): Abelian sandpile model demonstrating self-organized criticality. Queue-based toppling with absorbing/periodic boundary. 5-color grain visualization, avalanche flash effect, log₂ histogram overlay. Drop rate / grid size sliders, boundary toggle, Rain/Single Drop/Reset. Stats display. 15 unit tests
+  - **RayleighBenard** (`src/islands/experiments/RayleighBenard.tsx`): Streamfunction-vorticity simulation of Rayleigh-Bénard convection. 2D grid with Jacobi iteration for Poisson solve. Temperature field rendering (cold→dark→hot), velocity arrow overlay. Ra (500–10000) / Pr (0.1–10) / grid resolution sliders. Arrows toggle, overlay toggle, Reset, Pause/Resume. 17 unit tests
+  - **GalleryGrid registration**: 26 experiments total (4 new), with cursor/harmony mappings
+  - **Thumbnails**: `public/images/experiments/von-karmann-vortex.svg`, `spring-physics.svg`, `sandpile-model.svg`, `rayleigh-benard.svg`
+  - **Build verified**: `bun run build` succeeds (45 pages)
+  - **Unit tests**: `bun run test` — 347 passed (26 files, +62 new tests)
+  - **E2E tests**: `bun run test:e2e` — 87 passed (+12 new tests)
+
+### Sprint 11 (Number Theory) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 15 (Number Theory & Discrete Structures)**: ✅ COMPLETE
+  - **UlamSpiral** (`src/islands/experiments/UlamSpiral.tsx`): Primes on a square spiral with zoom, pan, Spiral/Rectangular mode toggle. Highlight modes: Primes, Twin Primes, Mersenne Primes, Prime Gaps. Center-on-number input, legend overlay, Sieve of Eratosthenes precomputed up to 200K. 12 unit tests
+  - **CollatzTree** (`src/islands/experiments/CollatzTree.tsx`): 3n+1 conjecture as interactive BFS tree. Click nodes to explore, Auto Explore random numbers, orbit display panel, path highlight on hover, stopping time histogram, zoom/pan. 12 unit tests
+  - **HyperbolicGoL** (`src/islands/experiments/HyperbolicGoL.tsx`): Conway's Game of Life on Poincaré disk with {7,3} heptagonal tiling (197 cells in 8 rings). 3 rules (Conway/Seeds/HighLife), 4 patterns (Random/Center/Ring/Custom), click to toggle cells, play/pause/step, generation/population counters. 15 unit tests
+  - **WaveFunctionCollapse** (`src/islands/experiments/WaveFunctionCollapse.tsx`): Constraint-based procedural generation. 4-tile set (Grass/Dirt/Water/Stone) with adjacency rules. Min-entropy cell selection, BFS constraint propagation. Step/Auto/Pause/Reset, entropy heatmap toggle, grid size/speed sliders, 3 presets (Checkerboard/River/Random), propagation flash visualization. 12 unit tests
+  - **CellularAutomata** (`src/islands/experiments/CellularAutomata.tsx`): Unified 1D/2D gallery. 1D: Rule 30/90/110/184/54/11 with space-time diagrams. 2D: Life/Seeds/HighLife/Day&Night/Anneal with Moore neighborhood and toroidal wrapping. 1D/2D mode toggle, rule presets, play/pause/reset/clear, speed slider, pattern classification (stable/periodic/chaotic/complex). 12 unit tests
+  - **GalleryGrid registration**: 31 experiments total (5 new), with cursor/harmony mappings
+  - **Thumbnails**: `public/images/experiments/ulam-spiral.svg`, `collatz-tree.svg`, `hyperbolic-gol.svg`, `wave-function-collapse.svg`, `cellular-automata.svg`
+  - **Build verified**: `bun run build` succeeds (45 pages)
+  - **Unit tests**: `bun run test` — 410 passed (31 files, +63 new tests)
+  - **E2E tests**: `bun run test:e2e` — 98 passed (+11 new tests)
+
+### Sprint 12 (Complex Analysis) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 16 (Complex Analysis & Pure Visual Math)**: ✅ COMPLETE
+  - **ConformalMapping** (`src/islands/experiments/ConformalMapping.tsx`): Complex function grid transformation (z², 1/z, e^z, sin(z), z³, √z). Cyan Re-lines + amber Im-lines with glow. Angle preservation markers at intersections. Smooth morph animation between functions. Zoom/pan, pole/zero markers (× and ●). Formula overlay. 13 unit tests
+  - **DomainColoring** (`src/islands/experiments/DomainColoring.tsx`): Complex functions as HSL color maps — hue = arg(f(z)), brightness = 2/(1+|w|^0.3). 7 functions (z², z³, 1/z, e^z, sin(z), cos(z), tanh(z)). ImageData pixel rendering, grid overlay toggle, auto-rotate, zoom/pan, HSL color legend wheel. 15 unit tests
+  - **BezierPlayground** (`src/islands/experiments/BezierPlayground.tsx`): Interactive N-degree Bézier/B-spline/Catmull-Rom curve editor. Click to add control points (up to 10), drag to move. De Casteljau construction animation with color-coded levels. Bernstein basis function chart. 4 presets (S-Curve, Loop, Star, Spiral). 16 unit tests
+  - **MoirePatterns** (`src/islands/experiments/MoirePatterns.tsx`): Multi-layer overlapping grid system (3 layers). 5 grid types (circles, lines, radial, checker, dots). Per-layer rotation/frequency/offset/color. 3 blend modes (multiply, screen, additive). 5 presets (Classic, Radial, Typography, Spiral, Zoom). Mouse drag rotation, auto-animate. 19 unit tests
+  - **GalleryGrid registration**: 35 experiments total (4 new), with cursor/harmony mappings
+  - **Thumbnails**: `public/images/experiments/conformal-mapping.svg`, `domain-coloring.svg`, `bezier-playground.svg`, `moire-patterns.svg`
+  - **Build verified**: `bun run build` succeeds (45 pages)
+  - **Unit tests**: `bun run test` — 473 passed (35 files, +63 new tests)
+  - **E2E tests**: `bun run test:e2e` — 108 passed (+10 new tests)
+
+### Sprint 13 (Wild Ideas I) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 20 (Wild Ideas — Crossover & Experimental)**: ✅ COMPLETE
+  - **MathSonification** (`src/islands/experiments/MathSonification.tsx`): Map mathematical concepts to sound — primes→pentatonic, π digits→C major, bifurcation→frequency modulation, fractal→depth-based harmonics. Web Audio API synthesizer with OscillatorNode, 4 wave types, tempo/wave controls, canvas visualization. 12 unit tests
+  - **QuantumCircuit** (`src/islands/experiments/QuantumCircuit.tsx`): Quantum circuit builder with 3 qubits × 8 columns. 9 gate types (H, X, Y, Z, CNOT, S, T, RX, RY) with correct unitary matrices. Statevector simulator (8 complex amplitudes), Bloch sphere visualization, probability bar chart, 3 presets (Bell, GHZ, Teleportation). 17 unit tests
+  - **KnotTheory** (`src/islands/experiments/KnotTheory.tsx`): Interactive knot explorer — 5 presets (Trefoil, Figure-Eight, Cinquefoil, Hopf, Unknot), parametric 3D→2D projection, crossing detection with over/under gaps, Reidemeister move animations (I, II, III), knot invariants (crossing number, writhe, tricolorability, Jones polynomial), pseudo-3D wireframe view. 12 unit tests
+  - **RandomMatrixTheory** (`src/islands/experiments/RandomMatrixTheory.tsx`): Gaussian ensembles (GOE, GUE, GSE), Jacobi eigenvalue algorithm, normalized spacing distribution histogram vs Wigner surmise overlay. Adjustable matrix size (2–200), sample count (10–1000), auto-generate mode, eigenvalue spectrum visualization. 14 unit tests
+  - **GalleryGrid registration**: 39 experiments total (4 new), with cursor/harmony mappings
+  - **Thumbnails**: `public/images/experiments/math-sonification.svg`, `quantum-circuit.svg`, `knot-theory.svg`, `random-matrix.svg`
+  - **Build verified**: `bun run build` succeeds (45 pages)
+  - **Unit tests**: `bun run test` — 528 passed (39 files, +55 new tests)
+  - **E2E tests**: `bun run test:e2e` — 137 passed (+29 new tests)
+
+### Sprint 14 (Wild Ideas II) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 20 (Wild Ideas — Crossover & Experimental, continued)**: ✅ COMPLETE
+  - **4DGameOfLife** (`src/islands/experiments/4DGameOfLife.tsx`): Conway's Game of Life in 4 dimensions — 6×6×3×3 hypergrid with 80 neighbors per cell, toroidal wrapping, 4D→3D→2D perspective projection with 6 rotation planes (XY/XZ/XW/YZ/YW/ZW). Rule presets (Standard 4D, HighLife 4D, Custom), pattern presets (Random, 4D Glider, 4D Oscillator), auto-rotate toggle, grid toggle. 13 unit tests, 5 E2E tests
+  - **NeuralNetworkArt** (`src/islands/experiments/NeuralNetworkArt.tsx`): Tiny 2-6-1 MLP learning XOR/Circle/Spiral classification in real-time. Activation particles flow along weighted connections during forward pass, loss curve panel, weight heatmap, 2D data scatter with decision boundary. Gradient descent backprop with adjustable speed. 14 unit tests, 5 E2E tests
+  - **MathEscapeRoom** (`src/islands/experiments/MathEscapeRoom.tsx`): 5 interconnected puzzle rooms (Algebra, Geometry, Calculus, Number Theory, Probability) as top-down floor plan. Glass-morphism puzzle overlay, hint system, timer with localStorage best time, particle burst celebration on escape. Randomized math problems each game. 13 unit tests, 5 E2E tests
+  - **FractalFlameSync** (`src/islands/experiments/FractalFlameSync.tsx`): IFS flame fractal (6 variations: Linear, Sinusoidal, Spherical, Swirl, Horseshoe, Heart) with audio FFT sync. Bass→variation weights, mids→rotation, treble→color palette. Microphone and file input, log-density coloring, additive glow blending. 13 unit tests, 5 E2E tests
+  - **GalleryGrid registration**: 43 experiments total (4 new), with cursor/harmony mappings
+  - **Thumbnails**: `public/images/experiments/4d-game-of-life.svg`, `neural-network-art.svg`, `math-escape-room.svg`, `fractal-flame-sync.svg`
+  - **Build verified**: `bun run build` succeeds (45 pages)
+  - **Unit tests**: `bun run test` — 581 passed (43 files, +53 new tests)
+  - **E2E tests**: `bun run test:e2e` — 157 passed (+20 new tests)
+
+### Sprint 15 (Game Theory) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 21 (Game Theory & Strategic Behavior)**: ✅ COMPLETE
+  - **GradientDescent** (`src/islands/experiments/GradientDescent.tsx`): 3D loss landscape visualization with SGD/Momentum/Adam optimizers, contour maps, learning rate slider, animated descent paths. 12 unit tests, 5 E2E tests
+  - **NashEquilibrium** (`src/islands/experiments/NashEquilibrium.tsx`): 2×2 payoff matrix explorer with pure/mixed NE detection, best-response curves, 5 presets (Prisoner's Dilemma, Stag Hunt, Chicken, Battle of Sexes, Matching Pennies). 12 unit tests, 5 E2E tests
+  - **PrisonersDilemma** (`src/islands/experiments/PrisonersDilemma.tsx`): Iterated Prisoner's Dilemma tournament with 7 strategies (Tit-for-Tat, Grudger, Always Cooperate, Always Defect, Random, Pavlov, TFTT), round-robin scoring, stacked area chart. 12 unit tests, 5 E2E tests
+  - **SimulatedAnnealingTSP** (`src/islands/experiments/SimulatedAnnealingTSP.tsx`): TSP solver with simulated annealing, click-to-add cities, 4 presets, temperature/cooling controls, animated tour construction. 12 unit tests, 5 E2E tests
+  - **EvolutionaryGameTheory** (`src/islands/experiments/EvolutionaryGameTheory.tsx`): Replicator dynamics on 2-simplex, vector field, trajectory curves, ESS detection. 12 unit tests, 5 E2E tests
+  - **GalleryGrid registration**: 48 experiments total (5 new), with cursor/harmony mappings
+  - **Thumbnails**: `public/images/experiments/gradient-descent.svg`, `nash-equilibrium.svg`, `prisoners-dilemma.svg`, `simulated-annealing-tsp.svg`, `evolutionary-game-theory.svg`
+  - **Build verified**: `bun run build` succeeds (45 pages)
+  - **Unit tests**: `bun run test` — 641 passed (48 files, +60 new tests)
+  - **E2E tests**: `bun run test:e2e` — 182 passed (+25 new tests)
+
+### Sprint 16 (Astrophysics) ✅
+- **Sprint plan**: `sprint_planning_UIUX_Creative_Experimental.md`
+- **Epic 22 (Astrophysics & Celestial Mechanics)**: ✅ COMPLETE
+  - **ThreeBodyProblem** (`src/islands/experiments/ThreeBodyProblem.tsx`): N-body gravity simulation with RK4 integration. Presets: Figure-8, Lagrange L4/L5, Broucke orbit. Drag bodies to disturb, energy & momentum conservation display. 17 unit tests, 5 E2E tests
+  - **OrbitalResonance** (`src/islands/experiments/OrbitalResonance.tsx`): Multi-body resonant systems — Pluto-Neptune 3:2, Laplace chain 1:2:4, custom ratios. Perturbation arrows, 250-frame trails, speed control. 16 unit tests, 5 E2E tests
+  - **RelativisticOrbits** (`src/islands/experiments/RelativisticOrbits.tsx`): Newton vs General Relativity side-by-side. RK4 integration with Schwarzschild effective potential, perihelion precession Δφ display, mass slider reaching photon sphere/event horizon. 15 unit tests, 5 E2E tests
+  - **KeplersLaws** (`src/islands/experiments/KeplersLaws.tsx`): Three laws animated — elliptical orbits with Sun at focus, equal areas in equal times (swept-sector animation), P²∝a³ chart across planets. Eccentricity slider. 14 unit tests, 5 E2E tests
+  - **GalaxyFormation** (`src/islands/experiments/GalaxyFormation.tsx`): 900-particle N-body collapse from uniform disk into spiral galaxy. Dark matter + baryonic components, mulberry32 seeded RNG, Plummer softening, density color ramp, angular momentum & dark matter fraction sliders. 26 unit tests, 5 E2E tests
+  - **GalleryGrid registration**: 53 experiments total (5 new), with cursor/harmony mappings
+  - **Thumbnails**: `public/images/experiments/three-body-problem.svg`, `orbital-resonance.svg`, `relativistic-orbits.svg`, `keplers-laws.svg`, `galaxy-formation.svg`
+  - **Build verified**: `bun run build` succeeds (45 pages)
+  - **Unit tests**: `bun run test` — 729 passed (53 files, +88 new tests)
+  - **E2E tests**: `bun run test:e2e` — 207 passed (+25 new tests)
+
+### Sprint detAIministic ✅ P0+P1+P2 COMPLETE (SPRINT SELESAI)
+- **Filosofi**: ilusi AI frontend tanpa backend — SSG murni, deterministik. P0 (Assistant A1–A8 + Command Palette B1–B6), P1 (Tracery C1–C4 + Recommender D1–D4), dan P2 (Sentiment Gauge E1–E3 + Markov Generator E4–E6) seluruhnya selesai. Sprint tuntas; usulkan sprint berikutnya berdasarkan state terbaru.
+- **Filosofi**: ilusi AI frontend tanpa backend — SSG murni, deterministik (input sama → output sama; `Math.random()` dilarang, pakai hash FNV-1a via `hashString`/`hashIndex`).
+- **P0 (A1–A8)**: ✅ COMPLETE — 64 unit assistant + 9 island + 3 seo + 6 e2e.
+  - **A1** data/faq.json (15 intent) + schema validate-data + `getFaq()`/`buildFaqLd()`; **A2** `src/lib/assistant/intentEngine.ts` (word-boundary keyword match, weight, threshold); **A3** `src/lib/assistant/eliza.ts` (patterns + refleksi pronomina 2-pass placeholder, pick deterministik); **A4** `src/lib/assistant/engine.ts` (compositor: empty→help→special cmd→greeting→intent→eliza; `respond→AssistantResponse{type,text,payload}`); **A5** `src/lib/assistant/useAssistantSession.ts` (thinking+streaming hook, reduced-motion→instant); **A6** `src/islands/AssistantBot.tsx` (FAB→drawer, quick-pick chips, bubbles amber/dark, engine modal, ARIA); **A7** mount `<AssistantBot client:load/>` di BaseLayout (semua halaman, build 48 page); **A8** FAQPage JSON-LD valid (`set:html` — **catatan**: script Person schema bawaan masih `is:inline`+source-JS = pre-existing, out of scope).
+  - **Pelajaran**: JSON-LD di Astro jangan pakai `is:inline`+`{JSON.stringify…}` (emits source-JS, invalid utk SEO); pakai `<script type="application/ld+json" set:html={JSON.stringify(obj)}/>`. Framer Motion `AnimatePresence` tak unmount saat exit di jsdom → mock `motion.*`/`AnimatePresence` passthrough utk test deterministik; deteksi reduced-motion via `matchMedia` (mock `matches:true` utk instant reply). z-index: CustomCursor 9999/9998, FAB 9997, drawer 9996, engine modal 9999.
+- **P0 Command Palette (B1–B6)**: ✅ COMPLETE — 14 unit + 4 e2e (total unit 531).
+  - **B1** `src/lib/search/buildIndex.ts` (item index person/skill/project/experience/certification/page/lab dari data layer + NAV/FOOTER/`LAB_REGISTRY`); **B2** `src/lib/search/fuzzy.ts` (from-scratch Bitap — DP Levenshtein, best-window bounded edit distance, tokenisasi AND, weighted title/keyword/desc); **B3** `src/islands/CommandPalette.tsx` (Cmd/Ctrl+K, native `<dialog>`, keyboard nav Arrow/Enter/Esc + focus trap `:not([tabindex="-1"])`, `window.__COMMAND_PALETTE_READY` utk e2e race-hydration, event `opencode:palette`); **B4** mount di BaseLayout + tombol cari di Header; **B5** polish kategori segmented/amber `mark`/badge via token CSS; **B6** QA e2e command-palette.spec.ts 4 test — full suite hijau (136 e2e + 3 flake WebGL galeri terisolasi).
+  - **Pelajaran**: race hydration island termount terakhir → trigger keyboard/click pertama hilang sebelum listener terdaftar; fix = flag global `window.__X_READY` + `waitForFunction`. Fokus trap: selector `:not([disabled])` ikut menangkap tombol opsi `tabIndex={-1}` → tambah `:not([tabindex="-1"])` per grup elemen.
+- **P1 Tracery (C1–C4)**: ✅ COMPLETE — capability generator (total unit 579, e2e 137+5).
+  - **C1** `src/lib/tracery/tracery.ts` (from-scratch grammar expander: `#key.modifier#`, `DEFAULT_MODIFIERS` capitalize/capitalizeAll/upper/lower/trim, picker deterministik FNV-1a hash `(seed|key|depth)`, guard stack+`maxDepth`+`maxIterations`, unknown symbol passthrough, `createTracery` factory — 26 unit); **C2** `data/capability-grammars.json` (3 simbol: `capability` template combinatorial + `project_blurb`/`fact` grounded — angka dari data layer, bukan metrics usang) + schema `grammarSymbols` di validate-data + 10 unit; **C3** `src/components/molecules/CapabilityGenerator.tsx` (mode segmented fieldset, output `<output>`, Generate lagi = bump seed, toggle "Lihat grammar" JSON source, `initialSeed` prop utk test — 12 unit); **C4** mount `<CapabilityGenerator client:load/>` di Section About index.astro + `e2e/capability-generator.spec.ts` 5 test.
+  - **Pelajaran**: (1) guard mutual recursion — stack symbol aktif harus membungkus EKSPANSI template terpilih (`try/finally`), bukan hanya `pick`; kalau tidak, a→b→a lolos ke guard depth. (2) Biome `useSemanticElements`: `role="group"`→`<fieldset>`+`<legend sr-only>`, `role="status"`→`<output>`. (3) Playwright `getByRole` name tidak exact by default → "Project" match "View Projects" → `exact:true`. (4) facts generator pakai count dari data layer (22 proyek, 50+ sertif) karena `profile.metrics.projects_shipped:18` usang vs list 22 — hindari kontradiksi dgn yang tampil.
+- **P1 Recommender (D1–D4)**: ✅ COMPLETE (unit 624→625 + session 5; e2e 143+4 baru). Content-based recommender: **D1** `src/lib/recommend/similarity.ts` (`toTagVector` TF + `cosineVectors` 0 utk empty/zero-mag, clamp 0..1, round 4dp; 16 unit); **D2** `useRecommendation.ts` (pure `rankRecommendations` fused query history 0.6/current 0.4, tie-break id asc, `TRACK_WEIGHTS` view1/hover2/click3, hook + `createViewTracker` guarded; 17 unit); **D3** `RecommendedRow.tsx` (strip "Karena kamu jelajahi X, coba Y", 3 kartu, null bila !hasInteractions/semua score 0; 8 unit); **D4** integrasi: `src/lib/recommend/session.ts` (HISTORY `detAIministic:recommend:v1` + CURRENT `detAIministic:recommend:current` + event `detAIministic:recommend:change`; semua SSR-guarded) + GalleryGrid record di **`handleClose`** (bukan launch — via `lastOpenedRef`) + mount di `gallery.astro` + `GALLERY_EXPERIMENTS` export; e2e/recommend.spec.ts 4 test.
+  - **Pelajaran**: (1) negasi `not.toHaveText` di locator multi-element = strict-mode violation → `getByRole(name).toHaveCount(0)`; (2) strip recommender di /gallery yang render saat modal terbuka mem-pollute `getByRole` button global (tag cards ketabrak asersi lama spt `name:/Chaos/` game-theory) → solusi arsitektur: baru record interaksi saat modal DITUTUP; (3) `getByText(...).click()` di grid kadang gagal buka modal → `scrollIntoViewIfNeeded()` + scoping `[aria-label='Experiments']` + timeout 10s; (4) modal GalleryGrid tanpa role dialog → tunggu `[data-modal-content]`; (5) komponen React yang di-import Astro wajib default export (`export default RecommendedRow`).
+- **P2 Lab (E1–E6)**: ✅ COMPLETE — Sentiment Gauge (lab ke-26) + Markov Generator (lab ke-27). Gallery 25→**27** eksperimen (total unit 679/53 file, +54). **E1** `src/lib/sentiment/afinn.ts` (from-scratch AFINN-style lexicon ~90 kata, `score(text)` → `total/avg(-1..1)/magnitude/count/positive/negative/neutral/words`; pure, deterministic; 14 unit); **E2** `src/islands/experiments/SentimentGauge.tsx` (textarea → gauge amber↔merah↔hijau + stat + per-word chips; compact = mini; thumb `sentiment-gauge.svg`; 10 unit); **E3** registrasi GalleryGrid (kategori ML & Algorithms, icon Gauge, cursor text, harmony amber) + `e2e/sentiment.spec.ts` 6 test + `toHaveCount(25→26)`; **E4** `src/lib/markov/markov.ts` (from-scratch first-order word chain: `buildGraph`+END sentinel, `walk`, `generate` weighted via injectable `rng`, `mulberry32` seeded PRNG + `hashSeed` FNV-1a → deterministic, NO Math.random; 21 unit); **E5** `src/islands/experiments/MarkovGenerator.tsx` (corpus dari data layer: projects desc/readme_summary, experience highlights, testimonials text; mode Bio/Project/Fact, Length slider, Generate lagi=bump seed, tag "generated, not AI"; thumb `markov-generator.svg`; 9 unit); **E6** registrasi GalleryGrid (kategori ML & Algorithms, icon Dices, cursor text, harmony amber) + `e2e/markov.spec.ts` 6 test + `toHaveCount(26→27)`.
+  - **Pelajaran P2**: (1) eksperimen teks/DOM (non-canvas) tak butuh mock RAF/canvas di test, cukup `render`+`userEvent`; yield deterministik via seed (bump seed = "generate lagi"), bukan `Math.random()` (selaras Rule 5). (2) Mood label muncul 2× (stat card + posisi gauge) → test pakai `getAllByText`/`getByText(...).first()`. (3) Start-token markov (Bio="AI", Project="Built", Fact="I") harus ada di corpus data-layer; verifikasi via grep corpus sebelum pilih start (proyek desc kaya "Built"/"AI"/"I"). (4) Biome a11y pada komponen baru: tambah `type="button"` di semua `<button>`, `role="group"`→`<fieldset>`+`<legend sr-only>` (existing experiment juga punya pelanggaran type-rule — clean-up baru utk file baru). (5) typecheck GalleryGrid 470 (`current` read-only) & 870 (`DroneHarmony`) = pre-existing, tak disentuh diff.
+- **Sprint Observatory (Portfolio as Dataset)**: ✅ COMPLETE — halaman `/observatory` baru: "the portfolio, read as a dataset". Deterministik murni (SSG, build-time, no `Math.random()`, no LLM) — setiap angka & insight dihitung dari rule tetap atas dataset; dataset sama → output sama.
+  - **Data layer** (`src/lib/observatory/`): `parsePeriod.ts` (+`periodSortKey`, `pointIndex`, en/em/hyphen dash, `Present`/`Now`, 22/22 proyek ter-parse); `metrics.ts` (`categoryCounts`/`skillCounts`/`skillPairs`/`categorySkillMatrix`/`complexityScore`/`perYearStats`/`keywordSignals`/`indexProjects` slug+repo-handle); `insights.ts` (`generateInsights` rule-only, cap dihapus — 10 insight di data real); `index.ts` (`buildObservatoryDataset` → `ObservatoryProject` extends `Project` + `slug`/`repoHandle`/`periodParsed`, bridge ke `getCachedGitHubData()`); `visual.ts` (SSG geometry murni: `timelineGeometry`/`technologyBars`/`categoryBars`/`patternGeometry` lingkaran deterministik TANPA force sim, `CATEGORY_COLORS` ml/web/iot/cli/devops). 26 unit test (`parsePeriod/metrics/insights`).
+  - **Page** (`src/pages/observatory.astro`, 49 page total): 5 section — Overview (`ObservatoryOverview.tsx` 6 MetricCard reuse, `client:visible`), Timeline (SVG axis+year ticks+nodes by category), Technology (bar + category mix), Patterns (co-occurrence graph + top-8 combos + category snapshot), Insights (cards dengan `rule>` footnote tiap card). Hook tes `data-observatory={metric|bar|rule}` untuk e2e deterministik.
+  - **Navigasi & meta**: `Observatory → /observatory` di `NAV_ITEMS`+`FOOTER_LINKS` (`src/lib/constants.ts`) + `navLinks` lokal `Header.astro`; nav `<ul>` `hidden md:flex`→`hidden lg:flex gap-5` (cegah overflow 6 item). Command Palette auto-index dari NAV (no edit). OG image: tambah entry `observatory` di `src/pages/og/[...route].ts` `pages` map → `/og/observatory.png` (tanpa entry = og:image 404).
+  - **Verifikasi**: build:fast ✓ (49 page), typecheck observatory CLEAN (sisanya pre-existing: `og/[...route].ts`/`rss.xml.ts`/`__tests__` canvas mock), biome source 8 file CLEAN, unit 26/26 ✓. e2e `e2e/observatory.spec.ts` (5 test: nav→/observatory, 5 section render, timeline svg+bar hooks, rule footnotes, metric determinism) **DITULIS tapi BELUM dieksekusi** (server preview bg ditekan environment; jalankan via `bunx playwright test e2e/observatory.spec.ts` — webServer auto build+serve).
+  - **Pelajaran**: (1) `og/[...route].ts` pakai `pages` map eksplisit — halaman baru yang `ogSlug`-nya tak ada di map akan 404 og:image; tambah entry. (2) Biome `noNonNullAssertion` + `noAssignInExpressions` di repo: gunakan type-predicate filter (`.filter((x): x is T & {f: NonNullable...} => …)`) & `const s = map.get(k); if (!s) …` alih-alih `!`/`??=`-in-expression — bersih tanpa unsafe fix. (3) `noUnusedTemplateLiteral` (rule string tanpa `${}`) di-fix jadi `"…"`; string berisi `"` (`“python”`) biarkan sebagai backtick. (4) `formatPercent` dipakai; `MetricCard` di-warp `<div data-observatory="metric">` agar tak ubah signature komponen shared.
+

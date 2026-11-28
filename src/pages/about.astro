@@ -13,7 +13,7 @@ import Section from "../components/molecules/Section.astro";
 import CapabilityArchitecture from "../components/organisms/CapabilityArchitecture.astro";
 import CareerSpine from "../components/organisms/CareerSpine.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { buildCareerEvents } from "../lib/creative/career-spine";
+import { buildCareerEvents, formatCareerDate, parseCareerDate } from "../lib/creative/career-spine";
 import { getCertifications, getProfile, getProjects, getSkills } from "../lib/data";
 import { ABOUT_ANCHORS, ROUTES } from "../lib/routes";
 import { buildCapabilityArchitecture } from "../lib/skills/architecture";
@@ -49,10 +49,8 @@ const nextSteps = [
 ];
 
 function formatDate(date: string | null): string {
-  if (!date) return "";
-  const [year, month] = date.split("-");
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return month ? `${months[Number.parseInt(month) - 1]} ${year}` : year;
+  const parsed = parseCareerDate(date);
+  return parsed ? formatCareerDate(parsed) : "";
 }
 
 const grouped = certifications.reduce((acc: Record<string, Certification[]>, cert) => {

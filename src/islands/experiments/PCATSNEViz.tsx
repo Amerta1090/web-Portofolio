@@ -1,4 +1,16 @@
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  centerData,
+  computeCovariance,
+  computeP,
+  computeQ,
+  computeTSNEGradient,
+  generateClusters,
+  powerIterate,
+  projectPCA,
+  vecNorm,
+} from "../../lib/experiments/pca-tsne";
+import type { ClusterConfig, PCAStep } from "../../lib/experiments/pca-tsne";
 import { useRafGuard } from "../../lib/useRafGuard";
 
 /* ------------------------------------------------------------------ */
@@ -7,304 +19,6 @@ import { useRafGuard } from "../../lib/useRafGuard";
 
 interface Props {
   compact?: boolean;
-}
-
-type PCAStep = "center" | "covariance" | "eigenvectors" | "project";
-
-interface ClusterConfig {
-  count: number;
-  dims: number;
-  pointsPerCluster: number;
-}
-
-/* ------------------------------------------------------------------ */
-/*  Math helpers                                                      */
-/* ------------------------------------------------------------------ */
-
-function randn(): number {
-  // Box-Muller transform
-  let u = 0, v = 0;
-  while (u === 0) u = Math.random();
-  while (v === 0) v = Math.random();
-  return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
-}
-
-function matMul(A: number[][], B: number[][]): number[][] {
-  const m = A.length, n = A[0].length, p = B[0].length;
-  const out: number[][] = Array.from({ length: m }, () => new Array(p).fill(0));
-  for (let i = 0; i < m; i++)
-    for (let j = 0; j < p; j++)
-      for (let k = 0; k < n; k++)
-        out[i][j] += A[i][k] * B[k][j];
-  return out;
-}
-
-function matT(M: number[][]): number[][] {
-  const r = M.length, c = M[0].length;
-  return Array.from({ length: c }, (_, j) => Array.from({ length: r }, (_, i) => M[i][j]));
-}
-
-function matScale(M: number[][], s: number): number[][] {
-  return M.map(row => row.map(v => v * s));
-}
-
-function vecSub(a: number[], b: number[]): number[] {
-  return a.map((v, i) => v - (b[i] ?? 0));
-}
-
-function vecNorm(v: number[]): number {
-  return Math.sqrt(v.reduce((s, x) => s + x * x, 0));
-}
-
-function vecDot(a: number[], b: number[]): number {
-  return a.reduce((s, v, i) => s + v * (b[i] ?? 0), 0);
-}
-
-function makeIdentity(n: number): number[][] {
-  return Array.from({ length: n }, (_, i) => {
-    const row = new Array(n).fill(0);
-    row[i] = 1;
-    return row;
-  });
-}
-
-/* ------------------------------------------------------------------ */
-/*  Cluster generation                                                */
-/* ------------------------------------------------------------------ */
-
-function generateClusters(cfg: ClusterConfig): {
-  data: number[][];
-  labels: number[];
-  clusterCenters: number[][];
-} {
-  const { count, dims, pointsPerCluster } = cfg;
-  const total = count * pointsPerCluster;
-  const data: number[][] = new Array(total);
-  const labels: number[] = new Array(total);
-  const clusterCenters: number[][] = [];
-
-  for (let c = 0; c < count; c++) {
-    // Random cluster center in [-5, 5]^dims
-    const center = Array.from({ length: dims }, () => (Math.random() - 0.5) * 10);
-    clusterCenters.push(center);
-    const spread = 0.5 + Math.random() * 1.0; // per-cluster variance
-    for (let p = 0; p < pointsPerCluster; p++) {
-      const idx = c * pointsPerCluster + p;
-      const point = center.map(mu => mu + randn() * spread);
-      data[idx] = point;
-      labels[idx] = c;
-    }
-  }
-  return { data, labels, clusterCenters };
-}
-
-/* ------------------------------------------------------------------ */
-/*  PCA Implementation                                                */
-/* ------------------------------------------------------------------ */
-
-function centerData(data: number[][]): { centered: number[][]; mean: number[] } {
-  const n = data.length;
-  const dims = data[0].length;
-  const mean = new Array(dims).fill(0);
-  for (const row of data) {
-    for (let d = 0; d < dims; d++) mean[d] += row[d] / n;
-  }
-  const centered = data.map(row => vecSub(row, mean));
-  return { centered, mean };
-}
-
-function computeCovariance(centered: number[][]): number[][] {
-  const n = centered.length;
-  const dims = centered[0].length;
-  const cov: number[][] = Array.from({ length: dims }, () => new Array(dims).fill(0));
-  for (const row of centered) {
-    for (let i = 0; i < dims; i++) {
-      for (let j = 0; j < dims; j++) {
-        cov[i][j] += (row[i] * row[j]) / (n - 1);
-      }
-    }
-  }
-  return cov;
-}
-
-/** Power iteration to compute top-k eigenvalues/eigenvectors of a symmetric matrix */
-function powerIterate(
-  mat: number[][],
-  k: number,
-  maxIter = 200,
-): { eigenvalues: number[]; eigenvectors: number[][] } {
-  const n = mat.length;
-  const eigenvalues: number[] = [];
-  const eigenvectors: number[][] = [];
-
-  // Deflate and find each eigenvector
-  let M = mat.map(row => [...row]);
-
-  for (let ev = 0; ev < k; ev++) {
-    let v = Array.from({ length: n }, () => randn());
-    let prevLambda = 0;
-    for (let iter = 0; iter < maxIter; iter++) {
-      // Normalize
-      const norm = vecNorm(v);
-      v = v.map(x => x / (norm + 1e-15));
-      // Multiply M * v
-      const Mv = new Array(n).fill(0);
-      for (let i = 0; i < n; i++)
-        for (let j = 0; j < n; j++)
-          Mv[i] += M[i][j] * v[j];
-      // Rayleigh quotient
-      const lambda = vecDot(Mv, v);
-      v = Mv;
-      if (Math.abs(lambda - prevLambda) < 1e-8) break;
-      prevLambda = lambda;
-    }
-    const norm = vecNorm(v);
-    v = v.map(x => x / (norm + 1e-15));
-    eigenvalues.push(Math.abs(prevLambda));
-    eigenvectors.push([...v]);
-
-    // Deflate: M = M - λ * v * v^T
-    for (let i = 0; i < n; i++) {
-      for (let j = 0; j < n; j++) {
-        M[i][j] -= prevLambda * v[i] * v[j];
-      }
-    }
-  }
-
-  return { eigenvalues, eigenvectors };
-}
-
-function projectPCA(
-  centered: number[][],
-  eigenvectors: number[][],
-): number[][] {
-  // Project onto first 2 eigenvectors → 2D
-  const proj = centered.map(row => [
-    vecDot(row, eigenvectors[0]),
-    vecDot(row, eigenvectors[1]),
-  ]);
-  return proj;
-}
-
-/* ------------------------------------------------------------------ */
-/*  Simplified t-SNE Implementation                                   */
-/* ------------------------------------------------------------------ */
-
-function computePairwiseDistSq(data: number[][]): number[][] {
-  const n = data.length;
-  const D: number[][] = Array.from({ length: n }, () => new Array(n).fill(0));
-  for (let i = 0; i < n; i++) {
-    for (let j = i + 1; j < n; j++) {
-      const d2 = data[i].reduce((s, v, k) => s + (v - data[j][k]) ** 2, 0);
-      D[i][j] = d2;
-      D[j][i] = d2;
-    }
-  }
-  return D;
-}
-
-/** Binary search for sigma that gives target perplexity */
-function binarySearchSigma(
-  distRow: number[],
-  targetPerp: number,
-  maxIter = 50,
-): number {
-  let lo = 1e-10, hi = 100;
-  for (let iter = 0; iter < maxIter; iter++) {
-    const mid = (lo + hi) / 2;
-    let sumP = 0;
-    for (let j = 0; j < distRow.length; j++) {
-      if (j === 0) continue; // skip self (index 0 is self in our usage)
-      sumP += Math.exp(-distRow[j] / (mid + 1e-15));
-    }
-    const H = Math.log(sumP + 1e-15) + (sumP > 0 ? (1 / (sumP + 1e-15)) * distRow.reduce((s, d, j) => {
-      if (j === 0) return s;
-      return s + (d / (mid + 1e-15)) * Math.exp(-d / (mid + 1e-15));
-    }, 0) : 0);
-    const perp = Math.exp(H);
-    if (perp > targetPerp) {
-      hi = mid;
-    } else {
-      lo = mid;
-    }
-  }
-  return (lo + hi) / 2;
-}
-
-function computeP(
-  data: number[][],
-  perplexity: number,
-): number[][] {
-  const n = data.length;
-  const D = computePairwiseDistSq(data);
-  const P: number[][] = Array.from({ length: n }, () => new Array(n).fill(0));
-  for (let i = 0; i < n; i++) {
-    const distRow = [0].concat(D[i].filter((_, j) => j !== i));
-    const sigma = binarySearchSigma(distRow, perplexity);
-    let sum = 0;
-    for (let j = 0; j < n; j++) {
-      if (i === j) continue;
-      P[i][j] = Math.exp(-D[i][j] / (sigma + 1e-15));
-      sum += P[i][j];
-    }
-    if (sum > 0) {
-      for (let j = 0; j < n; j++) {
-        if (i === j) continue;
-        P[i][j] /= sum;
-      }
-    }
-  }
-
-  // Symmetrize and normalize
-  const P_sym: number[][] = Array.from({ length: n }, () => new Array(n).fill(0));
-  for (let i = 0; i < n; i++) {
-    for (let j = 0; j < n; j++) {
-      if (i === j) continue;
-      P_sym[i][j] = (P[i][j] + P[j][i]) / (2 * n);
-    }
-  }
-  return P_sym;
-}
-
-function computeQ(y: number[][]): number[][] {
-  const n = y.length;
-  const Q: number[][] = Array.from({ length: n }, () => new Array(n).fill(0));
-  let Z = 0;
-  for (let i = 0; i < n; i++) {
-    for (let j = i + 1; j < n; j++) {
-      const d2 = (y[i][0] - y[j][0]) ** 2 + (y[i][1] - y[j][1]) ** 2;
-      const val = 1 / (1 + d2);
-      Q[i][j] = val;
-      Q[j][i] = val;
-      Z += 2 * val;
-    }
-  }
-  if (Z > 0) {
-    for (let i = 0; i < n; i++)
-      for (let j = 0; j < n; j++)
-        Q[i][j] /= Z;
-  }
-  return Q;
-}
-
-function computeTSNEGradient(
-  y: number[][],
-  P: number[][],
-  Q: number[][],
-): number[][] {
-  const n = y.length;
-  const grad: number[][] = Array.from({ length: n }, () => [0, 0]);
-  for (let i = 0; i < n; i++) {
-    for (let j = 0; j < n; j++) {
-      if (i === j) continue;
-      const diff = P[i][j] - Q[i][j];
-      const dist = 1 + (y[i][0] - y[j][0]) ** 2 + (y[i][1] - y[j][1]) ** 2;
-      const factor = 4 * diff / (dist + 1e-15);
-      grad[i][0] += factor * (y[i][0] - y[j][0]);
-      grad[i][1] += factor * (y[i][1] - y[j][1]);
-    }
-  }
-  return grad;
 }
 
 const TSNE_COLORS = ["#f59e0b", "#06b6d4", "#8b5cf6", "#10b981"];
@@ -369,13 +83,16 @@ export default function PCATSNEViz({ compact }: Props) {
 
     // Explained variance
     const totalVar = evals.reduce((s, v) => s + v, 0);
-    const evRatios = evals.map(v => v / (totalVar + 1e-15));
+    const evRatios = evals.map((v) => v / (totalVar + 1e-15));
 
     // PCA project to 2D
     const proj = projectPCA(c, evecs);
 
     // t-SNE init from PCA result
-    const initY = proj.map(p => [p[0] + (Math.random() - 0.5) * 0.1, p[1] + (Math.random() - 0.5) * 0.1]);
+    const initY = proj.map((p) => [
+      p[0] + (Math.random() - 0.5) * 0.1,
+      p[1] + (Math.random() - 0.5) * 0.1,
+    ]);
 
     setData(raw);
     setLabels(lbls);
@@ -444,16 +161,24 @@ export default function PCATSNEViz({ compact }: Props) {
 
     // Draw explained variance if enabled
     if (showExplainedVariance && explainedVariance.length > 0) {
-      drawExplainedVariance(
-        ctx,
-        leftW - 120,
-        H - 70,
-        110,
-        55,
-        explainedVariance,
-      );
+      drawExplainedVariance(ctx, leftW - 120, H - 70, 110, 55, explainedVariance);
     }
-  }, [data, labels, centered, covMatrix, eigenvalues, eigenvectors, pcaProjected, pcaStep, showCovHeatmap, showExplainedVariance, tsnePositions, tsneIter, explainedVariance, compact]);
+  }, [
+    data,
+    labels,
+    centered,
+    covMatrix,
+    eigenvalues,
+    eigenvectors,
+    pcaProjected,
+    pcaStep,
+    showCovHeatmap,
+    showExplainedVariance,
+    tsnePositions,
+    tsneIter,
+    explainedVariance,
+    compact,
+  ]);
 
   /* ---- Compact mode rendering ---- */
   useEffect(() => {
@@ -537,25 +262,35 @@ export default function PCATSNEViz({ compact }: Props) {
 
     if (step === "center" && centered.length > 0) {
       // Show raw data in original high-D (first 2 dims as fallback)
-      const raw2d = data.map(row => [row[0], row[1]]);
+      const raw2d = data.map((row) => [row[0], row[1]]);
       drawScatter(ctx, raw2d, labels, cx, cy, scale * 0.8, CLUSTER_COLORS);
 
       // Overlay: show the mean
       ctx.fillStyle = "#fff";
       ctx.globalAlpha = 0.9;
       ctx.beginPath();
-      ctx.arc(cx + (mean[0] ?? 0) * scale * 0.8, cy - (mean[1] ?? 0) * scale * 0.8, 5, 0, Math.PI * 2);
+      ctx.arc(
+        cx + (mean[0] ?? 0) * scale * 0.8,
+        cy - (mean[1] ?? 0) * scale * 0.8,
+        5,
+        0,
+        Math.PI * 2,
+      );
       ctx.fill();
       ctx.globalAlpha = 1;
       ctx.fillStyle = "rgba(255,255,255,0.4)";
       ctx.font = "9px monospace";
       ctx.textAlign = "center";
-      ctx.fillText("Mean", cx + (mean[0] ?? 0) * scale * 0.8, cy - (mean[1] ?? 0) * scale * 0.8 + 10);
+      ctx.fillText(
+        "Mean",
+        cx + (mean[0] ?? 0) * scale * 0.8,
+        cy - (mean[1] ?? 0) * scale * 0.8 + 10,
+      );
     }
 
     if (step === "covariance" && covMatrix.length > 0) {
       // Show mean-centered data (first 2 dims)
-      const centered2d = centered.map(row => [row[0], row[1]]);
+      const centered2d = centered.map((row) => [row[0], row[1]]);
       drawScatter(ctx, centered2d, labels, cx, cy, scale * 0.8, CLUSTER_COLORS);
 
       // Covariance heatmap on the side
@@ -565,7 +300,7 @@ export default function PCATSNEViz({ compact }: Props) {
     }
 
     if (step === "eigenvectors" && eigenvectors.length > 0 && eigenvalues.length > 0) {
-      const centered2d = centered.map(row => [row[0], row[1]]);
+      const centered2d = centered.map((row) => [row[0], row[1]]);
       drawScatter(ctx, centered2d, labels, cx, cy, scale * 0.8, CLUSTER_COLORS);
 
       // Draw eigenvectors as arrows
@@ -593,8 +328,14 @@ export default function PCATSNEViz({ compact }: Props) {
         const headLen = 8;
         ctx.beginPath();
         ctx.moveTo(cx + nx * arrowLen, cy - ny * arrowLen);
-        ctx.lineTo(cx + nx * arrowLen - headLen * Math.cos(angle - 0.4), cy - ny * arrowLen - headLen * Math.sin(angle - 0.4));
-        ctx.lineTo(cx + nx * arrowLen - headLen * Math.cos(angle + 0.4), cy - ny * arrowLen - headLen * Math.sin(angle + 0.4));
+        ctx.lineTo(
+          cx + nx * arrowLen - headLen * Math.cos(angle - 0.4),
+          cy - ny * arrowLen - headLen * Math.sin(angle - 0.4),
+        );
+        ctx.lineTo(
+          cx + nx * arrowLen - headLen * Math.cos(angle + 0.4),
+          cy - ny * arrowLen - headLen * Math.sin(angle + 0.4),
+        );
         ctx.closePath();
         ctx.fillStyle = PCA_COLOR;
         ctx.fill();
@@ -604,7 +345,7 @@ export default function PCATSNEViz({ compact }: Props) {
         ctx.font = "9px monospace";
         ctx.textAlign = "center";
         ctx.fillText(
-          `PC${k + 1} (${(eigenvalues[k] / (eigenvalues.reduce((a, b) => a + b, 0) + 1e-15) * 100).toFixed(0)}%)`,
+          `PC${k + 1} (${((eigenvalues[k] / (eigenvalues.reduce((a, b) => a + b, 0) + 1e-15)) * 100).toFixed(0)}%)`,
           cx + nx * (arrowLen + 20),
           cy - ny * (arrowLen + 20),
         );
@@ -647,7 +388,10 @@ export default function PCATSNEViz({ compact }: Props) {
 
     if (tsnePositions.length > 0) {
       // Compute bounds for centering
-      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+      let minX = Number.POSITIVE_INFINITY,
+        maxX = Number.NEGATIVE_INFINITY,
+        minY = Number.POSITIVE_INFINITY,
+        maxY = Number.NEGATIVE_INFINITY;
       for (const p of tsnePositions) {
         if (p[0] < minX) minX = p[0];
         if (p[0] > maxX) maxX = p[0];
@@ -701,7 +445,8 @@ export default function PCATSNEViz({ compact }: Props) {
         const val = mat[i][j] / maxAbs;
         // Blue-white-red diverging
         const r = val > 0 ? 245 : 100;
-        const g = val > 0 ? Math.round(150 - Math.abs(val) * 120) : Math.round(150 - Math.abs(val) * 120);
+        const g =
+          val > 0 ? Math.round(150 - Math.abs(val) * 120) : Math.round(150 - Math.abs(val) * 120);
         const b = val > 0 ? 100 : 245;
         ctx.fillStyle = `rgba(${r},${g},${b},${Math.abs(val) * 0.6 + 0.2})`;
         ctx.fillRect(ox + j * cellW, oy + i * cellH, cellW, cellH);
@@ -772,12 +517,9 @@ export default function PCATSNEViz({ compact }: Props) {
       const grad = computeTSNEGradient(tsnePositions, P, Q);
 
       // Update with momentum
-      const lr = 200 / (1 + iterCount * 0.01) * tsneSpeed;
+      const lr = (200 / (1 + iterCount * 0.01)) * tsneSpeed;
       setTsnePositions((prev) => {
-        return prev.map((pos, i) => [
-          pos[0] - lr * grad[i][0],
-          pos[1] - lr * grad[i][1],
-        ]);
+        return prev.map((pos, i) => [pos[0] - lr * grad[i][0], pos[1] - lr * grad[i][1]]);
       });
 
       iterCount++;
@@ -804,7 +546,12 @@ export default function PCATSNEViz({ compact }: Props) {
     } else {
       if (tsneIter >= 500) {
         // Reset t-SNE
-        setTsnePositions(pcaProjected.map(p => [p[0] + (Math.random() - 0.5) * 0.1, p[1] + (Math.random() - 0.5) * 0.1]));
+        setTsnePositions(
+          pcaProjected.map((p) => [
+            p[0] + (Math.random() - 0.5) * 0.1,
+            p[1] + (Math.random() - 0.5) * 0.1,
+          ]),
+        );
         setTsneIter(0);
       }
       setTsneRunning(true);
@@ -813,7 +560,12 @@ export default function PCATSNEViz({ compact }: Props) {
 
   const handleResetTSNE = useCallback(() => {
     setTsneRunning(false);
-    setTsnePositions(pcaProjected.map(p => [p[0] + (Math.random() - 0.5) * 0.1, p[1] + (Math.random() - 0.5) * 0.1]));
+    setTsnePositions(
+      pcaProjected.map((p) => [
+        p[0] + (Math.random() - 0.5) * 0.1,
+        p[1] + (Math.random() - 0.5) * 0.1,
+      ]),
+    );
     setTsneIter(0);
   }, [pcaProjected]);
 
@@ -822,14 +574,11 @@ export default function PCATSNEViz({ compact }: Props) {
     const P = tsneData.P;
     const Q = computeQ(tsnePositions);
     const grad = computeTSNEGradient(tsnePositions, P, Q);
-    const lr = 200 / (1 + tsneIter * 0.01) * tsneSpeed;
-    setTsnePositions(prev =>
-      prev.map((pos, i) => [
-        pos[0] - lr * grad[i][0],
-        pos[1] - lr * grad[i][1],
-      ]),
+    const lr = (200 / (1 + tsneIter * 0.01)) * tsneSpeed;
+    setTsnePositions((prev) =>
+      prev.map((pos, i) => [pos[0] - lr * grad[i][0], pos[1] - lr * grad[i][1]]),
     );
-    setTsneIter(i => i + 1);
+    setTsneIter((i) => i + 1);
   }, [tsneData, tsnePositions, tsneIter, tsneSpeed]);
 
   const dataLabel = `${totalPoints} pts × ${dims}D`;
@@ -996,9 +745,7 @@ export default function PCATSNEViz({ compact }: Props) {
                 />
               </label>
 
-              <span className="text-text-secondary/40">
-                Iter: {tsneIter}/500
-              </span>
+              <span className="text-text-secondary/40">Iter: {tsneIter}/500</span>
             </div>
           </div>
         </div>

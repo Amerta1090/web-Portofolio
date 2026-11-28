@@ -1,7 +1,7 @@
 {
   "generated": "2026-11-28",
   "total": 89,
-  "warnings": 71,
+  "warnings": 66,
   "note": "Regenerate with `bun run check:types:update` after a change that legitimately adds or removes diagnostics.",
   "byFileKindCode": {
     "src/components/atoms/Button.tsx|error|2322": 1,
@@ -39,7 +39,7 @@
     "src/islands/experiments/NeuralNetworkArt.tsx|warning|6133": 2,
     "src/islands/experiments/NoiseTopography.test.tsx|error|2322": 1,
     "src/islands/experiments/PCATSNEViz.test.tsx|warning|6133": 1,
-    "src/islands/experiments/PCATSNEViz.tsx|warning|6133": 5,
+    "src/islands/experiments/PCATSNEViz.tsx|warning|6133": 1,
     "src/islands/experiments/PrisonersDilemma.tsx|warning|6133": 2,
     "src/islands/experiments/RelativisticOrbits.tsx|error|2554": 2,
     "src/islands/experiments/RelativisticOrbits.tsx|warning|6133": 1,
@@ -49,7 +49,6 @@
     "src/islands/experiments/StrangeAttractorZoo.test.tsx|error|2322": 1,
     "src/islands/experiments/StrangeAttractorZoo.tsx|warning|6133": 2,
     "src/islands/experiments/SVDImageCompression.test.tsx|warning|6133": 3,
-    "src/islands/experiments/SVDImageCompression.tsx|warning|6133": 1,
     "src/islands/experiments/TesseractProjection.test.tsx|error|2322": 1,
     "src/islands/experiments/TesseractProjection.test.tsx|warning|6133": 2,
     "src/islands/experiments/ThreeBodyProblem.tsx|warning|6133": 1,
