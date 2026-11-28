@@ -14,13 +14,74 @@ Commands assume the repository root and a 4-core / 3 GB Linux box.
 | Image budget | `measure:routes` counts JS only. Measure image transfer with `performance.getEntriesByType("resource")` in a cold context; record `transferSize` and the top offenders. |
 | Load flakes | A timing-sensitive unit test that fails in a full run must be re-run alone before being called a regression. |
 
+## 0.1 Two tiers — run the cheap one, let CI run the expensive one
+
+A sprint used to pay the full gate after every task, and the first full run was
+usually red, so it paid twice: 6–24 minutes per run on this box. The tiers are
+now explicit:
+
+| Tier | Command | Cost | When |
+| --- | --- | --- | --- |
+| fast | `bun run gate:fast` | ~1.5–2 min | after each batch of 3–5 tasks |
+| spec | `bun run gate:spec` | seconds–minutes | when the batch touched a spec's subject |
+| full | `bun run gate:full` | ~2 min | before the commit (whole unit suite, not `--changed`) |
+| sprint | `bun run gate:sprint` | 20–40 min | once, at close — or let CI run it |
+
+`gate:fast` uses `vitest run --changed`, which compares against `HEAD`: if the
+work is already committed it runs nothing. That is why `gate:full` exists for
+the moment before the commit.
+
+CI (`.github/workflows/gate.yml`) runs the same tiers on every push/PR:
+`fast` = `validate-data` + `gate:full`; `sprint` = build + full e2e +
+`check:links`. A local session does not run the sprint tier unless the owner
+asks or CI is unavailable.
+
+`gate:sprint` is `scripts/gate-sprint.mjs`: it builds once, runs `check:links`
+against that dist, starts `astro preview` and lets Playwright reuse it. A raw
+`playwright test` with no server rebuilds inside `webServer`, which is why the
+local `webServer.timeout` is 420 s and why a pre-started `bun run serve` is
+still the cheapest path.
+
+CI has no `.cache/github/` (gitignored), so the workflow copies the committed
+`e2e/fixtures/github-cache/` snapshot in before building — no token, no network,
+same dataset every run. Refresh that snapshot only when the data layer
+legitimately changes; see its `README.md`.
+
+## 0.2 Gate vs noise — what may fail a sprint
+
+Only these may fail a sprint:
+
+| Metric | Threshold | Why it is a gate |
+| --- | --- | --- |
+| `validate-data` | OK | schema + count-claim + GitHub cache non-degeneracy |
+| Unit suite | 0 new failures | deterministic |
+| `bun run check:types` | identical to `scripts/astro-baseline.json` | deterministic multiset; line numbers ignored |
+| Build pages | expected count | a route change must be stated |
+| `check:links` | 0 broken / 0 retired-route | deterministic |
+| Payload per route (`measure:routes`) | ≤ ceiling in `SPRINT_PLAN.md` | deterministic to the byte |
+| Scroll listeners per page | ≤ baseline | integer count, stable across runs |
+| MotionScore tiers D/F | 0 findings | binary |
+
+These are **recorded, never gated** — they vary on identical code:
+
+| Metric | Observed variance |
+| --- | --- |
+| MotionScore homepage grade | 52–63 on identical builds |
+| `rectReads` (runtime probe) | 73–79 |
+| GPU memory (headless audit) | ~606 MB = environmental floor; page contribution ≈ 0 |
+| `idleFps` | ±40 frames between two identical builds |
+
+Record the range and move on. Do not spend an A/B worktree build reconciling a
+number from the second table; payload and listener counts are the only
+quantities worth an A/B.
+
 ## 1. Build and type gates
 
 ```bash
 bun run validate-data
 bun run build:fast                 # expect 72 pages (42 canonical + 30 redirect fallbacks, MOTION-18)
 bun run check:links                # 0 broken same-site links, 0 links to retired routes (MOTION-18)
-bunx astro check 2>&1 | tee /tmp/opencode/astro-check.log
+bun run check:types                # astro check vs scripts/astro-baseline.json
 bunx biome check <touched files>   # per-file, not repo-wide noise
 ```
 
@@ -29,7 +90,7 @@ bunx biome check <touched files>   # per-file, not repo-wide noise
 | `validate-data` | OK, GitHub cache non-degenerate | must stay OK |
 | Build pages | 72 (42 canonical incl. 404 + 30 retired-route fallbacks; was 49 before MOTION-18) | change only with a route change, and say which |
 | Link check | 0 broken, 0 retired-route links (`bun run check:links`) | must stay 0 |
-| `astro check` | 89 errors, 0 warnings (was 98 before MOTION-18: −9 from deleted pages, 0 new) | sorted diff must be empty |
+| `check:types` | 89 errors, 71 warnings in `scripts/astro-baseline.json` (was 98 before MOTION-18: −9 from deleted pages, 0 new) | multiset diff must be empty; `bun run check:types:update` only when a change legitimately adds or removes diagnostics |
 | Biome on touched files | clean | 0 new diagnostics |
 
 ## 2. Unit tests
@@ -59,7 +120,7 @@ bunx playwright test --workers=1
 
 | Gate | Baseline | Rule |
 | --- | --- | --- |
-| E2E suite | 429 tests / 36 files (2026-11-18; MOTION-14 added `palette.spec.ts`) | no new failures |
+| E2E suite | 407 tests / 35 files (`playwright test --list`, 2026-11-28) | no new failures |
 | `palette` | 16 tests (8 per theme) | computed-style AA, live hex/`-rgb` parity, no inline palette write, positive control |
 | `motion-chapters` | new | must have a reduced-motion positive control |
 | `career-spine` | 18 tests | sticky/jump/deep-link must stay green |

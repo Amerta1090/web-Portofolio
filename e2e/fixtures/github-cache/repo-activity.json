@@ -1,0 +1,157 @@
+[
+  {
+    "repo_name": "Nyatet-Duwit-PWA",
+    "repo_url": "https://github.com/Amerta1090/Nyatet-Duwit-PWA",
+    "commits": [
+      {
+        "message": "release: V2.0.0 - Polish, Documentation & Launch",
+        "date": "",
+        "url": "https://github.com/Amerta1090/Nyatet-Duwit-PWA/commit/6ae55456afaeb014e4f61ebcdcdb7e7bd2138bde"
+      },
+      {
+        "message": "feat: Sprint 7 - Transfer History, PWA Shortcuts, Update Checker Enhancement",
+        "date": "",
+        "url": "https://github.com/Amerta1090/Nyatet-Duwit-PWA/commit/bab67723ede34b71d5fc91c03ae085eb2614d44d"
+      },
+      {
+        "message": "fix: remove unused imports and parameters",
+        "date": "",
+        "url": "https://github.com/Amerta1090/Nyatet-Duwit-PWA/commit/15f83b28c9fc6bc57ac4670aecf9b85037242868"
+      },
+      {
+        "message": "fix: resolve build errors in Review page, encryption store, and utility",
+        "date": "",
+        "url": "https://github.com/Amerta1090/Nyatet-Duwit-PWA/commit/998f5056c6d5659244895b6d6535e40ded463b37"
+      },
+      {
+        "message": "feat: Sprint 6 - Encryption Toggle, Smart Notification, Review Enhancements",
+        "date": "",
+        "url": "https://github.com/Amerta1090/Nyatet-Duwit-PWA/commit/785d496cd15460f797f1fa2474b337331d38e93b"
+      }
+    ]
+  },
+  {
+    "repo_name": "web-Portofolio",
+    "repo_url": "https://github.com/Amerta1090/web-Portofolio",
+    "commits": [
+      {
+        "message": "fix: replace lucide-react Mail with custom IconMail component",
+        "date": "",
+        "url": "https://github.com/Amerta1090/web-Portofolio/commit/2d3f880d4b9fdfd206fe63347380a2de8779aff3"
+      },
+      {
+        "message": "fix: game mode menu, brand icons, testimonial & honor visuals",
+        "date": "",
+        "url": "https://github.com/Amerta1090/web-Portofolio/commit/e47ac28b2f9de93d1445cbf573181a8a05e67a52"
+      },
+      {
+        "message": "feat: integrate project images, company logos & fix asset paths",
+        "date": "",
+        "url": "https://github.com/Amerta1090/web-Portofolio/commit/577418f274eb882c329e391d768d185df3ba9229"
+      },
+      {
+        "message": "hero: foto lebih ke atas, rotating border diaktifkan kembali",
+        "date": "",
+        "url": "https://github.com/Amerta1090/web-Portofolio/commit/34b2a72d4a2541e39de2bd5bbbfe67e1c99ab225"
+      },
+      {
+        "message": "hero: left-align content, avatar tetap di atas teks",
+        "date": "",
+        "url": "https://github.com/Amerta1090/web-Portofolio/commit/19ccf4e346d1d3fcf049ed93dd00f026a3d89333"
+      }
+    ]
+  },
+  {
+    "repo_name": "2.5Dgame-portf",
+    "repo_url": "https://github.com/Amerta1090/2.5Dgame-portf",
+    "commits": [
+      {
+        "message": "Phase 12: Visual Design Overhaul — Persona-style SVG system, zone background geometric overlays, UI polish, pixel art enhancement, performance optimizations",
+        "date": "",
+        "url": "https://github.com/Amerta1090/2.5Dgame-portf/commit/7b6c275fdd7c938684c3bbb185b6b904d979e90f"
+      },
+      {
+        "message": "Phase 11: Launch — SEO, resume page, deploy config, documentation",
+        "date": "",
+        "url": "https://github.com/Amerta1090/2.5Dgame-portf/commit/7fae09d75b37f17442d1762474da7d184b3123cc"
+      },
+      {
+        "message": "Phase 10: Content Integration & Tuning — fix CI, tune puzzles, lore fragments, commentary, easter eggs, perf/a11y",
+        "date": "",
+        "url": "https://github.com/Amerta1090/2.5Dgame-portf/commit/95000cbce1ca7731441279e329f02e4a5c4c5a9d"
+      },
+      {
+        "message": "Phase 9: UI Components — screens, pause menu, dialogue box, toasts, effects, portfolio",
+        "date": "",
+        "url": "https://github.com/Amerta1090/2.5Dgame-portf/commit/4bd60ea4cd0d334a9bc3a2790cdaa890900471cf"
+      },
+      {
+        "message": "Phase 8: Zone 6 Final Room — circular room, pedestal, monologue, stats, credits",
+        "date": "",
+        "url": "https://github.com/Amerta1090/2.5Dgame-portf/commit/c99c8aff23ba61ddba9f34b87cdbe45946d0623d"
+      }
+    ]
+  },
+  {
+    "repo_name": "game-portfolio",
+    "repo_url": "https://github.com/Amerta1090/game-portfolio",
+    "commits": [
+      {
+        "message": "Asset production: procedural textures, door frames, terminal screens, fragment burst, audio tuning, UI polish",
+        "date": "",
+        "url": "https://github.com/Amerta1090/game-portfolio/commit/5254f545d2096bae7ce138ba9ed45d9db3746cfb"
+      },
+      {
+        "message": "fix: camera initial position behind player so +X maps to screen right immediately",
+        "date": "",
+        "url": "https://github.com/Amerta1090/game-portfolio/commit/07b6b444ba3cdecdcc463b9b96f4e8db2270545a"
+      },
+      {
+        "message": "fix: reset player rotation on game start to prevent stale rotation from breaking strafe direction",
+        "date": "",
+        "url": "https://github.com/Amerta1090/game-portfolio/commit/5521bd77bbc3f0d07ca034077212b5bc06ca6bd8"
+      },
+      {
+        "message": "fix: WASD movement now uses player-relative directions instead of rotating player",
+        "date": "",
+        "url": "https://github.com/Amerta1090/game-portfolio/commit/ff00f4a47216871f0b68e576fb432b8e84c42285"
+      },
+      {
+        "message": "Sprint 7: Performance + QA — tier detection, edge cases, accessibility, code splitting, bug fixes",
+        "date": "",
+        "url": "https://github.com/Amerta1090/game-portfolio/commit/3f167ec4cf3ea9276c82113bc33af60790d22cfc"
+      }
+    ]
+  },
+  {
+    "repo_name": "IHSG-Ijo-Plis-Django",
+    "repo_url": "https://github.com/Amerta1090/IHSG-Ijo-Plis-Django",
+    "commits": [
+      {
+        "message": "docs: add README with project overview, setup guide, and API docs",
+        "date": "",
+        "url": "https://github.com/Amerta1090/IHSG-Ijo-Plis-Django/commit/82033aed4c655a400fb0722bf3a7ea81047feeeb"
+      },
+      {
+        "message": "feat: FORCE_REFRESH button triggers retrain_all via API",
+        "date": "",
+        "url": "https://github.com/Amerta1090/IHSG-Ijo-Plis-Django/commit/b2a65d8aa2232bbb0e7d5e65694bc3b132c5e13e"
+      },
+      {
+        "message": "fix: Railway deployment with PostgreSQL DATABASE_URL, update Dockerfile and Worker proxy",
+        "date": "",
+        "url": "https://github.com/Amerta1090/IHSG-Ijo-Plis-Django/commit/edced52cbb93dc884129e10d49a0020ab51e8f5a"
+      },
+      {
+        "message": "feat: update branding and navigation logo with brutalist-inspired hover effects",
+        "date": "",
+        "url": "https://github.com/Amerta1090/IHSG-Ijo-Plis-Django/commit/d1e808ff423c5cbefb755ea03611a621973c6ac2"
+      },
+      {
+        "message": "feat: implement brutalist aesthetic redesign for dashboard UI and metrics components",
+        "date": "",
+        "url": "https://github.com/Amerta1090/IHSG-Ijo-Plis-Django/commit/da69152ce92bcf1713d2a7b1a3338f6f787706b3"
+      }
+    ]
+  }
+]

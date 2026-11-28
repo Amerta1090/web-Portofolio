@@ -12,12 +12,18 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   webServer: {
-    // Lokal: skip fetch-data GitHub (pakai .cache) — build data fresh hanya di CI.
-    command: process.env.CI
-      ? "bun run build && bunx astro preview --port 4321"
-      : "bun run build:fast && bunx astro preview --port 4321",
+    // Both tiers use `build:fast` (validate-data + astro build): CI has no
+    // `.cache/github`, so the workflow copies `e2e/fixtures/github-cache/` in
+    // first and the build must not run `fetch-data` (network + a token, and a
+    // dataset that changes daily — a gate whose inputs move cannot report a
+    // regression). Production deploys still use `bun run build`.
+    command: "bun run build:fast && bunx astro preview --port 4321",
     port: 4321,
     reuseExistingServer: !process.env.CI,
-    timeout: 180000,
+    // Measured `build:fast` on this 4-core/3 GB box: 3m16s. The old 180s budget
+    // made a cold local run fail before the first test. CI keeps 180s (faster
+    // runner); locally prefer `bun run serve &` or `gate:sprint` so this build
+    // is skipped entirely.
+    timeout: process.env.CI ? 180000 : 420000,
   },
 });

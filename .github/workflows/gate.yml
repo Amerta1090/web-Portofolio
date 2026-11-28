@@ -1,0 +1,67 @@
+# Gate — two tiers, so a local session never waits for the slow one.
+#
+# fast  : unit suite + astro type-check against the committed baseline. ~2-3 min.
+# sprint: build + the whole e2e suite + dead-link check. ~20-40 min locally;
+#         this is the tier that moves off the dev box.
+#
+# Why the sprint tier lives here: ~400 Playwright tests on a 4-core/3 GB box cost
+# 6-24 minutes per run and the first run is usually red, so a sprint paid it
+# twice. Locally you run `bun run gate:fast` per batch of 3-5 tasks and let this
+# workflow run the rest.
+#
+# Data: `.cache/github/` is gitignored, so this job copies the committed
+# `e2e/fixtures/github-cache/` snapshot in before building. No token, no network,
+# and the same dataset every run — the e2e suite asserts code, not today's stars.
+name: Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fast:
+    name: fast gate — unit + types
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bun run validate-data
+      - run: bun run gate:full
+
+  e2e:
+    name: sprint gate — build + full e2e + links
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: fast
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bunx playwright install --with-deps chromium
+      # Same fixture the local `build:fast` path validates against.
+      - run: mkdir -p .cache/github && cp e2e/fixtures/github-cache/*.json .cache/github/
+      - run: bun run validate-data
+      # Playwright's webServer runs `bun run build:fast` itself (see
+      # playwright.config.ts), so this is the single build of the job and
+      # `check:links` reads the same dist/ afterwards.
+      - run: bun run test:e2e
+      - run: bun run check:links
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7

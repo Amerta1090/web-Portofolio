@@ -5,7 +5,16 @@
 
 ## Project
 Astro SSG portfolio for **Abdul Majid Ridwan Tyastonoatmaja** (AI/ML Engineer & Systems Builder).
-Stack: Astro + React islands + TailwindCSS + Framer Motion + GSAP + D3 + Three.js/R3F + TypeScript + Bun.
+Stack: Astro + React islands + TailwindCSS + motion + GSAP + D3 + Three.js/R3F + TypeScript + Bun.
+
+## Verification contract (read before running gates)
+- **Batch 3–5 tasks per pass**, then `bun run gate:fast` (~2 min: `vitest --changed` + `check:types`). Red gate stops the batch. Do not run the sprint gate per task.
+- `bun run gate:full` once just before committing (`--changed` compares against `HEAD`, so it runs nothing after a commit).
+- `bun run gate:sprint` (build + `check:links` + full e2e `--workers=1`, 20–40 min) runs **once at sprint close, or in CI** (`.github/workflows/gate.yml`). Locally: `bun run serve &` on `[::1]:4321` first, or Playwright's `webServer` rebuilds past its 180 s timeout.
+- `check:types` = `astro check` vs `scripts/astro-baseline.json` (multiset of `file|kind|ts-code`; line numbers ignored). `bun run check:types:update` only when a change legitimately adds/removes diagnostics. Baseline today: 89 errors / 71 warnings.
+- **Gates**: unit suite · `check:types` · `validate-data` · build page count · `check:links` · payload per route · scroll-listener count · MotionScore tier D/F.
+- **Not gates** (record the range, never A/B): homepage MotionScore grade 52–63 on identical code · `rectReads` 73–79 · GPU ≈ 606 MB (environmental floor) · `idleFps` ±40.
+- Full table: `docs/motion/QA_CHECKLIST.md` §0.1–§0.2.
 
 ## Sprint State
 - Epic 1 (Data Layer): ✅ COMPLETE

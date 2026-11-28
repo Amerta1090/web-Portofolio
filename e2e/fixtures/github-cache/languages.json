@@ -1,0 +1,42 @@
+[
+  {
+    "language": "Jupyter Notebook",
+    "percentage": 56.4
+  },
+  {
+    "language": "Java",
+    "percentage": 15.8
+  },
+  {
+    "language": "TypeScript",
+    "percentage": 12.1
+  },
+  {
+    "language": "Kotlin",
+    "percentage": 7
+  },
+  {
+    "language": "HTML",
+    "percentage": 3.1
+  },
+  {
+    "language": "Python",
+    "percentage": 3.1
+  },
+  {
+    "language": "JavaScript",
+    "percentage": 1.1
+  },
+  {
+    "language": "Astro",
+    "percentage": 1.1
+  },
+  {
+    "language": "CSS",
+    "percentage": 0.3
+  },
+  {
+    "language": "Makefile",
+    "percentage": 0
+  }
+]
